@@ -1,0 +1,61 @@
+# Config file for Air (Go hot-reloader) in DiscoPanel
+# https://github.com/air-verse/air
+
+root = "."
+testdata_dir = "testdata"
+tmp_dir = "tmp"
+
+[build]
+  args_bins = []
+  bin = "./tmp/discopanel-dev"
+  cmd = "go build -o ./tmp/discopanel-dev cmd/discopanel/main.go"
+  delay = 1000
+  exclude_dir = [
+    "data",
+    "backups",
+    "build",
+    "web",
+    "docs",
+    "tmp",
+    ".git",
+    ".vscode",
+    "node_modules",
+    "oidc"
+  ]
+  exclude_file = []
+  exclude_regex = ["_test.go", ".*\\.db.*"]
+  exclude_unchanged = false
+  follow_symlink = false
+  full_bin = ""
+  include_dir = ["cmd", "internal", "pkg"]
+  include_ext = ["go", "yaml", "yml", "json"]
+  include_file = []
+  kill_delay = "500ms"
+  log = "build-errors.log"
+  poll = false
+  poll_interval = 0
+  post_cmd = []
+  pre_cmd = []
+  rerun = false
+  rerun_delay = 500
+  send_interrupt = true
+  stop_on_error = true
+
+[color]
+  app = ""
+  build = "yellow"
+  main = "magenta"
+  runner = "green"
+  watcher = "cyan"
+
+[log]
+  main_only = false
+  silent = false
+  time = false
+
+[misc]
+  clean_on_exit = true
+
+[screen]
+  clear_on_rebuild = false
+  keep_scroll = true
