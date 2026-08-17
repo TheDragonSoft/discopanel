@@ -1,0 +1,193 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Dev: Start All (Dual Mode Backend + Frontend)",
+      "type": "shell",
+      "windows": {
+        "command": "powershell -ExecutionPolicy Bypass -File ./scripts/dev-start.ps1"
+      },
+      "linux": {
+        "command": "./scripts/dev-start.sh"
+      },
+      "osx": {
+        "command": "./scripts/dev-start.sh"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated",
+        "clear": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Dev: Environment Pre-Flight Check",
+      "type": "shell",
+      "windows": {
+        "command": "powershell -ExecutionPolicy Bypass -File ./scripts/dev-check.ps1"
+      },
+      "linux": {
+        "command": "./scripts/dev-check.sh"
+      },
+      "osx": {
+        "command": "./scripts/dev-check.sh"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Go: Run Backend",
+      "type": "shell",
+      "command": "go run cmd/discopanel/main.go",
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": ["$go"]
+    },
+    {
+      "label": "Go: Build Standalone Binary",
+      "type": "shell",
+      "command": "go build -o build/discopanel cmd/discopanel/main.go",
+      "windows": {
+        "command": "go build -o build/discopanel.exe cmd/discopanel/main.go"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$go"]
+    },
+    {
+      "label": "Go: Run All Tests",
+      "type": "shell",
+      "command": "go test -v ./...",
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": ["$go"]
+    },
+    {
+      "label": "Go: Mod Tidy",
+      "type": "shell",
+      "command": "go mod tidy",
+      "presentation": {
+        "reveal": "silent"
+      },
+      "problemMatcher": ["$go"]
+    },
+    {
+      "label": "Web: Run Dev Server (Vite)",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": {
+        "cwd": "${workspaceFolder}/web/discopanel"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      "label": "Web: Build Frontend",
+      "type": "shell",
+      "command": "npm run build",
+      "options": {
+        "cwd": "${workspaceFolder}/web/discopanel"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Web: Type Check",
+      "type": "shell",
+      "command": "npm run check",
+      "options": {
+        "cwd": "${workspaceFolder}/web/discopanel"
+      },
+      "group": "test",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Web: Install Dependencies",
+      "type": "shell",
+      "command": "npm install",
+      "options": {
+        "cwd": "${workspaceFolder}/web/discopanel"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Buf: Clean & Regenerate Protos",
+      "type": "shell",
+      "windows": {
+        "command": "docker run --rm -v ${workspaceFolder}:/workspace -w /workspace bufbuild/buf:latest generate"
+      },
+      "linux": {
+        "command": "make gen"
+      },
+      "osx": {
+        "command": "make gen"
+      },
+      "group": "build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Buf: Lint Protos",
+      "type": "shell",
+      "windows": {
+        "command": "docker run --rm -v ${workspaceFolder}:/workspace -w /workspace bufbuild/buf:latest lint"
+      },
+      "linux": {
+        "command": "make proto-lint"
+      },
+      "osx": {
+        "command": "make proto-lint"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Docker: Compose Up (dev-docker)",
+      "type": "shell",
+      "command": "docker compose up --build",
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    }
+  ]
+}
