@@ -667,7 +667,7 @@
 													<Button
 														size="sm"
 														class="gap-1.5 bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-500 dark:text-black dark:hover:bg-amber-400 shadow-sm"
-														onclick={() => window.open('https://playit.gg/manage/tunnels', '_blank')}
+														onclick={() => window.open('https://playit.gg/account/setup/new-tunnel', '_blank')}
 													>
 														<ExternalLink class="h-3.5 w-3.5" />
 														Add Port {t.targetPort} on Playit.gg
@@ -1166,7 +1166,7 @@
 				size="sm"
 				class="gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
 				onclick={() => {
-					window.open('https://playit.gg/manage/tunnels', '_blank');
+					window.open('https://playit.gg/account/setup/new-tunnel', '_blank');
 				}}
 			>
 				<ExternalLink class="h-3.5 w-3.5" />
