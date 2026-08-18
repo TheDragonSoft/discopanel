@@ -1,0 +1,220 @@
+syntax = "proto3";
+
+package discopanel.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1";
+
+// TunnelService manages WAN internet tunnels (Playit.gg) for exposing game servers and sidecars
+service TunnelService {
+  // GetServerTunnels returns all active and configured tunnels for a specific server
+  rpc GetServerTunnels(GetServerTunnelsRequest) returns (GetServerTunnelsResponse);
+  // ListTunnels returns all tunnels across all servers
+  rpc ListTunnels(ListTunnelsRequest) returns (ListTunnelsResponse);
+  // GetTunnel returns a specific tunnel by ID
+  rpc GetTunnel(GetTunnelRequest) returns (GetTunnelResponse);
+  // CreateTunnel creates and starts a new tunnel for a server
+  rpc CreateTunnel(CreateTunnelRequest) returns (CreateTunnelResponse);
+  // UpdateTunnel updates configuration for an existing tunnel
+  rpc UpdateTunnel(UpdateTunnelRequest) returns (UpdateTunnelResponse);
+  // DeleteTunnel stops and removes a tunnel and its container
+  rpc DeleteTunnel(DeleteTunnelRequest) returns (DeleteTunnelResponse);
+  // StartTunnel starts a stopped tunnel container
+  rpc StartTunnel(StartTunnelRequest) returns (StartTunnelResponse);
+  // StopTunnel stops a running tunnel container
+  rpc StopTunnel(StopTunnelRequest) returns (StopTunnelResponse);
+  // RestartTunnel restarts a tunnel container
+  rpc RestartTunnel(RestartTunnelRequest) returns (RestartTunnelResponse);
+  // GetTunnelLogs retrieves recent container logs for a tunnel
+  rpc GetTunnelLogs(GetTunnelLogsRequest) returns (GetTunnelLogsResponse);
+  
+  // Playit Account Linking
+  // GetPlayitAccountConfig checks if a global Playit account secret is configured
+  rpc GetPlayitAccountConfig(GetPlayitAccountConfigRequest) returns (GetPlayitAccountConfigResponse);
+  // StartAccountLinkSession starts an interactive account claim flow with Playit.gg
+  rpc StartAccountLinkSession(StartAccountLinkSessionRequest) returns (StartAccountLinkSessionResponse);
+  // CheckAccountLinkStatus polls/checks if the account link session was claimed and saves the secret
+  rpc CheckAccountLinkStatus(CheckAccountLinkStatusRequest) returns (CheckAccountLinkStatusResponse);
+  // SetPlayitAccountSecret manually saves or updates a Playit account secret key
+  rpc SetPlayitAccountSecret(SetPlayitAccountSecretRequest) returns (SetPlayitAccountSecretResponse);
+  // UnlinkPlayitAccount removes the stored global Playit account secret key
+  rpc UnlinkPlayitAccount(UnlinkPlayitAccountRequest) returns (UnlinkPlayitAccountResponse);
+}
+
+// TunnelProvider specifies the backend tunneling service
+enum TunnelProvider {
+  TUNNEL_PROVIDER_UNSPECIFIED = 0;
+  TUNNEL_PROVIDER_PLAYIT = 1;
+}
+
+// TunnelStatus represents the runtime state of a tunnel
+enum TunnelStatus {
+  TUNNEL_STATUS_UNSPECIFIED = 0;
+  TUNNEL_STATUS_STOPPED = 1;
+  TUNNEL_STATUS_STARTING = 2;
+  TUNNEL_STATUS_CLAIM_PENDING = 3;
+  TUNNEL_STATUS_RUNNING = 4;
+  TUNNEL_STATUS_ERROR = 5;
+}
+
+// TunnelProtocol represents transport protocol
+enum TunnelProtocol {
+  TUNNEL_PROTOCOL_UNSPECIFIED = 0;
+  TUNNEL_PROTOCOL_TCP = 1;
+  TUNNEL_PROTOCOL_UDP = 2;
+  TUNNEL_PROTOCOL_BOTH = 3;
+}
+
+// Tunnel represents a configured tunnel instance
+message Tunnel {
+  string id = 1;
+  string server_id = 2;
+  string server_name = 3;
+  TunnelProvider provider = 4;
+  string name = 5;
+  TunnelProtocol protocol = 6;
+  string target_host = 7;
+  int32 target_port = 8;
+  string container_id = 9;
+  TunnelStatus status = 10;
+  string claim_url = 11;
+  string claim_code = 12;
+  bool is_account_linked = 13;
+  string public_address = 14;
+  int32 public_port = 15;
+  bool auto_start = 16;
+  bool follow_server_lifecycle = 17;
+  google.protobuf.Timestamp created_at = 18;
+  google.protobuf.Timestamp updated_at = 19;
+}
+
+message GetServerTunnelsRequest {
+  string server_id = 1;
+}
+
+message GetServerTunnelsResponse {
+  repeated Tunnel tunnels = 1;
+  bool has_global_account = 2;
+}
+
+message ListTunnelsRequest {}
+
+message ListTunnelsResponse {
+  repeated Tunnel tunnels = 1;
+  bool has_global_account = 2;
+}
+
+message GetTunnelRequest {
+  string id = 1;
+}
+
+message GetTunnelResponse {
+  Tunnel tunnel = 1;
+}
+
+message CreateTunnelRequest {
+  string server_id = 1;
+  string name = 2;
+  TunnelProvider provider = 3;
+  TunnelProtocol protocol = 4;
+  int32 target_port = 5;
+  optional string target_host = 6;
+  optional bool auto_start = 7;
+  optional bool follow_server_lifecycle = 8;
+}
+
+message CreateTunnelResponse {
+  Tunnel tunnel = 1;
+}
+
+message UpdateTunnelRequest {
+  string id = 1;
+  optional string name = 2;
+  optional bool auto_start = 3;
+  optional bool follow_server_lifecycle = 4;
+}
+
+message UpdateTunnelResponse {
+  Tunnel tunnel = 1;
+}
+
+message DeleteTunnelRequest {
+  string id = 1;
+}
+
+message DeleteTunnelResponse {
+  string status = 1;
+}
+
+message StartTunnelRequest {
+  string id = 1;
+}
+
+message StartTunnelResponse {
+  Tunnel tunnel = 1;
+}
+
+message StopTunnelRequest {
+  string id = 1;
+}
+
+message StopTunnelResponse {
+  Tunnel tunnel = 1;
+}
+
+message RestartTunnelRequest {
+  string id = 1;
+}
+
+message RestartTunnelResponse {
+  Tunnel tunnel = 1;
+}
+
+message GetTunnelLogsRequest {
+  string id = 1;
+  int32 tail = 2;
+}
+
+message GetTunnelLogsResponse {
+  repeated string logs = 1;
+}
+
+message GetPlayitAccountConfigRequest {}
+
+message GetPlayitAccountConfigResponse {
+  bool is_linked = 1;
+  string notice = 2;
+}
+
+message StartAccountLinkSessionRequest {}
+
+message StartAccountLinkSessionResponse {
+  string session_id = 1;
+  string claim_url = 2;
+  string claim_code = 3;
+  google.protobuf.Timestamp expires_at = 4;
+}
+
+message CheckAccountLinkStatusRequest {
+  string session_id = 1;
+}
+
+message CheckAccountLinkStatusResponse {
+  bool is_linked = 1;
+  string status = 2;
+}
+
+message SetPlayitAccountSecretRequest {
+  string secret_key = 1;
+}
+
+message SetPlayitAccountSecretResponse {
+  bool success = 1;
+}
+
+message UnlinkPlayitAccountRequest {}
+
+message UnlinkPlayitAccountResponse {
+  bool success = 1;
+}

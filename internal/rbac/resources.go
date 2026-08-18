@@ -16,6 +16,7 @@ const (
 	ResourceSettings        = "settings"
 	ResourceSupport         = "support"
 	ResourceUploads         = "uploads"
+	ResourceTunnels         = "tunnels"
 )
 
 // Action constants
@@ -46,7 +47,7 @@ var AllActions = []string{
 var AllResources = []string{
 	ResourceServers, ResourceServerConfig, ResourceMods,
 	ResourceModpacks, ResourceModules, ResourceModuleTemplates,
-	ResourceFiles, ResourceTasks, ResourceProxy,
+	ResourceFiles, ResourceTasks, ResourceProxy, ResourceTunnels,
 	ResourceUsers, ResourceRoles, ResourceSettings,
 	ResourceSupport, ResourceUploads,
 }
@@ -65,6 +66,7 @@ var ResourceScopeSource = map[string]string{
 	ResourceModpacks:        ResourceModpacks,
 	ResourceProxy:           ResourceProxy,
 	ResourceTasks:           ResourceTasks,
+	ResourceTunnels:         ResourceServers,
 }
 
 // ResourceActionsFromProcedures derives which actions are valid for each

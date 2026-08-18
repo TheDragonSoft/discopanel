@@ -228,7 +228,7 @@
 	</div>
 {:else if server}
 	<div
-		class="flex h-full flex-col bg-linear-to-br from-background to-muted/20 p-4 pt-4 sm:p-6 sm:pt-6 lg:p-8"
+		class="flex min-h-full min-w-0 max-w-full flex-col bg-linear-to-br from-background to-muted/20 p-4 pt-4 sm:p-6 sm:pt-6 lg:p-8"
 	>
 		<div
 			class="mb-4 flex shrink-0 flex-col items-start justify-between gap-4 border-b-2 border-border/50 pb-4 sm:mb-6 sm:flex-row sm:items-center sm:pb-6"
@@ -1012,59 +1012,59 @@
 
 		<Tabs
 			value="overview"
-			class="flex min-h-0 flex-1 flex-col gap-4"
+			class="flex min-h-0 min-w-0 flex-1 flex-col gap-4"
 			onValueChange={(value) => {
 				activeTab = value;
 			}}
 		>
-			<div class="w-full flex-shrink-0 overflow-x-auto">
+			<div class="w-full min-w-0 max-w-full flex-shrink-0 overflow-x-auto pb-1 scrollbar-thin">
 				<TabsList
-					class="inline-flex h-12 w-full min-w-max bg-muted/50 p-1 backdrop-blur-sm sm:grid sm:h-14 sm:grid-cols-8"
+					class="inline-flex h-11 w-max min-w-full items-center justify-start gap-1 rounded-xl bg-muted/60 p-1 backdrop-blur-sm 2xl:grid 2xl:h-12 2xl:grid-cols-8 2xl:w-full"
 				>
 					<TabsTrigger
 						value="overview"
-						class="px-3 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg sm:px-4 sm:text-sm"
+						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
 						>Overview</TabsTrigger
 					>
 					<TabsTrigger
 						value="console"
-						class="px-3 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg sm:px-4 sm:text-sm"
+						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
 						>Console</TabsTrigger
 					>
 					<TabsTrigger
 						value="configuration"
-						class="px-3 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg sm:px-4 sm:text-sm"
+						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
 						>Config</TabsTrigger
 					>
 					<TabsTrigger
 						value="mods"
-						class="px-3 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg sm:px-4 sm:text-sm"
+						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
 						>Mods</TabsTrigger
 					>
 					<TabsTrigger
 						value="modules"
-						class="px-3 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg sm:px-4 sm:text-sm"
+						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
 						>Modules</TabsTrigger
 					>
 					<TabsTrigger
 						value="files"
-						class="px-3 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg sm:px-4 sm:text-sm"
+						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
 						>Files</TabsTrigger
 					>
 					<TabsTrigger
 						value="tasks"
-						class="px-3 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg sm:px-4 sm:text-sm"
+						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
 						>Tasks</TabsTrigger
 					>
 					<TabsTrigger
 						value="routing"
-						class="px-3 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-lg sm:px-4 sm:text-sm"
-						>Routing</TabsTrigger
+						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
+						>Routing & Exposure</TabsTrigger
 					>
 				</TabsList>
 			</div>
 
-			<div class="min-h-0 flex-1 overflow-hidden">
+			<div class="min-h-0 min-w-0 flex-1">
 				<TabsContent value="overview" class="h-full space-y-4">
 					<Card class="border-border/50 shadow-sm">
 						<CardHeader class="pb-4">

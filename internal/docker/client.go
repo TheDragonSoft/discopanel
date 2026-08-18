@@ -517,6 +517,28 @@ func (c *Client) StartContainer(ctx context.Context, containerID string) error {
 	return nil
 }
 
+// GetContainerLogs retrieves recent container logs directly from Docker engine
+func (c *Client) GetContainerLogs(ctx context.Context, containerID string, tail int) (string, error) {
+	if tail <= 0 {
+		tail = 100
+	}
+	opts := container.LogsOptions{
+		ShowStdout: true,
+		ShowStderr: true,
+		Tail:       fmt.Sprintf("%d", tail),
+		Timestamps: false,
+	}
+	reader, err := c.docker.ContainerLogs(ctx, containerID, opts)
+	if err != nil {
+		return "", err
+	}
+	defer reader.Close()
+
+	var buf bytes.Buffer
+	_, _ = io.Copy(&buf, reader)
+	return buf.String(), nil
+}
+
 // StopContainer stops a container. Returns (containerFound, error).
 // If container doesn't exist, returns (false, nil) so caller can clean up stale references.
 func (c *Client) StopContainer(ctx context.Context, containerID string) (bool, error) {
@@ -755,6 +777,10 @@ func (c *Client) Exec(ctx context.Context, containerID string, execCmd []string)
 // ExecCommand executes a command inside the container and returns the output
 func (c *Client) ExecCommand(ctx context.Context, containerID string, command string) (string, error) {
 	return c.Exec(ctx, containerID, []string{"rcon-cli", command})
+}
+
+func (c *Client) PullImage(ctx context.Context, imageName string) error {
+	return c.pullImage(ctx, imageName)
 }
 
 func (c *Client) pullImage(ctx context.Context, imageName string) error {

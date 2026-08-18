@@ -1,0 +1,550 @@
+package tunnel
+
+import (
+	"context"
+	"fmt"
+	"strings"
+	"sync"
+	"time"
+
+	"github.com/google/uuid"
+	"github.com/nickheyer/discopanel/internal/config"
+	storage "github.com/nickheyer/discopanel/internal/db"
+	"github.com/nickheyer/discopanel/internal/docker"
+	"github.com/nickheyer/discopanel/internal/events"
+	"github.com/nickheyer/discopanel/pkg/logger"
+	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
+)
+
+type AccountLinkSession struct {
+	SessionID   string    `json:"session_id"`
+	ClaimURL    string    `json:"claim_url"`
+	ClaimCode   string    `json:"claim_code"`
+	ContainerID string    `json:"container_id"`
+	ExpiresAt   time.Time `json:"expires_at"`
+	IsLinked    bool      `json:"is_linked"`
+}
+
+type Manager struct {
+	store         *storage.Store
+	docker        *docker.Client
+	driver        *PlayitDriver
+	bus           *events.Bus
+	config        *config.Config
+	logger        *logger.Logger
+	logStreamer   *logger.LogStreamer
+	claimSessions map[string]*AccountLinkSession
+	mu            sync.RWMutex
+	running       bool
+	ctx           context.Context
+	cancel        context.CancelFunc
+}
+
+func NewManager(store *storage.Store, dockerClient *docker.Client, bus *events.Bus, cfg *config.Config, log *logger.Logger) *Manager {
+	return &Manager{
+		store:         store,
+		docker:        dockerClient,
+		driver:        NewPlayitDriver(dockerClient, cfg, log),
+		bus:           bus,
+		config:        cfg,
+		logger:        log,
+		claimSessions: make(map[string]*AccountLinkSession),
+	}
+}
+
+func (m *Manager) SetLogStreamer(streamer *logger.LogStreamer) {
+	m.logStreamer = streamer
+}
+
+func (m *Manager) Start(ctx context.Context) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if m.running {
+		return nil
+	}
+
+	m.ctx, m.cancel = context.WithCancel(ctx)
+	m.running = true
+
+	// Subscribe to server lifecycle events if event bus is available
+	if m.bus != nil {
+		m.bus.Subscribe(m.handleServerEvent)
+	}
+
+	// Auto-start enabled tunnels
+	go m.autoStartTunnels()
+
+	// Launch background monitor/sniffer loop
+	go m.runMonitorLoop(m.ctx)
+
+	m.logger.Info("Tunnel manager started")
+	return nil
+}
+
+func (m *Manager) Stop() error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if !m.running {
+		return nil
+	}
+
+	if m.cancel != nil {
+		m.cancel()
+	}
+
+	m.running = false
+	m.logger.Info("Tunnel manager stopped")
+	return nil
+}
+
+func (m *Manager) autoStartTunnels() {
+	ctx := context.Background()
+	tunnels, err := m.store.ListAutoStartTunnels(ctx)
+	if err != nil {
+		m.logger.Error("Failed to list auto-start tunnels: %v", err)
+		return
+	}
+
+	for _, t := range tunnels {
+		if t.Status != storage.TunnelStatusStopped {
+			continue
+		}
+		// If server is running or not detached, check server status
+		if t.FollowServerLifecycle {
+			server, err := m.store.GetServer(ctx, t.ServerID)
+			if err != nil || server.Status != storage.StatusRunning {
+				continue
+			}
+		}
+
+		m.logger.Info("Auto-starting tunnel: %s (%s)", t.Name, t.ID)
+		if _, err := m.StartTunnel(ctx, t.ID); err != nil {
+			m.logger.Error("Failed to auto-start tunnel %s: %v", t.ID, err)
+		}
+	}
+}
+
+func (m *Manager) handleServerEvent(ctx context.Context, ev events.Event) {
+	if ev.ServerID == "" {
+		return
+	}
+
+	switch ev.Type {
+	case v1.TriggeredEventType_TRIGGERED_EVENT_TYPE_SERVER_START:
+		tunnels, err := m.store.ListTunnelsFollowingServerLifecycle(ctx, ev.ServerID)
+		if err != nil {
+			return
+		}
+		for _, t := range tunnels {
+			if t.Status == storage.TunnelStatusStopped {
+				m.logger.Info("Server %s started, starting tunnel %s", ev.ServerID, t.Name)
+				go func(id string) {
+					_, _ = m.StartTunnel(context.Background(), id)
+				}(t.ID)
+			}
+		}
+
+	case v1.TriggeredEventType_TRIGGERED_EVENT_TYPE_SERVER_STOP:
+		tunnels, err := m.store.ListTunnelsFollowingServerLifecycle(ctx, ev.ServerID)
+		if err != nil {
+			return
+		}
+		for _, t := range tunnels {
+			if t.Status == storage.TunnelStatusRunning || t.Status == storage.TunnelStatusStarting || t.Status == storage.TunnelStatusClaimPending {
+				m.logger.Info("Server %s stopped, stopping tunnel %s", ev.ServerID, t.Name)
+				go func(id string) {
+					_, _ = m.StopTunnel(context.Background(), id)
+				}(t.ID)
+			}
+		}
+	}
+}
+
+func (m *Manager) CreateTunnel(ctx context.Context, serverID, name string, provider v1.TunnelProvider, protocol v1.TunnelProtocol, targetPort int, targetHost string, autoStart, followLifecycle bool) (*storage.Tunnel, error) {
+	server, err := m.store.GetServer(ctx, serverID)
+	if err != nil {
+		return nil, fmt.Errorf("server %s not found: %w", serverID, err)
+	}
+
+	if targetPort <= 0 {
+		targetPort = 25565
+	}
+	if targetHost == "" {
+		targetHost = fmt.Sprintf("discopanel-server-%s", server.ID)
+	}
+	if name == "" {
+		name = fmt.Sprintf("%s Tunnel (%d)", server.Name, targetPort)
+	}
+
+	protoStr := "tcp"
+	if protocol == v1.TunnelProtocol_TUNNEL_PROTOCOL_UDP {
+		protoStr = "udp"
+	} else if protocol == v1.TunnelProtocol_TUNNEL_PROTOCOL_BOTH {
+		protoStr = "both"
+	}
+
+	// Check if global account secret key exists
+	accountSecret, _ := m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
+	isAccountLinked := accountSecret != ""
+
+	tunnel := &storage.Tunnel{
+		ID:                    uuid.New().String(),
+		ServerID:              serverID,
+		Provider:              "playit",
+		Name:                  name,
+		Protocol:              protoStr,
+		TargetHost:            targetHost,
+		TargetPort:            targetPort,
+		Status:                storage.TunnelStatusStopped,
+		IsAccountLinked:       isAccountLinked,
+		AutoStart:             autoStart,
+		FollowServerLifecycle: followLifecycle,
+		CreatedAt:             time.Now().UTC(),
+		UpdatedAt:             time.Now().UTC(),
+	}
+
+	if err := m.store.CreateTunnel(ctx, tunnel); err != nil {
+		return nil, fmt.Errorf("failed to save tunnel in database: %w", err)
+	}
+
+	// Automatically start the tunnel
+	startedTunnel, err := m.StartTunnel(ctx, tunnel.ID)
+	if err != nil {
+		m.logger.Warn("Created tunnel %s but failed to start container immediately: %v", tunnel.ID, err)
+		return tunnel, nil
+	}
+
+	return startedTunnel, nil
+}
+
+func (m *Manager) StartTunnel(ctx context.Context, tunnelID string) (*storage.Tunnel, error) {
+	tunnel, err := m.store.GetTunnel(ctx, tunnelID)
+	if err != nil {
+		return nil, err
+	}
+
+	server, err := m.store.GetServer(ctx, tunnel.ServerID)
+	if err != nil {
+		return nil, fmt.Errorf("server not found: %w", err)
+	}
+
+	// Fetch global account secret key
+	accountSecret, _ := m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
+	if accountSecret != "" {
+		tunnel.IsAccountLinked = true
+	}
+
+	// Remove old container if it exists
+	if tunnel.ContainerID != "" {
+		_ = m.docker.RemoveContainer(ctx, tunnel.ContainerID)
+		tunnel.ContainerID = ""
+	}
+
+	// Create fresh container
+	containerID, err := m.driver.CreateContainer(ctx, tunnel, server, accountSecret)
+	if err != nil {
+		tunnel.Status = storage.TunnelStatusError
+		_ = m.store.UpdateTunnel(ctx, tunnel)
+		return nil, fmt.Errorf("failed to create tunnel container: %w", err)
+	}
+
+	tunnel.ContainerID = containerID
+	tunnel.Status = storage.TunnelStatusStarting
+
+	// Start container
+	if err := m.docker.StartContainer(ctx, containerID); err != nil {
+		tunnel.Status = storage.TunnelStatusError
+		_ = m.store.UpdateTunnel(ctx, tunnel)
+		return nil, fmt.Errorf("failed to start tunnel container: %w", err)
+	}
+
+	if err := m.store.UpdateTunnel(ctx, tunnel); err != nil {
+		m.logger.Error("Failed to update tunnel status: %v", err)
+	}
+
+	return tunnel, nil
+}
+
+func (m *Manager) StopTunnel(ctx context.Context, tunnelID string) (*storage.Tunnel, error) {
+	tunnel, err := m.store.GetTunnel(ctx, tunnelID)
+	if err != nil {
+		return nil, err
+	}
+
+	if tunnel.ContainerID != "" {
+		_, _ = m.docker.StopContainer(ctx, tunnel.ContainerID)
+	}
+
+	tunnel.Status = storage.TunnelStatusStopped
+	if err := m.store.UpdateTunnel(ctx, tunnel); err != nil {
+		return nil, err
+	}
+
+	return tunnel, nil
+}
+
+func (m *Manager) RestartTunnel(ctx context.Context, tunnelID string) (*storage.Tunnel, error) {
+	_, err := m.StopTunnel(ctx, tunnelID)
+	if err != nil {
+		m.logger.Warn("Error stopping tunnel %s during restart: %v", tunnelID, err)
+	}
+	return m.StartTunnel(ctx, tunnelID)
+}
+
+func (m *Manager) DeleteTunnel(ctx context.Context, tunnelID string) error {
+	tunnel, err := m.store.GetTunnel(ctx, tunnelID)
+	if err != nil {
+		return err
+	}
+
+	if tunnel.ContainerID != "" {
+		_, _ = m.docker.StopContainer(ctx, tunnel.ContainerID)
+		_ = m.docker.RemoveContainer(ctx, tunnel.ContainerID)
+	}
+
+	return m.store.DeleteTunnel(ctx, tunnelID)
+}
+
+func (m *Manager) GetTunnelLogs(ctx context.Context, tunnelID string, tail int) ([]string, error) {
+	tunnel, err := m.store.GetTunnel(ctx, tunnelID)
+	if err != nil {
+		return nil, err
+	}
+
+	if tunnel.ContainerID == "" {
+		return []string{}, nil
+	}
+
+	if tail <= 0 {
+		tail = 100
+	}
+
+	rawLogs, err := m.docker.GetContainerLogs(ctx, tunnel.ContainerID, tail)
+	if err != nil {
+		return nil, err
+	}
+
+	lines := strings.Split(rawLogs, "\n")
+	result := make([]string, 0, len(lines))
+	for _, l := range lines {
+		trimmed := strings.TrimSpace(l)
+		if trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+
+	return result, nil
+}
+
+func (m *Manager) GetServerTunnels(ctx context.Context, serverID string) ([]*storage.Tunnel, error) {
+	return m.store.GetServerTunnels(ctx, serverID)
+}
+
+func (m *Manager) ListTunnels(ctx context.Context) ([]*storage.Tunnel, error) {
+	return m.store.ListTunnels(ctx)
+}
+
+func (m *Manager) GetTunnel(ctx context.Context, id string) (*storage.Tunnel, error) {
+	return m.store.GetTunnel(ctx, id)
+}
+
+func (m *Manager) GetPlayitAccountConfig(ctx context.Context) (bool, string, error) {
+	secret, err := m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
+	if err != nil {
+		return false, "", err
+	}
+	if secret != "" {
+		return true, "Playit.gg account is linked. All tunnels automatically inherit your account credentials.", nil
+	}
+	return false, "No Playit.gg account linked. Tunnels run in guest mode with claim links.", nil
+}
+
+func (m *Manager) SetPlayitAccountSecret(ctx context.Context, secretKey string) error {
+	secretKey = strings.TrimSpace(secretKey)
+	if secretKey == "" {
+		return m.store.DeleteSystemSetting(ctx, PlayitAccountSecretKey)
+	}
+	return m.store.SetSystemSetting(ctx, PlayitAccountSecretKey, secretKey)
+}
+
+func (m *Manager) UnlinkPlayitAccount(ctx context.Context) error {
+	return m.store.DeleteSystemSetting(ctx, PlayitAccountSecretKey)
+}
+
+func (m *Manager) StartAccountLinkSession(ctx context.Context) (*AccountLinkSession, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	sessionID := uuid.New().String()
+	tempTunnel := &storage.Tunnel{
+		ID:         "setup-" + sessionID[:8],
+		ServerID:   "system-setup",
+		TargetHost: "127.0.0.1",
+		TargetPort: 25565,
+	}
+
+	// Launch temporary setup container to generate claim URL
+	containerID, err := m.driver.CreateContainer(ctx, tempTunnel, &storage.Server{ID: "setup"}, "")
+	if err != nil {
+		return nil, fmt.Errorf("failed to start account setup container: %w", err)
+	}
+
+	if err := m.docker.StartContainer(ctx, containerID); err != nil {
+		_ = m.docker.RemoveContainer(ctx, containerID)
+		return nil, fmt.Errorf("failed to run account setup container: %w", err)
+	}
+
+	session := &AccountLinkSession{
+		SessionID:   sessionID,
+		ContainerID: containerID,
+		ExpiresAt:   time.Now().Add(10 * time.Minute),
+	}
+
+	// Poll briefly for initial claim URL
+	for i := 0; i < 6; i++ {
+		time.Sleep(1 * time.Second)
+		rawLogs, err := m.docker.GetContainerLogs(ctx, containerID, 30)
+		if err == nil {
+			lines := strings.Split(rawLogs, "\n")
+			claimURL, claimCode, _, _, _ := m.driver.SniffLogs(lines)
+			if claimURL != "" {
+				session.ClaimURL = claimURL
+				session.ClaimCode = claimCode
+				break
+			}
+		}
+	}
+
+	m.claimSessions[sessionID] = session
+	return session, nil
+}
+
+func (m *Manager) CheckAccountLinkStatus(ctx context.Context, sessionID string) (bool, string, error) {
+	m.mu.Lock()
+	session, exists := m.claimSessions[sessionID]
+	m.mu.Unlock()
+
+	if !exists {
+		return false, "session not found", fmt.Errorf("session not found or expired")
+	}
+
+	if session.IsLinked {
+		return true, "linked", nil
+	}
+
+	if session.ContainerID == "" {
+		return false, "container stopped", nil
+	}
+
+	rawLogs, err := m.docker.GetContainerLogs(ctx, session.ContainerID, 50)
+	if err != nil {
+		return false, "error checking logs", err
+	}
+
+	lines := strings.Split(rawLogs, "\n")
+	claimURL, claimCode, _, _, isRunning := m.driver.SniffLogs(lines)
+	if session.ClaimURL == "" && claimURL != "" {
+		session.ClaimURL = claimURL
+		session.ClaimCode = claimCode
+	}
+
+	// Check if secret key or connection was established after claiming
+	for _, l := range lines {
+		if strings.Contains(l, "secret key:") || strings.Contains(l, "Agent registered") || isRunning {
+			// Extract secret or confirm linked
+			session.IsLinked = true
+			_ = m.store.SetSystemSetting(ctx, PlayitAccountSecretKey, "auto_linked_via_playit_claim")
+			// Clean up setup container
+			go func(cID string) {
+				time.Sleep(2 * time.Second)
+				_, _ = m.docker.StopContainer(context.Background(), cID)
+				_ = m.docker.RemoveContainer(context.Background(), cID)
+			}(session.ContainerID)
+
+			return true, "Account successfully linked to Playit.gg!", nil
+		}
+	}
+
+	return false, "waiting for user to claim in browser", nil
+}
+
+func (m *Manager) runMonitorLoop(ctx context.Context) {
+	ticker := time.NewTicker(4 * time.Second)
+	defer ticker.Stop()
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+		case <-ticker.C:
+			m.pollActiveTunnels(ctx)
+		}
+	}
+}
+
+func (m *Manager) pollActiveTunnels(ctx context.Context) {
+	tunnels, err := m.store.ListTunnels(ctx)
+	if err != nil {
+		return
+	}
+
+	for _, t := range tunnels {
+		if t.Status == storage.TunnelStatusStopped || t.ContainerID == "" {
+			continue
+		}
+
+		// Inspect container status
+		status, err := m.docker.GetContainerStatus(ctx, t.ContainerID)
+		if err != nil || (status != storage.StatusRunning && status != storage.StatusStarting) {
+			if t.Status != storage.TunnelStatusError && t.Status != storage.TunnelStatusStopped {
+				t.Status = storage.TunnelStatusError
+				_ = m.store.UpdateTunnel(ctx, t)
+			}
+			continue
+		}
+
+		// Read container logs to sniff claim link & public address
+		rawLogs, err := m.docker.GetContainerLogs(ctx, t.ContainerID, 60)
+		if err != nil {
+			continue
+		}
+
+		lines := strings.Split(rawLogs, "\n")
+		claimURL, claimCode, publicAddr, publicPort, isRunning := m.driver.SniffLogs(lines)
+
+		changed := false
+		if claimURL != "" && t.ClaimURL != claimURL {
+			t.ClaimURL = claimURL
+			t.ClaimCode = claimCode
+			changed = true
+		}
+
+		if publicAddr != "" && t.PublicAddress != publicAddr {
+			t.PublicAddress = publicAddr
+			changed = true
+		}
+		if publicPort > 0 && t.PublicPort != publicPort {
+			t.PublicPort = publicPort
+			changed = true
+		}
+
+		// Update runtime status
+		if publicAddr != "" || isRunning {
+			if t.Status != storage.TunnelStatusRunning {
+				t.Status = storage.TunnelStatusRunning
+				changed = true
+			}
+		} else if claimURL != "" {
+			if t.Status != storage.TunnelStatusClaimPending {
+				t.Status = storage.TunnelStatusClaimPending
+				changed = true
+			}
+		}
+
+		if changed {
+			_ = m.store.UpdateTunnel(ctx, t)
+		}
+	}
+}

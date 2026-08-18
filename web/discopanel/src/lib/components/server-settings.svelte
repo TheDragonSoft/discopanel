@@ -195,7 +195,7 @@
 	}
 </script>
 
-<div class="h-full space-y-6 overflow-y-auto p-4">
+<div class="space-y-6">
 	{#if server.status !== ServerStatus.STOPPED}
 		<Alert class="border-warning/50 bg-warning/10">
 			<AlertCircle class="text-warning h-4 w-4" />

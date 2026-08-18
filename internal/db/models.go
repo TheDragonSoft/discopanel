@@ -710,3 +710,41 @@ type Module struct {
 	MemoryUsage float64 `json:"memory_usage" gorm:"-"`
 	CPUPercent  float64 `json:"cpu_percent" gorm:"-"`
 }
+
+type TunnelStatus string
+
+const (
+	TunnelStatusStopped      TunnelStatus = "stopped"
+	TunnelStatusStarting     TunnelStatus = "starting"
+	TunnelStatusClaimPending TunnelStatus = "claim_pending"
+	TunnelStatusRunning      TunnelStatus = "running"
+	TunnelStatusError        TunnelStatus = "error"
+)
+
+// Tunnel represents a WAN internet tunnel instance (Playit.gg)
+type Tunnel struct {
+	ID                    string       `json:"id" gorm:"primaryKey"`
+	ServerID              string       `json:"server_id" gorm:"not null;index;column:server_id"`
+	Provider              string       `json:"provider" gorm:"not null;default:'playit'"`
+	Name                  string       `json:"name" gorm:"not null"`
+	Protocol              string       `json:"protocol" gorm:"not null;default:'tcp'"`
+	TargetHost            string       `json:"target_host" gorm:"column:target_host"`
+	TargetPort            int          `json:"target_port" gorm:"not null"`
+	ContainerID           string       `json:"container_id" gorm:"column:container_id"`
+	Status                TunnelStatus `json:"status" gorm:"not null;default:'stopped'"`
+	ClaimURL              string       `json:"claim_url" gorm:"column:claim_url"`
+	ClaimCode             string       `json:"claim_code" gorm:"column:claim_code"`
+	SecretKey             string       `json:"secret_key" gorm:"column:secret_key"`
+	IsAccountLinked       bool         `json:"is_account_linked" gorm:"default:false;column:is_account_linked"`
+	PublicAddress         string       `json:"public_address" gorm:"column:public_address"`
+	PublicPort            int          `json:"public_port" gorm:"column:public_port"`
+	AutoStart             bool         `json:"auto_start" gorm:"default:true;column:auto_start"`
+	FollowServerLifecycle bool         `json:"follow_server_lifecycle" gorm:"default:true;column:follow_server_lifecycle"`
+	DataPath              string       `json:"data_path" gorm:"column:data_path"`
+	CreatedAt             time.Time    `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt             time.Time    `json:"updated_at" gorm:"autoUpdateTime"`
+
+	// Relationships
+	Server *Server `json:"-" gorm:"foreignKey:ServerID;constraint:OnDelete:CASCADE"`
+}
+
