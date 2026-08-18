@@ -327,7 +327,7 @@ func (m *Manager) GetTunnelLogs(ctx context.Context, tunnelID string, tail int) 
 		return nil, err
 	}
 
-	lines := strings.Split(rawLogs, "\n")
+	lines := strings.Split(StripANSI(rawLogs), "\n")
 	result := make([]string, 0, len(lines))
 	for _, l := range lines {
 		trimmed := strings.TrimSpace(l)

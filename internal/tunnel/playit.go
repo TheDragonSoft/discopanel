@@ -23,12 +23,6 @@ const (
 	PlayitAccountSessionKey  = "playit_account_session"
 )
 
-var (
-	claimURLRegex     = regexp.MustCompile(`https?://playit\.gg/claim/([a-zA-Z0-9_\-]+)`)
-	publicAddrRegex   = regexp.MustCompile(`([a-zA-Z0-9_\-]+\.(?:gl\.joinmc\.link|craft\.ply\.gg|ply\.gg|auto\.playit\.gg))(?::(\d+))?`)
-	tunnelActiveRegex = regexp.MustCompile(`(?i)(tunnel active|tunnel running|connected to server|established connection|registered tunnel|agent registered)`)
-)
-
 type PlayitDriver struct {
 	docker *docker.Client
 	config *config.Config
@@ -180,9 +174,22 @@ func ReadSecretFromToml(dir string) (string, error) {
 	return "", fmt.Errorf("secret not found in %s", dir)
 }
 
+var (
+	ansiRegex         = regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]|\x1b\([a-zA-Z]|\x1b\)?`)
+	claimURLRegex     = regexp.MustCompile(`https?://playit\.gg/claim/([a-zA-Z0-9_\-]+)`)
+	publicAddrRegex   = regexp.MustCompile(`([a-zA-Z0-9_\-]+\.(?:gl\.joinmc\.link|craft\.ply\.gg|ply\.gg|auto\.playit\.gg))(?::(\d+))?`)
+	tunnelActiveRegex = regexp.MustCompile(`(?i)(tunnel active|tunnel running|connected to server|established connection|registered tunnel|agent registered|playit connected)`)
+)
+
+// StripANSI removes terminal escape codes for clean logging and parsing
+func StripANSI(str string) string {
+	return ansiRegex.ReplaceAllString(str, "")
+}
+
 // SniffLogs analyzes recent log output to extract claim URL, claim code, or public address
 func (d *PlayitDriver) SniffLogs(logs []string) (claimURL, claimCode, publicAddr string, publicPort int, isRunning bool) {
-	for _, line := range logs {
+	for _, rawLine := range logs {
+		line := StripANSI(rawLine)
 		// Sniff Claim URL
 		if matches := claimURLRegex.FindStringSubmatch(line); len(matches) > 0 {
 			claimURL = matches[0]
@@ -200,7 +207,7 @@ func (d *PlayitDriver) SniffLogs(logs []string) (claimURL, claimCode, publicAddr
 		}
 
 		// Sniff Tunnel Active state
-		if tunnelActiveRegex.MatchString(line) || strings.Contains(line, "gl.joinmc.link") || strings.Contains(line, "ply.gg") {
+		if tunnelActiveRegex.MatchString(line) || strings.Contains(line, "gl.joinmc.link") || strings.Contains(line, "ply.gg") || strings.Contains(line, "playit connected") {
 			isRunning = true
 		}
 	}
