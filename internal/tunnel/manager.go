@@ -3,6 +3,7 @@ package tunnel
 import (
 	"context"
 	"fmt"
+	"path/filepath"
 	"strings"
 	"sync"
 	"time"
@@ -374,9 +375,6 @@ func (m *Manager) UnlinkPlayitAccount(ctx context.Context) error {
 }
 
 func (m *Manager) StartAccountLinkSession(ctx context.Context) (*AccountLinkSession, error) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
 	sessionID := uuid.New().String()
 	tempTunnel := &storage.Tunnel{
 		ID:         "setup-" + sessionID[:8],
@@ -402,22 +400,27 @@ func (m *Manager) StartAccountLinkSession(ctx context.Context) (*AccountLinkSess
 		ExpiresAt:   time.Now().Add(10 * time.Minute),
 	}
 
-	// Poll briefly for initial claim URL
+	m.mu.Lock()
+	m.claimSessions[sessionID] = session
+	m.mu.Unlock()
+
+	// Poll briefly for initial claim URL without holding global lock
 	for i := 0; i < 6; i++ {
-		time.Sleep(1 * time.Second)
+		time.Sleep(500 * time.Millisecond)
 		rawLogs, err := m.docker.GetContainerLogs(ctx, containerID, 30)
 		if err == nil {
 			lines := strings.Split(rawLogs, "\n")
 			claimURL, claimCode, _, _, _ := m.driver.SniffLogs(lines)
 			if claimURL != "" {
+				m.mu.Lock()
 				session.ClaimURL = claimURL
 				session.ClaimCode = claimCode
+				m.mu.Unlock()
 				break
 			}
 		}
 	}
 
-	m.claimSessions[sessionID] = session
 	return session, nil
 }
 
@@ -445,26 +448,45 @@ func (m *Manager) CheckAccountLinkStatus(ctx context.Context, sessionID string) 
 
 	lines := strings.Split(rawLogs, "\n")
 	claimURL, claimCode, _, _, isRunning := m.driver.SniffLogs(lines)
+	m.mu.Lock()
 	if session.ClaimURL == "" && claimURL != "" {
 		session.ClaimURL = claimURL
 		session.ClaimCode = claimCode
 	}
+	m.mu.Unlock()
+
+	dataDir := m.config.Storage.DataDir
+	if dataDir == "" {
+		dataDir = "./data"
+	}
+	setupTunnelDir := filepath.Join(dataDir, "tunnels", "setup-"+sessionID[:8])
+	foundSecret, _ := ReadSecretFromToml(setupTunnelDir)
 
 	// Check if secret key or connection was established after claiming
-	for _, l := range lines {
-		if strings.Contains(l, "secret key:") || strings.Contains(l, "Agent registered") || isRunning {
-			// Extract secret or confirm linked
-			session.IsLinked = true
-			_ = m.store.SetSystemSetting(ctx, PlayitAccountSecretKey, "auto_linked_via_playit_claim")
-			// Clean up setup container
-			go func(cID string) {
-				time.Sleep(2 * time.Second)
-				_, _ = m.docker.StopContainer(context.Background(), cID)
-				_ = m.docker.RemoveContainer(context.Background(), cID)
-			}(session.ContainerID)
-
-			return true, "Account successfully linked to Playit.gg!", nil
+	secretToStore := foundSecret
+	if secretToStore == "" {
+		for _, l := range lines {
+			if strings.Contains(l, "secret key:") || strings.Contains(l, "Agent registered") || isRunning {
+				secretToStore = "auto_linked_via_playit_claim"
+				break
+			}
 		}
+	}
+
+	if secretToStore != "" {
+		m.mu.Lock()
+		session.IsLinked = true
+		m.mu.Unlock()
+
+		_ = m.store.SetSystemSetting(ctx, PlayitAccountSecretKey, secretToStore)
+		// Clean up setup container
+		go func(cID string) {
+			time.Sleep(2 * time.Second)
+			_, _ = m.docker.StopContainer(context.Background(), cID)
+			_ = m.docker.RemoveContainer(context.Background(), cID)
+		}(session.ContainerID)
+
+		return true, "Account successfully linked to Playit.gg!", nil
 	}
 
 	return false, "waiting for user to claim in browser", nil

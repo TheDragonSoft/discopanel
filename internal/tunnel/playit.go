@@ -111,6 +111,8 @@ func (d *PlayitDriver) CreateContainer(ctx context.Context, tunnel *storage.Tunn
 
 	containerConfig := &container.Config{
 		Image:        PlayitDockerImage,
+		Entrypoint:   []string{"playit"},
+		Cmd:          []string{"--secret_path", "/etc/playit/playit.toml", "start"},
 		Env:          env,
 		Tty:          true,
 		AttachStdout: true,
@@ -154,6 +156,28 @@ func (d *PlayitDriver) CreateContainer(ctx context.Context, tunnel *storage.Tunn
 	}
 
 	return resp.ID, nil
+}
+
+// ReadSecretFromToml attempts to read and extract the generated Playit secret key from the mounted directory
+func ReadSecretFromToml(dir string) (string, error) {
+	candidates := []string{
+		filepath.Join(dir, "playit.toml"),
+		filepath.Join(dir, "playit.secret"),
+	}
+	for _, f := range candidates {
+		data, err := os.ReadFile(f)
+		if err == nil {
+			re := regexp.MustCompile(`(?i)(?:secret|secret_key)\s*=\s*["']?([a-zA-Z0-9_\-]+)["']?`)
+			if matches := re.FindStringSubmatch(string(data)); len(matches) > 1 {
+				return matches[1], nil
+			}
+			trimmed := strings.TrimSpace(string(data))
+			if len(trimmed) > 10 && !strings.Contains(trimmed, "\n") {
+				return trimmed, nil
+			}
+		}
+	}
+	return "", fmt.Errorf("secret not found in %s", dir)
 }
 
 // SniffLogs analyzes recent log output to extract claim URL, claim code, or public address
