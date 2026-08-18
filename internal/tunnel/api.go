@@ -53,6 +53,77 @@ type playitOriginData struct {
 	LocalPort int    `json:"local_port,omitempty"`
 }
 
+// SetupClaim registers a new agent claim code with Playit.gg
+func (c *PlayitAPIClient) SetupClaim(ctx context.Context, code string) error {
+	body := map[string]string{
+		"code":       code,
+		"agent_type": "self-managed",
+		"version":    "1.0.10",
+	}
+	jsonData, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/claim/setup", bytes.NewReader(jsonData))
+	if err != nil {
+		return err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", "playit-agent/1.0.10")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		respBytes, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("claim setup failed (status %d): %s", resp.StatusCode, string(respBytes))
+	}
+	return nil
+}
+
+// ExchangeClaim attempts to exchange a claim code for an active Playit agent secret key
+func (c *PlayitAPIClient) ExchangeClaim(ctx context.Context, code string) (string, error) {
+	body := map[string]string{
+		"code": code,
+	}
+	jsonData, err := json.Marshal(body)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/claim/exchange", bytes.NewReader(jsonData))
+	if err != nil {
+		return "", err
+	}
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("User-Agent", "playit-agent/1.0.10")
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	var res struct {
+		Status string `json:"status"`
+		Data   struct {
+			SecretKey string `json:"secret_key"`
+		} `json:"data"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return "", err
+	}
+
+	if res.Status == "success" && res.Data.SecretKey != "" {
+		return res.Data.SecretKey, nil
+	}
+	return "", fmt.Errorf("claim code not accepted yet or invalid")
+}
+
 // CreateTunnel calls the Playit.gg API to automatically provision a tunnel on the user's account
 func (c *PlayitAPIClient) CreateTunnel(ctx context.Context, secretKey string, name string, tunnelType string, portType string, targetPort int) (*PlayitTunnelDetails, error) {
 	if strings.TrimSpace(secretKey) == "" {
