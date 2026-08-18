@@ -76,23 +76,7 @@ func (s *ModService) ListMods(ctx context.Context, req *connect.Request[v1.ListM
 				continue
 			}
 
-			// Extract display name from filename (remove extension)
-			displayName := file.Name()
-			if ext := filepath.Ext(displayName); ext != "" {
-				displayName = displayName[:len(displayName)-len(ext)]
-			}
-
-			// Create mod entry with consistent ID generation
-			mod := &v1.Mod{
-				Id:          uuid.NewSHA1(uuid.NameSpaceURL, []byte(msg.ServerId+file.Name())).String(),
-				ServerId:    msg.ServerId,
-				FileName:    file.Name(),
-				DisplayName: displayName,
-				Enabled:     true,
-				FileSize:    info.Size(),
-				UploadedAt:  timestamppb.New(info.ModTime()),
-			}
-
+			mod := s.buildModFromFile(msg.ServerId, modsDir, file.Name(), true, info)
 			mods = append(mods, mod)
 		}
 	}
@@ -114,22 +98,7 @@ func (s *ModService) ListMods(ctx context.Context, req *connect.Request[v1.ListM
 				continue
 			}
 
-			// Extract display name from filename
-			displayName := file.Name()
-			if ext := filepath.Ext(displayName); ext != "" {
-				displayName = displayName[:len(displayName)-len(ext)]
-			}
-
-			mod := &v1.Mod{
-				Id:          uuid.NewSHA1(uuid.NameSpaceURL, []byte(msg.ServerId+file.Name())).String(),
-				ServerId:    msg.ServerId,
-				FileName:    file.Name(),
-				DisplayName: displayName,
-				Enabled:     false,
-				FileSize:    info.Size(),
-				UploadedAt:  timestamppb.New(info.ModTime()),
-			}
-
+			mod := s.buildModFromFile(msg.ServerId, disabledDir, file.Name(), false, info)
 			mods = append(mods, mod)
 		}
 	}
@@ -159,27 +128,11 @@ func (s *ModService) GetMod(ctx context.Context, req *connect.Request[v1.GetModR
 	if files, err := os.ReadDir(modsDir); err == nil {
 		for _, file := range files {
 			if !file.IsDir() && minecraft.IsValidModFile(file.Name(), server.ModLoader) {
-				// Generate the same ID as in ListMods to match
 				fileID := uuid.NewSHA1(uuid.NameSpaceURL, []byte(msg.ServerId+file.Name())).String()
 				if fileID == msg.ModId {
 					info, _ := file.Info()
-
-					displayName := file.Name()
-					if ext := filepath.Ext(displayName); ext != "" {
-						displayName = displayName[:len(displayName)-len(ext)]
-					}
-
-					return connect.NewResponse(&v1.GetModResponse{
-						Mod: &v1.Mod{
-							Id:          fileID,
-							ServerId:    msg.ServerId,
-							FileName:    file.Name(),
-							DisplayName: displayName,
-							Enabled:     true,
-							FileSize:    info.Size(),
-							UploadedAt:  timestamppb.New(info.ModTime()),
-						},
-					}), nil
+					mod := s.buildModFromFile(msg.ServerId, modsDir, file.Name(), true, info)
+					return connect.NewResponse(&v1.GetModResponse{Mod: mod}), nil
 				}
 			}
 		}
@@ -193,23 +146,8 @@ func (s *ModService) GetMod(ctx context.Context, req *connect.Request[v1.GetModR
 				fileID := uuid.NewSHA1(uuid.NameSpaceURL, []byte(msg.ServerId+file.Name())).String()
 				if fileID == msg.ModId {
 					info, _ := file.Info()
-
-					displayName := file.Name()
-					if ext := filepath.Ext(displayName); ext != "" {
-						displayName = displayName[:len(displayName)-len(ext)]
-					}
-
-					return connect.NewResponse(&v1.GetModResponse{
-						Mod: &v1.Mod{
-							Id:          fileID,
-							ServerId:    msg.ServerId,
-							FileName:    file.Name(),
-							DisplayName: displayName,
-							Enabled:     false,
-							FileSize:    info.Size(),
-							UploadedAt:  timestamppb.New(info.ModTime()),
-						},
-					}), nil
+					mod := s.buildModFromFile(msg.ServerId, disabledDir, file.Name(), false, info)
+					return connect.NewResponse(&v1.GetModResponse{Mod: mod}), nil
 				}
 			}
 		}
@@ -277,25 +215,13 @@ func (s *ModService) ImportUploadedMod(ctx context.Context, req *connect.Request
 		return nil, connect.NewError(connect.CodeInternal, errors.New("failed to get mod info"))
 	}
 
-	// Use provided display name or derive from filename
-	displayName := msg.DisplayName
-	if displayName == "" {
-		displayName = originalFilename
-		if ext := filepath.Ext(displayName); ext != "" {
-			displayName = displayName[:len(displayName)-len(ext)]
-		}
-	}
-
 	// Create mod record
-	mod := &v1.Mod{
-		Id:          uuid.NewSHA1(uuid.NameSpaceURL, []byte(msg.ServerId+originalFilename)).String(),
-		ServerId:    msg.ServerId,
-		FileName:    originalFilename,
-		DisplayName: displayName,
-		Description: msg.Description,
-		Enabled:     true,
-		FileSize:    info.Size(),
-		UploadedAt:  timestamppb.New(info.ModTime()),
+	mod := s.buildModFromFile(msg.ServerId, modsDir, originalFilename, true, info)
+	if msg.DisplayName != "" {
+		mod.DisplayName = msg.DisplayName
+	}
+	if msg.Description != "" {
+		mod.Description = msg.Description
 	}
 
 	return connect.NewResponse(&v1.ImportUploadedModResponse{
@@ -388,34 +314,26 @@ func (s *ModService) UpdateMod(ctx context.Context, req *connect.Request[v1.Upda
 		}
 	}
 
-	// Build response
-	displayName := modFileName
-	if ext := filepath.Ext(displayName); ext != "" {
-		displayName = displayName[:len(displayName)-len(ext)]
+	targetDir := modsDir
+	if !finalEnabled {
+		targetDir = disabledDir
 	}
+
+	// Build response with metadata & icon
+	mod := s.buildModFromFile(msg.ServerId, targetDir, modFileName, finalEnabled, modInfo)
+	mod.UpdatedAt = timestamppb.Now()
 
 	// Use provided display name if given
 	if msg.DisplayName != nil && *msg.DisplayName != "" {
-		displayName = *msg.DisplayName
+		mod.DisplayName = *msg.DisplayName
 	}
 
-	description := ""
 	if msg.Description != nil {
-		description = *msg.Description
+		mod.Description = *msg.Description
 	}
 
 	return connect.NewResponse(&v1.UpdateModResponse{
-		Mod: &v1.Mod{
-			Id:          msg.ModId,
-			ServerId:    msg.ServerId,
-			FileName:    modFileName,
-			DisplayName: displayName,
-			Description: description,
-			Enabled:     finalEnabled,
-			FileSize:    modInfo.Size(),
-			UploadedAt:  timestamppb.New(modInfo.ModTime()),
-			UpdatedAt:   timestamppb.Now(),
-		},
+		Mod: mod,
 	}), nil
 }
 
@@ -483,4 +401,56 @@ func (s *ModService) DeleteMod(ctx context.Context, req *connect.Request[v1.Dele
 	return connect.NewResponse(&v1.DeleteModResponse{
 		Message: "Mod deleted successfully",
 	}), nil
+}
+
+// buildModFromFile constructs a Mod protobuf object with extracted metadata and icon
+func (s *ModService) buildModFromFile(serverId string, dir string, fileName string, enabled bool, info os.FileInfo) *v1.Mod {
+	filePath := filepath.Join(dir, fileName)
+	displayName := fileName
+	if ext := filepath.Ext(displayName); ext != "" {
+		displayName = displayName[:len(displayName)-len(ext)]
+	}
+
+	var fileSize int64
+	var modTime timestamppb.Timestamp
+	if info != nil {
+		fileSize = info.Size()
+		modTime = *timestamppb.New(info.ModTime())
+	}
+
+	mod := &v1.Mod{
+		Id:          uuid.NewSHA1(uuid.NameSpaceURL, []byte(serverId+fileName)).String(),
+		ServerId:    serverId,
+		FileName:    fileName,
+		DisplayName: displayName,
+		Enabled:     enabled,
+		FileSize:    fileSize,
+		UploadedAt:  &modTime,
+	}
+
+	if meta, err := minecraft.ExtractModMetadata(filePath); err == nil && meta != nil {
+		if meta.DisplayName != "" {
+			mod.DisplayName = meta.DisplayName
+		}
+		if meta.Version != "" {
+			mod.Version = meta.Version
+		}
+		if meta.Description != "" {
+			mod.Description = meta.Description
+		}
+		if meta.Author != "" {
+			mod.Author = meta.Author
+		}
+		if meta.Website != "" {
+			mod.Website = meta.Website
+		}
+		if meta.ModID != "" {
+			mod.ModId = meta.ModID
+		}
+		if meta.IconDataURL != "" {
+			mod.IconUrl = meta.IconDataURL
+		}
+	}
+
+	return mod
 }

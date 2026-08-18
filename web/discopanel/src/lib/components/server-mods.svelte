@@ -1,18 +1,22 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button';
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/components/ui/card';
-	import { ResizablePaneGroup, ResizablePane } from '$lib/components/ui/resizable';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Progress } from '$lib/components/ui/progress';
+	import { Input } from '$lib/components/ui/input';
+	import { Switch } from '$lib/components/ui/switch';
 	import {
 		Loader2,
+		Plus,
 		Upload,
 		Download,
 		Trash2,
-		ToggleLeft,
-		ToggleRight,
 		Package,
+		Blocks,
 		FileText,
+		ExternalLink,
+		RefreshCw,
+		Search,
 		X
 	} from '@lucide/svelte';
 	import { rpcClient } from '$lib/api/rpc-client';
@@ -30,19 +34,35 @@
 	let { server, active = false }: Props = $props();
 
 	let mods = $state<Mod[]>([]);
+	let searchQuery = $state('');
 	let loading = $state(true);
 	let uploading = $state(false);
 	let uploadProgress = $state<UploadProgress | null>(null);
 	let currentUploadFilename = $state('');
 	let uploadAbortController = $state<AbortController | null>(null);
 	let fileInput = $state<HTMLInputElement | null>(null);
-
-	// Drag-and-drop state
+	let togglingModIds = $state<Set<string>>(new Set());
 	let isDragging = $state(false);
-	let dragCounter = $state(0);
+	let dragCounter = 0;
 
 	let hasLoaded = false;
 	let previousServerId = $state(server.id);
+
+	// Filtered mods based on search query
+	let filteredMods = $derived(
+		mods.filter((mod) => {
+			if (!searchQuery.trim()) return true;
+			const q = searchQuery.toLowerCase();
+			return (
+				mod.displayName.toLowerCase().includes(q) ||
+				mod.fileName.toLowerCase().includes(q) ||
+				mod.description.toLowerCase().includes(q) ||
+				mod.author.toLowerCase().includes(q)
+			);
+		})
+	);
+
+	let enabledCount = $derived(mods.filter((m) => m.enabled).length);
 
 	// Reset state when server changes
 	$effect(() => {
@@ -50,6 +70,7 @@
 			previousServerId = server.id;
 			// Reset state variables
 			mods = [];
+			searchQuery = '';
 			loading = true;
 			uploading = false;
 			hasLoaded = false;
@@ -121,11 +142,11 @@
 				await rpcClient.mod.importUploadedMod({
 					serverId: server.id,
 					uploadSessionId: result.sessionId,
-					displayName: file.name,
+					displayName: '',
 					description: ''
 				});
 			}
-			toast.success(`Successfully uploaded ${validFiles.length} mod(s)`);
+			toast.success(`Uploaded ${validFiles.length} mod(s)`);
 			await loadMods();
 		} catch (error: unknown) {
 			if (error instanceof Error && error.message === 'Upload cancelled') {
@@ -142,53 +163,54 @@
 		}
 	}
 
-	async function handleFileSelect(event: Event) {
+	function handleFileSelect(event: Event) {
 		const input = event.target as HTMLInputElement;
-		const fileList = input.files;
-		if (!fileList || fileList.length === 0) return;
-		await processUploadFiles(fileList);
+		if (input.files) {
+			processUploadFiles(input.files);
+		}
 	}
 
-	function handleDragEnter(event: DragEvent) {
+	function handleDragEnter(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
 		if (!canHaveMods()) return;
-		if (event.dataTransfer?.types?.includes('Files')) {
-			event.preventDefault();
-			event.stopPropagation();
-			dragCounter++;
+		dragCounter++;
+		if (e.dataTransfer && Array.from(e.dataTransfer.types).includes('Files')) {
 			isDragging = true;
 		}
 	}
 
-	function handleDragOver(event: DragEvent) {
+	function handleDragOver(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
 		if (!canHaveMods()) return;
-		if (event.dataTransfer?.types?.includes('Files')) {
-			event.preventDefault();
-			event.stopPropagation();
-			event.dataTransfer.dropEffect = 'copy';
+		if (e.dataTransfer) {
+			e.dataTransfer.dropEffect = 'copy';
 		}
 	}
 
-	function handleDragLeave(event: DragEvent) {
+	function handleDragLeave(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
 		if (!canHaveMods()) return;
-		event.preventDefault();
-		event.stopPropagation();
 		dragCounter--;
 		if (dragCounter <= 0) {
-			dragCounter = 0;
 			isDragging = false;
+			dragCounter = 0;
 		}
 	}
 
-	async function handleDrop(event: DragEvent) {
-		if (!canHaveMods()) return;
-		event.preventDefault();
-		event.stopPropagation();
-		dragCounter = 0;
+	function handleDrop(e: DragEvent) {
+		e.preventDefault();
+		e.stopPropagation();
 		isDragging = false;
+		dragCounter = 0;
 
-		const dt = event.dataTransfer;
-		if (!dt || !dt.files || dt.files.length === 0) return;
-		await processUploadFiles(dt.files);
+		if (!canHaveMods() || uploading) return;
+
+		if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+			processUploadFiles(e.dataTransfer.files);
+		}
 	}
 
 	function cancelCurrentUpload() {
@@ -201,18 +223,38 @@
 	}
 
 	async function toggleMod(mod: Mod) {
+		if (togglingModIds.has(mod.id)) return;
+
+		const targetState = !mod.enabled;
+		const newToggling = new Set(togglingModIds);
+		newToggling.add(mod.id);
+		togglingModIds = newToggling;
+
 		try {
-			await rpcClient.mod.updateMod({
+			const res = await rpcClient.mod.updateMod({
 				serverId: server.id,
 				modId: mod.id,
-				enabled: !mod.enabled,
+				enabled: targetState,
 				displayName: mod.displayName,
 				description: mod.description
 			});
-			toast.success(`Mod ${!mod.enabled ? 'enabled' : 'disabled'}`);
-			await loadMods();
+
+			// Update in-place in state for immediate smooth response
+			if (res.mod) {
+				const updatedMod = res.mod;
+				mods = mods.map((m) => (m.id === mod.id ? updatedMod : m));
+			} else {
+				await loadMods();
+			}
+
+			toast.success(`Mod "${mod.displayName}" ${targetState ? 'enabled' : 'disabled'}`);
 		} catch (_e) {
-			toast.error('Failed to toggle mod');
+			toast.error(`Failed to ${targetState ? 'enable' : 'disable'} mod`);
+			await loadMods();
+		} finally {
+			const updated = new Set(togglingModIds);
+			updated.delete(mod.id);
+			togglingModIds = updated;
 		}
 	}
 
@@ -281,15 +323,14 @@
 	}
 </script>
 
-<ResizablePaneGroup
-	direction="vertical"
-	class="relative h-full max-h-[800px] min-h-[400px] overflow-hidden rounded-lg border"
+<Card
+	class="relative flex h-full min-h-[550px] flex-col rounded-xl border border-border/50 bg-card/50 shadow-sm backdrop-blur-xs overflow-hidden"
 	ondragenter={handleDragEnter}
 	ondragover={handleDragOver}
 	ondragleave={handleDragLeave}
 	ondrop={handleDrop}
 >
-	<!-- Simple minimalist drag and drop overlay -->
+	<!-- Minimalist Drag & Drop Overlay -->
 	{#if isDragging && canHaveMods()}
 		<div
 			class="absolute inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-background/80 dark:bg-zinc-950/80 pointer-events-none select-none transition-opacity duration-150"
@@ -304,161 +345,286 @@
 		</div>
 	{/if}
 
-	<ResizablePane defaultSize={100}>
-		<Card class="flex h-full flex-col">
-			<CardHeader>
-				<div class="flex items-center justify-between">
-					<div>
-						<CardTitle>Mod Management</CardTitle>
-						<p class="mt-1 text-sm text-muted-foreground">
-							{#if canHaveMods()}
-								Manage mods in the {getModsDirectory()} directory
-							{:else}
-								This server type does not support mods
-							{/if}
-						</p>
-					</div>
-					{#if canHaveMods()}
-						<Button onclick={() => fileInput?.click()} disabled={uploading}>
-							{#if uploading}
-								<Loader2 class="mr-2 h-4 w-4 animate-spin" />
-							{:else}
-								<Upload class="mr-2 h-4 w-4" />
-							{/if}
-							Upload Mods
-						</Button>
-						<input
-							bind:this={fileInput}
-							type="file"
-							multiple
-							accept=".jar,.zip,.litemod"
-							onchange={handleFileSelect}
-							class="hidden"
-						/>
+	<CardHeader class="p-5 sm:p-6 pb-4 border-b border-border/40">
+		<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+			<div>
+				<div class="flex items-center gap-2.5">
+					<CardTitle class="text-lg sm:text-xl font-bold tracking-tight">Mod Management</CardTitle>
+					{#if canHaveMods() && !loading && mods.length > 0}
+						<Badge variant="secondary" class="text-xs font-semibold px-2 py-0.5">
+							{mods.length} {mods.length === 1 ? 'mod' : 'mods'} ({enabledCount} active)
+						</Badge>
 					{/if}
 				</div>
-			</CardHeader>
-			{#if uploading && uploadProgress}
-				<div class="px-6 pb-4">
-					<div class="mb-2 flex items-center justify-between">
-						<span class="text-sm text-muted-foreground">
-							Uploading: {currentUploadFilename}
-						</span>
-						<div class="flex items-center gap-2">
-							<span class="text-sm text-muted-foreground">
-								{uploadProgress.percentComplete.toFixed(0)}%
-							</span>
+				<p class="mt-1 text-sm text-muted-foreground">
+					{#if canHaveMods()}
+						Manage mods in the <span class="font-mono text-foreground/80">{getModsDirectory()}</span> directory
+					{:else}
+						This server type does not support mods
+					{/if}
+				</p>
+			</div>
+
+			{#if canHaveMods()}
+				<div class="flex items-center gap-2.5">
+					<Button
+						variant="outline"
+						size="icon"
+						onclick={loadMods}
+						disabled={loading}
+						title="Refresh mods list"
+						class="h-9 w-9 shrink-0"
+					>
+						<RefreshCw class="h-4 w-4 {loading ? 'animate-spin' : ''}" />
+					</Button>
+					<Button href="/mods" variant="outline" class="h-9 shadow-xs">
+						<Plus class="mr-2 h-4 w-4" />
+						Add Mods
+					</Button>
+					<Button onclick={() => fileInput?.click()} disabled={uploading} class="h-9 shadow-xs">
+						{#if uploading}
+							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+						{:else}
+							<Upload class="mr-2 h-4 w-4" />
+						{/if}
+						Upload Mods
+					</Button>
+					<input
+						bind:this={fileInput}
+						type="file"
+						multiple
+						accept=".jar,.zip"
+						onchange={handleFileSelect}
+						class="hidden"
+					/>
+				</div>
+			{/if}
+		</div>
+
+		{#if canHaveMods() && mods.length > 3}
+			<div class="relative mt-3">
+				<Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+				<Input
+					placeholder="Search installed mods by name, filename, author..."
+					bind:value={searchQuery}
+					class="pl-9 h-9.5 text-sm bg-background/50"
+				/>
+				{#if searchQuery}
+					<button
+						onclick={() => (searchQuery = '')}
+						class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
+						aria-label="Clear search"
+					>
+						<X class="h-4 w-4" />
+					</button>
+				{/if}
+			</div>
+		{/if}
+	</CardHeader>
+
+	{#if uploading && uploadProgress}
+		<div class="px-6 py-4 bg-muted/20 border-b border-border/40">
+			<div class="mb-2 flex items-center justify-between">
+				<span class="text-sm font-medium text-foreground">
+					Uploading: <span class="font-mono text-muted-foreground">{currentUploadFilename}</span>
+				</span>
+				<div class="flex items-center gap-2">
+					<span class="text-sm font-semibold text-primary">
+						{uploadProgress.percentComplete.toFixed(0)}%
+					</span>
+					<Button
+						size="icon"
+						variant="ghost"
+						class="h-6 w-6 text-muted-foreground hover:text-foreground"
+						onclick={cancelCurrentUpload}
+						title="Cancel upload"
+					>
+						<X class="h-4 w-4" />
+					</Button>
+				</div>
+			</div>
+			<Progress value={uploadProgress.percentComplete} class="h-2" />
+			<p class="mt-1.5 text-xs text-muted-foreground">
+				{formatBytes(uploadProgress.bytesUploaded)} of {formatBytes(uploadProgress.totalBytes)}
+			</p>
+		</div>
+	{/if}
+
+	<CardContent class="flex-1 p-5 sm:p-6 overflow-y-auto space-y-3">
+		{#if !canHaveMods()}
+			<div class="flex flex-col items-center justify-center py-20 text-muted-foreground">
+				<Package class="mb-4 h-12 w-12 opacity-50" />
+				<p class="text-base font-medium">This server type does not support mods</p>
+			</div>
+		{:else if loading && mods.length === 0}
+			<div class="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
+				<Loader2 class="h-9 w-9 animate-spin text-primary" />
+				<p class="text-sm font-medium">Scanning server mods...</p>
+			</div>
+		{:else if mods.length === 0}
+			<div class="flex flex-col items-center justify-center py-20 text-muted-foreground space-y-2">
+				<div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-2">
+					<Package class="h-8 w-8 opacity-60" />
+				</div>
+				<p class="text-base font-semibold text-foreground">No mods installed</p>
+				<p class="text-sm text-muted-foreground max-w-sm text-center">Browse mods on Modrinth or drop / upload mod JAR files directly.</p>
+				<div class="flex flex-wrap items-center justify-center gap-3 mt-3">
+					<Button href="/mods" class="shadow-xs">
+						<Plus class="mr-2 h-4 w-4" />
+						Add Mods
+					</Button>
+					<Button onclick={() => fileInput?.click()} variant="outline">
+						<Upload class="mr-2 h-4 w-4" />
+						Upload Mods
+					</Button>
+				</div>
+			</div>
+		{:else if filteredMods.length === 0}
+			<div class="flex flex-col items-center justify-center py-16 text-muted-foreground space-y-2">
+				<Search class="h-10 w-10 opacity-40 mb-1" />
+				<p class="text-base font-medium">No mods match "{searchQuery}"</p>
+				<Button variant="link" size="sm" onclick={() => (searchQuery = '')}>
+					Clear search filter
+				</Button>
+			</div>
+		{:else}
+			<div class="space-y-3">
+				{#each filteredMods as mod (mod.id)}
+					<div
+						class="group flex items-center justify-between gap-4 sm:gap-5 rounded-xl border p-4 sm:p-4.5 bg-card/60 transition-all duration-200 hover:border-primary/40 hover:bg-card/95 hover:shadow-sm {mod.enabled
+							? 'border-border/60'
+							: 'opacity-70 bg-muted/20 border-dashed border-border/40'}"
+					>
+						<!-- Left: Switch + Mod Picture + Name & Meta -->
+						<div class="flex min-w-0 flex-1 items-center gap-4">
+							<!-- Modern Switch Control -->
+							<div class="flex shrink-0 items-center justify-center">
+								<Switch
+									checked={mod.enabled}
+									onCheckedChange={() => toggleMod(mod)}
+									disabled={togglingModIds.has(mod.id)}
+									class="data-[state=checked]:bg-emerald-500 cursor-pointer"
+									aria-label={mod.enabled ? `Disable ${mod.displayName}` : `Enable ${mod.displayName}`}
+								/>
+							</div>
+
+							<!-- Mod Picture / Icon Thumbnail -->
+							<div
+								class="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-muted/40 shadow-xs transition-transform group-hover:scale-105"
+							>
+								{#if mod.iconUrl}
+									<img
+										src={mod.iconUrl}
+										alt={mod.displayName}
+										class="h-full w-full object-contain p-1 rounded-lg"
+										onerror={(e) => {
+											const target = e.currentTarget as HTMLElement;
+											target.style.display = 'none';
+											const fallback = target.nextElementSibling as HTMLElement;
+											if (fallback) fallback.classList.remove('hidden');
+										}}
+									/>
+									<div class="hidden flex h-full w-full items-center justify-center text-primary/70 bg-primary/5">
+										<Blocks class="h-7 w-7" />
+									</div>
+								{:else}
+									<div class="flex h-full w-full items-center justify-center text-primary/70 bg-primary/5">
+										<Blocks class="h-7 w-7" />
+									</div>
+								{/if}
+							</div>
+
+							<!-- Mod Name & Metadata Details -->
+							<div class="min-w-0 flex-1">
+								<div class="flex flex-wrap items-center gap-2">
+									<h4 class="font-semibold text-base tracking-tight text-foreground truncate">
+										{mod.displayName}
+									</h4>
+									{#if mod.version}
+										<Badge variant="secondary" class="text-xs font-mono font-medium px-2 py-0.5">
+											{mod.version}
+										</Badge>
+									{/if}
+									{#if mod.enabled}
+										<Badge
+											variant="outline"
+											class="text-[11px] text-emerald-600 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/10 font-medium px-2 py-0.5"
+										>
+											Active
+										</Badge>
+									{:else}
+										<Badge
+											variant="outline"
+											class="text-[11px] text-muted-foreground border-border bg-muted/30 font-medium px-2 py-0.5"
+										>
+											Disabled
+										</Badge>
+									{/if}
+									{#if mod.author}
+										<span class="text-xs text-muted-foreground hidden md:inline">
+											by <span class="font-medium text-foreground/80">{mod.author}</span>
+										</span>
+									{/if}
+								</div>
+
+								<!-- Subtitle: filename, size, date, website link -->
+								<div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+									<span class="flex items-center gap-1 font-mono text-[11px]">
+										<FileText class="h-3.5 w-3.5 shrink-0" />
+										{mod.fileName}
+									</span>
+									<span>•</span>
+									<span>{formatBytes(Number(mod.fileSize))}</span>
+									{#if mod.uploadedAt}
+										<span>•</span>
+										<span>{new Date(Number(mod.uploadedAt.seconds) * 1000).toLocaleDateString()}</span>
+									{/if}
+									{#if mod.website}
+										<span>•</span>
+										<a
+											href={mod.website}
+											target="_blank"
+											rel="noopener noreferrer"
+											class="inline-flex items-center gap-0.5 text-primary hover:underline transition-colors"
+										>
+											<ExternalLink class="h-3 w-3" />
+											Website
+										</a>
+									{/if}
+								</div>
+
+								{#if mod.description}
+									<p class="mt-1 text-xs text-muted-foreground line-clamp-1 leading-normal">
+										{mod.description}
+									</p>
+								{/if}
+							</div>
+						</div>
+
+						<!-- Right: Action Buttons (Download & Delete) -->
+						<div class="flex items-center gap-1 shrink-0">
 							<Button
 								size="icon"
 								variant="ghost"
-								class="h-6 w-6"
-								onclick={cancelCurrentUpload}
-								title="Cancel upload"
+								class="h-8.5 w-8.5 text-muted-foreground hover:text-foreground hover:bg-muted"
+								onclick={() => downloadMod(mod)}
+								title="Download mod"
 							>
-								<X class="h-4 w-4" />
+								<Download class="h-4 w-4" />
+							</Button>
+							<Button
+								size="icon"
+								variant="ghost"
+								class="h-8.5 w-8.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+								onclick={() => deleteMod(mod)}
+								title="Delete mod"
+							>
+								<Trash2 class="h-4 w-4" />
 							</Button>
 						</div>
 					</div>
-					<Progress value={uploadProgress.percentComplete} class="h-2" />
-					<p class="mt-1 text-xs text-muted-foreground">
-						{formatBytes(uploadProgress.bytesUploaded)} / {formatBytes(uploadProgress.totalBytes)}
-					</p>
-				</div>
-			{/if}
-			<CardContent class="flex-1 overflow-auto">
-				{#if !canHaveMods()}
-					<div class="flex flex-col items-center justify-center py-12 text-muted-foreground">
-						<Package class="mb-4 h-12 w-12" />
-						<p>This server type does not support mods</p>
-					</div>
-				{:else if loading}
-					<div class="flex items-center justify-center py-12">
-						<Loader2 class="h-8 w-8 animate-spin text-muted-foreground" />
-					</div>
-				{:else if mods.length === 0}
-					<div
-						class="group m-2 flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-border/60 p-12 text-muted-foreground transition-colors hover:border-primary/50 hover:bg-muted/10"
-						onclick={() => fileInput?.click()}
-						role="button"
-						tabindex="0"
-						onkeydown={(e) => {
-							if (e.key === 'Enter' || e.key === ' ') fileInput?.click();
-						}}
-					>
-						<Package class="mb-3 h-8 w-8 text-muted-foreground/60" />
-						<p class="font-medium text-foreground">No mods installed</p>
-						<p class="mt-1 text-sm text-muted-foreground">
-							Drop mods here or click to upload
-						</p>
-					</div>
-				{:else}
-					<div class="space-y-2">
-						{#each mods as mod (mod.id)}
-							<div class="flex items-center justify-between rounded-lg border p-4">
-								<div class="flex items-center gap-4">
-									<button
-										onclick={() => toggleMod(mod)}
-										class="text-muted-foreground transition-colors hover:text-foreground"
-										title={mod.enabled ? 'Disable mod' : 'Enable mod'}
-									>
-										{#if mod.enabled}
-											<ToggleRight class="h-6 w-6 text-green-500" />
-										{:else}
-											<ToggleLeft class="h-6 w-6" />
-										{/if}
-									</button>
-
-									<div>
-										<div class="flex items-center gap-2">
-											<h4 class="font-medium">{mod.displayName}</h4>
-											{#if mod.version}
-												<Badge variant="secondary" class="text-xs">{mod.version}</Badge>
-											{/if}
-											{#if !mod.enabled}
-												<Badge variant="outline" class="text-xs">Disabled</Badge>
-											{/if}
-										</div>
-										<div class="mt-1 flex items-center gap-4 text-sm text-muted-foreground">
-											<span class="flex items-center gap-1">
-												<FileText class="h-3 w-3" />
-												{mod.fileName}
-											</span>
-											<span>{formatBytes(Number(mod.fileSize))}</span>
-											<span
-												>{mod.uploadedAt
-													? new Date(Number(mod.uploadedAt.seconds) * 1000).toLocaleDateString()
-													: ''}</span
-											>
-										</div>
-										{#if mod.description}
-											<p class="mt-2 text-sm text-muted-foreground">{mod.description}</p>
-										{/if}
-									</div>
-								</div>
-
-								<div class="flex items-center gap-2">
-									<Button
-										size="icon"
-										variant="ghost"
-										onclick={() => downloadMod(mod)}
-										title="Download mod"
-									>
-										<Download class="h-4 w-4" />
-									</Button>
-									<Button
-										size="icon"
-										variant="ghost"
-										onclick={() => deleteMod(mod)}
-										title="Delete mod"
-									>
-										<Trash2 class="h-4 w-4" />
-									</Button>
-								</div>
-							</div>
-						{/each}
-					</div>
-				{/if}
-			</CardContent>
-		</Card>
-	</ResizablePane>
-</ResizablePaneGroup>
+				{/each}
+			</div>
+		{/if}
+	</CardContent>
+</Card>
