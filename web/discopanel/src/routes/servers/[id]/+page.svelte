@@ -30,7 +30,9 @@
 		ExternalLink,
 		Trash2,
 		Cpu,
-		Info
+		Info,
+		Globe,
+		Radio
 	} from '@lucide/svelte';
 	import {
 		DropdownMenu,
@@ -51,6 +53,8 @@
 		RestartServerRequestSchema,
 		RecreateServerRequestSchema
 	} from '$lib/proto/discopanel/v1/server_pb';
+	import type { Tunnel } from '$lib/proto/discopanel/v1/tunnel_pb';
+	import { TunnelStatus, GetServerTunnelsRequestSchema } from '$lib/proto/discopanel/v1/tunnel_pb';
 	import { formatBytes } from '$lib/utils';
 	import { copyToClipboard as copyText } from '$lib/utils/clipboard';
 	import ServerConsole from '$lib/components/server-console.svelte';
@@ -63,6 +67,11 @@
 	import ServerModules from '$lib/components/server/ServerModules.svelte';
 
 	let server = $state<Server | null>(null);
+	let tunnels = $state<Tunnel[]>([]);
+	let activeWanTunnel = $derived(
+		tunnels.find((t) => t.status === TunnelStatus.RUNNING && !!t.publicAddress) ||
+		tunnels.find((t) => !!t.publicAddress)
+	);
 	let loading = $state(true);
 	let actionLoading = $state(false);
 	let serverId = $derived(page.params.id);
@@ -115,6 +124,19 @@
 				server = response.server;
 				serversStore.updateServer(server);
 				loading = false;
+			}
+
+			// Load tunnels to discover WAN Playit addresses
+			try {
+				const tunnelsResp = await rpcClient.tunnel.getServerTunnels(
+					create(GetServerTunnelsRequestSchema, { serverId: requestedId }),
+					callOptions
+				);
+				if (serverId === requestedId) {
+					tunnels = tunnelsResp.tunnels || [];
+				}
+			} catch {
+				// Non-fatal
 			}
 		} catch {
 			// Only show error if still on the same server and no data yet
@@ -240,11 +262,29 @@
 					<Package class="h-6 w-6 text-primary sm:h-8 sm:w-8" />
 				</div>
 				<div class="space-y-1">
-					<h2
-						class="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-2xl font-bold tracking-tight text-transparent sm:text-3xl lg:text-4xl"
-					>
-						{server.name}
-					</h2>
+					<div class="flex flex-wrap items-center gap-2 sm:gap-3">
+						<h2
+							class="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-2xl font-bold tracking-tight text-transparent sm:text-3xl lg:text-4xl"
+						>
+							{server.name}
+						</h2>
+						{#if activeWanTunnel?.publicAddress}
+							<button
+								type="button"
+								onclick={() => copyToClipboard(activeWanTunnel?.publicAddress + (activeWanTunnel?.publicPort ? `:${activeWanTunnel.publicPort}` : ''))}
+								class="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/40 bg-emerald-500/10 px-3 py-1 font-mono text-xs font-semibold text-emerald-600 dark:text-emerald-400 shadow-sm backdrop-blur-xs transition-all hover:scale-105 hover:bg-emerald-500/20 active:scale-95 cursor-pointer"
+								title="Click to copy public WAN address"
+							>
+								<span class="relative flex h-2 w-2">
+									<span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+									<span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+								</span>
+								<Globe class="h-3.5 w-3.5 text-emerald-500" />
+								<span>{activeWanTunnel.publicAddress}{activeWanTunnel.publicPort ? `:${activeWanTunnel.publicPort}` : ''}</span>
+								<Copy class="h-3 w-3 opacity-60 hover:opacity-100" />
+							</button>
+						{/if}
+					</div>
 					<p class="text-sm text-muted-foreground sm:text-base">{server.description || ''}</p>
 					{#if server.description || !server.description || server.description === ''}
 						<p class="mt-1 text-xs text-muted-foreground/70">
@@ -622,7 +662,13 @@
 						<CardTitle class="text-xs font-bold tracking-widest text-muted-foreground/70 uppercase"
 							>Connection</CardTitle
 						>
-						<p class="text-xs text-muted-foreground/50">Server address</p>
+						<p class="text-xs text-muted-foreground/50">
+							{#if activeWanTunnel?.publicAddress}
+								Public WAN & LAN
+							{:else}
+								Server address
+							{/if}
+						</p>
 					</div>
 					<div class="relative">
 						<div
@@ -631,42 +677,84 @@
 						<div
 							class="relative flex h-14 w-14 items-center justify-center rounded-2xl bg-linear-to-br from-blue-500/10 to-blue-600/10 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3"
 						>
-							<ExternalLink class="h-7 w-7 text-blue-500 group-hover:animate-pulse" />
+							{#if activeWanTunnel?.publicAddress}
+								<Globe class="h-7 w-7 text-emerald-500 group-hover:animate-pulse" />
+							{:else}
+								<ExternalLink class="h-7 w-7 text-blue-500 group-hover:animate-pulse" />
+							{/if}
 						</div>
 					</div>
 				</CardHeader>
 				<CardContent class="pt-1">
-					<div class="group/copy relative">
-						<div
-							class="absolute inset-0 rounded-xl bg-linear-to-r from-blue-500/10 to-purple-500/10 opacity-0 blur-xl transition-opacity duration-500 group-hover/copy:opacity-100"
-						></div>
-						<div
-							class="relative flex items-center justify-between rounded-xl border border-border/50 bg-linear-to-r from-muted/50 to-muted/30 p-3 backdrop-blur-sm transition-all duration-300 group-hover/copy:border-primary/30"
-						>
-							<div class="min-w-0 flex-1">
-								<span class="block truncate font-mono text-sm font-bold text-foreground/90">
-									{#if server.proxyHostname}
-										{server.proxyHostname}
-									{:else}
-										localhost:{server.port}
-									{/if}
-								</span>
-								<span class="mt-1 block text-xs text-muted-foreground/60">Click to copy</span>
+					{#if activeWanTunnel?.publicAddress}
+						<div class="space-y-2">
+							<div class="group/copy relative">
+								<div
+									class="absolute inset-0 rounded-xl bg-linear-to-r from-emerald-500/10 to-teal-500/10 opacity-0 blur-xl transition-opacity duration-500 group-hover/copy:opacity-100"
+								></div>
+								<div
+									class="relative flex items-center justify-between rounded-xl border border-emerald-500/30 bg-emerald-500/5 p-3 backdrop-blur-sm transition-all duration-300 group-hover/copy:border-emerald-500/60"
+								>
+									<div class="min-w-0 flex-1">
+										<div class="flex items-center gap-1.5">
+											<span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+											<span class="text-[10px] font-bold uppercase tracking-wider text-emerald-500 dark:text-emerald-400">Playit.gg WAN Join Link</span>
+										</div>
+										<span class="block truncate font-mono text-sm font-bold text-foreground/90 mt-0.5">
+											{activeWanTunnel.publicAddress}{activeWanTunnel.publicPort ? `:${activeWanTunnel.publicPort}` : ''}
+										</span>
+									</div>
+									<Button
+										size="icon"
+										variant="ghost"
+										onclick={() => {
+											const wanStr = activeWanTunnel!.publicAddress + (activeWanTunnel!.publicPort ? `:${activeWanTunnel!.publicPort}` : '');
+											copyToClipboard(wanStr);
+										}}
+										class="transition-all duration-300 hover:scale-110 hover:bg-emerald-500/20 hover:text-emerald-500"
+									>
+										<Copy class="h-4 w-4" />
+									</Button>
+								</div>
 							</div>
-							<Button
-								size="icon"
-								variant="ghost"
-								onclick={() => {
-									if (!server) return;
-									const connectionString = server.proxyHostname || `localhost:${server.port}`;
-									copyToClipboard(connectionString);
-								}}
-								class="transition-all duration-300 hover:scale-110 hover:bg-primary/20 hover:text-primary"
-							>
-								<Copy class="h-4 w-4" />
-							</Button>
+							<div class="flex items-center justify-between px-1 text-[11px] text-muted-foreground/60 font-mono">
+								<span>LAN / Local:</span>
+								<span>localhost:{server.port}</span>
+							</div>
 						</div>
-					</div>
+					{:else}
+						<div class="group/copy relative">
+							<div
+								class="absolute inset-0 rounded-xl bg-linear-to-r from-blue-500/10 to-purple-500/10 opacity-0 blur-xl transition-opacity duration-500 group-hover/copy:opacity-100"
+							></div>
+							<div
+								class="relative flex items-center justify-between rounded-xl border border-border/50 bg-linear-to-r from-muted/50 to-muted/30 p-3 backdrop-blur-sm transition-all duration-300 group-hover/copy:border-primary/30"
+							>
+								<div class="min-w-0 flex-1">
+									<span class="block truncate font-mono text-sm font-bold text-foreground/90">
+										{#if server.proxyHostname}
+											{server.proxyHostname}
+										{:else}
+											localhost:{server.port}
+										{/if}
+									</span>
+									<span class="mt-1 block text-xs text-muted-foreground/60">Click to copy</span>
+								</div>
+								<Button
+									size="icon"
+									variant="ghost"
+									onclick={() => {
+										if (!server) return;
+										const connectionString = server.proxyHostname || `localhost:${server.port}`;
+										copyToClipboard(connectionString);
+									}}
+									class="transition-all duration-300 hover:scale-110 hover:bg-primary/20 hover:text-primary"
+								>
+									<Copy class="h-4 w-4" />
+								</Button>
+							</div>
+						</div>
+					{/if}
 				</CardContent>
 			</Card>
 

@@ -385,10 +385,142 @@ func (m *Manager) GetTunnelLogs(ctx context.Context, tunnelID string, tail int) 
 }
 
 func (m *Manager) GetServerTunnels(ctx context.Context, serverID string) ([]*storage.Tunnel, error) {
-	return m.store.GetServerTunnels(ctx, serverID)
+	return m.SyncPlayitTunnels(ctx, serverID)
 }
 
 func (m *Manager) ListTunnels(ctx context.Context) ([]*storage.Tunnel, error) {
+	return m.SyncPlayitTunnels(ctx, "")
+}
+
+// SyncPlayitTunnels queries the Playit.gg API for all tunnels on the linked account,
+// maps each tunnel to the appropriate server and target port (e.g. 25565, 19132, etc.),
+// and automatically registers/connects them in DiscoPanel.
+func (m *Manager) SyncPlayitTunnels(ctx context.Context, serverID string) ([]*storage.Tunnel, error) {
+	secret, err := m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
+	if err != nil || secret == "" {
+		if serverID != "" {
+			return m.store.GetServerTunnels(ctx, serverID)
+		}
+		return m.store.ListTunnels(ctx)
+	}
+
+	remoteTunnels, err := m.apiClient.ListTunnels(ctx, secret)
+	if err != nil {
+		m.logger.Warn("Failed to list Playit tunnels from API during sync: %v", err)
+		if serverID != "" {
+			return m.store.GetServerTunnels(ctx, serverID)
+		}
+		return m.store.ListTunnels(ctx)
+	}
+
+	// Fetch target server or all servers
+	var servers []*storage.Server
+	if serverID != "" {
+		srv, err := m.store.GetServer(ctx, serverID)
+		if err == nil && srv != nil {
+			servers = []*storage.Server{srv}
+		}
+	} else {
+		servers, _ = m.store.ListServers(ctx)
+	}
+
+	existingTunnels, _ := m.store.ListTunnels(ctx)
+	existingMap := make(map[string]*storage.Tunnel) // key: serverID:port
+	for _, t := range existingTunnels {
+		key := fmt.Sprintf("%s:%d", t.ServerID, t.TargetPort)
+		existingMap[key] = t
+	}
+
+	for _, rt := range remoteTunnels {
+		port := rt.LocalPort
+		if port <= 0 {
+			if rt.TunnelType == "minecraft-java" {
+				port = 25565
+			} else if rt.TunnelType == "minecraft-bedrock" {
+				port = 19132
+			} else {
+				port = 25565
+			}
+		}
+
+		// Find which server matches this port
+		for _, srv := range servers {
+			isMatch := (srv.Port == port) || (srv.Port == 0 && port == 25565)
+			if !isMatch {
+				for _, ap := range srv.AdditionalPorts {
+					if ap != nil && (int(ap.HostPort) == port || int(ap.ContainerPort) == port) {
+						isMatch = true
+						break
+					}
+				}
+			}
+
+			if isMatch {
+				key := fmt.Sprintf("%s:%d", srv.ID, port)
+				if existing, ok := existingMap[key]; ok {
+					changed := false
+					if rt.PublicAddress != "" && existing.PublicAddress != rt.PublicAddress {
+						existing.PublicAddress = rt.PublicAddress
+						changed = true
+					}
+					if rt.PublicPort > 0 && existing.PublicPort != rt.PublicPort {
+						existing.PublicPort = rt.PublicPort
+						changed = true
+					}
+					if !existing.IsAccountLinked {
+						existing.IsAccountLinked = true
+						changed = true
+					}
+					if changed {
+						_ = m.store.UpdateTunnel(ctx, existing)
+					}
+					if existing.Status == storage.TunnelStatusStopped && existing.AutoStart && srv.Status == storage.StatusRunning {
+						go func(id string) {
+							_, _ = m.StartTunnel(context.Background(), id)
+						}(existing.ID)
+					}
+				} else {
+					tunnelName := rt.Name
+					if tunnelName == "" {
+						tunnelName = fmt.Sprintf("%s WAN Tunnel (%d)", srv.Name, port)
+					}
+					proto := "both"
+					if rt.PortType != "" {
+						proto = rt.PortType
+					}
+					newTunnel := &storage.Tunnel{
+						ID:                    uuid.New().String(),
+						ServerID:              srv.ID,
+						Provider:              "playit",
+						Name:                  tunnelName,
+						Protocol:              proto,
+						TargetHost:            fmt.Sprintf("discopanel-server-%s", srv.ID),
+						TargetPort:            port,
+						Status:                storage.TunnelStatusStopped,
+						IsAccountLinked:       true,
+						PublicAddress:         rt.PublicAddress,
+						PublicPort:            rt.PublicPort,
+						AutoStart:             true,
+						FollowServerLifecycle: true,
+						CreatedAt:             time.Now().UTC(),
+						UpdatedAt:             time.Now().UTC(),
+					}
+					_ = m.store.CreateTunnel(ctx, newTunnel)
+					existingMap[key] = newTunnel
+
+					if srv.Status == storage.StatusRunning {
+						go func(id string) {
+							_, _ = m.StartTunnel(context.Background(), id)
+						}(newTunnel.ID)
+					}
+				}
+			}
+		}
+	}
+
+	if serverID != "" {
+		return m.store.GetServerTunnels(ctx, serverID)
+	}
 	return m.store.ListTunnels(ctx)
 }
 

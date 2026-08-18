@@ -401,6 +401,16 @@
 				</div>
 				<div class="flex items-center gap-2">
 					{#if hasGlobalAccount}
+						<Button
+							size="sm"
+							variant="outline"
+							disabled={tunnelsLoading}
+							class="gap-1.5 border-border/70 text-xs"
+							onclick={() => loadTunnels(false)}
+						>
+							<RotateCw class="h-3.5 w-3.5 {tunnelsLoading ? 'animate-spin' : ''}" />
+							<span>Sync from Playit.gg</span>
+						</Button>
 						<Badge variant="default" class="gap-1 border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
 							<ShieldCheck class="h-3.5 w-3.5" />
 							Account Linked (Fleet Mode)
