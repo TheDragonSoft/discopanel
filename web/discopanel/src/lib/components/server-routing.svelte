@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { rpcClient, silentCallOptions } from '$lib/api/rpc-client';
 	import { toast } from 'svelte-sonner';
 	import { Input } from '$lib/components/ui/input';
@@ -405,11 +407,33 @@
 						</Badge>
 					{:else}
 						<Badge variant="outline" class="gap-1 text-xs text-muted-foreground">
-							Guest Mode
+							Account Setup Required
 						</Badge>
 					{/if}
 				</div>
 			</div>
+
+			<!-- Notice banner when no account is linked -->
+			{#if !hasGlobalAccount}
+				<div class="rounded-lg border border-border/80 bg-muted/40 p-4">
+					<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+						<div class="space-y-1">
+							<p class="text-sm font-semibold text-foreground">Playit.gg Account Linking Required</p>
+							<p class="text-xs text-muted-foreground">
+								To expose this server to the internet, link your Playit.gg account secret key in Settings.
+							</p>
+						</div>
+						<Button
+							size="sm"
+							class="gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
+							onclick={() => goto(resolve('/settings'))}
+						>
+							<Radio class="h-4 w-4" />
+							Link Account in Settings
+						</Button>
+					</div>
+				</div>
+			{/if}
 
 			<!-- Active Tunnels List -->
 			{#if tunnels.length > 0}

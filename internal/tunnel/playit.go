@@ -90,12 +90,14 @@ func (d *PlayitDriver) CreateContainer(ctx context.Context, tunnel *storage.Tunn
 	if secretKey == "" && accountSecretKey != "" {
 		secretKey = accountSecretKey
 	}
-	if secretKey != "" {
-		env = append(env,
-			fmt.Sprintf("SECRET_KEY=%s", secretKey),
-			fmt.Sprintf("PLAYIT_SECRET_KEY=%s", secretKey),
-		)
+	if secretKey == "" {
+		return "", fmt.Errorf("Playit secret key is required. Please link your account in Settings -> Routing or enter a secret key for this tunnel")
 	}
+
+	env = append(env,
+		fmt.Sprintf("SECRET_KEY=%s", secretKey),
+		fmt.Sprintf("PLAYIT_SECRET_KEY=%s", secretKey),
+	)
 
 	// Volume mount for persistent playit.toml / configuration
 	hostDataPath := docker.TranslateToHostPath(tunnelDataPath)
@@ -111,8 +113,6 @@ func (d *PlayitDriver) CreateContainer(ctx context.Context, tunnel *storage.Tunn
 
 	containerConfig := &container.Config{
 		Image:        PlayitDockerImage,
-		Entrypoint:   []string{"playit"},
-		Cmd:          []string{"--secret_path", "/etc/playit/playit.toml", "start"},
 		Env:          env,
 		Tty:          true,
 		AttachStdout: true,
