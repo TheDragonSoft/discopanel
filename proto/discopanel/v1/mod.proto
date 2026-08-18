@@ -35,6 +35,7 @@ message Mod {
   google.protobuf.Timestamp uploaded_at = 11;
   google.protobuf.Timestamp updated_at = 12;
   bool enabled = 13;
+  string icon_url = 14;
 }
 
 // Server mods request
