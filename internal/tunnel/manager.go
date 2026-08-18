@@ -445,7 +445,7 @@ func (m *Manager) SyncPlayitTunnels(ctx context.Context, serverID string) ([]*st
 
 		// Find which server matches this port
 		for _, srv := range servers {
-			isMatch := (srv.Port == port) || (srv.Port == 0 && port == 25565)
+			isMatch := (srv.Port == port) || (srv.Port == 0 && port == 25565) || (len(servers) == 1)
 			if !isMatch {
 				for _, ap := range srv.AdditionalPorts {
 					if ap != nil && (int(ap.HostPort) == port || int(ap.ContainerPort) == port) {
@@ -457,7 +457,19 @@ func (m *Manager) SyncPlayitTunnels(ctx context.Context, serverID string) ([]*st
 
 			if isMatch {
 				key := fmt.Sprintf("%s:%d", srv.ID, port)
-				if existing, ok := existingMap[key]; ok {
+				existing, ok := existingMap[key]
+				if !ok {
+					// Fallback: check if server already has any tunnel without public address
+					for _, ext := range existingTunnels {
+						if ext.ServerID == srv.ID && (ext.PublicAddress == "" || ext.TargetPort == port) {
+							existing = ext
+							ok = true
+							break
+						}
+					}
+				}
+
+				if ok && existing != nil {
 					changed := false
 					if rt.PublicAddress != "" && existing.PublicAddress != rt.PublicAddress {
 						existing.PublicAddress = rt.PublicAddress
@@ -739,7 +751,7 @@ func (m *Manager) pollActiveTunnels(ctx context.Context) {
 				apiTunnels, err := m.apiClient.ListTunnels(ctx, secretKey)
 				if err == nil {
 					for _, at := range apiTunnels {
-						if at.LocalPort == t.TargetPort || at.Name == t.Name {
+						if at.LocalPort == t.TargetPort || at.Name == t.Name || len(apiTunnels) == 1 {
 							if at.PublicAddress != "" {
 								t.PublicAddress = at.PublicAddress
 								t.PublicPort = at.PublicPort

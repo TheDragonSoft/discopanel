@@ -179,31 +179,53 @@ func (c *PlayitAPIClient) ListTunnels(ctx context.Context, secretKey string) ([]
 			item.TunnelType = tunnelType
 		}
 
-		// Extract public domain / display address
+		// 1. Extract domain object
 		if domain, ok := tmap["domain"].(map[string]interface{}); ok {
 			if domainName, ok := domain["name"].(string); ok && domainName != "" {
 				item.PublicAddress = domainName
 			}
+			if domainStr, ok := domain["domain"].(string); ok && domainStr != "" && item.PublicAddress == "" {
+				item.PublicAddress = domainStr
+			}
 		}
 
-		// Extract allocation
+		// 2. Extract allocation object
 		if alloc, ok := tmap["alloc"].(map[string]interface{}); ok {
 			if allocData, ok := alloc["data"].(map[string]interface{}); ok {
-				if ipHost, ok := allocData["ip_hostname"].(string); ok && item.PublicAddress == "" {
+				if assignedDomain, ok := allocData["assigned_domain"].(string); ok && assignedDomain != "" && item.PublicAddress == "" {
+					item.PublicAddress = assignedDomain
+				}
+				if ipHost, ok := allocData["ip_hostname"].(string); ok && ipHost != "" && item.PublicAddress == "" {
 					item.PublicAddress = ipHost
 				}
-				if port, ok := allocData["port"].(float64); ok {
+				if assignedSrv, ok := allocData["assigned_srv"].(string); ok && assignedSrv != "" && item.PublicAddress == "" {
+					item.PublicAddress = assignedSrv
+				}
+				if port, ok := allocData["port_start"].(float64); ok && port > 0 {
+					item.PublicPort = int(port)
+				} else if port, ok := allocData["port"].(float64); ok && port > 0 {
 					item.PublicPort = int(port)
 				}
 			}
 		}
 
-		// Extract origin local port
+		// 3. Extract origin local port
 		if origin, ok := tmap["origin"].(map[string]interface{}); ok {
 			if originData, ok := origin["data"].(map[string]interface{}); ok {
-				if lp, ok := originData["local_port"].(float64); ok {
+				if lp, ok := originData["local_port"].(float64); ok && lp > 0 {
 					item.LocalPort = int(lp)
+				} else if port, ok := originData["port"].(float64); ok && port > 0 {
+					item.LocalPort = int(port)
 				}
+			}
+		}
+
+		// 4. Default fallback port if unspecified
+		if item.LocalPort <= 0 {
+			if item.TunnelType == "minecraft-bedrock" {
+				item.LocalPort = 19132
+			} else {
+				item.LocalPort = 25565
 			}
 		}
 

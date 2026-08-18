@@ -535,27 +535,32 @@
 								{/if}
 
 								<!-- Running Connection Box -->
-								{#if t.status === TunnelStatus.RUNNING && t.publicAddress}
-									<div class="rounded-xl border border-emerald-500/20 bg-emerald-500/5 p-4">
+								{#if t.status === TunnelStatus.RUNNING}
+									<div class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 shadow-sm">
 										<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-											<div>
-												<p class="text-xs font-medium text-muted-foreground uppercase tracking-wider">
-													Public WAN Join Address
-												</p>
+											<div class="space-y-1">
+												<div class="flex items-center gap-1.5">
+													<span class="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+													<p class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+														Public WAN Join Address
+													</p>
+												</div>
 												<p class="font-mono text-xl font-bold tracking-tight text-foreground">
 													{getTunnelPublicEndpoint(t)}
 												</p>
 											</div>
-											<div class="flex items-center gap-2">
-												<Button
-													size="sm"
-													class="gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
-													onclick={() => copyToClipboard(getTunnelPublicEndpoint(t))}
-												>
-													<Copy class="h-4 w-4" />
-													Copy Address
-												</Button>
-											</div>
+											{#if t.publicAddress}
+												<div class="flex items-center gap-2">
+													<Button
+														size="sm"
+														class="gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400 shadow-sm"
+														onclick={() => copyToClipboard(getTunnelPublicEndpoint(t))}
+													>
+														<Copy class="h-4 w-4" />
+														Copy Address
+													</Button>
+												</div>
+											{/if}
 										</div>
 									</div>
 								{/if}
