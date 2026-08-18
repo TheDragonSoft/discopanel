@@ -250,9 +250,14 @@ func (c *PlayitAPIClient) ListTunnels(ctx context.Context, secretKey string) ([]
 			item.TunnelType = tunnelType
 		}
 
+		// 0. Extract display_address if directly present
+		if displayAddr, ok := tmap["display_address"].(string); ok && displayAddr != "" {
+			item.PublicAddress = displayAddr
+		}
+
 		// 1. Extract domain object
 		if domain, ok := tmap["domain"].(map[string]interface{}); ok {
-			if domainName, ok := domain["name"].(string); ok && domainName != "" {
+			if domainName, ok := domain["name"].(string); ok && domainName != "" && item.PublicAddress == "" {
 				item.PublicAddress = domainName
 			}
 			if domainStr, ok := domain["domain"].(string); ok && domainStr != "" && item.PublicAddress == "" {
@@ -309,9 +314,11 @@ func (c *PlayitAPIClient) ListTunnels(ctx context.Context, secretKey string) ([]
 func (c *PlayitAPIClient) setHeaders(req *http.Request, secretKey string) {
 	cleanKey := strings.TrimSpace(secretKey)
 	req.Header.Set("Content-Type", "application/json")
-	if strings.HasPrefix(cleanKey, "AgentKey ") {
+	if strings.HasPrefix(cleanKey, "agent-key ") {
 		req.Header.Set("Authorization", cleanKey)
+	} else if strings.HasPrefix(cleanKey, "AgentKey ") {
+		req.Header.Set("Authorization", "agent-key "+strings.TrimPrefix(cleanKey, "AgentKey "))
 	} else {
-		req.Header.Set("Authorization", "AgentKey "+cleanKey)
+		req.Header.Set("Authorization", "agent-key "+cleanKey)
 	}
 }
