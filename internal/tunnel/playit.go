@@ -131,13 +131,19 @@ func (d *PlayitDriver) CreateContainer(ctx context.Context, tunnel *storage.Tunn
 			Type:   "json-file",
 			Config: map[string]string{"max-size": "10m", "max-file": "2"},
 		},
-		ExtraHosts: []string{"host.docker.internal:host-gateway"},
 	}
 
 	networkConfig := &network.NetworkingConfig{}
-	if d.config.Docker.NetworkName != "" {
-		networkConfig.EndpointsConfig = map[string]*network.EndpointSettings{
-			d.config.Docker.NetworkName: {},
+	serverContainerName := fmt.Sprintf("discopanel-server-%s", server.ID)
+	if server.ID != "" && server.ID != "setup" {
+		// Share server container network stack so 127.0.0.1:<port> connects directly to Minecraft on loopback
+		hostConfig.NetworkMode = container.NetworkMode("container:" + serverContainerName)
+	} else {
+		hostConfig.ExtraHosts = []string{"host.docker.internal:host-gateway"}
+		if d.config.Docker.NetworkName != "" {
+			networkConfig.EndpointsConfig = map[string]*network.EndpointSettings{
+				d.config.Docker.NetworkName: {},
+			}
 		}
 	}
 
@@ -177,7 +183,7 @@ func ReadSecretFromToml(dir string) (string, error) {
 var (
 	ansiRegex         = regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]|\x1b\([a-zA-Z]|\x1b\)?`)
 	claimURLRegex     = regexp.MustCompile(`https?://playit\.gg/claim/([a-zA-Z0-9_\-]+)`)
-	publicAddrRegex   = regexp.MustCompile(`([a-zA-Z0-9_\-]+\.(?:gl\.joinmc\.link|craft\.ply\.gg|ply\.gg|auto\.playit\.gg))(?::(\d+))?`)
+	publicAddrRegex   = regexp.MustCompile(`\b([a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*\.(?:gl\.joinmc\.link|craft\.ply\.gg|tun\.ply\.gg|ply\.gg|auto\.playit\.gg))(?::(\d+))?\b`)
 	tunnelActiveRegex = regexp.MustCompile(`(?i)(tunnel active|tunnel running|connected to server|established connection|registered tunnel|agent registered|playit connected)`)
 )
 
