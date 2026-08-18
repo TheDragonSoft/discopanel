@@ -180,4 +180,21 @@ var ProcedurePermissions = map[string]ProcedurePermission{
 	"/discopanel.v1.UploadService/InitUpload":      {Resource: ResourceUploads, Action: ActionCreate},
 	"/discopanel.v1.UploadService/UploadChunk":     {Resource: ResourceUploads, Action: ActionCreate},
 	"/discopanel.v1.UploadService/CancelUpload":    {Resource: ResourceUploads, Action: ActionDelete},
+
+	// ── TunnelService ──────────────────────────────────────────────────
+	"/discopanel.v1.TunnelService/GetServerTunnels":        {Resource: ResourceTunnels, Action: ActionRead, ObjectIDField: "server_id"},
+	"/discopanel.v1.TunnelService/ListTunnels":             {Resource: ResourceTunnels, Action: ActionRead},
+	"/discopanel.v1.TunnelService/GetTunnel":               {Resource: ResourceTunnels, Action: ActionRead, ObjectIDField: "id"},
+	"/discopanel.v1.TunnelService/CreateTunnel":            {Resource: ResourceTunnels, Action: ActionCreate, ObjectIDField: "server_id"},
+	"/discopanel.v1.TunnelService/UpdateTunnel":            {Resource: ResourceTunnels, Action: ActionUpdate, ObjectIDField: "id"},
+	"/discopanel.v1.TunnelService/DeleteTunnel":            {Resource: ResourceTunnels, Action: ActionDelete, ObjectIDField: "id"},
+	"/discopanel.v1.TunnelService/StartTunnel":             {Resource: ResourceTunnels, Action: ActionStart, ObjectIDField: "id"},
+	"/discopanel.v1.TunnelService/StopTunnel":              {Resource: ResourceTunnels, Action: ActionStop, ObjectIDField: "id"},
+	"/discopanel.v1.TunnelService/RestartTunnel":           {Resource: ResourceTunnels, Action: ActionRestart, ObjectIDField: "id"},
+	"/discopanel.v1.TunnelService/GetTunnelLogs":           {Resource: ResourceTunnels, Action: ActionRead, ObjectIDField: "id"},
+	"/discopanel.v1.TunnelService/GetPlayitAccountConfig":  {Resource: ResourceSettings, Action: ActionRead},
+	"/discopanel.v1.TunnelService/StartAccountLinkSession": {Resource: ResourceSettings, Action: ActionUpdate},
+	"/discopanel.v1.TunnelService/CheckAccountLinkStatus":  {Resource: ResourceSettings, Action: ActionUpdate},
+	"/discopanel.v1.TunnelService/SetPlayitAccountSecret":  {Resource: ResourceSettings, Action: ActionUpdate},
+	"/discopanel.v1.TunnelService/UnlinkPlayitAccount":     {Resource: ResourceSettings, Action: ActionUpdate},
 }

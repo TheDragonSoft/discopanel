@@ -21,6 +21,7 @@ import (
 	"github.com/nickheyer/discopanel/internal/proxy"
 	"github.com/nickheyer/discopanel/internal/rpc"
 	"github.com/nickheyer/discopanel/internal/scheduler"
+	"github.com/nickheyer/discopanel/internal/tunnel"
 	"github.com/nickheyer/discopanel/pkg/logger"
 	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
 )
@@ -97,6 +98,10 @@ func main() {
 	if err != nil {
 		log.Error("Failed to list modules for cleanup: %v", err)
 	}
+	tunnels, err := store.ListTunnels(ctx)
+	if err != nil {
+		log.Error("Failed to list tunnels for cleanup: %v", err)
+	}
 
 	// Build map of tracked container IDs
 	trackedIDs := make(map[string]bool)
@@ -108,6 +113,11 @@ func main() {
 	for _, module := range modules {
 		if module.ContainerID != "" {
 			trackedIDs[module.ContainerID] = true
+		}
+	}
+	for _, t := range tunnels {
+		if t.ContainerID != "" {
+			trackedIDs[t.ContainerID] = true
 		}
 	}
 
@@ -193,6 +203,13 @@ func main() {
 	}
 	defer moduleManager.Stop()
 
+	// Initialize tunnel manager (Playit.gg)
+	tunnelManager := tunnel.NewManager(store, dockerClient, eventBus, cfg, log)
+	if err := tunnelManager.Start(ctx); err != nil {
+		log.Error("Failed to start tunnel manager: %v", err)
+	}
+	defer tunnelManager.Stop()
+
 	// Register event consumers on the event bus - EVENT CONSUMERS REGISTER HERE...
 	eventBus.Subscribe(moduleManager.HandleServerEvent)
 	eventBus.Subscribe(taskScheduler.HandleServerEvent)
@@ -204,7 +221,7 @@ func main() {
 	defer metricsCollector.Stop()
 
 	// Initialize RPC server with full configuration
-	rpcServer := rpc.NewServer(store, dockerClient, sender, cfg, proxyManager, taskScheduler, metricsCollector, moduleManager, eventBus, log)
+	rpcServer := rpc.NewServer(store, dockerClient, sender, cfg, proxyManager, taskScheduler, metricsCollector, moduleManager, tunnelManager, eventBus, log)
 
 	// Print recovery key
 	if key := rpcServer.RecoveryKey(); key != "" {

@@ -375,10 +375,10 @@
 				</SidebarFooter>
 			</Sidebar>
 
-			<SidebarInset class="flex h-screen flex-col">
-				<main class="flex-1">
+			<SidebarInset class="flex h-screen flex-col overflow-y-auto overflow-x-hidden min-w-0 max-w-full">
+				<div class="flex-1 min-w-0">
 					{@render children?.()}
-				</main>
+				</div>
 			</SidebarInset>
 		</SidebarProvider>
 	</div>

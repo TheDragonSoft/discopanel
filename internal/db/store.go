@@ -1020,6 +1020,9 @@ func (s *Store) GetSystemSetting(ctx context.Context, key string) (string, error
 	var setting SystemSetting
 	err := s.db.WithContext(ctx).First(&setting, "key = ?", key).Error
 	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return "", nil
+		}
 		return "", err
 	}
 	return setting.Value, nil
@@ -1028,6 +1031,10 @@ func (s *Store) GetSystemSetting(ctx context.Context, key string) (string, error
 func (s *Store) SetSystemSetting(ctx context.Context, key, value string) error {
 	setting := SystemSetting{Key: key, Value: value}
 	return s.db.WithContext(ctx).Save(&setting).Error
+}
+
+func (s *Store) DeleteSystemSetting(ctx context.Context, key string) error {
+	return s.db.WithContext(ctx).Where("key = ?", key).Delete(&SystemSetting{}).Error
 }
 
 // ScheduledTask operations
@@ -1435,3 +1442,68 @@ func (s *Store) ListEventTriggeredTasks(ctx context.Context, serverID string, ev
 	}
 	return matching, nil
 }
+
+// Tunnel operations
+func (s *Store) CreateTunnel(ctx context.Context, tunnel *Tunnel) error {
+	if tunnel.ID == "" {
+		tunnel.ID = uuid.New().String()
+	}
+	return s.db.WithContext(ctx).Create(tunnel).Error
+}
+
+func (s *Store) GetTunnel(ctx context.Context, id string) (*Tunnel, error) {
+	var tunnel Tunnel
+	err := s.db.WithContext(ctx).Preload("Server").Where("id = ?", id).First(&tunnel).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("tunnel not found")
+		}
+		return nil, err
+	}
+	return &tunnel, nil
+}
+
+func (s *Store) GetServerTunnels(ctx context.Context, serverID string) ([]*Tunnel, error) {
+	var tunnels []*Tunnel
+	err := s.db.WithContext(ctx).Preload("Server").Where("server_id = ?", serverID).Order("created_at ASC").Find(&tunnels).Error
+	return tunnels, err
+}
+
+func (s *Store) ListTunnels(ctx context.Context) ([]*Tunnel, error) {
+	var tunnels []*Tunnel
+	err := s.db.WithContext(ctx).Preload("Server").Order("created_at DESC").Find(&tunnels).Error
+	return tunnels, err
+}
+
+func (s *Store) UpdateTunnel(ctx context.Context, tunnel *Tunnel) error {
+	return s.db.WithContext(ctx).Save(tunnel).Error
+}
+
+func (s *Store) DeleteTunnel(ctx context.Context, id string) error {
+	return s.db.WithContext(ctx).Where("id = ?", id).Delete(&Tunnel{}).Error
+}
+
+func (s *Store) GetTunnelByContainerID(ctx context.Context, containerID string) (*Tunnel, error) {
+	var tunnel Tunnel
+	err := s.db.WithContext(ctx).Preload("Server").Where("container_id = ?", containerID).First(&tunnel).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+	return &tunnel, nil
+}
+
+func (s *Store) ListAutoStartTunnels(ctx context.Context) ([]*Tunnel, error) {
+	var tunnels []*Tunnel
+	err := s.db.WithContext(ctx).Preload("Server").Where("auto_start = ?", true).Find(&tunnels).Error
+	return tunnels, err
+}
+
+func (s *Store) ListTunnelsFollowingServerLifecycle(ctx context.Context, serverID string) ([]*Tunnel, error) {
+	var tunnels []*Tunnel
+	err := s.db.WithContext(ctx).Preload("Server").Where("server_id = ? AND follow_server_lifecycle = ?", serverID, true).Find(&tunnels).Error
+	return tunnels, err
+}
+
