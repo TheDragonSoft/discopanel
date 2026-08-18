@@ -187,6 +187,55 @@
 		}
 	}
 
+	interface ParsedLogLine {
+		raw: string;
+		timestamp?: string;
+		level: 'INFO' | 'WARN' | 'ERROR' | 'DEBUG' | 'TRACE' | 'OTHER';
+		module?: string;
+		message: string;
+		isIpv6Probe?: boolean;
+		isConnectedNotice?: boolean;
+	}
+
+	function parseLogLine(line: string): ParsedLogLine {
+		const raw = line.trim();
+		const match = raw.match(/^(\d{4}-\d{2}-\d{2}T(\d{2}:\d{2}:\d{2})\.\d+Z)\s+([A-Z]+)\s+([^:]+):\s+(.*)$/);
+		if (match) {
+			const time = match[2];
+			const levelStr = match[3];
+			const module = match[4];
+			const message = match[5];
+
+			let level: ParsedLogLine['level'] = 'OTHER';
+			if (levelStr === 'INFO') level = 'INFO';
+			else if (levelStr === 'WARN') level = 'WARN';
+			else if (levelStr === 'ERROR') level = 'ERROR';
+			else if (levelStr === 'DEBUG') level = 'DEBUG';
+			else if (levelStr === 'TRACE') level = 'TRACE';
+
+			const isIpv6Probe = raw.includes('Network unreachable') || raw.includes('addr=[');
+			const isConnectedNotice = raw.includes('playit connected; tunnels loaded');
+
+			return {
+				raw,
+				timestamp: time,
+				level,
+				module,
+				message,
+				isIpv6Probe,
+				isConnectedNotice
+			};
+		}
+
+		return {
+			raw,
+			level: raw.includes('ERROR') ? 'ERROR' : raw.includes('WARN') ? 'WARN' : 'INFO',
+			message: raw,
+			isIpv6Probe: raw.includes('Network unreachable'),
+			isConnectedNotice: raw.includes('playit connected; tunnels loaded')
+		};
+	}
+
 	async function syncFromPlayit() {
 		tunnelsLoading = true;
 		try {
@@ -195,11 +244,13 @@
 			hasGlobalAccount = res.hasGlobalAccount;
 
 			const expectedPort = server.port || 25565;
-			const matching = tunnels.filter((t) => t.targetPort === expectedPort);
-			if (matching.length === 0) {
+			const validMatching = tunnels.filter(
+				(t) => t.targetPort === expectedPort && t.publicAddress && t.publicAddress.trim() !== ''
+			);
+			if (validMatching.length === 0) {
 				noMatchingTunnelModalOpen = true;
 			} else {
-				toast.success('Synced successfully from Playit.gg!');
+				toast.success(`Synced ${validMatching[0].publicAddress} from Playit.gg!`);
 			}
 		} catch (e: unknown) {
 			const msg = e instanceof Error ? e.message : 'Failed to sync from Playit.gg';
@@ -499,10 +550,17 @@
 
 									<div class="flex items-center gap-2">
 										{#if t.status === TunnelStatus.RUNNING}
-											<Badge variant="default" class="gap-1.5 bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400">
-												<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-												Live Online
-											</Badge>
+											{#if t.publicAddress && t.publicAddress.trim() !== ''}
+												<Badge variant="default" class="gap-1.5 bg-emerald-500/15 text-emerald-600 hover:bg-emerald-500/20 dark:text-emerald-400">
+													<span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+													Live Online
+												</Badge>
+											{:else}
+												<Badge variant="secondary" class="gap-1.5 border-amber-500/30 bg-amber-500/15 text-amber-600 dark:text-amber-400">
+													<AlertCircle class="h-3.5 w-3.5" />
+													Awaiting Port Mapping
+												</Badge>
+											{/if}
 										{:else if t.status === TunnelStatus.CLAIM_PENDING}
 											<Badge variant="secondary" class="gap-1.5 border-amber-500/30 bg-amber-500/15 text-amber-600 dark:text-amber-400">
 												<AlertCircle class="h-3.5 w-3.5 animate-bounce" />
@@ -562,20 +620,20 @@
 
 								<!-- Running Connection Box -->
 								{#if t.status === TunnelStatus.RUNNING}
-									<div class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 shadow-sm">
-										<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-											<div class="space-y-1">
-												<div class="flex items-center gap-1.5">
-													<span class="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
-													<p class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
-														Public WAN Join Address
+									{#if t.publicAddress && t.publicAddress.trim() !== ''}
+										<div class="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-4 shadow-sm">
+											<div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+												<div class="space-y-1">
+													<div class="flex items-center gap-1.5">
+														<span class="inline-block h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+														<p class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">
+															Public WAN Join Address
+														</p>
+													</div>
+													<p class="font-mono text-xl font-bold tracking-tight text-foreground">
+														{getTunnelPublicEndpoint(t)}
 													</p>
 												</div>
-												<p class="font-mono text-xl font-bold tracking-tight text-foreground">
-													{getTunnelPublicEndpoint(t)}
-												</p>
-											</div>
-											{#if t.publicAddress}
 												<div class="flex items-center gap-2">
 													<Button
 														size="sm"
@@ -586,9 +644,38 @@
 														Copy Address
 													</Button>
 												</div>
-											{/if}
+											</div>
 										</div>
-									</div>
+									{:else}
+										<div class="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 shadow-sm">
+											<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+												<div class="space-y-1">
+													<div class="flex items-center gap-1.5">
+														<AlertCircle class="h-4 w-4 text-amber-500" />
+														<p class="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wider">
+															Port Mapping Required on Playit.gg
+														</p>
+													</div>
+													<p class="text-sm font-medium text-foreground">
+														Playit agent is active, but no tunnel was found for port <code class="font-mono font-bold text-amber-500">{t.targetPort}</code>.
+													</p>
+													<p class="text-xs text-muted-foreground">
+														Please add a tunnel forwarding to local port {t.targetPort} on your Playit dashboard, then click Sync.
+													</p>
+												</div>
+												<div class="flex items-center gap-2">
+													<Button
+														size="sm"
+														class="gap-1.5 bg-amber-600 text-white hover:bg-amber-700 dark:bg-amber-500 dark:text-black dark:hover:bg-amber-400 shadow-sm"
+														onclick={() => window.open('https://playit.gg/manage/tunnels', '_blank')}
+													>
+														<ExternalLink class="h-3.5 w-3.5" />
+														Add Port {t.targetPort} on Playit.gg
+													</Button>
+												</div>
+											</div>
+										</div>
+									{/if}
 								{/if}
 
 								<!-- Toolbar -->
@@ -934,33 +1021,105 @@
 
 <!-- Tunnel Logs Dialog -->
 <Dialog.Root bind:open={logsModalOpen}>
-	<Dialog.Content class="max-w-3xl">
-		<Dialog.Header>
-			<Dialog.Title class="flex items-center gap-2">
-				<Terminal class="h-5 w-5 text-primary" />
-				Tunnel Logs: {activeLogTunnel?.name}
-			</Dialog.Title>
-			<Dialog.Description>
-				Recent container output from Playit.gg agent
-			</Dialog.Description>
+	<Dialog.Content class="max-w-3xl sm:max-h-[85vh] flex flex-col p-0 overflow-hidden border border-border/80 bg-zinc-950 text-zinc-100 shadow-2xl">
+		<Dialog.Header class="p-4 sm:p-5 border-b border-zinc-800/80 bg-zinc-900/50">
+			<div class="flex flex-wrap items-center justify-between gap-3">
+				<div class="flex items-center gap-2.5">
+					<div class="flex h-9 w-9 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-400">
+						<Terminal class="h-5 w-5" />
+					</div>
+					<div>
+						<Dialog.Title class="text-base font-semibold text-zinc-100">
+							Playit Tunnel Logs: {activeLogTunnel?.name}
+						</Dialog.Title>
+						<Dialog.Description class="text-xs text-zinc-400">
+							Target: <code class="font-mono text-zinc-300">{activeLogTunnel?.targetHost}:{activeLogTunnel?.targetPort}</code> • Container: <code class="font-mono text-zinc-400">{activeLogTunnel?.containerId?.slice(0, 12) || 'N/A'}</code>
+						</Dialog.Description>
+					</div>
+				</div>
+
+				<div class="flex items-center gap-2">
+					<Button
+						variant="outline"
+						size="sm"
+						class="h-8 gap-1.5 border-zinc-700 bg-zinc-800/60 text-xs text-zinc-300 hover:bg-zinc-700 hover:text-white"
+						onclick={() => {
+							if (activeLogTunnel) viewLogs(activeLogTunnel);
+						}}
+						disabled={logsLoading}
+					>
+						<RotateCw class="h-3.5 w-3.5 {logsLoading ? 'animate-spin' : ''}" />
+						<span>Refresh</span>
+					</Button>
+					<Button
+						variant="outline"
+						size="sm"
+						class="h-8 gap-1.5 border-zinc-700 bg-zinc-800/60 text-xs text-zinc-300 hover:bg-zinc-700 hover:text-white"
+						onclick={() => copyToClipboard(tunnelLogs.join('\n'))}
+					>
+						<Copy class="h-3.5 w-3.5" />
+						<span>Copy All</span>
+					</Button>
+				</div>
+			</div>
 		</Dialog.Header>
 
-		<div class="mt-2 h-80 overflow-y-auto rounded-lg bg-black/90 p-4 font-mono text-xs text-green-400">
+		<div class="relative flex-1 overflow-y-auto max-h-[55vh] min-h-[300px] p-4 font-mono text-xs leading-relaxed space-y-1 bg-zinc-950 selection:bg-emerald-500/30">
 			{#if logsLoading}
-				<div class="flex h-full items-center justify-center">
-					<Loader2 class="h-6 w-6 animate-spin text-muted-foreground" />
+				<div class="flex h-64 flex-col items-center justify-center gap-2 text-zinc-500">
+					<Loader2 class="h-6 w-6 animate-spin text-emerald-400" />
+					<p class="text-xs">Fetching tunnel container output...</p>
 				</div>
 			{:else if tunnelLogs.length === 0}
-				<p class="text-muted-foreground">No logs recorded yet.</p>
+				<div class="flex h-64 flex-col items-center justify-center gap-2 text-zinc-500">
+					<Terminal class="h-8 w-8 text-zinc-600" />
+					<p class="text-xs">No logs recorded for this tunnel container yet.</p>
+				</div>
 			{:else}
-				{#each tunnelLogs as logLine, idx (idx)}
-					<div class="leading-relaxed whitespace-pre-wrap break-all">{logLine}</div>
+				{#each tunnelLogs as rawLine, idx (idx)}
+					{@const parsed = parseLogLine(rawLine)}
+					<div class="group flex items-start gap-2.5 rounded px-2 py-1 transition-colors hover:bg-zinc-900/70 {parsed.isConnectedNotice ? 'bg-emerald-950/40 border border-emerald-500/30' : parsed.level === 'ERROR' && !parsed.isIpv6Probe ? 'bg-red-950/20' : ''}">
+						<span class="w-7 shrink-0 text-right select-none text-[11px] text-zinc-600 group-hover:text-zinc-400">
+							{idx + 1}
+						</span>
+						{#if parsed.timestamp}
+							<span class="shrink-0 select-none text-[11px] text-zinc-500 font-semibold">
+								{parsed.timestamp}
+							</span>
+						{/if}
+						<span class="shrink-0">
+							{#if parsed.isIpv6Probe}
+								<span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-bold text-zinc-400">IPv6 PROBE</span>
+							{:else if parsed.isConnectedNotice}
+								<span class="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400 border border-emerald-500/40">CONNECTED</span>
+							{:else if parsed.level === 'INFO'}
+								<span class="rounded bg-emerald-900/40 px-1.5 py-0.5 text-[10px] font-bold text-emerald-400">INFO</span>
+							{:else if parsed.level === 'WARN'}
+								<span class="rounded bg-amber-900/40 px-1.5 py-0.5 text-[10px] font-bold text-amber-400">WARN</span>
+							{:else if parsed.level === 'ERROR'}
+								<span class="rounded bg-red-900/40 px-1.5 py-0.5 text-[10px] font-bold text-red-400">ERROR</span>
+							{:else}
+								<span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-bold text-zinc-400">{parsed.level}</span>
+							{/if}
+						</span>
+						<div class="min-w-0 flex-1 break-words whitespace-pre-wrap text-zinc-300">
+							{#if parsed.module}
+								<span class="text-zinc-500">{parsed.module}: </span>
+							{/if}
+							<span class="{parsed.isConnectedNotice ? 'text-emerald-300 font-semibold' : parsed.level === 'ERROR' && !parsed.isIpv6Probe ? 'text-red-300' : parsed.level === 'WARN' ? 'text-amber-300' : 'text-zinc-300'}">{parsed.message}</span>
+						</div>
+					</div>
 				{/each}
 			{/if}
 		</div>
 
-		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (logsModalOpen = false)}>Close</Button>
+		<Dialog.Footer class="p-3 sm:p-4 border-t border-zinc-800/80 bg-zinc-900/50 flex items-center justify-between">
+			<span class="text-xs text-zinc-500">
+				Showing latest {tunnelLogs.length} lines
+			</span>
+			<Button variant="outline" size="sm" class="border-zinc-700 bg-zinc-800 text-zinc-300 hover:bg-zinc-700 hover:text-white" onclick={() => (logsModalOpen = false)}>
+				Close
+			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

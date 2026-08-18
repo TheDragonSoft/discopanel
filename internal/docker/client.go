@@ -470,9 +470,11 @@ func (c *Client) CreateContainer(ctx context.Context, server *models.Server, ser
 		},
 	}
 
-	// Apply global DNS from config
+	// Apply global DNS from config, defaulting to reliable public DNS if unset
 	if c.config.DNS != "" {
 		hostConfig.DNS = []string{c.config.DNS}
+	} else {
+		hostConfig.DNS = []string{"1.1.1.1", "8.8.8.8", "1.0.0.1"}
 	}
 
 	// Apply global labels from config
