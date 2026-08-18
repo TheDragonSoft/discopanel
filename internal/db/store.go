@@ -11,7 +11,6 @@ import (
 	"github.com/glebarez/sqlite"
 	"github.com/nickheyer/discopanel/internal/config"
 	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
-	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 )
