@@ -65,10 +65,13 @@
 	import ServerFiles from '$lib/components/files/server-files.svelte';
 	import ServerRouting from '$lib/components/server-routing.svelte';
 	import TerrariaConfigEditor from '$lib/components/terraria/terraria-config-editor.svelte';
+	import type { TerrariaConfig } from '$lib/proto/discopanel/v1/terraria_pb';
 	import ServerTasks from '$lib/components/server-tasks.svelte';
 	import ServerModules from '$lib/components/server/ServerModules.svelte';
 
 	let server = $state<Server | null>(null);
+	let terrariaConfig = $state<TerrariaConfig | null>(null);
+	let savingTerrariaConfig = $state(false);
 	let tunnels = $state<Tunnel[]>([]);
 	let activeWanTunnel = $derived(
 		tunnels.find((t) => t.status === TunnelStatus.RUNNING && !!t.publicAddress) ||
@@ -126,6 +129,9 @@
 				server = response.server;
 				serversStore.updateServer(server);
 				loading = false;
+				if (server.gameType === GameType.TERRARIA && !terrariaConfig) {
+					loadTerrariaConfig(requestedId);
+				}
 			}
 
 			// Load tunnels to discover WAN Playit addresses
@@ -146,6 +152,33 @@
 				toast.error('Failed to load server');
 				loading = false;
 			}
+		}
+	}
+
+	async function loadTerrariaConfig(id: string) {
+		try {
+			const res = await rpcClient.terraria.getTerrariaConfig({ serverId: id });
+			if (res.config && serverId === id) {
+				terrariaConfig = res.config;
+			}
+		} catch (e) {
+			console.error('Failed to load terraria config:', e);
+		}
+	}
+
+	async function saveTerrariaConfig() {
+		if (!serverId || !terrariaConfig) return;
+		savingTerrariaConfig = true;
+		try {
+			await rpcClient.terraria.updateTerrariaConfig({
+				serverId,
+				config: terrariaConfig
+			});
+			toast.success('Terraria configuration saved successfully');
+		} catch (e) {
+			toast.error(`Failed to save configuration: ${e instanceof Error ? e.message : 'Unknown error'}`);
+		} finally {
+			savingTerrariaConfig = false;
 		}
 	}
 
@@ -1204,10 +1237,18 @@
 									<CardDescription>Edit serverconfig.txt parameters</CardDescription>
 								</CardHeader>
 								<CardContent>
-									<TerrariaConfigEditor config={(server as any).terrariaConfig} disabled={server.status !== ServerStatus.STOPPED} />
-									<div class="mt-6 flex justify-end">
-										<Button disabled={server.status !== ServerStatus.STOPPED}>Save Changes</Button>
-									</div>
+									{#if terrariaConfig}
+										<TerrariaConfigEditor bind:config={terrariaConfig} disabled={server.status !== ServerStatus.STOPPED} />
+										<div class="mt-6 flex justify-end">
+											<Button onclick={saveTerrariaConfig} disabled={server.status !== ServerStatus.STOPPED || savingTerrariaConfig}>
+												{savingTerrariaConfig ? 'Saving...' : 'Save Changes'}
+											</Button>
+										</div>
+									{:else}
+										<div class="flex justify-center p-8">
+											<Loader2 class="h-6 w-6 animate-spin text-muted-foreground" />
+										</div>
+									{/if}
 								</CardContent>
 							</Card>
 						</div>

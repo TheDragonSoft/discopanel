@@ -14,6 +14,7 @@
   ];
 </script>
 
+{#if config}
 <div class="space-y-6">
   <div class="grid grid-cols-2 gap-4">
     <div class="space-y-2">
@@ -69,3 +70,4 @@
     <Switch bind:checked={config.spawnProtection} {disabled} />
   </div>
 </div>
+{/if}
