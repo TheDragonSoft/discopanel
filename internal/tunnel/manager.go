@@ -253,6 +253,12 @@ func (m *Manager) StartTunnel(ctx context.Context, tunnelID string) (*storage.Tu
 		return nil, fmt.Errorf("server not found: %w", err)
 	}
 
+	if server.Status != storage.StatusRunning {
+		tunnel.Status = storage.TunnelStatusStopped
+		_ = m.store.UpdateTunnel(ctx, tunnel)
+		return nil, fmt.Errorf("server '%s' is stopped. Please start the server first to activate this tunnel", server.Name)
+	}
+
 	// Fetch global account secret key
 	accountSecret, _ := m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
 	if accountSecret != "" {
@@ -362,6 +368,19 @@ func (m *Manager) DeleteTunnel(ctx context.Context, tunnelID string) error {
 		_ = m.docker.RemoveContainer(ctx, tunnel.ContainerID)
 	}
 
+	// Delete from Playit.gg remote account if linked
+	accountSecret, _ := m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
+	if accountSecret != "" {
+		remoteTunnels, _ := m.apiClient.ListTunnels(ctx, accountSecret)
+		for _, rt := range remoteTunnels {
+			if (rt.PublicAddress != "" && rt.PublicAddress == tunnel.PublicAddress) || (rt.Name != "" && rt.Name == tunnel.Name) {
+				_ = m.apiClient.DeleteTunnel(ctx, accountSecret, rt.ID)
+				m.logger.Info("Deleted remote Playit tunnel: %s (%s)", rt.Name, rt.ID)
+				break
+			}
+		}
+	}
+
 	return m.store.DeleteTunnel(ctx, tunnelID)
 }
 
@@ -405,8 +424,7 @@ func (m *Manager) ListTunnels(ctx context.Context) ([]*storage.Tunnel, error) {
 }
 
 // SyncPlayitTunnels queries the Playit.gg API for all tunnels on the linked account,
-// maps each tunnel to the appropriate server and target port (e.g. 25565, 19132, etc.),
-// and automatically registers/connects them in DiscoPanel.
+// updates existing tunnels with their assigned public addresses, and provisions unlinked ones.
 func (m *Manager) SyncPlayitTunnels(ctx context.Context, serverID string) ([]*storage.Tunnel, error) {
 	secret, err := m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
 	if err != nil || secret == "" {
@@ -425,23 +443,8 @@ func (m *Manager) SyncPlayitTunnels(ctx context.Context, serverID string) ([]*st
 		return m.store.ListTunnels(ctx)
 	}
 
-	// Fetch target server or all servers
-	var servers []*storage.Server
-	if serverID != "" {
-		srv, err := m.store.GetServer(ctx, serverID)
-		if err == nil && srv != nil {
-			servers = []*storage.Server{srv}
-		}
-	} else {
-		servers, _ = m.store.ListServers(ctx)
-	}
-
+	allServers, _ := m.store.ListServers(ctx)
 	existingTunnels, _ := m.store.ListTunnels(ctx)
-	existingMap := make(map[string]*storage.Tunnel) // key: serverID:port
-	for _, t := range existingTunnels {
-		key := fmt.Sprintf("%s:%d", t.ServerID, t.TargetPort)
-		existingMap[key] = t
-	}
 
 	for _, rt := range remoteTunnels {
 		port := rt.LocalPort
@@ -455,89 +458,86 @@ func (m *Manager) SyncPlayitTunnels(ctx context.Context, serverID string) ([]*st
 			}
 		}
 
-		// Find which server matches this port
-		for _, srv := range servers {
-			isMatch := (srv.Port == port) || (srv.Port == 0 && port == 25565) || (len(servers) == 1)
-			if !isMatch {
-				for _, ap := range srv.AdditionalPorts {
-					if ap != nil && (int(ap.HostPort) == port || int(ap.ContainerPort) == port) {
-						isMatch = true
-						break
-					}
-				}
+		// 1. Check if an existing tunnel in DB already matches this remote tunnel
+		var matchedTunnel *storage.Tunnel
+		for _, ext := range existingTunnels {
+			if rt.PublicAddress != "" && ext.PublicAddress == rt.PublicAddress {
+				matchedTunnel = ext
+				break
 			}
+			if rt.Name != "" && ext.Name == rt.Name {
+				matchedTunnel = ext
+				break
+			}
+		}
 
-			if isMatch {
-				key := fmt.Sprintf("%s:%d", srv.ID, port)
-				existing, ok := existingMap[key]
-				if !ok {
-					// Fallback: check if server already has any tunnel without public address
-					for _, ext := range existingTunnels {
-						if ext.ServerID == srv.ID && (ext.PublicAddress == "" || ext.TargetPort == port) {
-							existing = ext
-							ok = true
-							break
-						}
-					}
-				}
+		if matchedTunnel != nil {
+			changed := false
+			if rt.PublicAddress != "" && matchedTunnel.PublicAddress != rt.PublicAddress {
+				matchedTunnel.PublicAddress = rt.PublicAddress
+				changed = true
+			}
+			if rt.PublicPort > 0 && matchedTunnel.PublicPort != rt.PublicPort {
+				matchedTunnel.PublicPort = rt.PublicPort
+				changed = true
+			}
+			if !matchedTunnel.IsAccountLinked {
+				matchedTunnel.IsAccountLinked = true
+				changed = true
+			}
+			if changed {
+				_ = m.store.UpdateTunnel(ctx, matchedTunnel)
+			}
+			continue
+		}
 
-				if ok && existing != nil {
-					changed := false
-					if rt.PublicAddress != "" && existing.PublicAddress != rt.PublicAddress {
-						existing.PublicAddress = rt.PublicAddress
-						changed = true
-					}
-					if rt.PublicPort > 0 && existing.PublicPort != rt.PublicPort {
-						existing.PublicPort = rt.PublicPort
-						changed = true
-					}
-					if !existing.IsAccountLinked {
-						existing.IsAccountLinked = true
-						changed = true
-					}
-					if changed {
-						_ = m.store.UpdateTunnel(ctx, existing)
-					}
-					if existing.Status == storage.TunnelStatusStopped && existing.AutoStart && srv.Status == storage.StatusRunning {
-						go func(id string) {
-							_, _ = m.StartTunnel(context.Background(), id)
-						}(existing.ID)
-					}
-				} else {
-					tunnelName := rt.Name
-					if tunnelName == "" {
-						tunnelName = fmt.Sprintf("%s WAN Tunnel (%d)", srv.Name, port)
-					}
-					proto := "both"
-					if rt.PortType != "" {
-						proto = rt.PortType
-					}
-					newTunnel := &storage.Tunnel{
-						ID:                    uuid.New().String(),
-						ServerID:              srv.ID,
-						Provider:              "playit",
-						Name:                  tunnelName,
-						Protocol:              proto,
-						TargetHost:            fmt.Sprintf("discopanel-server-%s", srv.ID),
-						TargetPort:            port,
-						Status:                storage.TunnelStatusStopped,
-						IsAccountLinked:       true,
-						PublicAddress:         rt.PublicAddress,
-						PublicPort:            rt.PublicPort,
-						AutoStart:             true,
-						FollowServerLifecycle: true,
-						CreatedAt:             time.Now().UTC(),
-						UpdatedAt:             time.Now().UTC(),
-					}
-					_ = m.store.CreateTunnel(ctx, newTunnel)
-					existingMap[key] = newTunnel
+		// 2. Not found in existing tunnels -> Try to match to a specific server by server name prefix
+		var targetServer *storage.Server
+		for _, srv := range allServers {
+			if strings.HasPrefix(strings.ToLower(rt.Name), strings.ToLower(srv.Name)) {
+				targetServer = srv
+				break
+			}
+		}
 
-					if srv.Status == storage.StatusRunning {
-						go func(id string) {
-							_, _ = m.StartTunnel(context.Background(), id)
-						}(newTunnel.ID)
-					}
-				}
+		// If no name match and only 1 server exists on the entire panel, assign to it
+		if targetServer == nil && len(allServers) == 1 {
+			targetServer = allServers[0]
+		}
+
+		if targetServer != nil {
+			tunnelName := rt.Name
+			if tunnelName == "" {
+				tunnelName = fmt.Sprintf("%s WAN Tunnel (%d)", targetServer.Name, port)
+			}
+			proto := "both"
+			if rt.PortType != "" {
+				proto = rt.PortType
+			}
+			newTunnel := &storage.Tunnel{
+				ID:                    uuid.New().String(),
+				ServerID:              targetServer.ID,
+				Provider:              "playit",
+				Name:                  tunnelName,
+				Protocol:              proto,
+				TargetHost:            fmt.Sprintf("discopanel-server-%s", targetServer.ID),
+				TargetPort:            port,
+				Status:                storage.TunnelStatusStopped,
+				IsAccountLinked:       true,
+				PublicAddress:         rt.PublicAddress,
+				PublicPort:            rt.PublicPort,
+				AutoStart:             true,
+				FollowServerLifecycle: true,
+				CreatedAt:             time.Now().UTC(),
+				UpdatedAt:             time.Now().UTC(),
+			}
+			_ = m.store.CreateTunnel(ctx, newTunnel)
+			existingTunnels = append(existingTunnels, newTunnel)
+
+			if targetServer.Status == storage.StatusRunning {
+				go func(id string) {
+					_, _ = m.StartTunnel(context.Background(), id)
+				}(newTunnel.ID)
 			}
 		}
 	}

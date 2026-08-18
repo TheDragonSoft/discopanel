@@ -98,4 +98,25 @@ func TestPlayitAPIClient(t *testing.T) {
 			t.Errorf("expected 'secret-abc-123', got '%s'", secretKey)
 		}
 	})
+
+	t.Run("DeleteTunnel success", func(t *testing.T) {
+		ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.URL.Path != "/tunnels/delete" {
+				t.Errorf("unexpected path: %s", r.URL.Path)
+			}
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"status":"success"}`))
+		}))
+		defer ts.Close()
+
+		client := &PlayitAPIClient{
+			httpClient: ts.Client(),
+			baseURL:    ts.URL,
+		}
+
+		if err := client.DeleteTunnel(context.Background(), "test-secret", "tun-123"); err != nil {
+			t.Fatalf("DeleteTunnel error: %v", err)
+		}
+	})
 }

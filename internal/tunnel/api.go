@@ -195,6 +195,39 @@ func (c *PlayitAPIClient) CreateTunnel(ctx context.Context, secretKey string, na
 	}, nil
 }
 
+// DeleteTunnel deletes a tunnel on Playit.gg
+func (c *PlayitAPIClient) DeleteTunnel(ctx context.Context, secretKey string, tunnelID string) error {
+	if strings.TrimSpace(secretKey) == "" || strings.TrimSpace(tunnelID) == "" {
+		return nil
+	}
+
+	body := map[string]string{
+		"tunnel_id": tunnelID,
+	}
+	jsonData, err := json.Marshal(body)
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/tunnels/delete", bytes.NewReader(jsonData))
+	if err != nil {
+		return err
+	}
+	c.setHeaders(req, secretKey)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		respBytes, _ := io.ReadAll(resp.Body)
+		return fmt.Errorf("failed to delete tunnel from Playit (HTTP %d): %s", resp.StatusCode, string(respBytes))
+	}
+	return nil
+}
+
 // ListTunnels lists all tunnels registered to the given Playit agent secret key
 func (c *PlayitAPIClient) ListTunnels(ctx context.Context, secretKey string) ([]*PlayitTunnelDetails, error) {
 	if strings.TrimSpace(secretKey) == "" {
