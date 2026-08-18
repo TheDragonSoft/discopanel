@@ -48,19 +48,14 @@ func TestPlayitDriverSniffLogs(t *testing.T) {
 		}
 	})
 
-	t.Run("Sniff general playit domain with port", func(t *testing.T) {
+	t.Run("Sniff tun.ply.gg domain from client connection logs", func(t *testing.T) {
 		logs := []string{
-			"playit agent connected",
-			"tunnel address: auto-proxy-1.ply.gg:34567",
-			"started forwarding traffic",
+			"INFO playit_agent_core::network::tcp::tcp_clients: New TCP Client details=NewClient { connect_addr: 147.185.221.22:36104, domain: reminded-known.tun.ply.gg }",
 		}
 
-		_, _, publicAddr, publicPort, isRunning := driver.SniffLogs(logs)
-		if publicAddr != "auto-proxy-1.ply.gg" {
-			t.Errorf("expected public address 'auto-proxy-1.ply.gg', got '%s'", publicAddr)
-		}
-		if publicPort != 34567 {
-			t.Errorf("expected public port 34567, got %d", publicPort)
+		_, _, publicAddr, _, isRunning := driver.SniffLogs(logs)
+		if publicAddr != "reminded-known.tun.ply.gg" {
+			t.Errorf("expected public address 'reminded-known.tun.ply.gg', got '%s'", publicAddr)
 		}
 		if !isRunning {
 			t.Errorf("expected isRunning to be true")

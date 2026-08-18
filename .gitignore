@@ -6,6 +6,7 @@ backups/
 sandbox/
 build/
 discopanel
+*.exe
 !proto/discopanel
 !docs/discopanel
 web/discopanel/src/lib/proto/gnostic/

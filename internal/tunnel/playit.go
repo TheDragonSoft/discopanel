@@ -23,12 +23,6 @@ const (
 	PlayitAccountSessionKey  = "playit_account_session"
 )
 
-var (
-	claimURLRegex     = regexp.MustCompile(`https?://playit\.gg/claim/([a-zA-Z0-9_\-]+)`)
-	publicAddrRegex   = regexp.MustCompile(`([a-zA-Z0-9_\-]+\.(?:gl\.joinmc\.link|craft\.ply\.gg|ply\.gg|auto\.playit\.gg))(?::(\d+))?`)
-	tunnelActiveRegex = regexp.MustCompile(`(?i)(tunnel active|tunnel running|connected to server|established connection|registered tunnel|agent registered)`)
-)
-
 type PlayitDriver struct {
 	docker *docker.Client
 	config *config.Config
@@ -90,12 +84,14 @@ func (d *PlayitDriver) CreateContainer(ctx context.Context, tunnel *storage.Tunn
 	if secretKey == "" && accountSecretKey != "" {
 		secretKey = accountSecretKey
 	}
-	if secretKey != "" {
-		env = append(env,
-			fmt.Sprintf("SECRET_KEY=%s", secretKey),
-			fmt.Sprintf("PLAYIT_SECRET_KEY=%s", secretKey),
-		)
+	if secretKey == "" {
+		return "", fmt.Errorf("Playit secret key is required. Please link your account in Settings -> Routing or enter a secret key for this tunnel")
 	}
+
+	env = append(env,
+		fmt.Sprintf("SECRET_KEY=%s", secretKey),
+		fmt.Sprintf("PLAYIT_SECRET_KEY=%s", secretKey),
+	)
 
 	// Volume mount for persistent playit.toml / configuration
 	hostDataPath := docker.TranslateToHostPath(tunnelDataPath)
@@ -135,13 +131,19 @@ func (d *PlayitDriver) CreateContainer(ctx context.Context, tunnel *storage.Tunn
 			Type:   "json-file",
 			Config: map[string]string{"max-size": "10m", "max-file": "2"},
 		},
-		ExtraHosts: []string{"host.docker.internal:host-gateway"},
 	}
 
 	networkConfig := &network.NetworkingConfig{}
-	if d.config.Docker.NetworkName != "" {
-		networkConfig.EndpointsConfig = map[string]*network.EndpointSettings{
-			d.config.Docker.NetworkName: {},
+	serverContainerName := fmt.Sprintf("discopanel-server-%s", server.ID)
+	if server.ID != "" && server.ID != "setup" {
+		// Share server container network stack so 127.0.0.1:<port> connects directly to Minecraft on loopback
+		hostConfig.NetworkMode = container.NetworkMode("container:" + serverContainerName)
+	} else {
+		hostConfig.ExtraHosts = []string{"host.docker.internal:host-gateway"}
+		if d.config.Docker.NetworkName != "" {
+			networkConfig.EndpointsConfig = map[string]*network.EndpointSettings{
+				d.config.Docker.NetworkName: {},
+			}
 		}
 	}
 
@@ -156,9 +158,44 @@ func (d *PlayitDriver) CreateContainer(ctx context.Context, tunnel *storage.Tunn
 	return resp.ID, nil
 }
 
+// ReadSecretFromToml attempts to read and extract the generated Playit secret key from the mounted directory
+func ReadSecretFromToml(dir string) (string, error) {
+	candidates := []string{
+		filepath.Join(dir, "playit.toml"),
+		filepath.Join(dir, "playit.secret"),
+	}
+	for _, f := range candidates {
+		data, err := os.ReadFile(f)
+		if err == nil {
+			re := regexp.MustCompile(`(?i)(?:secret|secret_key)\s*=\s*["']?([a-zA-Z0-9_\-]+)["']?`)
+			if matches := re.FindStringSubmatch(string(data)); len(matches) > 1 {
+				return matches[1], nil
+			}
+			trimmed := strings.TrimSpace(string(data))
+			if len(trimmed) > 10 && !strings.Contains(trimmed, "\n") {
+				return trimmed, nil
+			}
+		}
+	}
+	return "", fmt.Errorf("secret not found in %s", dir)
+}
+
+var (
+	ansiRegex         = regexp.MustCompile(`\x1b\[[0-9;]*[a-zA-Z]|\x1b\([a-zA-Z]|\x1b\)?`)
+	claimURLRegex     = regexp.MustCompile(`https?://playit\.gg/claim/([a-zA-Z0-9_\-]+)`)
+	publicAddrRegex   = regexp.MustCompile(`\b([a-zA-Z0-9\-]+(?:\.[a-zA-Z0-9\-]+)*\.(?:gl\.joinmc\.link|craft\.ply\.gg|tun\.ply\.gg|ply\.gg|auto\.playit\.gg))(?::(\d+))?\b`)
+	tunnelActiveRegex = regexp.MustCompile(`(?i)(tunnel active|tunnel running|connected to server|established connection|registered tunnel|agent registered|playit connected)`)
+)
+
+// StripANSI removes terminal escape codes for clean logging and parsing
+func StripANSI(str string) string {
+	return ansiRegex.ReplaceAllString(str, "")
+}
+
 // SniffLogs analyzes recent log output to extract claim URL, claim code, or public address
 func (d *PlayitDriver) SniffLogs(logs []string) (claimURL, claimCode, publicAddr string, publicPort int, isRunning bool) {
-	for _, line := range logs {
+	for _, rawLine := range logs {
+		line := StripANSI(rawLine)
 		// Sniff Claim URL
 		if matches := claimURLRegex.FindStringSubmatch(line); len(matches) > 0 {
 			claimURL = matches[0]
@@ -176,7 +213,7 @@ func (d *PlayitDriver) SniffLogs(logs []string) (claimURL, claimCode, publicAddr
 		}
 
 		// Sniff Tunnel Active state
-		if tunnelActiveRegex.MatchString(line) || strings.Contains(line, "gl.joinmc.link") || strings.Contains(line, "ply.gg") {
+		if tunnelActiveRegex.MatchString(line) || strings.Contains(line, "gl.joinmc.link") || strings.Contains(line, "ply.gg") || strings.Contains(line, "playit connected") {
 			isRunning = true
 		}
 	}

@@ -98,23 +98,8 @@
 		}
 	}
 
-	async function startPlayitLinking() {
-		playitLoading = true;
-		try {
-			const res = await rpcClient.tunnel.startAccountLinkSession({});
-			linkSession = {
-				sessionId: res.sessionId,
-				claimUrl: res.claimUrl,
-				claimCode: res.claimCode
-			};
-			linkingModalOpen = true;
-			startLinkStatusPolling(res.sessionId);
-		} catch (e: unknown) {
-			const msg = e instanceof Error ? e.message : 'Failed to start Playit account linking session';
-			toast.error(msg);
-		} finally {
-			playitLoading = false;
-		}
+	function startPlayitLinking() {
+		manualSecretModalOpen = true;
 	}
 
 	function startLinkStatusPolling(sessionId: string) {
@@ -758,12 +743,12 @@
 </div>
 
 <!-- Playit Account Linking Modal -->
-<Dialog.Root bind:open={linkingModalOpen}>
+<Dialog.Root bind:open={manualSecretModalOpen}>
 	<Dialog.Content class="max-w-md">
 		<Dialog.Header>
 			<Dialog.Title class="flex items-center gap-2">
 				<Radio class="h-5 w-5 text-emerald-500" />
-				Authorize Playit.gg Account
+				Link Playit.gg Account
 			</Dialog.Title>
 			<Dialog.Description>
 				Follow the steps below to link DiscoPanel to your Playit.gg account.
@@ -771,81 +756,33 @@
 		</Dialog.Header>
 
 		<div class="space-y-4 py-2">
-			{#if linkSession?.claimUrl}
-				<div class="space-y-2">
-					<Label class="text-xs font-semibold text-muted-foreground uppercase">Step 1: Open Claim Link</Label>
-					<div class="rounded-lg border border-border/80 bg-muted/40 p-3">
-						<p class="mb-2 text-xs text-muted-foreground">
-							Click the button below to authorize DiscoPanel on Playit.gg. Keep this dialog open.
-						</p>
-						<div class="flex items-center gap-2">
-							<Button
-								class="w-full gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
-								onclick={() => window.open(linkSession?.claimUrl, '_blank')}
-							>
-								<ExternalLink class="h-4 w-4" />
-								Authorize on Playit.gg
-							</Button>
-							<Button
-								variant="outline"
-								size="icon"
-								onclick={() => copyToClipboard(linkSession?.claimUrl || '')}
-							>
-								<Copy class="h-4 w-4" />
-							</Button>
-						</div>
-					</div>
+			<div class="space-y-2">
+				<Label class="text-xs font-semibold uppercase text-muted-foreground">Step 1: Get Your Secret Key</Label>
+				<div class="rounded-lg border border-border/80 bg-muted/40 p-3">
+					<p class="mb-3 text-xs text-muted-foreground">
+						Open your Playit.gg dashboard, create or select an agent, and copy its <strong>Secret Key</strong>.
+					</p>
+					<Button
+						variant="outline"
+						class="w-full gap-1.5"
+						onclick={() => window.open('https://playit.gg/manage/agents', '_blank')}
+					>
+						<ExternalLink class="h-4 w-4" />
+						Open Playit.gg Agents Dashboard
+					</Button>
 				</div>
+			</div>
 
-				<div class="space-y-2">
-					<Label class="text-xs font-semibold text-muted-foreground uppercase">Step 2: Awaiting Confirmation</Label>
-					<div class="flex items-center gap-3 rounded-lg border border-primary/20 bg-primary/5 p-3">
-						<Loader2 class="h-5 w-5 animate-spin text-primary" />
-						<div class="text-xs">
-							<p class="font-medium text-foreground">Listening for claim approval...</p>
-							<p class="text-muted-foreground">This modal will close automatically once authorized.</p>
-						</div>
-					</div>
-				</div>
-			{:else}
-				<div class="flex items-center justify-center py-6">
-					<Loader2 class="h-8 w-8 animate-spin text-muted-foreground" />
-				</div>
-			{/if}
-		</div>
-
-		<Dialog.Footer>
-			<Button variant="outline" onclick={() => (linkingModalOpen = false)}>
-				Cancel
-			</Button>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>
-
-<!-- Manual Secret Key Dialog -->
-<Dialog.Root bind:open={manualSecretModalOpen}>
-	<Dialog.Content class="max-w-md">
-		<Dialog.Header>
-			<Dialog.Title class="flex items-center gap-2">
-				<Key class="h-5 w-5 text-primary" />
-				Set Playit Secret Key
-			</Dialog.Title>
-			<Dialog.Description>
-				Paste your existing Playit.gg account or agent secret key.
-			</Dialog.Description>
-		</Dialog.Header>
-
-		<div class="space-y-3 py-2">
-			<div class="space-y-1.5">
-				<Label for="manual-secret" class="text-xs">Secret Key</Label>
+			<div class="space-y-2">
+				<Label for="manual-secret" class="text-xs font-semibold uppercase text-muted-foreground">Step 2: Paste Secret Key</Label>
 				<Input
 					id="manual-secret"
 					type="password"
-					placeholder="playit secret key..."
+					placeholder="Paste Playit Secret Key here..."
 					bind:value={manualSecret}
 				/>
 				<p class="text-xs text-muted-foreground">
-					This key is securely stored in DiscoPanel settings and used for all server tunnels.
+					This key is securely stored in DiscoPanel settings and used to auto-link all server tunnels.
 				</p>
 			</div>
 		</div>
@@ -854,8 +791,12 @@
 			<Button variant="outline" onclick={() => (manualSecretModalOpen = false)}>
 				Cancel
 			</Button>
-			<Button onclick={saveManualSecret}>
-				Save Key
+			<Button
+				class="bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
+				onclick={saveManualSecret}
+				disabled={!manualSecret}
+			>
+				Save & Link Account
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>

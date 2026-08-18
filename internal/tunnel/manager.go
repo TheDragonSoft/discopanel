@@ -29,6 +29,7 @@ type Manager struct {
 	store         *storage.Store
 	docker        *docker.Client
 	driver        *PlayitDriver
+	apiClient     *PlayitAPIClient
 	bus           *events.Bus
 	config        *config.Config
 	logger        *logger.Logger
@@ -45,6 +46,7 @@ func NewManager(store *storage.Store, dockerClient *docker.Client, bus *events.B
 		store:         store,
 		docker:        dockerClient,
 		driver:        NewPlayitDriver(dockerClient, cfg, log),
+		apiClient:     NewPlayitAPIClient(),
 		bus:           bus,
 		config:        cfg,
 		logger:        log,
@@ -205,6 +207,25 @@ func (m *Manager) CreateTunnel(ctx context.Context, serverID, name string, provi
 		UpdatedAt:             time.Now().UTC(),
 	}
 
+	// Auto-provision tunnel on Playit.gg API if account is linked
+	if isAccountLinked && accountSecret != "" {
+		tunnelType := "minecraft-java"
+		if targetPort == 19132 {
+			tunnelType = "minecraft-bedrock"
+		}
+
+		apiDetails, apiErr := m.apiClient.CreateTunnel(ctx, accountSecret, name, tunnelType, protoStr, targetPort)
+		if apiErr == nil && apiDetails != nil {
+			if apiDetails.PublicAddress != "" {
+				tunnel.PublicAddress = apiDetails.PublicAddress
+				tunnel.PublicPort = apiDetails.PublicPort
+			}
+			m.logger.Info("Successfully auto-provisioned Playit tunnel via API: %s (%s:%d)", name, tunnel.PublicAddress, tunnel.PublicPort)
+		} else if apiErr != nil {
+			m.logger.Warn("Could not auto-provision Playit tunnel via API: %v (agent will sync upon connection)", apiErr)
+		}
+	}
+
 	if err := m.store.CreateTunnel(ctx, tunnel); err != nil {
 		return nil, fmt.Errorf("failed to save tunnel in database: %w", err)
 	}
@@ -230,10 +251,49 @@ func (m *Manager) StartTunnel(ctx context.Context, tunnelID string) (*storage.Tu
 		return nil, fmt.Errorf("server not found: %w", err)
 	}
 
+	if server.Status != storage.StatusRunning {
+		tunnel.Status = storage.TunnelStatusStopped
+		_ = m.store.UpdateTunnel(ctx, tunnel)
+		return nil, fmt.Errorf("server '%s' is stopped. Please start the server first to activate this tunnel", server.Name)
+	}
+
 	// Fetch global account secret key
 	accountSecret, _ := m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
 	if accountSecret != "" {
 		tunnel.IsAccountLinked = true
+	}
+
+	secretToUse := tunnel.SecretKey
+	if secretToUse == "" {
+		secretToUse = accountSecret
+	}
+
+	if secretToUse == "" {
+		claimSession, claimErr := m.StartAccountLinkSession(ctx)
+		if claimErr == nil && claimSession != nil {
+			tunnel.Status = storage.TunnelStatusClaimPending
+			tunnel.ClaimURL = claimSession.ClaimURL
+			tunnel.ClaimCode = claimSession.ClaimCode
+			_ = m.store.UpdateTunnel(ctx, tunnel)
+			m.logger.Info("Initiated Playit claim session for tunnel %s: %s", tunnel.Name, tunnel.ClaimURL)
+			return tunnel, nil
+		}
+		return nil, fmt.Errorf("Playit secret key is required. Please link your account in Settings -> Routing")
+	}
+
+	// Auto-provision on Playit.gg API if account is linked and public address not yet known
+	if secretToUse != "" && tunnel.PublicAddress == "" {
+		tunnelType := "minecraft-java"
+		if tunnel.TargetPort == 19132 {
+			tunnelType = "minecraft-bedrock"
+		}
+		apiDetails, apiErr := m.apiClient.CreateTunnel(ctx, secretToUse, tunnel.Name, tunnelType, tunnel.Protocol, tunnel.TargetPort)
+		if apiErr == nil && apiDetails != nil && apiDetails.PublicAddress != "" {
+			tunnel.PublicAddress = apiDetails.PublicAddress
+			tunnel.PublicPort = apiDetails.PublicPort
+			_ = m.store.UpdateTunnel(ctx, tunnel)
+			m.logger.Info("Provisioned Playit tunnel on start: %s -> %s:%d", tunnel.Name, tunnel.PublicAddress, tunnel.PublicPort)
+		}
 	}
 
 	// Remove old container if it exists
@@ -304,6 +364,19 @@ func (m *Manager) DeleteTunnel(ctx context.Context, tunnelID string) error {
 		_ = m.docker.RemoveContainer(ctx, tunnel.ContainerID)
 	}
 
+	// Delete from Playit.gg remote account if linked
+	accountSecret, _ := m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
+	if accountSecret != "" {
+		remoteTunnels, _ := m.apiClient.ListTunnels(ctx, accountSecret)
+		for _, rt := range remoteTunnels {
+			if (rt.PublicAddress != "" && rt.PublicAddress == tunnel.PublicAddress) || (rt.Name != "" && rt.Name == tunnel.Name) {
+				_ = m.apiClient.DeleteTunnel(ctx, accountSecret, rt.ID)
+				m.logger.Info("Deleted remote Playit tunnel: %s (%s)", rt.Name, rt.ID)
+				break
+			}
+		}
+	}
+
 	return m.store.DeleteTunnel(ctx, tunnelID)
 }
 
@@ -326,7 +399,7 @@ func (m *Manager) GetTunnelLogs(ctx context.Context, tunnelID string, tail int) 
 		return nil, err
 	}
 
-	lines := strings.Split(rawLogs, "\n")
+	lines := strings.Split(StripANSI(rawLogs), "\n")
 	result := make([]string, 0, len(lines))
 	for _, l := range lines {
 		trimmed := strings.TrimSpace(l)
@@ -339,15 +412,157 @@ func (m *Manager) GetTunnelLogs(ctx context.Context, tunnelID string, tail int) 
 }
 
 func (m *Manager) GetServerTunnels(ctx context.Context, serverID string) ([]*storage.Tunnel, error) {
-	return m.store.GetServerTunnels(ctx, serverID)
+	return m.SyncPlayitTunnels(ctx, serverID)
 }
 
 func (m *Manager) ListTunnels(ctx context.Context) ([]*storage.Tunnel, error) {
+	return m.SyncPlayitTunnels(ctx, "")
+}
+
+// SyncPlayitTunnels queries the Playit.gg API for all tunnels on the linked account,
+// updates existing tunnels with their assigned public addresses, and provisions unlinked ones.
+func (m *Manager) SyncPlayitTunnels(ctx context.Context, serverID string) ([]*storage.Tunnel, error) {
+	secret, err := m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
+	if err != nil || secret == "" {
+		if serverID != "" {
+			return m.store.GetServerTunnels(ctx, serverID)
+		}
+		return m.store.ListTunnels(ctx)
+	}
+
+	remoteTunnels, err := m.apiClient.ListTunnels(ctx, secret)
+	if err != nil {
+		m.logger.Warn("Failed to list Playit tunnels from API during sync: %v", err)
+		if serverID != "" {
+			return m.store.GetServerTunnels(ctx, serverID)
+		}
+		return m.store.ListTunnels(ctx)
+	}
+
+	allServers, _ := m.store.ListServers(ctx)
+	existingTunnels, _ := m.store.ListTunnels(ctx)
+
+	for _, rt := range remoteTunnels {
+		port := rt.LocalPort
+		if port <= 0 {
+			continue
+		}
+
+		// 1. Check if an existing tunnel in DB matches this remote tunnel by target port
+		var matchedTunnel *storage.Tunnel
+		for _, ext := range existingTunnels {
+			if ext.TargetPort == port {
+				matchedTunnel = ext
+				break
+			}
+		}
+
+		if matchedTunnel != nil {
+			changed := false
+			if rt.PublicAddress != "" && matchedTunnel.PublicAddress != rt.PublicAddress {
+				matchedTunnel.PublicAddress = rt.PublicAddress
+				changed = true
+			}
+			if rt.PublicPort > 0 && matchedTunnel.PublicPort != rt.PublicPort {
+				matchedTunnel.PublicPort = rt.PublicPort
+				changed = true
+			}
+			if !matchedTunnel.IsAccountLinked {
+				matchedTunnel.IsAccountLinked = true
+				changed = true
+			}
+			if changed {
+				_ = m.store.UpdateTunnel(ctx, matchedTunnel)
+			}
+			continue
+		}
+
+		// 2. Not found in existing tunnels -> Find which server in DiscoPanel uses this port!
+		var targetServer *storage.Server
+		for _, srv := range allServers {
+			srvPort := srv.Port
+			if srvPort == 0 {
+				srvPort = 25565
+			}
+			if srvPort == port {
+				targetServer = srv
+				break
+			}
+		}
+
+		if targetServer != nil {
+			tunnelName := rt.Name
+			if tunnelName == "" {
+				tunnelName = fmt.Sprintf("%s WAN Tunnel (%d)", targetServer.Name, port)
+			}
+			proto := "both"
+			if rt.PortType != "" {
+				proto = rt.PortType
+			}
+			newTunnel := &storage.Tunnel{
+				ID:                    uuid.New().String(),
+				ServerID:              targetServer.ID,
+				Provider:              "playit",
+				Name:                  tunnelName,
+				Protocol:              proto,
+				TargetHost:            fmt.Sprintf("discopanel-server-%s", targetServer.ID),
+				TargetPort:            port,
+				Status:                storage.TunnelStatusStopped,
+				IsAccountLinked:       true,
+				PublicAddress:         rt.PublicAddress,
+				PublicPort:            rt.PublicPort,
+				AutoStart:             true,
+				FollowServerLifecycle: true,
+				CreatedAt:             time.Now().UTC(),
+				UpdatedAt:             time.Now().UTC(),
+			}
+			_ = m.store.CreateTunnel(ctx, newTunnel)
+			existingTunnels = append(existingTunnels, newTunnel)
+
+			if targetServer.Status == storage.StatusRunning {
+				go func(id string) {
+					_, _ = m.StartTunnel(context.Background(), id)
+				}(newTunnel.ID)
+			}
+		}
+	}
+
+	if serverID != "" {
+		return m.store.GetServerTunnels(ctx, serverID)
+	}
 	return m.store.ListTunnels(ctx)
 }
 
 func (m *Manager) GetTunnel(ctx context.Context, id string) (*storage.Tunnel, error) {
 	return m.store.GetTunnel(ctx, id)
+}
+
+func (m *Manager) SetPlayitAccountSecret(ctx context.Context, secretKey string) error {
+	cleanKey := strings.TrimSpace(secretKey)
+	if cleanKey == "" {
+		return fmt.Errorf("secret key cannot be empty")
+	}
+
+	if err := m.store.SetSystemSetting(ctx, PlayitAccountSecretKey, cleanKey); err != nil {
+		return err
+	}
+
+	// Trigger async sync and restart any active tunnel containers
+	go func() {
+		bgCtx := context.Background()
+		_, _ = m.SyncPlayitTunnels(bgCtx, "")
+
+		tunnels, err := m.store.ListTunnels(bgCtx)
+		if err == nil {
+			for _, t := range tunnels {
+				if t.Status == storage.TunnelStatusRunning || t.Status == storage.TunnelStatusStarting {
+					_, _ = m.RestartTunnel(bgCtx, t.ID)
+				}
+			}
+		}
+	}()
+
+	return nil
 }
 
 func (m *Manager) GetPlayitAccountConfig(ctx context.Context) (bool, string, error) {
@@ -361,63 +576,38 @@ func (m *Manager) GetPlayitAccountConfig(ctx context.Context) (bool, string, err
 	return false, "No Playit.gg account linked. Tunnels run in guest mode with claim links.", nil
 }
 
-func (m *Manager) SetPlayitAccountSecret(ctx context.Context, secretKey string) error {
-	secretKey = strings.TrimSpace(secretKey)
-	if secretKey == "" {
-		return m.store.DeleteSystemSetting(ctx, PlayitAccountSecretKey)
-	}
-	return m.store.SetSystemSetting(ctx, PlayitAccountSecretKey, secretKey)
+func (m *Manager) UnlinkPlayitAccount(ctx context.Context) error {
+	return m.DeletePlayitAccountSecret(ctx)
 }
 
-func (m *Manager) UnlinkPlayitAccount(ctx context.Context) error {
+func (m *Manager) GetPlayitAccountSecret(ctx context.Context) (string, error) {
+	return m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
+}
+
+func (m *Manager) DeletePlayitAccountSecret(ctx context.Context) error {
 	return m.store.DeleteSystemSetting(ctx, PlayitAccountSecretKey)
 }
 
 func (m *Manager) StartAccountLinkSession(ctx context.Context) (*AccountLinkSession, error) {
-	m.mu.Lock()
-	defer m.mu.Unlock()
-
 	sessionID := uuid.New().String()
-	tempTunnel := &storage.Tunnel{
-		ID:         "setup-" + sessionID[:8],
-		ServerID:   "system-setup",
-		TargetHost: "127.0.0.1",
-		TargetPort: 25565,
+	code := sessionID[:8]
+
+	if err := m.apiClient.SetupClaim(ctx, code); err != nil {
+		return nil, fmt.Errorf("failed to register claim with Playit.gg: %w", err)
 	}
 
-	// Launch temporary setup container to generate claim URL
-	containerID, err := m.driver.CreateContainer(ctx, tempTunnel, &storage.Server{ID: "setup"}, "")
-	if err != nil {
-		return nil, fmt.Errorf("failed to start account setup container: %w", err)
-	}
-
-	if err := m.docker.StartContainer(ctx, containerID); err != nil {
-		_ = m.docker.RemoveContainer(ctx, containerID)
-		return nil, fmt.Errorf("failed to run account setup container: %w", err)
-	}
-
+	claimURL := fmt.Sprintf("https://playit.gg/claim/%s", code)
 	session := &AccountLinkSession{
-		SessionID:   sessionID,
-		ContainerID: containerID,
-		ExpiresAt:   time.Now().Add(10 * time.Minute),
+		SessionID: sessionID,
+		ClaimURL:  claimURL,
+		ClaimCode: code,
+		ExpiresAt: time.Now().Add(10 * time.Minute),
 	}
 
-	// Poll briefly for initial claim URL
-	for i := 0; i < 6; i++ {
-		time.Sleep(1 * time.Second)
-		rawLogs, err := m.docker.GetContainerLogs(ctx, containerID, 30)
-		if err == nil {
-			lines := strings.Split(rawLogs, "\n")
-			claimURL, claimCode, _, _, _ := m.driver.SniffLogs(lines)
-			if claimURL != "" {
-				session.ClaimURL = claimURL
-				session.ClaimCode = claimCode
-				break
-			}
-		}
-	}
-
+	m.mu.Lock()
 	m.claimSessions[sessionID] = session
+	m.mu.Unlock()
+
 	return session, nil
 }
 
@@ -434,35 +624,15 @@ func (m *Manager) CheckAccountLinkStatus(ctx context.Context, sessionID string) 
 		return true, "linked", nil
 	}
 
-	if session.ContainerID == "" {
-		return false, "container stopped", nil
-	}
-
-	rawLogs, err := m.docker.GetContainerLogs(ctx, session.ContainerID, 50)
-	if err != nil {
-		return false, "error checking logs", err
-	}
-
-	lines := strings.Split(rawLogs, "\n")
-	claimURL, claimCode, _, _, isRunning := m.driver.SniffLogs(lines)
-	if session.ClaimURL == "" && claimURL != "" {
-		session.ClaimURL = claimURL
-		session.ClaimCode = claimCode
-	}
-
-	// Check if secret key or connection was established after claiming
-	for _, l := range lines {
-		if strings.Contains(l, "secret key:") || strings.Contains(l, "Agent registered") || isRunning {
-			// Extract secret or confirm linked
+	if session.ClaimCode != "" {
+		secretKey, err := m.apiClient.ExchangeClaim(ctx, session.ClaimCode)
+		if err == nil && secretKey != "" {
+			if err := m.SetPlayitAccountSecret(ctx, secretKey); err != nil {
+				return false, "failed to save secret", err
+			}
+			m.mu.Lock()
 			session.IsLinked = true
-			_ = m.store.SetSystemSetting(ctx, PlayitAccountSecretKey, "auto_linked_via_playit_claim")
-			// Clean up setup container
-			go func(cID string) {
-				time.Sleep(2 * time.Second)
-				_, _ = m.docker.StopContainer(context.Background(), cID)
-				_ = m.docker.RemoveContainer(context.Background(), cID)
-			}(session.ContainerID)
-
+			m.mu.Unlock()
 			return true, "Account successfully linked to Playit.gg!", nil
 		}
 	}
@@ -491,6 +661,22 @@ func (m *Manager) pollActiveTunnels(ctx context.Context) {
 	}
 
 	for _, t := range tunnels {
+		// If tunnel is waiting for account claim, poll Playit API to check if user accepted in browser
+		if t.Status == storage.TunnelStatusClaimPending && t.ClaimCode != "" {
+			secretKey, err := m.apiClient.ExchangeClaim(ctx, t.ClaimCode)
+			if err == nil && secretKey != "" {
+				_ = m.SetPlayitAccountSecret(ctx, secretKey)
+				t.IsAccountLinked = true
+				t.Status = storage.TunnelStatusStarting
+				_ = m.store.UpdateTunnel(ctx, t)
+				m.logger.Info("Account successfully linked via claim for tunnel %s! Starting tunnel...", t.Name)
+				go func(tID string) {
+					_, _ = m.StartTunnel(context.Background(), tID)
+				}(t.ID)
+				continue
+			}
+		}
+
 		if t.Status == storage.TunnelStatusStopped || t.ContainerID == "" {
 			continue
 		}
@@ -530,8 +716,32 @@ func (m *Manager) pollActiveTunnels(ctx context.Context) {
 			changed = true
 		}
 
+		// If public address is still empty and account is linked, poll Playit API list
+		if t.PublicAddress == "" && t.IsAccountLinked {
+			secretKey := t.SecretKey
+			if secretKey == "" {
+				secretKey, _ = m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
+			}
+			if secretKey != "" {
+				apiTunnels, err := m.apiClient.ListTunnels(ctx, secretKey)
+				if err == nil {
+					for _, at := range apiTunnels {
+						// STRICT PORT CHECK: Tunnel must match the server's target port!
+						if at.LocalPort == t.TargetPort {
+							if at.PublicAddress != "" {
+								t.PublicAddress = at.PublicAddress
+								t.PublicPort = at.PublicPort
+								changed = true
+								break
+							}
+						}
+					}
+				}
+			}
+		}
+
 		// Update runtime status
-		if publicAddr != "" || isRunning {
+		if publicAddr != "" || isRunning || t.PublicAddress != "" {
 			if t.Status != storage.TunnelStatusRunning {
 				t.Status = storage.TunnelStatusRunning
 				changed = true
