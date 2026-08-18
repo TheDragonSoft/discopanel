@@ -85,6 +85,10 @@
 	let tunnelLogs = $state<string[]>([]);
 	let logsLoading = $state(false);
 
+	// Missing tunnel modal state
+	let noMatchingTunnelModalOpen = $state(false);
+	let requiredPort = $derived(server.port || 25565);
+
 	let pollInterval: ReturnType<typeof setInterval> | null = null;
 
 	onMount(() => {
@@ -180,6 +184,28 @@
 			}
 		} finally {
 			if (!silent) tunnelsLoading = false;
+		}
+	}
+
+	async function syncFromPlayit() {
+		tunnelsLoading = true;
+		try {
+			const res = await rpcClient.tunnel.getServerTunnels({ serverId: server.id });
+			tunnels = res.tunnels;
+			hasGlobalAccount = res.hasGlobalAccount;
+
+			const expectedPort = server.port || 25565;
+			const matching = tunnels.filter((t) => t.targetPort === expectedPort);
+			if (matching.length === 0) {
+				noMatchingTunnelModalOpen = true;
+			} else {
+				toast.success('Synced successfully from Playit.gg!');
+			}
+		} catch (e: unknown) {
+			const msg = e instanceof Error ? e.message : 'Failed to sync from Playit.gg';
+			toast.error(msg);
+		} finally {
+			tunnelsLoading = false;
 		}
 	}
 
@@ -406,7 +432,7 @@
 							variant="outline"
 							disabled={tunnelsLoading}
 							class="gap-1.5 border-border/70 text-xs"
-							onclick={() => loadTunnels(false)}
+							onclick={syncFromPlayit}
 						>
 							<RotateCw class="h-3.5 w-3.5 {tunnelsLoading ? 'animate-spin' : ''}" />
 							<span>Sync from Playit.gg</span>
@@ -935,6 +961,73 @@
 
 		<Dialog.Footer>
 			<Button variant="outline" onclick={() => (logsModalOpen = false)}>Close</Button>
+		</Dialog.Footer>
+	</Dialog.Content>
+</Dialog.Root>
+
+<!-- No Matching Tunnel Found Dialog -->
+<Dialog.Root bind:open={noMatchingTunnelModalOpen}>
+	<Dialog.Content class="max-w-md">
+		<Dialog.Header>
+			<Dialog.Title class="flex items-center gap-2 text-foreground">
+				<AlertCircle class="h-5 w-5 text-amber-500" />
+				No Matching Tunnel on Playit.gg
+			</Dialog.Title>
+			<Dialog.Description>
+				DiscoPanel checked your linked Playit.gg account, but no active tunnel was found targeting this server's required port.
+			</Dialog.Description>
+		</Dialog.Header>
+
+		<div class="space-y-3 py-2 text-sm">
+			<div class="rounded-lg border border-border/80 bg-muted/40 p-3 space-y-2">
+				<div class="flex items-center justify-between text-xs">
+					<span class="text-muted-foreground">Server Name:</span>
+					<span class="font-semibold text-foreground">{server.name}</span>
+				</div>
+				<div class="flex items-center justify-between text-xs">
+					<span class="text-muted-foreground">Required Target Port:</span>
+					<span class="font-mono font-bold text-primary">{requiredPort}</span>
+				</div>
+				<div class="flex items-center justify-between text-xs">
+					<span class="text-muted-foreground">Protocol:</span>
+					<span class="font-mono text-muted-foreground">TCP / UDP</span>
+				</div>
+			</div>
+
+			<p class="text-xs text-muted-foreground">
+				To expose this server, a tunnel targeting port <code class="font-mono font-semibold text-foreground">{requiredPort}</code> must be created. You can create it automatically right now, or manage it in your Playit.gg dashboard.
+			</p>
+		</div>
+
+		<Dialog.Footer class="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+			<Button variant="outline" size="sm" onclick={() => (noMatchingTunnelModalOpen = false)}>
+				Dismiss
+			</Button>
+			<Button
+				variant="outline"
+				size="sm"
+				class="gap-1.5"
+				onclick={() => window.open('https://playit.gg/manage/tunnels', '_blank')}
+			>
+				<ExternalLink class="h-3.5 w-3.5" />
+				Playit Dashboard
+			</Button>
+			<Button
+				size="sm"
+				class="gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
+				disabled={creatingTunnel}
+				onclick={async () => {
+					noMatchingTunnelModalOpen = false;
+					await createPresetTunnel('java');
+				}}
+			>
+				{#if creatingTunnel}
+					<Loader2 class="h-3.5 w-3.5 animate-spin" />
+				{:else}
+					<Radio class="h-3.5 w-3.5" />
+				{/if}
+				Create Tunnel for Port {requiredPort}
+			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
 </Dialog.Root>

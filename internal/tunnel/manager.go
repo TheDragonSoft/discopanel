@@ -209,10 +209,8 @@ func (m *Manager) CreateTunnel(ctx context.Context, serverID, name string, provi
 
 	// Auto-provision tunnel on Playit.gg API if account is linked
 	if isAccountLinked && accountSecret != "" {
-		tunnelType := ""
-		if targetPort == 25565 {
-			tunnelType = "minecraft-java"
-		} else if targetPort == 19132 {
+		tunnelType := "minecraft-java"
+		if targetPort == 19132 {
 			tunnelType = "minecraft-bedrock"
 		}
 
@@ -285,10 +283,8 @@ func (m *Manager) StartTunnel(ctx context.Context, tunnelID string) (*storage.Tu
 
 	// Auto-provision on Playit.gg API if account is linked and public address not yet known
 	if secretToUse != "" && tunnel.PublicAddress == "" {
-		tunnelType := ""
-		if tunnel.TargetPort == 25565 {
-			tunnelType = "minecraft-java"
-		} else if tunnel.TargetPort == 19132 {
+		tunnelType := "minecraft-java"
+		if tunnel.TargetPort == 19132 {
 			tunnelType = "minecraft-bedrock"
 		}
 		apiDetails, apiErr := m.apiClient.CreateTunnel(ctx, secretToUse, tunnel.Name, tunnelType, tunnel.Protocol, tunnel.TargetPort)
