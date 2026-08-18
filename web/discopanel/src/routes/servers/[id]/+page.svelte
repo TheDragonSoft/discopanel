@@ -114,6 +114,9 @@
 			// Initial tab data loading requests - corner loader
 			loadServer(true);
 			interval = setInterval(() => loadServer(true), 5000); // Poll every 5 seconds
+			return () => {
+				if (interval) clearInterval(interval);
+			};
 		}
 	});
 

@@ -89,14 +89,14 @@ type Server struct {
 	ID              string               `json:"id" gorm:"primaryKey"`
 	Name            string               `json:"name" gorm:"not null"`
 	Description     string               `json:"description"`
-	GameType        GameType             `json:"game_type" gorm:"default:'minecraft';column:game_type"`
+	GameType        GameType             `json:"game_type" gorm:"default:'minecraft';column:game_type;index"`
 	ModLoader       ModLoader            `json:"mod_loader" gorm:"not null"`
 	MCVersion       string               `json:"mc_version" gorm:"not null;column:mc_version"`
 	TerrariaFlavor  TerrariaFlavor       `json:"terraria_flavor" gorm:"column:terraria_flavor"`
 	TerrariaVersion string               `json:"terraria_version" gorm:"column:terraria_version"`
-	ContainerID     string               `json:"container_id" gorm:"column:container_id"`
-	Status          ServerStatus         `json:"status" gorm:"not null"`
-	Port            int                  `json:"port"`
+	ContainerID     string               `json:"container_id" gorm:"column:container_id;index"`
+	Status          ServerStatus         `json:"status" gorm:"not null;index"`
+	Port            int                  `json:"port" gorm:"index"`
 	ProxyPort       int                  `json:"proxy_port" gorm:"column:proxy_port"`
 	ProxyHostname   string               `json:"proxy_hostname" gorm:"column:proxy_hostname;uniqueIndex:idx_proxy_hostname_listener,where:proxy_hostname != ''"`
 	ProxyListenerID string               `json:"proxy_listener_id" gorm:"column:proxy_listener_id;uniqueIndex:idx_proxy_hostname_listener,where:proxy_listener_id != ''"` // Which listener this server uses

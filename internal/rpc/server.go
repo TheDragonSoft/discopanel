@@ -140,6 +140,7 @@ func (s *Server) setupHandler() {
 		connect.WithHandlerOptions(
 			connect.WithCompression("gzip", nil, nil),
 		),
+		connect.WithReadMaxBytes(5 << 20),
 	}
 
 	// Register all service handlers
@@ -389,6 +390,25 @@ func (s *Server) createFrontendHandler(fs http.FileSystem) http.HandlerFunc {
 		if err == nil {
 			defer file.Close()
 			stat, _ := file.Stat()
+			if len(path) > 16 && path[:16] == "/_app/immutable/" || len(path) > 15 && path[len(path)-15:] == "/_app/immutable/" || (len(path) > 0 && path[0] == '/' && path[1:16] == "_app/immutable/") {
+				// simple strings.Contains simulation
+				w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+			} else {
+				foundImmutable := false
+				for i := 0; i < len(path)-15; i++ {
+					if path[i:i+16] == "/_app/immutable/" {
+						foundImmutable = true
+						break
+					}
+				}
+				if foundImmutable {
+					w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+				} else if path == "/index.html" {
+					w.Header().Set("Cache-Control", "no-cache")
+				} else {
+					w.Header().Set("Cache-Control", "public, max-age=3600")
+				}
+			}
 			http.ServeContent(w, r, path, stat.ModTime(), file)
 			return
 		}
@@ -403,6 +423,7 @@ func (s *Server) createFrontendHandler(fs http.FileSystem) http.HandlerFunc {
 
 		stat, _ := indexFile.Stat()
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Header().Set("Cache-Control", "no-cache")
 		http.ServeContent(w, r, "/index.html", stat.ModTime(), indexFile)
 	}
 }

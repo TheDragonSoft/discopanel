@@ -70,5 +70,17 @@ export default defineConfig({
 	},
 	optimizeDeps: {
 		include: ['monaco-editor']
+	},
+	build: {
+		sourcemap: false,
+		cssMinify: 'lightningcss',
+		rollupOptions: {
+			output: {
+				manualChunks: (id: string) => {
+					if (id.includes('monaco-editor')) return 'monaco';
+					if (id.includes('@bufbuild') || id.includes('@connectrpc')) return 'rpc';
+				}
+			}
+		}
 	}
 });

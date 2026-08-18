@@ -46,6 +46,19 @@ func NewSQLiteStore(cfg *config.Config) (*Store, error) {
 		sqlDB.SetConnMaxLifetime(time.Duration(cfg.Database.ConnMaxLifetime) * time.Second)
 	}
 
+	// Performance PRAGMAs
+	for _, pragma := range []string{
+		"PRAGMA journal_mode=WAL;",
+		"PRAGMA busy_timeout=5000;",
+		"PRAGMA synchronous=NORMAL;",
+		"PRAGMA cache_size=-64000;",
+		"PRAGMA foreign_keys=ON;",
+	} {
+		if _, err := sqlDB.Exec(pragma); err != nil {
+			return nil, fmt.Errorf("failed to set pragma: %w", err)
+		}
+	}
+
 	store := &Store{db: db, cfg: cfg}
 
 	if cfg.Database.AutoMigrate {
