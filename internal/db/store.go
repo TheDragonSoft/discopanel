@@ -8,6 +8,7 @@ import (
 
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/google/uuid"
+	"github.com/glebarez/sqlite"
 	"github.com/nickheyer/discopanel/internal/config"
 	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
 	"github.com/glebarez/sqlite"

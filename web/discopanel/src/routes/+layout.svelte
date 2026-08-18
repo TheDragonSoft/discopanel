@@ -49,7 +49,8 @@
 		FileText,
 		Sun,
 		Moon,
-		Puzzle
+		Puzzle,
+		Blocks
 	} from '@lucide/svelte';
 	import { toggleMode, mode } from 'mode-watcher';
 	import { ServerStatus, type User } from '$lib/proto/discopanel/v1/common_pb';
@@ -199,6 +200,16 @@
 											<a href={resolvePath('/modpacks')} {...props}>
 												<Package class="h-4 w-4" />
 												<span class="group-data-[collapsible=icon]:hidden">Modpacks</span>
+											</a>
+										{/snippet}
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+								<SidebarMenuItem>
+									<SidebarMenuButton isActive={page.url.pathname.startsWith('/mods')}>
+										{#snippet child({ props })}
+											<a href={resolvePath('/mods')} {...props}>
+												<Blocks class="h-4 w-4" />
+												<span class="group-data-[collapsible=icon]:hidden">Mods</span>
 											</a>
 										{/snippet}
 									</SidebarMenuButton>
