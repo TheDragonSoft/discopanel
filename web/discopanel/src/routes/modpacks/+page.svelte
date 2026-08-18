@@ -38,7 +38,7 @@
 		GetIndexerStatusResponse
 	} from '$lib/proto/discopanel/v1/modpack_pb';
 	import { SearchModpacksRequestSchema } from '$lib/proto/discopanel/v1/modpack_pb';
-	import { rpcClient } from '$lib/api/rpc-client';
+	import { rpcClient, silentCallOptions } from '$lib/api/rpc-client';
 	import { debounce } from 'lodash-es';
 	import { uploadFile, cancelUpload, type UploadProgress } from '$lib/utils/chunked-upload';
 	import { formatBytes } from '$lib/utils';
@@ -69,11 +69,51 @@
 	let selectedIndexer = $state('modrinth'); // Default Modrinth since no API key initially
 	let indexerName = $derived(selectedIndexer === 'fuego' ? 'CurseForge' : 'Modrinth');
 
-	// Dynamic game versions and mod loaders from API
-	let gameVersions = $state<string[]>([]);
-	let modLoaders = $state<Array<{ value: string; label: string }>>([
-		{ value: '', label: 'All Loaders' }
-	]);
+	const DEFAULT_VERSIONS = [
+		'1.21.4',
+		'1.21.3',
+		'1.21.2',
+		'1.21.1',
+		'1.21',
+		'1.20.6',
+		'1.20.5',
+		'1.20.4',
+		'1.20.3',
+		'1.20.2',
+		'1.20.1',
+		'1.20',
+		'1.19.4',
+		'1.19.3',
+		'1.19.2',
+		'1.19.1',
+		'1.19',
+		'1.18.2',
+		'1.18.1',
+		'1.18',
+		'1.17.1',
+		'1.16.5',
+		'1.15.2',
+		'1.14.4',
+		'1.12.2',
+		'1.8.9',
+		'1.7.10'
+	];
+
+	const DEFAULT_LOADERS: Array<{ value: string; label: string }> = [
+		{ value: '', label: 'All Loaders' },
+		{ value: 'fabric', label: 'Fabric' },
+		{ value: 'forge', label: 'Forge' },
+		{ value: 'neoforge', label: 'NeoForge' },
+		{ value: 'quilt', label: 'Quilt' },
+		{ value: 'paper', label: 'Paper' },
+		{ value: 'purpur', label: 'Purpur' },
+		{ value: 'spigot', label: 'Spigot' },
+		{ value: 'bukkit', label: 'Bukkit' }
+	];
+
+	// Dynamic game versions and mod loaders from API with defaults
+	let gameVersions = $state<string[]>(DEFAULT_VERSIONS);
+	let modLoaders = $state<Array<{ value: string; label: string }>>(DEFAULT_LOADERS);
 
 	onMount(async () => {
 		await Promise.all([
@@ -92,26 +132,30 @@
 
 	async function loadMinecraftVersions() {
 		try {
-			const response = await rpcClient.minecraft.getMinecraftVersions({});
-			gameVersions = response.versions.map((v) => v.id);
+			const response = await rpcClient.minecraft.getMinecraftVersions({}, { ...silentCallOptions });
+			if (response?.versions?.length > 0) {
+				gameVersions = response.versions.map((v) => v.id);
+			}
 		} catch (error) {
-			console.error('Failed to load Minecraft versions:', error);
+			console.debug('Using default Minecraft versions:', error);
 		}
 	}
 
 	async function loadModLoaders() {
 		try {
-			const response = await rpcClient.minecraft.getModLoaders({});
-			const loaders = response.modloaders || [];
-			modLoaders = [
-				{ value: '', label: 'All Loaders' },
-				...loaders.map((loader) => ({
-					value: loader.name,
-					label: loader.displayName || loader.name
-				}))
-			];
+			const response = await rpcClient.minecraft.getModLoaders({}, { ...silentCallOptions });
+			const loaders = response?.modloaders || [];
+			if (loaders.length > 0) {
+				modLoaders = [
+					{ value: '', label: 'All Loaders' },
+					...loaders.map((loader) => ({
+						value: loader.name,
+						label: loader.displayName || loader.name
+					}))
+				];
+			}
 		} catch (error) {
-			console.error('Failed to load mod loaders:', error);
+			console.debug('Using default mod loaders:', error);
 		}
 	}
 
