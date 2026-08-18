@@ -21,7 +21,8 @@
 	import { create } from '@bufbuild/protobuf';
 	import type { CreateServerRequest } from '$lib/proto/discopanel/v1/server_pb';
 	import { CreateServerRequestSchema } from '$lib/proto/discopanel/v1/server_pb';
-	import { ModLoader, type ProxyListener } from '$lib/proto/discopanel/v1/common_pb';
+	import { ModLoader, GameType, TerrariaFlavor, type ProxyListener } from '$lib/proto/discopanel/v1/common_pb';
+	import { TerrariaConfigSchema } from '$lib/proto/discopanel/v1/terraria_pb';
 	import type { ModLoaderInfo, DockerImage } from '$lib/proto/discopanel/v1/minecraft_pb';
 	import type { IndexedModpack, Version } from '$lib/proto/discopanel/v1/modpack_pb';
 	import { Badge } from '$lib/components/ui/badge';
@@ -37,7 +38,20 @@
 	import { getUniqueDockerImages, getDockerImageDisplayName } from '$lib/utils';
 	import { resolve } from '$app/paths';
 	import * as _ from 'lodash-es';
-
+	import TerrariaConfigEditor from '$lib/components/terraria/terraria-config-editor.svelte';
+	import GameIcon from '$lib/components/game-icon.svelte';
+	let gameType = $state<'minecraft' | 'terraria'>('minecraft');
+	let terrariaFlavor = $state<'vanilla' | 'tshock' | 'tmodloader'>('vanilla');
+	let terrariaVersion = $state('1.4.4.9');
+	let terrariaConfig = $state({
+		worldName: 'World',
+		difficulty: 0,
+		maxPlayers: 8,
+		password: '',
+		motd: 'Terraria Server',
+		secure: false,
+		spawnProtection: false
+	});
 	let loading = $state(false);
 	let loadingVersions = $state(true);
 	let minecraftVersions = $state<string[]>([]);
@@ -293,13 +307,51 @@
 					? selectedVersion.versionNumber
 					: selectedVersionId;
 
-			const createRequest = {
-				...formData,
-				modpackId: selectedModpack?.id || '',
-				modpackVersionId: versionToSend || '',
-				// When using proxy with hostname, set port to 0 to indicate proxy usage
-				port: useProxyMode ? 0 : formData.port
-			};
+			const reqGameType = gameType === 'terraria' ? GameType.TERRARIA : GameType.MINECRAFT;
+			let reqFlavor = TerrariaFlavor.UNSPECIFIED;
+			if (gameType === 'terraria') {
+				if (terrariaFlavor === 'vanilla') reqFlavor = TerrariaFlavor.VANILLA;
+				else if (terrariaFlavor === 'tshock') reqFlavor = TerrariaFlavor.TSHOCK;
+				else if (terrariaFlavor === 'tmodloader') reqFlavor = TerrariaFlavor.TMODLOADER;
+			}
+
+			const createRequest = create(CreateServerRequestSchema, {
+				name: formData.name,
+				description: formData.description,
+				modLoader: gameType === 'minecraft' ? formData.modLoader : ModLoader.UNSPECIFIED,
+				mcVersion: gameType === 'minecraft' ? formData.mcVersion : '',
+				port: useProxyMode ? 0 : (gameType === 'terraria' ? (formData.port || 7777) : formData.port),
+				maxPlayers: gameType === 'terraria' ? (terrariaConfig.maxPlayers || 8) : formData.maxPlayers,
+				memory: formData.memory || 2048,
+				dockerImage: formData.dockerImage,
+				autoStart: formData.autoStart,
+				detached: formData.detached,
+				startImmediately: formData.startImmediately,
+				proxyHostname: formData.proxyHostname,
+				proxyListenerId: formData.proxyListenerId,
+				useBaseUrl: formData.useBaseUrl,
+				additionalPorts: formData.additionalPorts,
+				dockerOverrides: formData.dockerOverrides,
+				modpackId: gameType === 'minecraft' ? (selectedModpack?.id || '') : '',
+				modpackVersionId: gameType === 'minecraft' ? (versionToSend || '') : '',
+				gameType: reqGameType,
+				terrariaFlavor: reqFlavor,
+				terrariaVersion: gameType === 'terraria' ? terrariaVersion : '',
+				terrariaConfig: gameType === 'terraria' ? create(TerrariaConfigSchema, {
+					worldName: terrariaConfig.worldName || formData.name || 'World',
+					worldSize: 'medium',
+					difficulty: Number(terrariaConfig.difficulty) || 0,
+					seed: '',
+					password: terrariaConfig.password || '',
+					maxPlayers: Number(terrariaConfig.maxPlayers) || 8,
+					motd: terrariaConfig.motd || '',
+					customConfig: '',
+					banListPath: '',
+					spawnProtection: Boolean(terrariaConfig.spawnProtection),
+					secure: Boolean(terrariaConfig.secure),
+					language: 'en-US'
+				}) : undefined
+			});
 
 			// Create the server
 			const response = await rpcClient.server.createServer(createRequest);
@@ -339,26 +391,81 @@
 						Create New Server
 					</h2>
 					<p class="text-base text-muted-foreground">
-						Set up a new Minecraft server instance with your preferred configuration
+						Set up a new server instance with your preferred configuration
 					</p>
 				</div>
 			</div>
 		</div>
 
+		<Card class="border-2 bg-linear-to-br from-card to-card/90 shadow-xl transition-colors hover:border-primary/30">
+			<CardHeader class="pb-6">
+				<div class="flex items-center gap-3">
+					<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+						<Package class="h-5 w-5 text-primary" />
+					</div>
+					<div>
+						<CardTitle class="text-2xl">Game Selection</CardTitle>
+						<CardDescription class="text-base">Choose which game server to host</CardDescription>
+					</div>
+				</div>
+			</CardHeader>
+			<CardContent>
+				<div class="grid grid-cols-2 gap-4">
+					<Button
+						type="button"
+						variant={gameType === 'minecraft' ? 'default' : 'outline'}
+						onclick={() => { gameType = 'minecraft'; formData.port = 25565; }}
+						class="h-auto justify-start p-4 transition-all hover:scale-[1.01]"
+					>
+						<div class="flex items-center gap-3.5">
+							<div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-background/50 p-1.5 shadow-xs border border-border/40">
+								<GameIcon game="minecraft" class="h-9 w-9" />
+							</div>
+							<div class="text-left">
+								<div class="flex items-center gap-2">
+									<span class="font-bold text-lg">Minecraft</span>
+								</div>
+								<div class="text-sm text-muted-foreground mt-0.5">Java Edition Server</div>
+							</div>
+						</div>
+					</Button>
+					<Button
+						type="button"
+						variant={gameType === 'terraria' ? 'default' : 'outline'}
+						onclick={() => { gameType = 'terraria'; formData.port = 7777; formData.maxPlayers = 8; }}
+						class="h-auto justify-start p-4 transition-all hover:scale-[1.01]"
+					>
+						<div class="flex items-center gap-3.5">
+							<div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-background/50 p-1.5 shadow-xs border border-border/40">
+								<GameIcon game="terraria" class="h-9 w-9" />
+							</div>
+							<div class="text-left">
+								<div class="flex items-center gap-2">
+									<span class="font-bold text-lg">Terraria</span>
+								</div>
+								<div class="text-sm text-muted-foreground mt-0.5">Vanilla, TShock, or tModLoader</div>
+							</div>
+						</div>
+					</Button>
+				</div>
+			</CardContent>
+		</Card>
+
 		<form onsubmit={handleSubmit}>
 			<div class="grid gap-6 lg:grid-cols-2">
+				{#if gameType === 'minecraft'}
 				<Card
 					class="border-2 bg-linear-to-br from-card to-card/90 shadow-xl transition-colors hover:border-primary/30"
 				>
 					<CardHeader class="pb-6">
 						<div class="flex items-center gap-3">
-							<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-								<Settings class="h-5 w-5 text-primary" />
+							<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 p-1">
+								<GameIcon game="minecraft" class="h-7 w-7" />
 							</div>
 							<div>
-								<CardTitle class="text-2xl">Basic Information</CardTitle>
+								<CardTitle class="text-2xl">Minecraft Settings</CardTitle>
 								<CardDescription class="text-base"
-									>Configure your server's basic settings and metadata</CardDescription
+									>Configure your Minecraft server's basic settings and metadata</CardDescription
 								>
 							</div>
 						</div>
@@ -604,6 +711,57 @@
 						</div>
 					</CardContent>
 				</Card>
+				{/if}
+
+				{#if gameType === 'terraria'}
+				<Card class="border-2 bg-linear-to-br from-card to-card/90 shadow-xl transition-colors hover:border-primary/30">
+					<CardHeader class="pb-6">
+						<div class="flex items-center gap-3">
+							<div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 p-1">
+								<GameIcon game="terraria" class="h-7 w-7" />
+							</div>
+							<div>
+								<CardTitle class="text-2xl">Terraria Settings</CardTitle>
+								<CardDescription class="text-base">Configure your Terraria server</CardDescription>
+							</div>
+						</div>
+					</CardHeader>
+					<CardContent class="space-y-6">
+						<div class="space-y-2">
+							<Label class="text-sm font-medium">Server Name <span class="text-destructive">*</span></Label>
+							<Input bind:value={formData.name} required placeholder="My Terraria Server" />
+						</div>
+
+						<div class="space-y-2">
+							<Label class="text-sm font-medium">Flavor</Label>
+							<Select type="single" value={terrariaFlavor} onValueChange={(v) => terrariaFlavor = (v as any) || 'vanilla'}>
+								<SelectTrigger><span>{terrariaFlavor}</span></SelectTrigger>
+								<SelectContent>
+									<SelectItem value="vanilla">Vanilla</SelectItem>
+									<SelectItem value="tshock">TShock</SelectItem>
+									<SelectItem value="tmodloader">tModLoader</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+
+						<div class="space-y-2">
+							<Label class="text-sm font-medium">Version</Label>
+							<Select type="single" value={terrariaVersion} onValueChange={(v) => terrariaVersion = v || '1.4.4.9'}>
+								<SelectTrigger><span>{terrariaVersion}</span></SelectTrigger>
+								<SelectContent>
+									<SelectItem value="1.4.4.9">1.4.4.9</SelectItem>
+									<SelectItem value="1.4.4.x">1.4.4.x</SelectItem>
+									<SelectItem value="TShock v5.2">TShock v5.2</SelectItem>
+									<SelectItem value="tModLoader 1.4">tModLoader 1.4</SelectItem>
+								</SelectContent>
+							</Select>
+						</div>
+						
+						<Separator />
+						<TerrariaConfigEditor bind:config={terrariaConfig} />
+					</CardContent>
+				</Card>
+				{/if}
 
 				<Card
 					class="border-2 bg-linear-to-br from-card to-card/90 shadow-xl transition-colors hover:border-primary/30"
@@ -847,6 +1005,7 @@
 
 						<Separator />
 
+						{#if gameType === 'minecraft'}
 						<div class="space-y-2">
 							<Label for="docker_image" class="text-sm font-medium"
 								>Docker Image <span class="text-xs text-muted-foreground">(Advanced)</span></Label
@@ -879,6 +1038,7 @@
 						</div>
 
 						<Separator />
+						{/if}
 
 						<div class="space-y-4">
 							<h4 class="text-sm font-semibold">Lifecycle Management</h4>
@@ -956,6 +1116,7 @@
 				</Card>
 
 				<!-- Docker Overrides - Advanced Configuration -->
+				{#if gameType === 'minecraft'}
 				<div class="lg:col-span-2">
 					<DockerOverridesEditor
 						bind:overrides={formData.dockerOverrides}
@@ -963,6 +1124,7 @@
 						onchange={(overrides) => (formData.dockerOverrides = overrides)}
 					/>
 				</div>
+				{/if}
 			</div>
 
 			<div class="mt-8 flex justify-end gap-3">

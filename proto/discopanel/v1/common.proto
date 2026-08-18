@@ -19,6 +19,21 @@ enum ServerStatus {
   SERVER_STATUS_UNHEALTHY = 8;
 }
 
+// Game type
+enum GameType {
+  GAME_TYPE_UNSPECIFIED = 0;
+  GAME_TYPE_MINECRAFT = 1;
+  GAME_TYPE_TERRARIA = 2;
+}
+
+// Terraria server software type
+enum TerrariaFlavor {
+  TERRARIA_FLAVOR_UNSPECIFIED = 0;
+  TERRARIA_FLAVOR_VANILLA = 1;
+  TERRARIA_FLAVOR_TSHOCK = 2;
+  TERRARIA_FLAVOR_TMODLOADER = 3;
+}
+
 // Minecraft server software type
 enum ModLoader {
   MOD_LOADER_UNSPECIFIED = 0;
@@ -59,8 +74,11 @@ message Server {
   string id = 1;
   string name = 2;
   string description = 3;
+  GameType game_type = 40;
   ModLoader mod_loader = 4;
   string mc_version = 5;
+  TerrariaFlavor terraria_flavor = 41;
+  string terraria_version = 42;
   ServerStatus status = 6;
   int32 port = 7;
   string proxy_hostname = 8;

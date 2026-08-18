@@ -57,7 +57,7 @@ func DefaultConfig() CollectorConfig {
 	return CollectorConfig{
 		StatsInterval: 5 * time.Second,
 		RCONInterval:  10 * time.Second,
-		DiskInterval:  60 * time.Second,
+		DiskInterval:  5 * time.Minute,
 		SLPInterval:   15 * time.Second,
 		SLPTimeout:    5 * time.Second,
 		SLPEnabled:    true,
@@ -246,30 +246,40 @@ func (c *Collector) collectDockerStats() {
 		return
 	}
 
+	var wg sync.WaitGroup
 	for _, server := range servers {
 		if server.ContainerID == "" {
 			continue
 		}
 
-		// Check if server is running
-		status, err := c.docker.GetContainerStatus(ctx, server.ContainerID)
-		if err != nil || (status != storage.StatusRunning && status != storage.StatusUnhealthy) {
-			continue
-		}
+		wg.Add(1)
+		go func(server *storage.Server) {
+			defer wg.Done()
 
-		// Get container stats
-		stats, err := c.docker.GetContainerStats(ctx, server.ContainerID)
-		if err != nil {
-			c.log.Debug("Metrics collector: failed to get stats for %s: %v", server.ID, err)
-			continue
-		}
+			serverCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+			defer cancel()
 
-		c.updateMetrics(server.ID, func(m *ServerMetrics) {
-			m.CPUPercent = stats.CPUPercent
-			m.MemoryUsage = stats.MemoryUsage
-			m.LastUpdated = time.Now()
-		})
+			// Check if server is running
+			status, err := c.docker.GetContainerStatus(serverCtx, server.ContainerID)
+			if err != nil || (status != storage.StatusRunning && status != storage.StatusUnhealthy) {
+				return
+			}
+
+			// Get container stats
+			stats, err := c.docker.GetContainerStats(serverCtx, server.ContainerID)
+			if err != nil {
+				c.log.Debug("Metrics collector: failed to get stats for %s: %v", server.ID, err)
+				return
+			}
+
+			c.updateMetrics(server.ID, func(m *ServerMetrics) {
+				m.CPUPercent = stats.CPUPercent
+				m.MemoryUsage = stats.MemoryUsage
+				m.LastUpdated = time.Now()
+			})
+		}(server)
 	}
+	wg.Wait()
 }
 
 // Collects player count and TPS via RCON
@@ -283,56 +293,70 @@ func (c *Collector) collectRCONData() {
 		return
 	}
 
+	var wg sync.WaitGroup
 	for _, server := range servers {
 		if server.ContainerID == "" {
 			continue
 		}
 
-		// Check if server is running
-		status, err := c.docker.GetContainerStatus(ctx, server.ContainerID)
-		if err != nil || status != storage.StatusRunning {
+		if server.GameType == storage.GameTypeTerraria {
 			continue
 		}
 
-		existingMetrics := c.GetMetrics(server.ID)
-		slpHasPlayerData := existingMetrics != nil &&
-			existingMetrics.SLPAvailable &&
-			time.Since(existingMetrics.SLPLastUpdated) < c.collectorConfig.SLPInterval*2
+		wg.Add(1)
+		go func(server *storage.Server) {
+			defer wg.Done()
 
-		// Get player count and roster from RCON
-		if !slpHasPlayerData {
-			output, err := c.sender.SendCommand(ctx, server.ID, "list")
-			if err == nil && output != "" {
-				count, players := minecraft.ParsePlayerListFromOutput(output)
-				c.updateMetrics(server.ID, func(m *ServerMetrics) {
-					m.PlayersOnline = count
-					m.PlayerSample = players
-					m.LastUpdated = time.Now()
-				})
+			serverCtx, cancel := context.WithTimeout(ctx, 5*time.Second)
+			defer cancel()
+
+			// Check if server is running
+			status, err := c.docker.GetContainerStatus(serverCtx, server.ContainerID)
+			if err != nil || status != storage.StatusRunning {
+				return
 			}
-		}
 
-		// Get TPS if configured
-		if server.TPSCommand != "" {
-			for _, cmd := range strings.Split(server.TPSCommand, " ?? ") {
-				cmd = strings.TrimSpace(cmd)
-				if cmd == "" {
-					continue
-				}
-				output, err := c.sender.SendCommand(ctx, server.ID, cmd)
+			existingMetrics := c.GetMetrics(server.ID)
+			slpHasPlayerData := existingMetrics != nil &&
+				existingMetrics.SLPAvailable &&
+				time.Since(existingMetrics.SLPLastUpdated) < c.collectorConfig.SLPInterval*2
+
+			// Get player count and roster from RCON
+			if !slpHasPlayerData {
+				output, err := c.sender.SendCommand(serverCtx, server.ID, "list")
 				if err == nil && output != "" {
-					tps := minecraft.ParseTPSFromOutput(output)
-					if tps > 0 {
-						c.updateMetrics(server.ID, func(m *ServerMetrics) {
-							m.TPS = tps
-							m.LastUpdated = time.Now()
-						})
-						break
+					count, players := minecraft.ParsePlayerListFromOutput(output)
+					c.updateMetrics(server.ID, func(m *ServerMetrics) {
+						m.PlayersOnline = count
+						m.PlayerSample = players
+						m.LastUpdated = time.Now()
+					})
+				}
+			}
+
+			// Get TPS if configured
+			if server.TPSCommand != "" {
+				for _, cmd := range strings.Split(server.TPSCommand, " ?? ") {
+					cmd = strings.TrimSpace(cmd)
+					if cmd == "" {
+						continue
+					}
+					output, err := c.sender.SendCommand(serverCtx, server.ID, cmd)
+					if err == nil && output != "" {
+						tps := minecraft.ParseTPSFromOutput(output)
+						if tps > 0 {
+							c.updateMetrics(server.ID, func(m *ServerMetrics) {
+								m.TPS = tps
+								m.LastUpdated = time.Now()
+							})
+							break
+						}
 					}
 				}
 			}
-		}
+		}(server)
 	}
+	wg.Wait()
 }
 
 // Collects disk usage for server worlds
@@ -442,6 +466,10 @@ func (c *Collector) collectSLPData() {
 
 	for _, server := range servers {
 		if server.ContainerID == "" {
+			continue
+		}
+
+		if server.GameType == storage.GameTypeTerraria {
 			continue
 		}
 

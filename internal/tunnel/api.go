@@ -36,12 +36,12 @@ type PlayitTunnelDetails struct {
 }
 
 type playitCreateReq struct {
-	Name       string            `json:"name,omitempty"`
-	TunnelType string            `json:"tunnel_type,omitempty"`
-	PortType   string            `json:"port_type"` // "tcp", "udp", "both"
-	PortCount  int               `json:"port_count"`
-	Enabled    bool              `json:"enabled"`
-	Origin     playitOrigin      `json:"origin"`
+	Name       string       `json:"name,omitempty"`
+	TunnelType string       `json:"tunnel_type,omitempty"`
+	PortType   string       `json:"port_type"` // "tcp", "udp", "both"
+	PortCount  int          `json:"port_count"`
+	Enabled    bool         `json:"enabled"`
+	Origin     playitOrigin `json:"origin"`
 }
 
 type playitOrigin struct {

@@ -42,7 +42,16 @@
 
 	let { server, active = false }: { server: Server; active?: boolean } = $props();
 
-	let logEntries = $state<LogEntry[]>([]);
+	let logIdCounter = 0;
+	function processLogEntries(entries: LogEntry[]) {
+		return entries.map((e) => ({
+			...e,
+			_id: logIdCounter++,
+			_html: ansiConverter.toHtml(e.message)
+		}));
+	}
+
+	let logEntries = $state<(LogEntry & { _id: number; _html: string })[]>([]);
 	let command = $state('');
 	let loading = $state(false);
 	let autoScroll = $state(true);
@@ -103,16 +112,19 @@
 		// Register handlers
 		const unsubLogs = wsClient.onLogs((serverId, logs) => {
 			if (serverId === server.id) {
-				logEntries = logs.length > MAX_LOG_ENTRIES ? logs.slice(-MAX_LOG_ENTRIES) : logs;
+				const processed = processLogEntries(logs);
+				logEntries = processed.length > MAX_LOG_ENTRIES ? processed.slice(-MAX_LOG_ENTRIES) : processed;
 			}
 		});
 
 		const unsubLogEntry = wsClient.onLogEntry((serverId, logs) => {
 			if (serverId === server.id && logs.length > 0) {
 				// Just append logs - browser preserves scrollTop naturally
-				const combined = [...logEntries, ...logs];
-				logEntries =
-					combined.length > MAX_LOG_ENTRIES ? combined.slice(-MAX_LOG_ENTRIES) : combined;
+				const processed = processLogEntries(logs);
+				logEntries.push(...processed);
+				if (logEntries.length > MAX_LOG_ENTRIES) {
+					logEntries.splice(0, logEntries.length - MAX_LOG_ENTRIES);
+				}
 			}
 		});
 
@@ -182,7 +194,8 @@
 			});
 			const response = await rpcClient.server.getServerLogs(request);
 			const logs = response.logs || [];
-			logEntries = logs.length > MAX_LOG_ENTRIES ? logs.slice(-MAX_LOG_ENTRIES) : logs;
+			const processed = processLogEntries(logs);
+			logEntries = processed.length > MAX_LOG_ENTRIES ? processed.slice(-MAX_LOG_ENTRIES) : processed;
 		} catch (error) {
 			console.error('Failed to fetch logs:', error);
 		}
@@ -393,10 +406,10 @@
 								: 'Start the server to see output.'}
 						</div>
 					{:else}
-						{#each logEntries as entry, i (i)}
+						{#each logEntries as entry (entry._id)}
 							<div class="log-line break-all whitespace-pre-wrap" data-type={entry.level}>
 								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-								{@html ansiConverter.toHtml(entry.message)}
+								{@html entry._html}
 							</div>
 						{/each}
 					{/if}
@@ -415,7 +428,7 @@
 					type="text"
 					placeholder={server.status === ServerStatus.RUNNING ||
 					server.status === ServerStatus.UNHEALTHY
-						? 'Enter command...'
+						? ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 'Enter Terraria command (e.g. time noon)...' : 'Enter command...')
 						: 'Server must be running'}
 					bind:value={command}
 					disabled={server.status !== ServerStatus.RUNNING &&
@@ -433,6 +446,30 @@
 				<Send class="h-3 w-3" />
 			</Button>
 		</div>
+
+		{#if (server as any).gameType === 1 || (server as any).gameType === 'TERRARIA'}
+			<div class="flex flex-wrap gap-2 px-3 pb-2">
+				{#each ['say ', 'playing', 'save', 'time', 'kick ', 'ban ', 'motd', 'settle'] as quickCmd}
+					<Button
+						variant="outline"
+						size="sm"
+						class="h-6 px-2 text-[10px] bg-zinc-900 border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800"
+						onclick={() => {
+							if (quickCmd.endsWith(' ')) {
+								command = quickCmd;
+								// Focus input manually if needed, but svelte doesn't have a direct ref here.
+							} else {
+								command = quickCmd;
+								sendCommand();
+							}
+						}}
+						disabled={server.status !== ServerStatus.RUNNING && server.status !== ServerStatus.UNHEALTHY}
+					>
+						{quickCmd.trim()}
+					</Button>
+				{/each}
+			</div>
+		{/if}
 
 		<div class="flex shrink-0 items-center justify-between px-3 pb-2 text-xs text-zinc-500">
 			<div class="flex items-center gap-4">

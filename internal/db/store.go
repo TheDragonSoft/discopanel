@@ -6,9 +6,9 @@ import (
 	"reflect"
 	"time"
 
+	"github.com/glebarez/sqlite"
 	"github.com/go-viper/mapstructure/v2"
 	"github.com/google/uuid"
-	"github.com/glebarez/sqlite"
 	"github.com/nickheyer/discopanel/internal/config"
 	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
 	"gorm.io/gorm"
@@ -44,6 +44,19 @@ func NewSQLiteStore(cfg *config.Config) (*Store, error) {
 	}
 	if cfg.Database.ConnMaxLifetime > 0 {
 		sqlDB.SetConnMaxLifetime(time.Duration(cfg.Database.ConnMaxLifetime) * time.Second)
+	}
+
+	// Performance PRAGMAs
+	for _, pragma := range []string{
+		"PRAGMA journal_mode=WAL;",
+		"PRAGMA busy_timeout=5000;",
+		"PRAGMA synchronous=NORMAL;",
+		"PRAGMA cache_size=-64000;",
+		"PRAGMA foreign_keys=ON;",
+	} {
+		if _, err := sqlDB.Exec(pragma); err != nil {
+			return nil, fmt.Errorf("failed to set pragma: %w", err)
+		}
 	}
 
 	store := &Store{db: db, cfg: cfg}
@@ -269,6 +282,42 @@ func (s *Store) CreateDefaultServerConfig(serverID string) *ServerConfig {
 	}
 
 	return config
+}
+
+// TerrariaConfig operations
+func (s *Store) GetTerrariaConfig(ctx context.Context, serverID string) (*TerrariaConfig, error) {
+	var config TerrariaConfig
+	err := s.db.WithContext(ctx).Where("server_id = ?", serverID).First(&config).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, fmt.Errorf("terraria config not found")
+		}
+		return nil, err
+	}
+	return &config, nil
+}
+
+func (s *Store) CreateTerrariaConfig(ctx context.Context, config *TerrariaConfig) error {
+	return s.db.WithContext(ctx).Create(config).Error
+}
+
+func (s *Store) UpdateTerrariaConfig(ctx context.Context, config *TerrariaConfig) error {
+	return s.db.WithContext(ctx).Save(config).Error
+}
+
+func (s *Store) CreateDefaultTerrariaConfig(serverID string) *TerrariaConfig {
+	return &TerrariaConfig{
+		ServerID:        serverID,
+		WorldName:       "World",
+		WorldSize:       "small",
+		Difficulty:      1,
+		MaxPlayers:      8,
+		MOTD:            "Welcome to Terraria Server",
+		AutoCreate:      true,
+		SpawnProtection: false,
+		Secure:          false,
+		Language:        "en-US",
+	}
 }
 
 // Mod operations
@@ -1506,4 +1555,3 @@ func (s *Store) ListTunnelsFollowingServerLifecycle(ctx context.Context, serverI
 	err := s.db.WithContext(ctx).Preload("Server").Where("server_id = ? AND follow_server_lifecycle = ?", serverID, true).Find(&tunnels).Error
 	return tunnels, err
 }
-

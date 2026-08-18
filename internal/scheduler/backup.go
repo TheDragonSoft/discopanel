@@ -142,6 +142,18 @@ func (s *Scheduler) pauseWorldSaves(ctx context.Context, server *storage.Server)
 		return func() {}
 	}
 
+	if server.GameType == storage.GameTypeTerraria {
+		if _, err := s.sender.SendCommand(ctx, server.ID, "save"); err != nil {
+			s.log.Warn("Backup: failed to save Terraria world on server %s: %v", server.Name, err)
+		} else {
+			select {
+			case <-ctx.Done():
+			case <-time.After(2 * time.Second):
+			}
+		}
+		return func() {}
+	}
+
 	if _, err := s.sender.SendCommand(ctx, server.ID, "save-off"); err != nil {
 		s.log.Warn("Backup: failed to disable world saves on server %s (continuing anyway): %v", server.Name, err)
 		return func() {}

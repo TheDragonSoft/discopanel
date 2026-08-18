@@ -66,18 +66,37 @@ const (
 	ModLoaderAutoCurseForge ModLoader = "auto_curseforge"
 	ModLoaderCurseForge     ModLoader = "curseforge"
 	ModLoaderFTBA           ModLoader = "ftba"
-	ModLoaderModrinth       ModLoader = "modrinth"
+	// Modrinth
+	ModLoaderModrinth ModLoader = "modrinth"
+)
+
+type GameType string
+
+const (
+	GameTypeMinecraft GameType = "minecraft"
+	GameTypeTerraria  GameType = "terraria"
+)
+
+type TerrariaFlavor string
+
+const (
+	TerrariaFlavorVanilla    TerrariaFlavor = "vanilla"
+	TerrariaFlavorTShock     TerrariaFlavor = "tshock"
+	TerrariaFlavorTModLoader TerrariaFlavor = "tmodloader"
 )
 
 type Server struct {
 	ID              string               `json:"id" gorm:"primaryKey"`
 	Name            string               `json:"name" gorm:"not null"`
 	Description     string               `json:"description"`
+	GameType        GameType             `json:"game_type" gorm:"default:'minecraft';column:game_type;index"`
 	ModLoader       ModLoader            `json:"mod_loader" gorm:"not null"`
 	MCVersion       string               `json:"mc_version" gorm:"not null;column:mc_version"`
-	ContainerID     string               `json:"container_id" gorm:"column:container_id"`
-	Status          ServerStatus         `json:"status" gorm:"not null"`
-	Port            int                  `json:"port"`
+	TerrariaFlavor  TerrariaFlavor       `json:"terraria_flavor" gorm:"column:terraria_flavor"`
+	TerrariaVersion string               `json:"terraria_version" gorm:"column:terraria_version"`
+	ContainerID     string               `json:"container_id" gorm:"column:container_id;index"`
+	Status          ServerStatus         `json:"status" gorm:"not null;index"`
+	Port            int                  `json:"port" gorm:"index"`
 	ProxyPort       int                  `json:"proxy_port" gorm:"column:proxy_port"`
 	ProxyHostname   string               `json:"proxy_hostname" gorm:"column:proxy_hostname;uniqueIndex:idx_proxy_hostname_listener,where:proxy_hostname != ''"`
 	ProxyListenerID string               `json:"proxy_listener_id" gorm:"column:proxy_listener_id;uniqueIndex:idx_proxy_hostname_listener,where:proxy_listener_id != ''"` // Which listener this server uses
@@ -113,6 +132,25 @@ type Server struct {
 	PlayerSample    []string `json:"player_sample" gorm:"-"`
 	MaxPlayersSLP   int      `json:"max_players_slp" gorm:"-"` // Actual from SLP (MaxPlayers field is config)
 	Favicon         string   `json:"favicon" gorm:"-"`         // Base64 PNG from SLP
+}
+
+type TerrariaConfig struct {
+	ServerID        string    `json:"server_id" gorm:"primaryKey;column:server_id"`
+	WorldName       string    `json:"world_name" gorm:"column:world_name"`
+	WorldSize       string    `json:"world_size" gorm:"column:world_size"`
+	Difficulty      int       `json:"difficulty" gorm:"column:difficulty"`
+	Seed            string    `json:"seed" gorm:"column:seed"`
+	Password        string    `json:"password" gorm:"column:password"`
+	MaxPlayers      int       `json:"max_players" gorm:"column:max_players"`
+	MOTD            string    `json:"motd" gorm:"column:motd"`
+	CustomConfig    string    `json:"custom_config" gorm:"column:custom_config"`
+	AutoCreate      bool      `json:"auto_create" gorm:"column:auto_create"`
+	BanListPath     string    `json:"ban_list_path" gorm:"column:ban_list_path"`
+	SpawnProtection bool      `json:"spawn_protection" gorm:"column:spawn_protection"`
+	Secure          bool      `json:"secure" gorm:"column:secure"`
+	Language        string    `json:"language" gorm:"column:language"`
+	UpdatedAt       time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+	Server          *Server   `json:"-" gorm:"foreignKey:ServerID;constraint:OnDelete:CASCADE"`
 }
 
 type ServerConfig struct {
@@ -747,4 +785,3 @@ type Tunnel struct {
 	// Relationships
 	Server *Server `json:"-" gorm:"foreignKey:ServerID;constraint:OnDelete:CASCADE"`
 }
-

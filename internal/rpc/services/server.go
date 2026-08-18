@@ -25,6 +25,7 @@ import (
 	"github.com/nickheyer/discopanel/internal/minecraft"
 	"github.com/nickheyer/discopanel/internal/module"
 	"github.com/nickheyer/discopanel/internal/proxy"
+	"github.com/nickheyer/discopanel/internal/terraria"
 	"github.com/nickheyer/discopanel/pkg/files"
 	"github.com/nickheyer/discopanel/pkg/logger"
 	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
@@ -116,6 +117,11 @@ func dbServerToProto(server *storage.Server) *v1.Server {
 
 	// Apply overrides
 	protoServer.DockerOverrides = server.DockerOverrides
+
+	// Map game type and terraria metadata
+	protoServer.GameType = dbGameTypeToProto(server.GameType)
+	protoServer.TerrariaFlavor = dbTerrariaFlavorToProto(server.TerrariaFlavor)
+	protoServer.TerrariaVersion = server.TerrariaVersion
 
 	// Map mod loader
 	protoServer.ModLoader = dbModLoaderToProto(server.ModLoader)
@@ -230,6 +236,54 @@ func dbStatusToProto(status storage.ServerStatus) v1.ServerStatus {
 		return v1.ServerStatus_SERVER_STATUS_UNHEALTHY
 	default:
 		return v1.ServerStatus_SERVER_STATUS_UNSPECIFIED
+	}
+}
+
+func dbGameTypeToProto(gt storage.GameType) v1.GameType {
+	switch gt {
+	case storage.GameTypeTerraria:
+		return v1.GameType_GAME_TYPE_TERRARIA
+	case storage.GameTypeMinecraft:
+		return v1.GameType_GAME_TYPE_MINECRAFT
+	default:
+		return v1.GameType_GAME_TYPE_MINECRAFT
+	}
+}
+
+func protoGameTypeToDB(gt v1.GameType) storage.GameType {
+	switch gt {
+	case v1.GameType_GAME_TYPE_TERRARIA:
+		return storage.GameTypeTerraria
+	case v1.GameType_GAME_TYPE_MINECRAFT:
+		return storage.GameTypeMinecraft
+	default:
+		return storage.GameTypeMinecraft
+	}
+}
+
+func dbTerrariaFlavorToProto(tf storage.TerrariaFlavor) v1.TerrariaFlavor {
+	switch tf {
+	case storage.TerrariaFlavorVanilla:
+		return v1.TerrariaFlavor_TERRARIA_FLAVOR_VANILLA
+	case storage.TerrariaFlavorTShock:
+		return v1.TerrariaFlavor_TERRARIA_FLAVOR_TSHOCK
+	case storage.TerrariaFlavorTModLoader:
+		return v1.TerrariaFlavor_TERRARIA_FLAVOR_TMODLOADER
+	default:
+		return v1.TerrariaFlavor_TERRARIA_FLAVOR_UNSPECIFIED
+	}
+}
+
+func protoTerrariaFlavorToDB(tf v1.TerrariaFlavor) storage.TerrariaFlavor {
+	switch tf {
+	case v1.TerrariaFlavor_TERRARIA_FLAVOR_VANILLA:
+		return storage.TerrariaFlavorVanilla
+	case v1.TerrariaFlavor_TERRARIA_FLAVOR_TSHOCK:
+		return storage.TerrariaFlavorTShock
+	case v1.TerrariaFlavor_TERRARIA_FLAVOR_TMODLOADER:
+		return storage.TerrariaFlavorTModLoader
+	default:
+		return storage.TerrariaFlavorVanilla
 	}
 }
 
@@ -394,15 +448,28 @@ func (s *ServerService) CreateServer(ctx context.Context, req *connect.Request[v
 		}
 	}
 
+	// Determine game type and flavor
+	gameType := protoGameTypeToDB(msg.GameType)
+	terrariaFlavor := protoTerrariaFlavorToDB(msg.TerrariaFlavor)
+
 	// Validate request
-	if msg.Name == "" || msg.McVersion == "" {
-		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("name and MC version are required"))
+	if gameType == storage.GameTypeTerraria {
+		if msg.Name == "" {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("name is required"))
+		}
+	} else {
+		if msg.Name == "" || msg.McVersion == "" {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("name and MC version are required"))
+		}
 	}
 
 	// Handle proxy configuration
 	proxyHostname := msg.ProxyHostname
 	proxyListenerID := msg.ProxyListenerId
 	port := int(msg.Port)
+	if gameType == storage.GameTypeTerraria && (port == 0 || port == 25565) {
+		port = 7777
+	}
 
 	if proxyHostname != "" {
 		// If using base URL, append it to the hostname
@@ -479,7 +546,11 @@ func (s *ServerService) CreateServer(ctx context.Context, req *connect.Request[v
 	// Determine Docker image if not specified
 	dockerImage := msg.DockerImage
 	if dockerImage == "" {
-		dockerImage = docker.GetOptimalDockerTag(msg.McVersion, modLoader, false)
+		if gameType == storage.GameTypeTerraria {
+			dockerImage = terraria.GetDockerImage(terrariaFlavor, msg.TerrariaVersion)
+		} else {
+			dockerImage = docker.GetOptimalDockerTag(msg.McVersion, modLoader, false)
+		}
 	}
 
 	// Validate additional ports
@@ -531,12 +602,22 @@ func (s *ServerService) CreateServer(ctx context.Context, req *connect.Request[v
 	serverDataDir := fmt.Sprintf("%s_%s", files.SanitizePathName(msg.Name), serverUUID)
 	serverDataPath := filepath.Join(s.config.Storage.DataDir, "servers", serverDataDir)
 
+	javaVersion := ""
+	tpsCommand := ""
+	if gameType == storage.GameTypeMinecraft {
+		javaVersion = docker.GetRequiredJavaVersion(msg.McVersion, modLoader)
+		tpsCommand = minecraft.GetTPSCommand(modLoader)
+	}
+
 	server := &storage.Server{
 		ID:              serverUUID,
 		Name:            msg.Name,
 		Description:     msg.Description,
+		GameType:        gameType,
 		ModLoader:       modLoader,
 		MCVersion:       msg.McVersion,
+		TerrariaFlavor:  terrariaFlavor,
+		TerrariaVersion: msg.TerrariaVersion,
 		Status:          storage.StatusCreating,
 		Port:            port,
 		ProxyHostname:   proxyHostname,
@@ -544,18 +625,22 @@ func (s *ServerService) CreateServer(ctx context.Context, req *connect.Request[v
 		MaxPlayers:      int(msg.MaxPlayers),
 		Memory:          int(msg.Memory),
 		DataPath:        serverDataPath,
-		JavaVersion:     docker.GetRequiredJavaVersion(msg.McVersion, modLoader),
+		JavaVersion:     javaVersion,
 		DockerImage:     dockerImage,
 		AutoStart:       msg.AutoStart,
 		Detached:        msg.Detached,
-		TPSCommand:      minecraft.GetTPSCommand(modLoader),
+		TPSCommand:      tpsCommand,
 		AdditionalPorts: additionalPorts,
 		DockerOverrides: msg.DockerOverrides,
 	}
 
 	// Set defaults
 	if server.MaxPlayers == 0 {
-		server.MaxPlayers = 20
+		if gameType == storage.GameTypeTerraria {
+			server.MaxPlayers = 8
+		} else {
+			server.MaxPlayers = 20
+		}
 	}
 	if server.Memory == 0 {
 		server.Memory = 4096
@@ -585,88 +670,120 @@ func (s *ServerService) CreateServer(ctx context.Context, req *connect.Request[v
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to create server"))
 	}
 
-	// Get the server config
-	serverConfig, err := s.store.GetServerConfig(ctx, server.ID)
-	if err != nil {
-		s.log.Error("Failed to get server config: %v", err)
-		serverConfig = s.store.CreateDefaultServerConfig(server.ID)
-	}
-
-	// Set memory configuration
-	if serverConfig.MaxMemory == nil && serverConfig.Memory == nil && serverConfig.InitMemory == nil {
-		strMax := fmt.Sprintf("%dM", int(float64(server.Memory)*0.75))
-		serverConfig.MaxMemory = &strMax
-		strMin := fmt.Sprintf("%dM", int(float64(server.Memory)*0.45))
-		serverConfig.InitMemory = &strMin
-	}
-
-	if serverConfig.Memory != nil {
-		serverConfig.MaxMemory = serverConfig.Memory
-		serverConfig.InitMemory = serverConfig.Memory
-	}
-
-	if err := s.store.UpdateServerConfig(ctx, serverConfig); err != nil {
-		s.log.Error("Failed to update server config with memory settings: %v", err)
-	}
-
-	// Configure modpack if selected
-	if msg.ModpackId != "" {
-		modpack, _ := s.store.GetIndexedModpack(ctx, msg.ModpackId)
-		if modpack != nil && modpack.Indexer == "manual" {
-			// For manual modpacks, copy the zip file
-			modpackFile, err := s.store.GetIndexedModpackFiles(ctx, msg.ModpackId)
-			if err == nil && len(modpackFile) > 0 {
-				sourcePath := modpackFile[0].DownloadURL
-				destPath := filepath.Join(server.DataPath, "modpack.zip")
-
-				// Copy the modpack file
-				if sourceFile, err := os.Open(sourcePath); err == nil {
-					defer sourceFile.Close()
-					if destFile, err := os.Create(destPath); err == nil {
-						defer destFile.Close()
-						io.Copy(destFile, sourceFile)
-
-						// Set CF_MODPACK_ZIP for manual modpack
-						cfModpackZip := "/data/modpack.zip"
-						serverConfig.CFModpackZip = &cfModpackZip
-
-						// Set a dummy slug
-						cfSlug := "manual-" + modpack.ID
-						serverConfig.CFSlug = &cfSlug
-					}
-				}
+	var serverConfig *storage.ServerConfig
+	if gameType == storage.GameTypeTerraria {
+		terrariaConfig := s.store.CreateDefaultTerrariaConfig(server.ID)
+		if server.Name != "" {
+			terrariaConfig.WorldName = server.Name
+		}
+		if msg.TerrariaConfig != nil {
+			if msg.TerrariaConfig.WorldName != "" {
+				terrariaConfig.WorldName = msg.TerrariaConfig.WorldName
 			}
-		} else if modpackURL != "" && server.ModLoader == storage.ModLoaderAutoCurseForge {
-			// If version is pinned, append /files/<id>
-			if msg.ModpackVersionId != "" {
-				versionedURL := fmt.Sprintf("%s/files/%s", modpackURL, msg.ModpackVersionId)
-				serverConfig.CFPageURL = &versionedURL
-			} else {
-				serverConfig.CFPageURL = &modpackURL
+			if msg.TerrariaConfig.WorldSize != "" {
+				terrariaConfig.WorldSize = msg.TerrariaConfig.WorldSize
 			}
-		} else if modpack != nil && modpack.Indexer == "modrinth" {
-			var projectSpec string
-			if msg.ModpackVersionId != "" && msg.ModpackVersionId != "latest" {
-				projectSpec = fmt.Sprintf("%s:%s", modpack.IndexerID, msg.ModpackVersionId)
-				s.log.Info("Using specific Modrinth version: %s", projectSpec)
-			} else {
-				projectSpec = modpack.IndexerID
-				s.log.Info("Using latest Modrinth version for project: %s", projectSpec)
+			terrariaConfig.Difficulty = int(msg.TerrariaConfig.Difficulty)
+			terrariaConfig.Seed = msg.TerrariaConfig.Seed
+			terrariaConfig.Password = msg.TerrariaConfig.Password
+			if msg.TerrariaConfig.MaxPlayers > 0 {
+				terrariaConfig.MaxPlayers = int(msg.TerrariaConfig.MaxPlayers)
 			}
-			serverConfig.ModrinthModpack = &projectSpec
-			downloadDeps := "required"
-			serverConfig.ModrinthDownloadDependencies = &downloadDeps
-
-			// Only set version type when using latest
-			if msg.ModpackVersionId == "" || msg.ModpackVersionId == "latest" {
-				versionType := "release"
-				serverConfig.ModrinthModpackVersionType = &versionType
-			}
+			terrariaConfig.MOTD = msg.TerrariaConfig.Motd
+			terrariaConfig.CustomConfig = msg.TerrariaConfig.CustomConfig
+			terrariaConfig.BanListPath = msg.TerrariaConfig.BanListPath
+			terrariaConfig.SpawnProtection = msg.TerrariaConfig.SpawnProtection
+			terrariaConfig.Secure = msg.TerrariaConfig.Secure
+			terrariaConfig.Language = msg.TerrariaConfig.Language
+		}
+		if err := s.store.CreateTerrariaConfig(ctx, terrariaConfig); err != nil {
+			s.log.Error("Failed to create terraria config: %v", err)
+		}
+	} else {
+		// Get the server config
+		var err error
+		serverConfig, err = s.store.GetServerConfig(ctx, server.ID)
+		if err != nil {
+			s.log.Error("Failed to get server config: %v", err)
+			serverConfig = s.store.CreateDefaultServerConfig(server.ID)
 		}
 
-		// Update config with modpack settings
+		// Set memory configuration
+		if serverConfig.MaxMemory == nil && serverConfig.Memory == nil && serverConfig.InitMemory == nil {
+			strMax := fmt.Sprintf("%dM", int(float64(server.Memory)*0.75))
+			serverConfig.MaxMemory = &strMax
+			strMin := fmt.Sprintf("%dM", int(float64(server.Memory)*0.45))
+			serverConfig.InitMemory = &strMin
+		}
+
+		if serverConfig.Memory != nil {
+			serverConfig.MaxMemory = serverConfig.Memory
+			serverConfig.InitMemory = serverConfig.Memory
+		}
+
 		if err := s.store.UpdateServerConfig(ctx, serverConfig); err != nil {
-			s.log.Error("Failed to update server config with modpack settings: %v", err)
+			s.log.Error("Failed to update server config with memory settings: %v", err)
+		}
+
+		// Configure modpack if selected
+		if msg.ModpackId != "" {
+			modpack, _ := s.store.GetIndexedModpack(ctx, msg.ModpackId)
+			if modpack != nil && modpack.Indexer == "manual" {
+				// For manual modpacks, copy the zip file
+				modpackFile, err := s.store.GetIndexedModpackFiles(ctx, msg.ModpackId)
+				if err == nil && len(modpackFile) > 0 {
+					sourcePath := modpackFile[0].DownloadURL
+					destPath := filepath.Join(server.DataPath, "modpack.zip")
+
+					// Copy the modpack file
+					if sourceFile, err := os.Open(sourcePath); err == nil {
+						defer sourceFile.Close()
+						if destFile, err := os.Create(destPath); err == nil {
+							defer destFile.Close()
+							io.Copy(destFile, sourceFile)
+
+							// Set CF_MODPACK_ZIP for manual modpack
+							cfModpackZip := "/data/modpack.zip"
+							serverConfig.CFModpackZip = &cfModpackZip
+
+							// Set a dummy slug
+							cfSlug := "manual-" + modpack.ID
+							serverConfig.CFSlug = &cfSlug
+						}
+					}
+				}
+			} else if modpackURL != "" && server.ModLoader == storage.ModLoaderAutoCurseForge {
+				// If version is pinned, append /files/<id>
+				if msg.ModpackVersionId != "" {
+					versionedURL := fmt.Sprintf("%s/files/%s", modpackURL, msg.ModpackVersionId)
+					serverConfig.CFPageURL = &versionedURL
+				} else {
+					serverConfig.CFPageURL = &modpackURL
+				}
+			} else if modpack != nil && modpack.Indexer == "modrinth" {
+				var projectSpec string
+				if msg.ModpackVersionId != "" && msg.ModpackVersionId != "latest" {
+					projectSpec = fmt.Sprintf("%s:%s", modpack.IndexerID, msg.ModpackVersionId)
+					s.log.Info("Using specific Modrinth version: %s", projectSpec)
+				} else {
+					projectSpec = modpack.IndexerID
+					s.log.Info("Using latest Modrinth version for project: %s", projectSpec)
+				}
+				serverConfig.ModrinthModpack = &projectSpec
+				downloadDeps := "required"
+				serverConfig.ModrinthDownloadDependencies = &downloadDeps
+
+				// Only set version type when using latest
+				if msg.ModpackVersionId == "" || msg.ModpackVersionId == "latest" {
+					versionType := "release"
+					serverConfig.ModrinthModpackVersionType = &versionType
+				}
+			}
+
+			// Update config with modpack settings
+			if err := s.store.UpdateServerConfig(ctx, serverConfig); err != nil {
+				s.log.Error("Failed to update server config with modpack settings: %v", err)
+			}
 		}
 	}
 

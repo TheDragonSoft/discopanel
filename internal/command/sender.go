@@ -40,6 +40,10 @@ func (s *Sender) SendCommand(ctx context.Context, serverID string, command strin
 		return "", fmt.Errorf("server container not found")
 	}
 
+	if server.GameType == storage.GameTypeTerraria {
+		return s.docker.ExecCommand(ctx, server.ContainerID, command)
+	}
+
 	// old docker exec command
 	dockerExec := func(cause error) (string, error) {
 		output, err := s.docker.ExecCommand(ctx, server.ContainerID, command)

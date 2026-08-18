@@ -140,6 +140,7 @@ func (s *Server) setupHandler() {
 		connect.WithHandlerOptions(
 			connect.WithCompression("gzip", nil, nil),
 		),
+		connect.WithReadMaxBytes(5 << 20),
 	}
 
 	// Register all service handlers
@@ -159,6 +160,7 @@ func (s *Server) setupHandler() {
 		discopanelv1connect.ServerServiceName,
 		discopanelv1connect.SupportServiceName,
 		discopanelv1connect.TaskServiceName,
+		discopanelv1connect.TerrariaServiceName,
 		discopanelv1connect.TunnelServiceName,
 		discopanelv1connect.UploadServiceName,
 		discopanelv1connect.UserServiceName,
@@ -209,6 +211,7 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 	moduleService := services.NewModuleService(s.store, s.docker, s.moduleManager, s.proxyManager, s.authManager, s.config, s.logStreamer, s.log)
 	tunnelService := services.NewTunnelService(s.store, s.tunnelManager, s.log)
 	uploadService := services.NewUploadService(s.uploadManager, s.config, s.log)
+	terrariaService := services.NewTerrariaServiceHandler(s.store)
 
 	// Register service handlers
 	authPath, authHandler := discopanelv1connect.NewAuthServiceHandler(authService, opts...)
@@ -255,6 +258,9 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 
 	uploadPath, uploadHandler := discopanelv1connect.NewUploadServiceHandler(uploadService, opts...)
 	mux.Handle(uploadPath, uploadHandler)
+
+	terrariaPath, terrariaHandler := discopanelv1connect.NewTerrariaServiceHandler(terrariaService, opts...)
+	mux.Handle(terrariaPath, terrariaHandler)
 }
 
 // The HTTP handler for the server
@@ -384,6 +390,25 @@ func (s *Server) createFrontendHandler(fs http.FileSystem) http.HandlerFunc {
 		if err == nil {
 			defer file.Close()
 			stat, _ := file.Stat()
+			if len(path) > 16 && path[:16] == "/_app/immutable/" || len(path) > 15 && path[len(path)-15:] == "/_app/immutable/" || (len(path) > 0 && path[0] == '/' && path[1:16] == "_app/immutable/") {
+				// simple strings.Contains simulation
+				w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+			} else {
+				foundImmutable := false
+				for i := 0; i < len(path)-15; i++ {
+					if path[i:i+16] == "/_app/immutable/" {
+						foundImmutable = true
+						break
+					}
+				}
+				if foundImmutable {
+					w.Header().Set("Cache-Control", "public, max-age=31536000, immutable")
+				} else if path == "/index.html" {
+					w.Header().Set("Cache-Control", "no-cache")
+				} else {
+					w.Header().Set("Cache-Control", "public, max-age=3600")
+				}
+			}
 			http.ServeContent(w, r, path, stat.ModTime(), file)
 			return
 		}
@@ -398,6 +423,7 @@ func (s *Server) createFrontendHandler(fs http.FileSystem) http.HandlerFunc {
 
 		stat, _ := indexFile.Stat()
 		w.Header().Set("Content-Type", "text/html; charset=utf-8")
+		w.Header().Set("Cache-Control", "no-cache")
 		http.ServeContent(w, r, "/index.html", stat.ModTime(), indexFile)
 	}
 }
