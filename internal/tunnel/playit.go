@@ -18,15 +18,15 @@ import (
 )
 
 const (
-	PlayitDockerImage        = "playitgg/playit-cli:latest"
+	PlayitDockerImage        = "ghcr.io/playit-cloud/playit-agent:latest"
 	PlayitAccountSecretKey   = "playit_account_secret_key"
 	PlayitAccountSessionKey  = "playit_account_session"
 )
 
 var (
-	claimURLRegex     = regexp.MustCompile(`https://playit\.gg/claim/([a-zA-Z0-9_\-]+)`)
+	claimURLRegex     = regexp.MustCompile(`https?://playit\.gg/claim/([a-zA-Z0-9_\-]+)`)
 	publicAddrRegex   = regexp.MustCompile(`([a-zA-Z0-9_\-]+\.(?:gl\.joinmc\.link|craft\.ply\.gg|ply\.gg|auto\.playit\.gg))(?::(\d+))?`)
-	tunnelActiveRegex = regexp.MustCompile(`(?i)(tunnel active|tunnel running|connected to server|established connection|registered tunnel)`)
+	tunnelActiveRegex = regexp.MustCompile(`(?i)(tunnel active|tunnel running|connected to server|established connection|registered tunnel|agent registered)`)
 )
 
 type PlayitDriver struct {
@@ -43,11 +43,24 @@ func NewPlayitDriver(dockerClient *docker.Client, cfg *config.Config, log *logge
 	}
 }
 
+// EnsureImage ensures the Playit Docker image is downloaded locally
+func (d *PlayitDriver) EnsureImage(ctx context.Context) error {
+	d.log.Info("Ensuring playit docker image %s is available...", PlayitDockerImage)
+	if err := d.docker.PullImage(ctx, PlayitDockerImage); err != nil {
+		d.log.Warn("Failed to pull image %s: %v, checking for local cached image", PlayitDockerImage, err)
+		if _, _, inspectErr := d.docker.GetDockerClient().ImageInspectWithRaw(ctx, PlayitDockerImage); inspectErr != nil {
+			return fmt.Errorf("failed to pull required playit image %s: %w", PlayitDockerImage, err)
+		}
+		d.log.Info("Using locally cached image %s", PlayitDockerImage)
+	}
+	return nil
+}
+
 // CreateContainer creates a Playit container for a tunnel
 func (d *PlayitDriver) CreateContainer(ctx context.Context, tunnel *storage.Tunnel, server *storage.Server, accountSecretKey string) (string, error) {
-	// Pull image if not already cached
-	if err := d.docker.PullImage(ctx, PlayitDockerImage); err != nil {
-		d.log.Warn("Failed to pull image %s: %v, attempting to use local cache", PlayitDockerImage, err)
+	// Ensure image is downloaded
+	if err := d.EnsureImage(ctx); err != nil {
+		return "", err
 	}
 
 	// Prepare persistent config dir
@@ -78,7 +91,10 @@ func (d *PlayitDriver) CreateContainer(ctx context.Context, tunnel *storage.Tunn
 		secretKey = accountSecretKey
 	}
 	if secretKey != "" {
-		env = append(env, fmt.Sprintf("PLAYIT_SECRET_KEY=%s", secretKey))
+		env = append(env,
+			fmt.Sprintf("SECRET_KEY=%s", secretKey),
+			fmt.Sprintf("PLAYIT_SECRET_KEY=%s", secretKey),
+		)
 	}
 
 	// Volume mount for persistent playit.toml / configuration
