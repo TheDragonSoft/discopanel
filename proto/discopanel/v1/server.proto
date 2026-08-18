@@ -3,6 +3,7 @@ syntax = "proto3";
 package discopanel.v1;
 
 import "discopanel/v1/common.proto";
+import "discopanel/v1/terraria.proto";
 import "google/protobuf/timestamp.proto";
 
 option go_package = "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1";
@@ -108,8 +109,12 @@ message GetNextAvailablePortResponse {
 message CreateServerRequest {
   string name = 1;
   string description = 2;
+  GameType game_type = 19;
   ModLoader mod_loader = 3;
   string mc_version = 4;
+  TerrariaFlavor terraria_flavor = 20;
+  string terraria_version = 21;
+  TerrariaConfig terraria_config = 22;
   int32 port = 5;
   int32 max_players = 6;
   int32 memory = 7;
@@ -141,6 +146,10 @@ message UpdateServerRequest {
   int32 memory = 6;
   string mod_loader = 7;
   string mc_version = 8;
+  GameType game_type = 17;
+  TerrariaFlavor terraria_flavor = 18;
+  string terraria_version = 19;
+  TerrariaConfig terraria_config = 20;
   string docker_image = 9;
   optional bool auto_start = 10;
   optional bool detached = 11;

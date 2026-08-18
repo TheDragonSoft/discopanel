@@ -32,7 +32,8 @@
 		Cpu,
 		Info,
 		Globe,
-		Radio
+		Radio,
+		Gamepad2
 	} from '@lucide/svelte';
 	import {
 		DropdownMenu,
@@ -43,7 +44,7 @@
 	import { create } from '@bufbuild/protobuf';
 	import type { Timestamp } from '@bufbuild/protobuf/wkt';
 	import type { Server } from '$lib/proto/discopanel/v1/common_pb';
-	import { ServerStatus, ModLoader } from '$lib/proto/discopanel/v1/common_pb';
+	import { ServerStatus, ModLoader, GameType } from '$lib/proto/discopanel/v1/common_pb';
 	import type { GetServerRoutingResponse } from '$lib/proto/discopanel/v1/proxy_pb';
 	import {
 		GetServerRequestSchema,
@@ -63,6 +64,7 @@
 	import ServerMods from '$lib/components/server-mods.svelte';
 	import ServerFiles from '$lib/components/files/server-files.svelte';
 	import ServerRouting from '$lib/components/server-routing.svelte';
+	import TerrariaConfigEditor from '$lib/components/terraria/terraria-config-editor.svelte';
 	import ServerTasks from '$lib/components/server-tasks.svelte';
 	import ServerModules from '$lib/components/server/ServerModules.svelte';
 
@@ -259,7 +261,11 @@
 				<div
 					class="flex h-12 w-12 items-center justify-center rounded-xl bg-linear-to-br from-primary/20 to-primary/10 shadow-lg sm:h-16 sm:w-16 sm:rounded-2xl"
 				>
-					<Package class="h-6 w-6 text-primary sm:h-8 sm:w-8" />
+					{#if server.gameType === GameType.TERRARIA}
+						<Gamepad2 class="h-6 w-6 text-primary sm:h-8 sm:w-8" />
+					{:else}
+						<Package class="h-6 w-6 text-primary sm:h-8 sm:w-8" />
+					{/if}
 				</div>
 				<div class="space-y-1">
 					<div class="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -791,49 +797,67 @@
 					</CardHeader>
 					<CardContent class="flex-1 scrollbar-thin overflow-y-auto pt-0 pb-2">
 						<div class="space-y-1.5">
-							<div class="flex items-center justify-between">
-								<span class="text-[10px] text-muted-foreground/60">Minecraft</span>
-								<span class="font-mono text-[11px] font-semibold text-purple-500"
-									>{server.mcVersion}</span
-								>
-							</div>
-							{#if server.javaVersion}
+							{#if server.gameType === GameType.TERRARIA}
 								<div class="flex items-center justify-between">
-									<span class="text-[10px] text-muted-foreground/60">Java</span>
-									<span class="font-mono text-[11px] font-semibold text-purple-400"
-										>Java {server.javaVersion}</span
+									<span class="text-[10px] text-muted-foreground/60">Terraria</span>
+									<span class="font-mono text-[11px] font-semibold text-purple-500"
+										>{(server as any).terrariaVersion || 'Unknown'}</span
 									>
 								</div>
-							{/if}
-							<div class="flex items-center justify-between">
-								<span class="text-[10px] text-muted-foreground/60">Mod Loader</span>
-								{#if server.modLoader === ModLoader.VANILLA}
+								<div class="flex items-center justify-between">
+									<span class="text-[10px] text-muted-foreground/60">Flavor</span>
 									<Badge
 										variant="secondary"
-										class="h-4 border-yellow-500/20 bg-yellow-500/10 px-1.5 py-0 text-[10px]"
+										class="h-4 border-purple-500/20 bg-purple-500/10 px-1.5 py-0 text-[10px] capitalize"
 									>
-										Vanilla
+										{(server as any).terrariaFlavor === 1 ? 'TShock' : (server as any).terrariaFlavor === 2 ? 'tModLoader' : 'Vanilla'}
 									</Badge>
-								{:else if server.modLoader === ModLoader.FORGE || server.modLoader === ModLoader.NEOFORGE}
-									<Badge
-										variant="secondary"
-										class="h-4 border-orange-500/20 bg-orange-500/10 px-1.5 py-0 text-[10px]"
+								</div>
+							{:else}
+								<div class="flex items-center justify-between">
+									<span class="text-[10px] text-muted-foreground/60">Minecraft</span>
+									<span class="font-mono text-[11px] font-semibold text-purple-500"
+										>{server.mcVersion}</span
 									>
-										{server.modLoader === ModLoader.FORGE ? 'Forge' : 'NeoForge'}
-									</Badge>
-								{:else if server.modLoader === ModLoader.FABRIC}
-									<Badge
-										variant="secondary"
-										class="h-4 border-blue-500/20 bg-blue-500/10 px-1.5 py-0 text-[10px]"
-									>
-										Fabric
-									</Badge>
-								{:else}
-									<Badge variant="secondary" class="h-4 px-1.5 py-0 text-[10px] capitalize">
-										{ModLoader[server.modLoader]}
-									</Badge>
+								</div>
+								{#if server.javaVersion}
+									<div class="flex items-center justify-between">
+										<span class="text-[10px] text-muted-foreground/60">Java</span>
+										<span class="font-mono text-[11px] font-semibold text-purple-400"
+											>Java {server.javaVersion}</span
+										>
+									</div>
 								{/if}
-							</div>
+								<div class="flex items-center justify-between">
+									<span class="text-[10px] text-muted-foreground/60">Mod Loader</span>
+									{#if server.modLoader === ModLoader.VANILLA}
+										<Badge
+											variant="secondary"
+											class="h-4 border-yellow-500/20 bg-yellow-500/10 px-1.5 py-0 text-[10px]"
+										>
+											Vanilla
+										</Badge>
+									{:else if server.modLoader === ModLoader.FORGE || server.modLoader === ModLoader.NEOFORGE}
+										<Badge
+											variant="secondary"
+											class="h-4 border-orange-500/20 bg-orange-500/10 px-1.5 py-0 text-[10px]"
+										>
+											{server.modLoader === ModLoader.FORGE ? 'Forge' : 'NeoForge'}
+										</Badge>
+									{:else if server.modLoader === ModLoader.FABRIC}
+										<Badge
+											variant="secondary"
+											class="h-4 border-blue-500/20 bg-blue-500/10 px-1.5 py-0 text-[10px]"
+										>
+											Fabric
+										</Badge>
+									{:else}
+										<Badge variant="secondary" class="h-4 px-1.5 py-0 text-[10px] capitalize">
+											{ModLoader[server.modLoader]}
+										</Badge>
+									{/if}
+								</div>
+							{/if}
 							<div
 								class="group/copy flex cursor-pointer items-center justify-between"
 								onclick={() => copyToClipboard(server?.id)}
@@ -1172,7 +1196,24 @@
 				</TabsContent>
 
 				<TabsContent value="configuration" class="h-full overflow-y-auto">
-					<ServerConfiguration {server} />
+					{#if server.gameType === GameType.TERRARIA}
+						<div class="p-4 sm:p-6 lg:p-8">
+							<Card class="border-border/50 shadow-sm max-w-4xl mx-auto">
+								<CardHeader class="pb-4">
+									<CardTitle class="text-xl">Terraria Configuration</CardTitle>
+									<CardDescription>Edit serverconfig.txt parameters</CardDescription>
+								</CardHeader>
+								<CardContent>
+									<TerrariaConfigEditor config={(server as any).terrariaConfig} disabled={server.status !== ServerStatus.STOPPED} />
+									<div class="mt-6 flex justify-end">
+										<Button disabled={server.status !== ServerStatus.STOPPED}>Save Changes</Button>
+									</div>
+								</CardContent>
+							</Card>
+						</div>
+					{:else}
+						<ServerConfiguration {server} />
+					{/if}
 				</TabsContent>
 
 				<TabsContent value="mods" class="h-full">

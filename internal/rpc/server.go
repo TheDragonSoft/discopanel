@@ -159,6 +159,7 @@ func (s *Server) setupHandler() {
 		discopanelv1connect.ServerServiceName,
 		discopanelv1connect.SupportServiceName,
 		discopanelv1connect.TaskServiceName,
+		discopanelv1connect.TerrariaServiceName,
 		discopanelv1connect.TunnelServiceName,
 		discopanelv1connect.UploadServiceName,
 		discopanelv1connect.UserServiceName,
@@ -209,6 +210,7 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 	moduleService := services.NewModuleService(s.store, s.docker, s.moduleManager, s.proxyManager, s.authManager, s.config, s.logStreamer, s.log)
 	tunnelService := services.NewTunnelService(s.store, s.tunnelManager, s.log)
 	uploadService := services.NewUploadService(s.uploadManager, s.config, s.log)
+	terrariaService := services.NewTerrariaServiceHandler(s.store)
 
 	// Register service handlers
 	authPath, authHandler := discopanelv1connect.NewAuthServiceHandler(authService, opts...)
@@ -255,6 +257,9 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 
 	uploadPath, uploadHandler := discopanelv1connect.NewUploadServiceHandler(uploadService, opts...)
 	mux.Handle(uploadPath, uploadHandler)
+
+	terrariaPath, terrariaHandler := discopanelv1connect.NewTerrariaServiceHandler(terrariaService, opts...)
+	mux.Handle(terrariaPath, terrariaHandler)
 }
 
 // The HTTP handler for the server

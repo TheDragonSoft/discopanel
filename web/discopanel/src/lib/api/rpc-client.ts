@@ -29,6 +29,7 @@ import { UserService } from '$lib/proto/discopanel/v1/user_pb';
 import { RoleService } from '$lib/proto/discopanel/v1/role_pb';
 import { ModuleService } from '$lib/proto/discopanel/v1/module_pb';
 import { TunnelService } from '$lib/proto/discopanel/v1/tunnel_pb';
+import { TerrariaService } from '$lib/proto/discopanel/v1/terraria_pb';
 
 // Header to mark requests as silent / no loader
 const SILENT_HEADER = 'X-Silent-Request';
@@ -108,6 +109,7 @@ export class RpcClient {
 	public readonly role: Client<typeof RoleService>;
 	public readonly module: Client<typeof ModuleService>;
 	public readonly tunnel: Client<typeof TunnelService>;
+	public readonly terraria: Client<typeof TerrariaService>;
 
 	constructor() {
 		this.auth = createClient(AuthService, transport);
@@ -125,6 +127,7 @@ export class RpcClient {
 		this.role = createClient(RoleService, transport);
 		this.module = createClient(ModuleService, transport);
 		this.tunnel = createClient(TunnelService, transport);
+		this.terraria = createClient(TerrariaService, transport);
 	}
 }
 

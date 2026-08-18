@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package discopanel.v1;
+
+option go_package = "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1";
+
+import "discopanel/v1/common.proto";
+
+service TerrariaService {
+  rpc GetTerrariaVersions(GetTerrariaVersionsRequest) returns (GetTerrariaVersionsResponse);
+  rpc GetTerrariaFlavors(GetTerrariaFlavorsRequest) returns (GetTerrariaFlavorsResponse);
+  rpc GetTerrariaConfig(GetTerrariaConfigRequest) returns (GetTerrariaConfigResponse);
+  rpc UpdateTerrariaConfig(UpdateTerrariaConfigRequest) returns (UpdateTerrariaConfigResponse);
+}
+
+message TerrariaConfig {
+  string world_name = 1;
+  string world_size = 2;
+  int32 difficulty = 3;
+  string seed = 4;
+  string password = 5;
+  int32 max_players = 6;
+  string motd = 7;
+  string custom_config = 8;
+  string ban_list_path = 9;
+  bool spawn_protection = 10;
+  bool secure = 11;
+  string language = 12;
+}
+
+message GetTerrariaVersionsRequest {
+  TerrariaFlavor flavor = 1;
+}
+
+message GetTerrariaVersionsResponse {
+  repeated string versions = 1;
+}
+
+message GetTerrariaFlavorsRequest {}
+
+message GetTerrariaFlavorsResponse {
+  repeated TerrariaFlavor flavors = 1;
+}
+
+message GetTerrariaConfigRequest {
+  string server_id = 1;
+}
+
+message GetTerrariaConfigResponse {
+  TerrariaConfig config = 1;
+}
+
+message UpdateTerrariaConfigRequest {
+  string server_id = 1;
+  TerrariaConfig config = 2;
+}
+
+message UpdateTerrariaConfigResponse {
+  TerrariaConfig config = 1;
+}

@@ -415,7 +415,7 @@
 					type="text"
 					placeholder={server.status === ServerStatus.RUNNING ||
 					server.status === ServerStatus.UNHEALTHY
-						? 'Enter command...'
+						? ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 'Enter Terraria command (e.g. time noon)...' : 'Enter command...')
 						: 'Server must be running'}
 					bind:value={command}
 					disabled={server.status !== ServerStatus.RUNNING &&
@@ -433,6 +433,30 @@
 				<Send class="h-3 w-3" />
 			</Button>
 		</div>
+
+		{#if (server as any).gameType === 1 || (server as any).gameType === 'TERRARIA'}
+			<div class="flex flex-wrap gap-2 px-3 pb-2">
+				{#each ['say ', 'playing', 'save', 'time', 'kick ', 'ban ', 'motd', 'settle'] as quickCmd}
+					<Button
+						variant="outline"
+						size="sm"
+						class="h-6 px-2 text-[10px] bg-zinc-900 border-zinc-700 text-zinc-400 hover:text-white hover:bg-zinc-800"
+						onclick={() => {
+							if (quickCmd.endsWith(' ')) {
+								command = quickCmd;
+								// Focus input manually if needed, but svelte doesn't have a direct ref here.
+							} else {
+								command = quickCmd;
+								sendCommand();
+							}
+						}}
+						disabled={server.status !== ServerStatus.RUNNING && server.status !== ServerStatus.UNHEALTHY}
+					>
+						{quickCmd.trim()}
+					</Button>
+				{/each}
+			</div>
+		{/if}
 
 		<div class="flex shrink-0 items-center justify-between px-3 pb-2 text-xs text-zinc-500">
 			<div class="flex items-center gap-4">

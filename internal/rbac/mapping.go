@@ -32,6 +32,10 @@ var AuthenticatedOnlyProcedures = map[string]bool{
 	"/discopanel.v1.MinecraftService/GetMinecraftVersions": true,
 	"/discopanel.v1.MinecraftService/GetModLoaders":        true,
 	"/discopanel.v1.MinecraftService/GetDockerImages":      true,
+
+	// TerrariaService - reference data
+	"/discopanel.v1.TerrariaService/GetTerrariaVersions": true,
+	"/discopanel.v1.TerrariaService/GetTerrariaFlavors":  true,
 }
 
 // ProcedurePermissions maps each RPC procedure path to the resource and action
@@ -65,6 +69,10 @@ var ProcedurePermissions = map[string]ProcedurePermission{
 	"/discopanel.v1.ConfigService/UpdateServerConfig":   {Resource: ResourceServerConfig, Action: ActionUpdate, ObjectIDField: "server_id"},
 	"/discopanel.v1.ConfigService/GetGlobalSettings":    {Resource: ResourceSettings, Action: ActionRead},
 	"/discopanel.v1.ConfigService/UpdateGlobalSettings": {Resource: ResourceSettings, Action: ActionUpdate},
+
+	// ── TerrariaService ────────────────────────────────────────────────
+	"/discopanel.v1.TerrariaService/GetTerrariaConfig":    {Resource: ResourceServerConfig, Action: ActionRead, ObjectIDField: "server_id"},
+	"/discopanel.v1.TerrariaService/UpdateTerrariaConfig": {Resource: ResourceServerConfig, Action: ActionUpdate, ObjectIDField: "server_id"},
 
 	// ── FileService ────────────────────────────────────────────────────
 	"/discopanel.v1.FileService/ListFiles":           {Resource: ResourceFiles, Action: ActionRead, ObjectIDField: "server_id"},

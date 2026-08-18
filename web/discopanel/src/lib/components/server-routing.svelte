@@ -75,7 +75,7 @@
 	let creatingTunnel = $state(false);
 	let tunnelActionLoading = $state<Record<string, boolean>>({});
 	let customPresetOpen = $state(false);
-	let customPort = $state<number>(server.port || 25565);
+	let customPort = $state<number>(server.port || ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 25565));
 	let customProtocol = $state<'tcp' | 'udp' | 'both'>('tcp');
 	let customName = $state('');
 
@@ -87,7 +87,7 @@
 
 	// Missing tunnel modal state
 	let noMatchingTunnelModalOpen = $state(false);
-	let requiredPort = $derived(server.port || 25565);
+	let requiredPort = $derived(server.port || ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 25565));
 
 	let pollInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -243,7 +243,7 @@
 			tunnels = res.tunnels;
 			hasGlobalAccount = res.hasGlobalAccount;
 
-			const expectedPort = server.port || 25565;
+			const expectedPort = server.port || ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 25565);
 			const validMatching = tunnels.filter(
 				(t) => t.targetPort === expectedPort && t.publicAddress && t.publicAddress.trim() !== ''
 			);
@@ -263,12 +263,12 @@
 	async function createPresetTunnel(presetType: 'java' | 'bedrock' | 'webmap' | 'custom') {
 		creatingTunnel = true;
 		try {
-			let port = server.port || 25565;
+			let port = server.port || ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 25565);
 			let protocol = TunnelProtocol.BOTH;
 			let name = `${server.name} Java Tunnel`;
 
 			if (presetType === 'bedrock') {
-				port = 19132;
+				port = ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 19132);
 				protocol = TunnelProtocol.UDP;
 				name = `${server.name} Bedrock Tunnel`;
 			} else if (presetType === 'webmap') {
@@ -276,7 +276,7 @@
 				protocol = TunnelProtocol.TCP;
 				name = `${server.name} Web Map`;
 			} else if (presetType === 'custom') {
-				port = customPort || 25565;
+				port = customPort || ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 25565);
 				protocol =
 					customProtocol === 'udp'
 						? TunnelProtocol.UDP
@@ -445,13 +445,13 @@
 
 	function getConnectionString() {
 		const host = getFullHostname();
-		const port = routingInfo?.listenPort || 25565;
-		return port === 25565 ? host : `${host}:${port}`;
+		const port = routingInfo?.listenPort || ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 25565);
+		return port === ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 25565) ? host : `${host}:${port}`;
 	}
 
 	function getTunnelPublicEndpoint(t: Tunnel): string {
 		if (!t.publicAddress) return 'Generating public link...';
-		if (t.publicPort && t.publicPort !== 25565 && t.publicPort !== 19132) {
+		if (t.publicPort && t.publicPort !== ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 25565) && t.publicPort !== ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 19132)) {
 			return `${t.publicAddress}:${t.publicPort}`;
 		}
 		return t.publicAddress;
@@ -532,7 +532,7 @@
 								<div class="flex flex-wrap items-center justify-between gap-2">
 									<div class="flex items-center gap-2.5">
 										<div class="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/10 text-primary">
-											{#if t.targetPort === 19132}
+											{#if t.targetPort === ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 19132)}
 												<Smartphone class="h-5 w-5" />
 											{:else if t.targetPort === 8100 || t.targetPort === 8123}
 												<MapPin class="h-5 w-5" />
@@ -766,7 +766,7 @@
 								<Gamepad2 class="h-4 w-4 text-emerald-500" />
 								<span>Minecraft Java</span>
 							</div>
-							<p class="text-xs text-muted-foreground">Port {server.port || 25565} (TCP+UDP)</p>
+							<p class="text-xs text-muted-foreground">Port {server.port || ((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 25565)} (TCP+UDP)</p>
 						</Button>
 
 						<Button
@@ -779,7 +779,7 @@
 								<Smartphone class="h-4 w-4 text-blue-500" />
 								<span>Bedrock / Geyser</span>
 							</div>
-							<p class="text-xs text-muted-foreground">Port 19132 (UDP)</p>
+							<p class="text-xs text-muted-foreground">Port {((server as any).gameType === 1 || (server as any).gameType === 'TERRARIA' ? 7777 : 19132)} (UDP)</p>
 						</Button>
 
 						<Button
@@ -822,7 +822,7 @@
 										<Label class="text-xs">Target Port</Label>
 										<Input
 											type="number"
-											placeholder="25565"
+											placeholder={(server as any).gameType === 2 ? '7777' : '25565'}
 											bind:value={customPort}
 											class="h-8 text-xs"
 										/>

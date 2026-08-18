@@ -25,6 +25,7 @@ import (
 	"github.com/docker/go-connections/nat"
 	models "github.com/nickheyer/discopanel/internal/db"
 	"github.com/nickheyer/discopanel/internal/minecraft"
+	"github.com/nickheyer/discopanel/internal/terraria"
 	"github.com/nickheyer/discopanel/pkg/logger"
 	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
 )
@@ -360,21 +361,48 @@ func ApplyOverrides(overrides *v1.DockerOverrides, config *container.Config, hos
 }
 
 func (c *Client) CreateContainer(ctx context.Context, server *models.Server, serverConfig *models.ServerConfig) (string, error) {
-	// Use server's DockerImage if specified, otherwise determine based on version and loader
 	var imageName string
-	if server.DockerImage != "" {
-		imageName = "itzg/minecraft-server:" + server.DockerImage
+	var env []string
+	targetMount := "/data"
+
+	if server.GameType == models.GameTypeTerraria {
+		if server.DockerImage != "" {
+			imageName = server.DockerImage
+		} else {
+			imageName = terraria.GetDockerImage(server.TerrariaFlavor, server.TerrariaVersion)
+		}
+		targetMount = "/config"
+
+		// Pre-create config directory
+		configDir := filepath.Join(server.DataPath, "config")
+		_ = os.MkdirAll(configDir, 0755)
+
+		// Basic Terraria environment defaults
+		worldName := server.Name
+		if worldName == "" {
+			worldName = "World"
+		}
+		env = []string{
+			fmt.Sprintf("WORLD_NAME=%s", worldName),
+			"WORLD_SIZE=medium",
+			"DIFFICULTY=0",
+			fmt.Sprintf("MAX_PLAYERS=%d", server.MaxPlayers),
+		}
 	} else {
-		imageName = getDockerImage(server.ModLoader, server.MCVersion)
+		// Use server's DockerImage if specified, otherwise determine based on version and loader
+		if server.DockerImage != "" {
+			imageName = "itzg/minecraft-server:" + server.DockerImage
+		} else {
+			imageName = getDockerImage(server.ModLoader, server.MCVersion)
+		}
+		// Build environment variables
+		env = buildEnvFromConfig(serverConfig)
 	}
 
 	// Try pulling latest
 	if err := c.pullImage(ctx, imageName); err != nil {
 		return "", fmt.Errorf("failed to pull image: %w", err)
 	}
-
-	// Build environment variables
-	env := buildEnvFromConfig(serverConfig)
 
 	// Determine container port - proxy servers always use default port internally
 	useProxy := server.ProxyHostname != ""
@@ -395,8 +423,10 @@ func (c *Client) CreateContainer(ctx context.Context, server *models.Server, ser
 
 	// Build exposed ports
 	exposedPorts := nat.PortSet{
-		nat.Port(fmt.Sprintf("%d/tcp", containerPort)):   struct{}{},
-		nat.Port(fmt.Sprintf("%d/tcp", DefaultRCONPort)): struct{}{},
+		nat.Port(fmt.Sprintf("%d/tcp", containerPort)): struct{}{},
+	}
+	if server.GameType != models.GameTypeTerraria {
+		exposedPorts[nat.Port(fmt.Sprintf("%d/tcp", DefaultRCONPort))] = struct{}{}
 	}
 	for _, port := range server.AdditionalPorts {
 		protocol := port.GetProtocol()
@@ -413,9 +443,11 @@ func (c *Client) CreateContainer(ctx context.Context, server *models.Server, ser
 		portBindings[nat.Port(fmt.Sprintf("%d/tcp", containerPort))] = []nat.PortBinding{
 			{HostIP: "0.0.0.0", HostPort: fmt.Sprintf("%d", server.Port)},
 		}
-		// Bind RCON to localhost only
-		portBindings[nat.Port(fmt.Sprintf("%d/tcp", DefaultRCONPort))] = []nat.PortBinding{
-			{HostIP: "127.0.0.1", HostPort: fmt.Sprintf("%d", server.Port+RCONPortOffset)},
+		// Bind RCON to localhost only for Minecraft
+		if server.GameType != models.GameTypeTerraria {
+			portBindings[nat.Port(fmt.Sprintf("%d/tcp", DefaultRCONPort))] = []nat.PortBinding{
+				{HostIP: "127.0.0.1", HostPort: fmt.Sprintf("%d", server.Port+RCONPortOffset)},
+			}
 		}
 	}
 	// Add additional port bindings
@@ -438,6 +470,20 @@ func (c *Client) CreateContainer(ctx context.Context, server *models.Server, ser
 		return "", fmt.Errorf("failed to create server data directory: %w", err)
 	}
 
+	labels := map[string]string{
+		"discopanel.server.id":   server.ID,
+		"discopanel.server.name": server.Name,
+		"discopanel.server.game": string(server.GameType),
+		"discopanel.managed":     "true",
+	}
+	if server.GameType == models.GameTypeTerraria {
+		labels["discopanel.server.flavor"] = string(server.TerrariaFlavor)
+		labels["discopanel.server.version"] = server.TerrariaVersion
+	} else {
+		labels["discopanel.server.loader"] = string(server.ModLoader)
+		labels["discopanel.server.version"] = server.MCVersion
+	}
+
 	config := &container.Config{
 		Image:        imageName,
 		Env:          env,
@@ -445,19 +491,13 @@ func (c *Client) CreateContainer(ctx context.Context, server *models.Server, ser
 		AttachStdout: true,
 		AttachStderr: true,
 		ExposedPorts: exposedPorts,
-		Labels: map[string]string{
-			"discopanel.server.id":      server.ID,
-			"discopanel.server.name":    server.Name,
-			"discopanel.server.loader":  string(server.ModLoader),
-			"discopanel.server.version": server.MCVersion,
-			"discopanel.managed":        "true",
-		},
+		Labels:       labels,
 	}
 
 	hostConfig := &container.HostConfig{
 		PortBindings: portBindings,
 		Mounts: []mount.Mount{
-			{Type: mount.TypeBind, Source: dataPath, Target: "/data", BindOptions: &mount.BindOptions{CreateMountpoint: true}},
+			{Type: mount.TypeBind, Source: dataPath, Target: targetMount, BindOptions: &mount.BindOptions{CreateMountpoint: true}},
 		},
 		RestartPolicy: container.RestartPolicy{Name: "unless-stopped"},
 		Resources: container.Resources{
@@ -778,6 +818,12 @@ func (c *Client) Exec(ctx context.Context, containerID string, execCmd []string)
 
 // ExecCommand executes a command inside the container and returns the output
 func (c *Client) ExecCommand(ctx context.Context, containerID string, command string) (string, error) {
+	inspect, err := c.docker.ContainerInspect(ctx, containerID)
+	if err == nil && inspect.Config != nil && inspect.Config.Labels != nil {
+		if inspect.Config.Labels["discopanel.server.game"] == "terraria" {
+			return c.Exec(ctx, containerID, []string{"inject", command})
+		}
+	}
 	return c.Exec(ctx, containerID, []string{"rcon-cli", command})
 }
 

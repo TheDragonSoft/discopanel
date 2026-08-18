@@ -18,9 +18,9 @@ import (
 )
 
 const (
-	PlayitDockerImage        = "ghcr.io/playit-cloud/playit-agent:latest"
-	PlayitAccountSecretKey   = "playit_account_secret_key"
-	PlayitAccountSessionKey  = "playit_account_session"
+	PlayitDockerImage       = "ghcr.io/playit-cloud/playit-agent:latest"
+	PlayitAccountSecretKey  = "playit_account_secret_key"
+	PlayitAccountSessionKey = "playit_account_session"
 )
 
 type PlayitDriver struct {

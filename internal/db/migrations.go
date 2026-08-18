@@ -12,6 +12,7 @@ import (
 func allModels() []any {
 	return []any{
 		&Server{},
+		&TerrariaConfig{},
 		&ServerConfig{},
 		&Mod{},
 		&IndexedModpack{},

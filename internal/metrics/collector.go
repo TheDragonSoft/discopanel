@@ -288,6 +288,10 @@ func (c *Collector) collectRCONData() {
 			continue
 		}
 
+		if server.GameType == storage.GameTypeTerraria {
+			continue
+		}
+
 		// Check if server is running
 		status, err := c.docker.GetContainerStatus(ctx, server.ContainerID)
 		if err != nil || status != storage.StatusRunning {
@@ -442,6 +446,10 @@ func (c *Collector) collectSLPData() {
 
 	for _, server := range servers {
 		if server.ContainerID == "" {
+			continue
+		}
+
+		if server.GameType == storage.GameTypeTerraria {
 			continue
 		}
 
