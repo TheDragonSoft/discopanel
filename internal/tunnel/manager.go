@@ -556,7 +556,24 @@ func (m *Manager) SetPlayitAccountSecret(ctx context.Context, secretKey string) 
 	if secretKey == "" {
 		return m.store.DeleteSystemSetting(ctx, PlayitAccountSecretKey)
 	}
-	return m.store.SetSystemSetting(ctx, PlayitAccountSecretKey, secretKey)
+	if err := m.store.SetSystemSetting(ctx, PlayitAccountSecretKey, secretKey); err != nil {
+		return err
+	}
+
+	// Trigger background sync and restart active tunnel containers to apply new credentials
+	go func() {
+		ctx := context.Background()
+		tunnels, err := m.SyncPlayitTunnels(ctx, "")
+		if err == nil {
+			for _, t := range tunnels {
+				if t.Status == storage.TunnelStatusRunning || t.Status == storage.TunnelStatusStarting {
+					_, _ = m.StartTunnel(ctx, t.ID)
+				}
+			}
+		}
+	}()
+
+	return nil
 }
 
 func (m *Manager) UnlinkPlayitAccount(ctx context.Context) error {
