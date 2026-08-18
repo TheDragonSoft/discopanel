@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -179,11 +180,10 @@ func (c *PlayitAPIClient) CreateTunnel(ctx context.Context, secretKey string, na
 	tunnels, listErr := c.ListTunnels(ctx, secretKey)
 	if listErr == nil && len(tunnels) > 0 {
 		for _, t := range tunnels {
-			if t.LocalPort == targetPort || t.Name == name {
+			if t.LocalPort == targetPort {
 				return t, nil
 			}
 		}
-		return tunnels[0], nil
 	}
 
 	return &PlayitTunnelDetails{
@@ -318,13 +318,32 @@ func (c *PlayitAPIClient) ListTunnels(ctx context.Context, secretKey string) ([]
 			}
 		}
 
-		// 3. Extract origin local port
+		// 3a. Extract origin local port
 		if origin, ok := tmap["origin"].(map[string]interface{}); ok {
 			if originData, ok := origin["data"].(map[string]interface{}); ok {
 				if lp, ok := originData["local_port"].(float64); ok && lp > 0 {
 					item.LocalPort = int(lp)
 				} else if port, ok := originData["port"].(float64); ok && port > 0 {
 					item.LocalPort = int(port)
+				}
+			}
+		}
+
+		// 3b. Extract agent_config fields (from /v1/agents/rundata or list)
+		if agentConfig, ok := tmap["agent_config"].(map[string]interface{}); ok {
+			if fields, ok := agentConfig["fields"].([]interface{}); ok {
+				for _, f := range fields {
+					if fmap, ok := f.(map[string]interface{}); ok {
+						if fmap["name"] == "local_port" {
+							if valStr, ok := fmap["value"].(string); ok {
+								if p, err := strconv.Atoi(valStr); err == nil && p > 0 {
+									item.LocalPort = p
+								}
+							} else if valNum, ok := fmap["value"].(float64); ok && valNum > 0 {
+								item.LocalPort = int(valNum)
+							}
+						}
+					}
 				}
 			}
 		}

@@ -445,23 +445,13 @@ func (m *Manager) SyncPlayitTunnels(ctx context.Context, serverID string) ([]*st
 	for _, rt := range remoteTunnels {
 		port := rt.LocalPort
 		if port <= 0 {
-			if rt.TunnelType == "minecraft-java" {
-				port = 25565
-			} else if rt.TunnelType == "minecraft-bedrock" {
-				port = 19132
-			} else {
-				port = 25565
-			}
+			continue
 		}
 
-		// 1. Check if an existing tunnel in DB already matches this remote tunnel
+		// 1. Check if an existing tunnel in DB matches this remote tunnel by target port
 		var matchedTunnel *storage.Tunnel
 		for _, ext := range existingTunnels {
-			if rt.PublicAddress != "" && ext.PublicAddress == rt.PublicAddress {
-				matchedTunnel = ext
-				break
-			}
-			if rt.Name != "" && ext.Name == rt.Name {
+			if ext.TargetPort == port {
 				matchedTunnel = ext
 				break
 			}
@@ -487,18 +477,17 @@ func (m *Manager) SyncPlayitTunnels(ctx context.Context, serverID string) ([]*st
 			continue
 		}
 
-		// 2. Not found in existing tunnels -> Try to match to a specific server by server name prefix
+		// 2. Not found in existing tunnels -> Find which server in DiscoPanel uses this port!
 		var targetServer *storage.Server
 		for _, srv := range allServers {
-			if strings.HasPrefix(strings.ToLower(rt.Name), strings.ToLower(srv.Name)) {
+			srvPort := srv.Port
+			if srvPort == 0 {
+				srvPort = 25565
+			}
+			if srvPort == port {
 				targetServer = srv
 				break
 			}
-		}
-
-		// If no name match and only 1 server exists on the entire panel, assign to it
-		if targetServer == nil && len(allServers) == 1 {
-			targetServer = allServers[0]
 		}
 
 		if targetServer != nil {
@@ -548,6 +537,34 @@ func (m *Manager) GetTunnel(ctx context.Context, id string) (*storage.Tunnel, er
 	return m.store.GetTunnel(ctx, id)
 }
 
+func (m *Manager) SetPlayitAccountSecret(ctx context.Context, secretKey string) error {
+	cleanKey := strings.TrimSpace(secretKey)
+	if cleanKey == "" {
+		return fmt.Errorf("secret key cannot be empty")
+	}
+
+	if err := m.store.SetSystemSetting(ctx, PlayitAccountSecretKey, cleanKey); err != nil {
+		return err
+	}
+
+	// Trigger async sync and restart any active tunnel containers
+	go func() {
+		bgCtx := context.Background()
+		_, _ = m.SyncPlayitTunnels(bgCtx, "")
+
+		tunnels, err := m.store.ListTunnels(bgCtx)
+		if err == nil {
+			for _, t := range tunnels {
+				if t.Status == storage.TunnelStatusRunning || t.Status == storage.TunnelStatusStarting {
+					_, _ = m.RestartTunnel(bgCtx, t.ID)
+				}
+			}
+		}
+	}()
+
+	return nil
+}
+
 func (m *Manager) GetPlayitAccountConfig(ctx context.Context) (bool, string, error) {
 	secret, err := m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
 	if err != nil {
@@ -559,32 +576,15 @@ func (m *Manager) GetPlayitAccountConfig(ctx context.Context) (bool, string, err
 	return false, "No Playit.gg account linked. Tunnels run in guest mode with claim links.", nil
 }
 
-func (m *Manager) SetPlayitAccountSecret(ctx context.Context, secretKey string) error {
-	secretKey = strings.TrimSpace(secretKey)
-	if secretKey == "" {
-		return m.store.DeleteSystemSetting(ctx, PlayitAccountSecretKey)
-	}
-	if err := m.store.SetSystemSetting(ctx, PlayitAccountSecretKey, secretKey); err != nil {
-		return err
-	}
-
-	// Trigger background sync and restart active tunnel containers to apply new credentials
-	go func() {
-		ctx := context.Background()
-		tunnels, err := m.SyncPlayitTunnels(ctx, "")
-		if err == nil {
-			for _, t := range tunnels {
-				if t.Status == storage.TunnelStatusRunning || t.Status == storage.TunnelStatusStarting {
-					_, _ = m.StartTunnel(ctx, t.ID)
-				}
-			}
-		}
-	}()
-
-	return nil
+func (m *Manager) UnlinkPlayitAccount(ctx context.Context) error {
+	return m.DeletePlayitAccountSecret(ctx)
 }
 
-func (m *Manager) UnlinkPlayitAccount(ctx context.Context) error {
+func (m *Manager) GetPlayitAccountSecret(ctx context.Context) (string, error) {
+	return m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
+}
+
+func (m *Manager) DeletePlayitAccountSecret(ctx context.Context) error {
 	return m.store.DeleteSystemSetting(ctx, PlayitAccountSecretKey)
 }
 
@@ -726,7 +726,8 @@ func (m *Manager) pollActiveTunnels(ctx context.Context) {
 				apiTunnels, err := m.apiClient.ListTunnels(ctx, secretKey)
 				if err == nil {
 					for _, at := range apiTunnels {
-						if at.LocalPort == t.TargetPort || at.Name == t.Name || len(apiTunnels) == 1 {
+						// STRICT PORT CHECK: Tunnel must match the server's target port!
+						if at.LocalPort == t.TargetPort {
 							if at.PublicAddress != "" {
 								t.PublicAddress = at.PublicAddress
 								t.PublicPort = at.PublicPort

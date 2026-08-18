@@ -995,7 +995,7 @@
 			</div>
 
 			<p class="text-xs text-muted-foreground">
-				To expose this server, a tunnel targeting port <code class="font-mono font-semibold text-foreground">{requiredPort}</code> must be created. You can create it automatically right now, or manage it in your Playit.gg dashboard.
+				To expose this server, please add a tunnel targeting local port <code class="font-mono font-semibold text-foreground">{requiredPort}</code> on your Playit.gg dashboard, then click <strong>Sync from Playit.gg</strong>.
 			</p>
 		</div>
 
@@ -1004,29 +1004,14 @@
 				Dismiss
 			</Button>
 			<Button
-				variant="outline"
-				size="sm"
-				class="gap-1.5"
-				onclick={() => window.open('https://playit.gg/manage/tunnels', '_blank')}
-			>
-				<ExternalLink class="h-3.5 w-3.5" />
-				Playit Dashboard
-			</Button>
-			<Button
 				size="sm"
 				class="gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
-				disabled={creatingTunnel}
-				onclick={async () => {
-					noMatchingTunnelModalOpen = false;
-					await createPresetTunnel('java');
+				onclick={() => {
+					window.open('https://playit.gg/manage/tunnels', '_blank');
 				}}
 			>
-				{#if creatingTunnel}
-					<Loader2 class="h-3.5 w-3.5 animate-spin" />
-				{:else}
-					<Radio class="h-3.5 w-3.5" />
-				{/if}
-				Create Tunnel for Port {requiredPort}
+				<ExternalLink class="h-3.5 w-3.5" />
+				Add Tunnel on Playit.gg (Port {requiredPort})
 			</Button>
 		</Dialog.Footer>
 	</Dialog.Content>
