@@ -1,0 +1,224 @@
+package tunnel
+
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"strings"
+	"time"
+)
+
+type PlayitAPIClient struct {
+	httpClient *http.Client
+	baseURL    string
+}
+
+func NewPlayitAPIClient() *PlayitAPIClient {
+	return &PlayitAPIClient{
+		httpClient: &http.Client{Timeout: 10 * time.Second},
+		baseURL:    "https://api.playit.gg",
+	}
+}
+
+type PlayitTunnelDetails struct {
+	ID            string `json:"id"`
+	Name          string `json:"name"`
+	TunnelType    string `json:"tunnel_type"`
+	PortType      string `json:"port_type"`
+	PublicAddress string `json:"public_address"`
+	PublicPort    int    `json:"public_port"`
+	LocalPort     int    `json:"local_port"`
+	Enabled       bool   `json:"enabled"`
+}
+
+type playitCreateReq struct {
+	Name       string            `json:"name,omitempty"`
+	TunnelType string            `json:"tunnel_type,omitempty"`
+	PortType   string            `json:"port_type"` // "tcp", "udp", "both"
+	PortCount  int               `json:"port_count"`
+	Enabled    bool              `json:"enabled"`
+	Origin     playitOrigin      `json:"origin"`
+}
+
+type playitOrigin struct {
+	Type string           `json:"type"` // "default"
+	Data playitOriginData `json:"data"`
+}
+
+type playitOriginData struct {
+	LocalIP   string `json:"local_ip"`
+	LocalPort int    `json:"local_port,omitempty"`
+}
+
+// CreateTunnel calls the Playit.gg API to automatically provision a tunnel on the user's account
+func (c *PlayitAPIClient) CreateTunnel(ctx context.Context, secretKey string, name string, tunnelType string, portType string, targetPort int) (*PlayitTunnelDetails, error) {
+	if strings.TrimSpace(secretKey) == "" {
+		return nil, fmt.Errorf("secret key is required")
+	}
+
+	if portType == "" {
+		portType = "both"
+	}
+	if portType == "both" && tunnelType == "minecraft-bedrock" {
+		portType = "udp"
+	}
+
+	reqBody := playitCreateReq{
+		Name:       name,
+		TunnelType: tunnelType,
+		PortType:   portType,
+		PortCount:  1,
+		Enabled:    true,
+		Origin: playitOrigin{
+			Type: "default",
+			Data: playitOriginData{
+				LocalIP:   "127.0.0.1",
+				LocalPort: targetPort,
+			},
+		},
+	}
+
+	jsonData, err := json.Marshal(reqBody)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/tunnels/create", bytes.NewReader(jsonData))
+	if err != nil {
+		return nil, err
+	}
+
+	c.setHeaders(req, secretKey)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	bodyBytes, _ := io.ReadAll(resp.Body)
+	if resp.StatusCode < 200 || resp.StatusCode >= 300 {
+		return nil, fmt.Errorf("playit api error (HTTP %d): %s", resp.StatusCode, string(bodyBytes))
+	}
+
+	// Also list tunnels to extract full allocated address details
+	tunnels, listErr := c.ListTunnels(ctx, secretKey)
+	if listErr == nil && len(tunnels) > 0 {
+		for _, t := range tunnels {
+			if t.LocalPort == targetPort || t.Name == name {
+				return t, nil
+			}
+		}
+		return tunnels[0], nil
+	}
+
+	return &PlayitTunnelDetails{
+		Name:       name,
+		TunnelType: tunnelType,
+		PortType:   portType,
+		LocalPort:  targetPort,
+		Enabled:    true,
+	}, nil
+}
+
+// ListTunnels lists all tunnels registered to the given Playit agent secret key
+func (c *PlayitAPIClient) ListTunnels(ctx context.Context, secretKey string) ([]*PlayitTunnelDetails, error) {
+	if strings.TrimSpace(secretKey) == "" {
+		return nil, fmt.Errorf("secret key is required")
+	}
+
+	req, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/tunnels/list", bytes.NewReader([]byte("{}")))
+	if err != nil {
+		return nil, err
+	}
+
+	c.setHeaders(req, secretKey)
+
+	resp, err := c.httpClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	var res map[string]interface{}
+	if err := json.NewDecoder(resp.Body).Decode(&res); err != nil {
+		return nil, err
+	}
+
+	dataMap, ok := res["data"].(map[string]interface{})
+	if !ok {
+		return []*PlayitTunnelDetails{}, nil
+	}
+
+	rawTunnels, ok := dataMap["tunnels"].([]interface{})
+	if !ok {
+		return []*PlayitTunnelDetails{}, nil
+	}
+
+	var results []*PlayitTunnelDetails
+	for _, raw := range rawTunnels {
+		tmap, ok := raw.(map[string]interface{})
+		if !ok {
+			continue
+		}
+
+		item := &PlayitTunnelDetails{}
+		if id, ok := tmap["id"].(string); ok {
+			item.ID = id
+		}
+		if name, ok := tmap["name"].(string); ok {
+			item.Name = name
+		}
+		if portType, ok := tmap["port_type"].(string); ok {
+			item.PortType = portType
+		}
+		if tunnelType, ok := tmap["tunnel_type"].(string); ok {
+			item.TunnelType = tunnelType
+		}
+
+		// Extract public domain / display address
+		if domain, ok := tmap["domain"].(map[string]interface{}); ok {
+			if domainName, ok := domain["name"].(string); ok && domainName != "" {
+				item.PublicAddress = domainName
+			}
+		}
+
+		// Extract allocation
+		if alloc, ok := tmap["alloc"].(map[string]interface{}); ok {
+			if allocData, ok := alloc["data"].(map[string]interface{}); ok {
+				if ipHost, ok := allocData["ip_hostname"].(string); ok && item.PublicAddress == "" {
+					item.PublicAddress = ipHost
+				}
+				if port, ok := allocData["port"].(float64); ok {
+					item.PublicPort = int(port)
+				}
+			}
+		}
+
+		// Extract origin local port
+		if origin, ok := tmap["origin"].(map[string]interface{}); ok {
+			if originData, ok := origin["data"].(map[string]interface{}); ok {
+				if lp, ok := originData["local_port"].(float64); ok {
+					item.LocalPort = int(lp)
+				}
+			}
+		}
+
+		results = append(results, item)
+	}
+
+	return results, nil
+}
+
+func (c *PlayitAPIClient) setHeaders(req *http.Request, secretKey string) {
+	cleanKey := strings.TrimSpace(secretKey)
+	req.Header.Set("Content-Type", "application/json")
+	if strings.HasPrefix(cleanKey, "AgentKey ") {
+		req.Header.Set("Authorization", cleanKey)
+	} else {
+		req.Header.Set("Authorization", "AgentKey "+cleanKey)
+	}
+}

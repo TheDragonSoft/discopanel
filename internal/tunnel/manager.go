@@ -30,6 +30,7 @@ type Manager struct {
 	store         *storage.Store
 	docker        *docker.Client
 	driver        *PlayitDriver
+	apiClient     *PlayitAPIClient
 	bus           *events.Bus
 	config        *config.Config
 	logger        *logger.Logger
@@ -46,6 +47,7 @@ func NewManager(store *storage.Store, dockerClient *docker.Client, bus *events.B
 		store:         store,
 		docker:        dockerClient,
 		driver:        NewPlayitDriver(dockerClient, cfg, log),
+		apiClient:     NewPlayitAPIClient(),
 		bus:           bus,
 		config:        cfg,
 		logger:        log,
@@ -204,6 +206,27 @@ func (m *Manager) CreateTunnel(ctx context.Context, serverID, name string, provi
 		FollowServerLifecycle: followLifecycle,
 		CreatedAt:             time.Now().UTC(),
 		UpdatedAt:             time.Now().UTC(),
+	}
+
+	// Auto-provision tunnel on Playit.gg API if account is linked
+	if isAccountLinked && accountSecret != "" {
+		tunnelType := ""
+		if targetPort == 25565 {
+			tunnelType = "minecraft-java"
+		} else if targetPort == 19132 {
+			tunnelType = "minecraft-bedrock"
+		}
+
+		apiDetails, apiErr := m.apiClient.CreateTunnel(ctx, accountSecret, name, tunnelType, protoStr, targetPort)
+		if apiErr == nil && apiDetails != nil {
+			if apiDetails.PublicAddress != "" {
+				tunnel.PublicAddress = apiDetails.PublicAddress
+				tunnel.PublicPort = apiDetails.PublicPort
+			}
+			m.logger.Info("Successfully auto-provisioned Playit tunnel via API: %s (%s:%d)", name, tunnel.PublicAddress, tunnel.PublicPort)
+		} else if apiErr != nil {
+			m.logger.Warn("Could not auto-provision Playit tunnel via API: %v (agent will sync upon connection)", apiErr)
+		}
 	}
 
 	if err := m.store.CreateTunnel(ctx, tunnel); err != nil {
