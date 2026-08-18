@@ -260,6 +260,28 @@ func (m *Manager) StartTunnel(ctx context.Context, tunnelID string) (*storage.Tu
 		tunnel.IsAccountLinked = true
 	}
 
+	secretToUse := tunnel.SecretKey
+	if secretToUse == "" {
+		secretToUse = accountSecret
+	}
+
+	// Auto-provision on Playit.gg API if account is linked and public address not yet known
+	if secretToUse != "" && tunnel.PublicAddress == "" {
+		tunnelType := ""
+		if tunnel.TargetPort == 25565 {
+			tunnelType = "minecraft-java"
+		} else if tunnel.TargetPort == 19132 {
+			tunnelType = "minecraft-bedrock"
+		}
+		apiDetails, apiErr := m.apiClient.CreateTunnel(ctx, secretToUse, tunnel.Name, tunnelType, tunnel.Protocol, tunnel.TargetPort)
+		if apiErr == nil && apiDetails != nil && apiDetails.PublicAddress != "" {
+			tunnel.PublicAddress = apiDetails.PublicAddress
+			tunnel.PublicPort = apiDetails.PublicPort
+			_ = m.store.UpdateTunnel(ctx, tunnel)
+			m.logger.Info("Provisioned Playit tunnel on start: %s -> %s:%d", tunnel.Name, tunnel.PublicAddress, tunnel.PublicPort)
+		}
+	}
+
 	// Remove old container if it exists
 	if tunnel.ContainerID != "" {
 		_ = m.docker.RemoveContainer(ctx, tunnel.ContainerID)
@@ -575,8 +597,31 @@ func (m *Manager) pollActiveTunnels(ctx context.Context) {
 			changed = true
 		}
 
+		// If public address is still empty and account is linked, poll Playit API list
+		if t.PublicAddress == "" && t.IsAccountLinked {
+			secretKey := t.SecretKey
+			if secretKey == "" {
+				secretKey, _ = m.store.GetSystemSetting(ctx, PlayitAccountSecretKey)
+			}
+			if secretKey != "" {
+				apiTunnels, err := m.apiClient.ListTunnels(ctx, secretKey)
+				if err == nil {
+					for _, at := range apiTunnels {
+						if at.LocalPort == t.TargetPort || at.Name == t.Name {
+							if at.PublicAddress != "" {
+								t.PublicAddress = at.PublicAddress
+								t.PublicPort = at.PublicPort
+								changed = true
+								break
+							}
+						}
+					}
+				}
+			}
+		}
+
 		// Update runtime status
-		if publicAddr != "" || isRunning {
+		if publicAddr != "" || isRunning || t.PublicAddress != "" {
 			if t.Status != storage.TunnelStatusRunning {
 				t.Status = storage.TunnelStatusRunning
 				changed = true
