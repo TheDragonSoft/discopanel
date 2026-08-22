@@ -50,7 +50,12 @@ func isWebSocketRequest(r *http.Request) bool {
 // ServeHTTP implements http.Handler for routing requests
 func (p *HTTPProxy) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	// Extract hostname from Host header
-	hostname := strings.ToLower(strings.Split(r.Host, ":")[0])
+	// ⚡ Bolt: avoid allocating a slice with strings.Split for performance
+	host := r.Host
+	if idx := strings.IndexByte(host, ':'); idx != -1 {
+		host = host[:idx]
+	}
+	hostname := strings.ToLower(host)
 
 	// Find the route
 	p.routesMutex.RLock()
@@ -151,7 +156,10 @@ func (p *HTTPProxy) AddRoute(serverID, hostname, backendHost string, backendPort
 	p.routesMutex.Lock()
 	defer p.routesMutex.Unlock()
 
-	hostname = strings.ToLower(strings.Split(hostname, ":")[0])
+	if idx := strings.IndexByte(hostname, ':'); idx != -1 {
+		hostname = hostname[:idx]
+	}
+	hostname = strings.ToLower(hostname)
 
 	p.routes[hostname] = &Route{
 		ServerID:    serverID,
@@ -169,7 +177,10 @@ func (p *HTTPProxy) RemoveRoute(hostname string) {
 	p.routesMutex.Lock()
 	defer p.routesMutex.Unlock()
 
-	hostname = strings.ToLower(strings.Split(hostname, ":")[0])
+	if idx := strings.IndexByte(hostname, ':'); idx != -1 {
+		hostname = hostname[:idx]
+	}
+	hostname = strings.ToLower(hostname)
 	delete(p.routes, hostname)
 
 	p.logger.Info("HTTP proxy removed route: hostname=%s", hostname)
@@ -180,7 +191,10 @@ func (p *HTTPProxy) UpdateRoute(hostname, backendHost string, backendPort int) {
 	p.routesMutex.Lock()
 	defer p.routesMutex.Unlock()
 
-	hostname = strings.ToLower(strings.Split(hostname, ":")[0])
+	if idx := strings.IndexByte(hostname, ':'); idx != -1 {
+		hostname = hostname[:idx]
+	}
+	hostname = strings.ToLower(hostname)
 	if route, exists := p.routes[hostname]; exists {
 		route.BackendHost = backendHost
 		route.BackendPort = backendPort
