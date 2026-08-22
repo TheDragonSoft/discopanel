@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/go-viper/mapstructure/v2"
@@ -21,7 +22,14 @@ type Store struct {
 }
 
 func NewSQLiteStore(cfg *config.Config) (*Store, error) {
-	db, err := gorm.Open(sqlite.Open(cfg.Database.Path), &gorm.Config{
+	dsn := cfg.Database.Path
+	separator := "?"
+	if strings.Contains(dsn, "?") {
+		separator = "&"
+	}
+	dsn = fmt.Sprintf("%s%s_pragma=busy_timeout(5000)&_pragma=journal_mode(WAL)&_pragma=synchronous(NORMAL)&_pragma=foreign_keys(ON)&_pragma=temp_store(MEMORY)&_pragma=cache_size(-64000)", dsn, separator)
+
+	db, err := gorm.Open(sqlite.Open(dsn), &gorm.Config{
 		Logger: logger.Default.LogMode(logger.Silent),
 		NowFunc: func() time.Time {
 			return time.Now().UTC()

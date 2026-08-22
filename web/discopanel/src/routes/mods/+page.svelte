@@ -277,14 +277,27 @@
 	<!-- Search & Filter Controls -->
 	{#if !showFavorites}
 		<div class="flex flex-col gap-4">
-			<div class="flex flex-wrap gap-2">
+			<div class="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2">
 				<!-- Search text input -->
-				<Input
-					placeholder="Search mods & resource packs..."
-					bind:value={searchParams.query}
-					onkeydown={(e) => e.key === 'Enter' && performSearch(true)}
-					class="min-w-64 flex-1 h-10"
-				/>
+				<div class="col-span-1 sm:col-span-2 lg:flex-1 lg:min-w-64 flex gap-2">
+					<Input
+						placeholder="Search mods & resource packs..."
+						bind:value={searchParams.query}
+						onkeydown={(e) => e.key === 'Enter' && performSearch(true)}
+						class="flex-1 h-10"
+					/>
+					<Button
+						onclick={() => performSearch(true)}
+						disabled={loading}
+						class="lg:hidden bg-linear-to-r from-primary to-primary/80 h-10 shrink-0 px-3"
+					>
+						{#if loading}
+							<Loader2 class="h-4 w-4 animate-spin" />
+						{:else}
+							<Search class="h-4 w-4" />
+						{/if}
+					</Button>
+				</div>
 
 				<!-- Type selector -->
 				<Select
@@ -298,7 +311,7 @@
 					}}
 					disabled={loading}
 				>
-					<SelectTrigger class="w-40 h-10">
+					<SelectTrigger class="w-full lg:w-40 h-10">
 						<span>
 							{searchParams.projectType === 'all'
 								? 'All Types'
@@ -332,7 +345,7 @@
 					}}
 					disabled={loading}
 				>
-					<SelectTrigger class="w-44 h-10">
+					<SelectTrigger class="w-full lg:w-44 h-10">
 						<span>
 							{searchParams.environment === 'all'
 								? 'All Environments'
@@ -364,7 +377,7 @@
 					}}
 					disabled={loading}
 				>
-					<SelectTrigger class="w-36 h-10">
+					<SelectTrigger class="w-full lg:w-36 h-10">
 						<span>{searchParams.gameVersion || 'All Versions'}</span>
 					</SelectTrigger>
 					<SelectContent class="max-h-64">
@@ -385,7 +398,7 @@
 					}}
 					disabled={loading}
 				>
-					<SelectTrigger class="w-36 h-10">
+					<SelectTrigger class="w-full lg:w-36 h-10">
 						<span>
 							{searchParams.modLoader
 								? modLoaders.find((l) => l.value === searchParams.modLoader)?.label ||
@@ -412,7 +425,7 @@
 					}}
 					disabled={loading}
 				>
-					<SelectTrigger class="w-40 h-10">
+					<SelectTrigger class="w-full lg:w-40 h-10">
 						<span>
 							{searchParams.sortBy === 'downloads'
 								? 'Most Downloads'
@@ -434,11 +447,11 @@
 					</SelectContent>
 				</Select>
 
-				<!-- Search action button -->
+				<!-- Search action button (desktop only) -->
 				<Button
 					onclick={() => performSearch(true)}
 					disabled={loading}
-					class="bg-linear-to-r from-primary to-primary/80 shadow-md transition-all hover:scale-[1.02] hover:from-primary/90 hover:to-primary/70 hover:shadow-lg h-10"
+					class="hidden lg:flex bg-linear-to-r from-primary to-primary/80 shadow-md transition-all hover:scale-[1.02] hover:from-primary/90 hover:to-primary/70 hover:shadow-lg h-10"
 				>
 					{#if loading}
 						<Loader2 class="mr-2 h-4 w-4 animate-spin" />

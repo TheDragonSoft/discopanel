@@ -565,12 +565,12 @@
 	}}
 >
 	<DialogContent
-		class="flex !h-[70vh] !w-[90vw] !max-w-3xl flex-col !gap-0 overflow-hidden !p-0"
+		class="flex !h-[100dvh] sm:!h-[70vh] !w-full sm:!w-[90vw] !max-w-3xl flex-col !gap-0 overflow-hidden !p-0 rounded-none sm:rounded-lg border-0 sm:border"
 		showCloseButton={false}
 	>
-		<div class="flex h-full">
-			<!-- Sidebar -->
-			<div class="flex w-64 flex-col border-r bg-muted/30">
+		<div class="flex flex-col md:flex-row h-full">
+			<!-- Sidebar (desktop only) -->
+			<div class="hidden md:flex w-64 flex-col border-r bg-muted/30">
 				<!-- Sidebar Header -->
 				<div class="border-b p-6">
 					<div class="flex items-center gap-3">
@@ -620,24 +620,24 @@
 			<!-- Main Content -->
 			<div class="flex min-w-0 flex-1 flex-col">
 				<!-- Content Header -->
-				<div class="flex items-center justify-between border-b bg-muted/30 px-8 py-6">
+				<div class="flex items-center justify-between border-b bg-muted/30 px-4 py-3 sm:px-8 sm:py-6">
 					<div>
-						<h2 class="text-2xl font-semibold tracking-tight">
+						<h2 class="text-lg sm:text-2xl font-semibold tracking-tight">
 							{createdToken ? 'Token Created' : 'Create API Token'}
 						</h2>
-						<p class="mt-1 text-muted-foreground">
+						<p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">
 							{createdToken
 								? "Copy your token now — it won't be shown again"
 								: 'Configure your new API token'}
 						</p>
 					</div>
-					<Button variant="ghost" size="icon" onclick={closeCreateDialog} class="h-10 w-10">
-						<X class="h-5 w-5" />
+					<Button variant="ghost" size="icon" onclick={closeCreateDialog} class="h-8 w-8 sm:h-10 sm:w-10">
+						<X class="h-4 w-4 sm:h-5 sm:w-5" />
 					</Button>
 				</div>
 
 				<!-- Scrollable Content Area -->
-				<div class="flex-1 overflow-y-auto p-8">
+				<div class="flex-1 overflow-y-auto p-4 sm:p-8">
 					{#if createdToken}
 						<!-- Token Created View -->
 						<div class="space-y-6">

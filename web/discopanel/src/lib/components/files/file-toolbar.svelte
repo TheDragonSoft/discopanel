@@ -18,22 +18,22 @@
 </script>
 
 <div class="flex items-center justify-between border-b bg-muted/30 px-3 py-1.5">
-	<div class="flex items-center gap-0.5">
-		<Button size="icon" variant="ghost" class="h-7 w-7" onclick={onNewFile} title="New File">
-			<FilePlus class="h-3.5 w-3.5" />
+	<div class="flex items-center gap-1 sm:gap-0.5">
+		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onNewFile} title="New File">
+			<FilePlus class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 		</Button>
-		<Button size="icon" variant="ghost" class="h-7 w-7" onclick={onNewFolder} title="New Folder">
-			<FolderPlus class="h-3.5 w-3.5" />
+		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onNewFolder} title="New Folder">
+			<FolderPlus class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 		</Button>
-		<Button size="icon" variant="ghost" class="h-7 w-7" onclick={onUpload} title="Upload Files">
-			<Upload class="h-3.5 w-3.5" />
+		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onUpload} title="Upload Files">
+			<Upload class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 		</Button>
 	</div>
-	<div class="flex items-center gap-0.5">
+	<div class="flex items-center gap-1 sm:gap-0.5">
 		{#if showSearch}
 			<div class="flex items-center gap-1">
 				<Input
-					class="h-7 w-40 text-xs"
+					class="h-8 sm:h-7 w-36 sm:w-40 text-xs"
 					placeholder="Filter files..."
 					value={filterText}
 					oninput={(e) => onFilterChange((e.target as HTMLInputElement).value)}
@@ -42,28 +42,28 @@
 				<Button
 					size="icon"
 					variant="ghost"
-					class="h-7 w-7"
+					class="h-8 w-8 sm:h-7 sm:w-7"
 					onclick={() => {
 						showSearch = false;
 						onFilterChange('');
 					}}
 				>
-					<X class="h-3.5 w-3.5" />
+					<X class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 				</Button>
 			</div>
 		{:else}
 			<Button
 				size="icon"
 				variant="ghost"
-				class="h-7 w-7"
+				class="h-8 w-8 sm:h-7 sm:w-7"
 				onclick={() => (showSearch = true)}
 				title="Filter"
 			>
-				<Search class="h-3.5 w-3.5" />
+				<Search class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 			</Button>
 		{/if}
-		<Button size="icon" variant="ghost" class="h-7 w-7" onclick={onRefresh} title="Refresh">
-			<RefreshCw class="h-3.5 w-3.5" />
+		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onRefresh} title="Refresh">
+			<RefreshCw class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 		</Button>
 	</div>
 </div>

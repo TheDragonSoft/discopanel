@@ -103,8 +103,8 @@
 	{#if ports.length > 0}
 		<div class="rounded-lg border bg-muted/10 p-3">
 			<div class="space-y-3">
-				<!-- Headers -->
-				<div class="grid grid-cols-12 gap-2 px-1 text-xs font-medium text-muted-foreground">
+				<!-- Headers (desktop only) -->
+				<div class="hidden sm:grid grid-cols-12 gap-2 px-1 text-xs font-medium text-muted-foreground">
 					<div class="col-span-4">Name</div>
 					<div class="col-span-2">Container Port</div>
 					<div class="col-span-2">Host Port</div>
@@ -115,8 +115,9 @@
 				<!-- Port entries -->
 				{#each ports as port, index (index)}
 					<div class="space-y-2">
-						<div class="grid grid-cols-12 items-center gap-2">
-							<div class="col-span-4">
+						<div class="flex flex-col sm:grid sm:grid-cols-12 gap-2 p-2.5 sm:p-0 rounded-md border sm:border-0 bg-background/50 sm:bg-transparent items-stretch sm:items-center">
+							<div class="sm:col-span-4">
+								<label class="block sm:hidden text-[10px] font-semibold text-muted-foreground uppercase mb-1">Port Name</label>
 								<Input
 									type="text"
 									placeholder="e.g., BlueMap Web"
@@ -126,57 +127,64 @@
 									class="h-8 text-xs"
 								/>
 							</div>
-							<div class="col-span-2">
-								<Input
-									type="number"
-									min="1"
-									max="65535"
-									placeholder="8100"
-									bind:value={port.containerPort}
-									{disabled}
-									onchange={() => updatePort(index, 'containerPort', port.containerPort)}
-									class="h-8 text-xs"
-								/>
+							<div class="grid grid-cols-2 sm:contents gap-2">
+								<div class="sm:col-span-2">
+									<label class="block sm:hidden text-[10px] font-semibold text-muted-foreground uppercase mb-1">Container</label>
+									<Input
+										type="number"
+										min="1"
+										max="65535"
+										placeholder="8100"
+										bind:value={port.containerPort}
+										{disabled}
+										onchange={() => updatePort(index, 'containerPort', port.containerPort)}
+										class="h-8 text-xs"
+									/>
+								</div>
+								<div class="sm:col-span-2">
+									<label class="block sm:hidden text-[10px] font-semibold text-muted-foreground uppercase mb-1">Host</label>
+									<Input
+										type="number"
+										min="1"
+										max="65535"
+										placeholder="8100"
+										bind:value={port.hostPort}
+										{disabled}
+										onchange={() => updatePort(index, 'hostPort', port.hostPort)}
+										class="h-8 text-xs {portErrors[index] ? 'border-destructive' : ''}"
+									/>
+								</div>
 							</div>
-							<div class="col-span-2">
-								<Input
-									type="number"
-									min="1"
-									max="65535"
-									placeholder="8100"
-									bind:value={port.hostPort}
-									{disabled}
-									onchange={() => updatePort(index, 'hostPort', port.hostPort)}
-									class="h-8 text-xs {portErrors[index] ? 'border-destructive' : ''}"
-								/>
-							</div>
-							<div class="col-span-2">
-								<Select
-									type="single"
-									value={port.protocol}
-									onValueChange={(v) => updatePort(index, 'protocol', v)}
-									{disabled}
-								>
-									<SelectTrigger class="h-8 text-xs">
-										<span>{port.protocol.toUpperCase()}</span>
-									</SelectTrigger>
-									<SelectContent>
-										<SelectItem value="tcp">TCP</SelectItem>
-										<SelectItem value="udp">UDP</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-							<div class="col-span-2 flex justify-end">
-								<Button
-									type="button"
-									variant="ghost"
-									size="icon"
-									onclick={() => removePort(index)}
-									{disabled}
-									class="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
-								>
-									<X class="h-3 w-3" />
-								</Button>
+							<div class="flex items-center justify-between sm:contents gap-2">
+								<div class="sm:col-span-2 flex-1 sm:flex-initial">
+									<label class="block sm:hidden text-[10px] font-semibold text-muted-foreground uppercase mb-1">Protocol</label>
+									<Select
+										type="single"
+										value={port.protocol}
+										onValueChange={(v) => updatePort(index, 'protocol', v)}
+										{disabled}
+									>
+										<SelectTrigger class="h-8 text-xs">
+											<span>{port.protocol.toUpperCase()}</span>
+										</SelectTrigger>
+										<SelectContent>
+											<SelectItem value="tcp">TCP</SelectItem>
+											<SelectItem value="udp">UDP</SelectItem>
+										</SelectContent>
+									</Select>
+								</div>
+								<div class="sm:col-span-2 flex justify-end shrink-0 sm:pt-0 pt-4">
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon"
+										onclick={() => removePort(index)}
+										{disabled}
+										class="h-8 w-8 hover:bg-destructive/10 hover:text-destructive"
+									>
+										<X class="h-3.5 w-3.5" />
+									</Button>
+								</div>
 							</div>
 						</div>
 

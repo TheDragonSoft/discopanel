@@ -9,7 +9,8 @@
 		Image,
 		Archive,
 		ChevronRight,
-		ChevronDown
+		ChevronDown,
+		MoreVertical
 	} from '@lucide/svelte';
 	import type { FileInfo } from '$lib/proto/discopanel/v1/file_pb';
 	import { formatBytes } from '$lib/utils';
@@ -120,21 +121,64 @@
 
 	let Icon = $derived(getFileIcon(file));
 	let showCheckbox = $derived(hasSelection || isSelected);
+
+	let touchStartX = 0;
+	let touchStartY = 0;
+	let longPressTimer: ReturnType<typeof setTimeout> | null = null;
+
+	function handleTouchStart(e: TouchEvent) {
+		if (e.touches.length !== 1) return;
+		touchStartX = e.touches[0].clientX;
+		touchStartY = e.touches[0].clientY;
+		longPressTimer = setTimeout(() => {
+			if (typeof navigator !== 'undefined' && navigator.vibrate) {
+				navigator.vibrate(40);
+			}
+			const touch = e.touches[0];
+			const fakeMouseEvent = new MouseEvent('contextmenu', {
+				clientX: touch.clientX,
+				clientY: touch.clientY,
+				bubbles: true
+			});
+			onContextMenu(file, fakeMouseEvent);
+		}, 500);
+	}
+
+	function handleTouchMove(e: TouchEvent) {
+		if (!longPressTimer) return;
+		const touch = e.touches[0];
+		const dist = Math.hypot(touch.clientX - touchStartX, touch.clientY - touchStartY);
+		if (dist > 10) {
+			clearTimeout(longPressTimer);
+			longPressTimer = null;
+		}
+	}
+
+	function handleTouchEnd() {
+		if (longPressTimer) {
+			clearTimeout(longPressTimer);
+			longPressTimer = null;
+		}
+	}
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="file-row group flex h-[28px] cursor-pointer items-center pr-3 text-xs select-none
+	class="file-row group flex h-[34px] sm:h-[28px] cursor-pointer items-center pr-2 sm:pr-3 text-xs select-none
 		{isSelected ? 'bg-primary/10' : ''}
 		{isFocused && !isSelected ? 'bg-accent/50' : ''}
 		{isDragOver && file.isDir ? 'bg-primary/20 ring-1 ring-primary/40 ring-inset' : ''}
-		hover:bg-muted/50"
+		hover:bg-muted/50 active:bg-muted/70"
 	draggable="true"
 	onclick={(e) => onSelect(file, e)}
 	oncontextmenu={(e) => {
 		e.preventDefault();
 		onContextMenu(file, e);
 	}}
+	ontouchstart={handleTouchStart}
+	ontouchmove={handleTouchMove}
+	ontouchend={handleTouchEnd}
+	ontouchcancel={handleTouchEnd}
 	ondragstart={(e) => onDragStart(file, e)}
 	ondragover={(e) => onDragOver(file, e)}
 	ondragleave={() => onDragLeave()}
@@ -159,10 +203,10 @@
 
 	<!-- Indent + Chevron -->
 	<div class="flex shrink-0 items-center" style="width: {depth * 16}px"></div>
-	<div class="flex w-4 shrink-0 items-center justify-center">
+	<div class="flex w-5 sm:w-4 shrink-0 items-center justify-center">
 		{#if file.isDir}
 			<button
-				class="p-0 text-muted-foreground hover:text-foreground"
+				class="p-1 sm:p-0 text-muted-foreground hover:text-foreground"
 				onclick={(e) => {
 					e.stopPropagation();
 					onToggleExpand(file.path);
@@ -186,7 +230,7 @@
 	</div>
 
 	<!-- Size (right-aligned) -->
-	<span class="w-16 shrink-0 text-right text-muted-foreground tabular-nums">
+	<span class="w-14 sm:w-16 shrink-0 text-right text-muted-foreground tabular-nums text-[11px] sm:text-xs">
 		{#if !file.isDir}
 			{formatBytes(Number(file.size))}
 		{/if}
@@ -196,4 +240,18 @@
 	<span class="hidden w-20 shrink-0 text-right text-muted-foreground sm:inline-block">
 		{formatModified(file.modified)}
 	</span>
+
+	<!-- Mobile 3-dot action button (< md) -->
+	<button
+		type="button"
+		class="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground md:hidden shrink-0 ml-1 active:scale-95"
+		onclick={(e) => {
+			e.stopPropagation();
+			e.preventDefault();
+			onContextMenu(file, e);
+		}}
+		title="File actions"
+	>
+		<MoreVertical class="h-3.5 w-3.5" />
+	</button>
 </div>

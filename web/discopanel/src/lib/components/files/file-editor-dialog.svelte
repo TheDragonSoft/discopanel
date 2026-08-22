@@ -282,14 +282,14 @@
 	<DialogContent
 		showCloseButton={false}
 		class={isFullscreen
-			? 'flex h-[95vh] w-[95vw]! max-w-[95vw]! flex-col sm:max-w-[95vw]!'
-			: 'flex h-[85vh] w-[90vw]! max-w-[90vw]! flex-col sm:max-w-[90vw]!'}
+			? 'flex h-[100dvh] w-full max-w-full rounded-none border-0 p-3 sm:p-6 sm:rounded-lg sm:border sm:h-[95vh] sm:w-[95vw]! sm:max-w-[95vw]! flex-col'
+			: 'flex h-[100dvh] w-full max-w-full rounded-none border-0 p-3 sm:p-6 sm:rounded-lg sm:border sm:h-[85vh] sm:w-[90vw]! sm:max-w-[90vw]! flex-col'}
 	>
-		<div class="absolute top-4 right-4 flex gap-1">
+		<div class="absolute top-3 right-3 sm:top-4 sm:right-4 flex gap-1 z-20">
 			<button
 				onclick={toggleFullscreen}
 				title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-				class="inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+				class="inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
 			>
 				{#if isFullscreen}
 					<Minimize2 class="h-4 w-4" />
@@ -298,16 +298,16 @@
 				{/if}
 			</button>
 			<DialogPrimitive.Close
-				class="inline-flex h-9 w-9 items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+				class="inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
 			>
 				<X class="h-4 w-4" />
 				<span class="sr-only">Close</span>
 			</DialogPrimitive.Close>
 		</div>
-		<DialogHeader class="shrink-0">
-			<DialogTitle class="flex items-center gap-2">
+		<DialogHeader class="shrink-0 pr-20 sm:pr-0">
+			<DialogTitle class="flex items-center gap-2 truncate text-base sm:text-lg">
 				{#if file}
-					{file.name}
+					<span class="truncate">{file.name}</span>
 					{#if isDirty}
 						<span class="text-sm text-muted-foreground">●</span>
 					{/if}
@@ -315,14 +315,14 @@
 					File Editor
 				{/if}
 			</DialogTitle>
-			<DialogDescription>
+			<DialogDescription class="truncate text-xs">
 				{#if file}
 					{file.path}
 				{/if}
 			</DialogDescription>
 		</DialogHeader>
 
-		<div class="relative min-h-0 flex-1 overflow-hidden rounded-md border bg-background">
+		<div class="relative min-h-0 flex-1 overflow-hidden rounded-md border bg-background my-2 sm:my-0">
 			{#if loading}
 				<div class="absolute inset-0 z-10 flex items-center justify-center bg-background/80">
 					<Loader2 class="h-8 w-8 animate-spin" />
@@ -332,9 +332,9 @@
 		</div>
 
 		<DialogFooter class="shrink-0">
-			<div class="flex w-full items-center justify-between">
-				<div class="flex items-center gap-4 text-sm text-muted-foreground">
-					<span>
+			<div class="flex flex-col sm:flex-row w-full sm:items-center justify-between gap-2">
+				<div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+					<span class="font-mono">
 						{#if file}
 							{getFileLanguage(file.name).toUpperCase()}
 						{:else}
@@ -342,29 +342,31 @@
 						{/if}
 					</span>
 					<span>
-						{content.split('\n').length} lines, {content.length} characters
+						{content.split('\n').length} lines
 					</span>
 					{#if isDirty}
-						<span class="text-orange-500">● Modified</span>
+						<span class="text-orange-500 font-medium">● Modified</span>
 					{:else}
-						<span class="text-green-500">● Saved</span>
+						<span class="text-green-500 font-medium">● Saved</span>
 					{/if}
 				</div>
-				<div class="flex items-center gap-2">
-					<span class="text-xs text-muted-foreground"> Ctrl+S to save </span>
-					<Button variant="outline" onclick={handleClose}>
-						<X class="mr-2 h-4 w-4" />
+				<div class="flex items-center justify-end gap-2">
+					<span class="hidden sm:inline text-xs text-muted-foreground"> Ctrl+S to save </span>
+					<Button variant="outline" size="sm" onclick={handleClose} class="h-8">
+						<X class="mr-1.5 h-3.5 w-3.5" />
 						Close
 					</Button>
 					<Button
 						onclick={handleSave}
 						disabled={!isDirty || saving || loading}
 						variant={isDirty ? 'default' : 'secondary'}
+						size="sm"
+						class="h-8"
 					>
 						{#if saving}
-							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+							<Loader2 class="mr-1.5 h-3.5 w-3.5 animate-spin" />
 						{:else}
-							<Save class="mr-2 h-4 w-4" />
+							<Save class="mr-1.5 h-3.5 w-3.5" />
 						{/if}
 						Save
 					</Button>

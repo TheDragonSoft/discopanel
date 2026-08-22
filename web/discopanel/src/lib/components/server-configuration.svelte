@@ -344,42 +344,44 @@
 </script>
 
 <Card class="flex h-full flex-col gap-0 pb-0">
-	<CardHeader class="mb-0 shrink-0 border-b pb-0">
-		<div class="flex flex-col justify-between sm:flex-row sm:items-center">
+	<CardHeader class="pb-3 shrink-0 border-b">
+		<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
 			<div>
-				<CardTitle>
+				<CardTitle class="text-lg sm:text-xl">
 					{!server ? 'Default Server Configuration' : 'Server Configuration'}
 				</CardTitle>
-				<p class="mt-1 text-sm text-muted-foreground">
+				<p class="mt-0.5 text-xs sm:text-sm text-muted-foreground">
 					{!server
 						? 'Configure default values for new servers'
 						: 'Configure Minecraft server environment variables'}
 				</p>
 			</div>
-			<div class="flex items-center gap-3">
+			<div class="flex flex-wrap items-center gap-2 sm:gap-3">
 				{#if hasChanges}
-					<span class="text-sm whitespace-nowrap text-muted-foreground">
+					<span class="text-xs sm:text-sm whitespace-nowrap text-muted-foreground">
 						{modifiedFields.size} unsaved {modifiedFields.size === 1 ? 'change' : 'changes'}
 					</span>
 				{/if}
 				<Button
 					variant="outline"
 					size="sm"
+					class="h-8"
 					onclick={handleReset}
 					disabled={loading || isServerRunning || !hasChanges}
 				>
-					<RefreshCw class="mr-2 h-4 w-4" />
+					<RefreshCw class="mr-1.5 h-3.5 w-3.5" />
 					Reset
 				</Button>
 				<Button
 					size="sm"
+					class="h-8"
 					onclick={handleSave}
 					disabled={loading || isSaving || isServerRunning || !hasChanges}
 				>
 					{#if isSaving}
-						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+						<Loader2 class="mr-1.5 h-3.5 w-3.5 animate-spin" />
 					{:else}
-						<Save class="mr-2 h-4 w-4" />
+						<Save class="mr-1.5 h-3.5 w-3.5" />
 					{/if}
 					Save
 				</Button>
@@ -398,25 +400,25 @@
 				<p class="text-sm">Unable to load server configuration</p>
 			</div>
 		{:else}
-			<div class="flex h-full">
-				<!-- Category Sidebar -->
-				<div class="w-48 shrink-0 overflow-y-auto border-r bg-muted/20">
-					<nav class="space-y-1 p-2">
+			<div class="flex flex-col md:flex-row h-full">
+				<!-- Category Navigation: Horizontal Pills on mobile (< md), Left Sidebar on Desktop (>= md) -->
+				<div class="w-full md:w-48 shrink-0 overflow-x-auto md:overflow-y-auto border-b md:border-b-0 md:border-r bg-muted/20 scrollbar-none">
+					<nav class="flex md:flex-col gap-1 p-2">
 						{#each filteredCategories as category (category.name)}
 							{@const categoryId = getCategoryId(category.name)}
 							{@const isActive = activeCategory === categoryId}
 							{@const modCount = modifiedCountByCategory.get(categoryId) ?? 0}
 							<button
-								class="flex w-full items-center justify-between rounded-md px-3 py-2 text-left text-sm transition-colors
+								class="flex shrink-0 items-center justify-between gap-2 rounded-md px-3 py-1.5 md:py-2 text-left text-xs md:text-sm font-medium whitespace-nowrap transition-colors
 									{isActive
-									? 'bg-primary text-primary-foreground'
-									: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+									? 'bg-primary text-primary-foreground shadow-xs'
+									: 'text-muted-foreground hover:bg-muted hover:text-foreground bg-background/50 md:bg-transparent border md:border-0 border-border/40'}"
 								onclick={() => selectCategory(categoryId)}
 							>
 								<span class="truncate">{category.name}</span>
 								{#if modCount > 0}
 									<span
-										class="ml-2 inline-flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-xs font-medium
+										class="inline-flex h-4 min-w-4 md:h-5 md:min-w-5 items-center justify-center rounded-full px-1 text-[10px] md:text-xs font-semibold
 										{isActive ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-orange-500 text-white'}"
 									>
 										{modCount}

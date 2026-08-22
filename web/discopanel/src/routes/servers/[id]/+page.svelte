@@ -376,7 +376,7 @@
 						onclick={() => handleServerAction('restart')}
 						disabled={actionLoading}
 						size="default"
-						class="hidden border-2 shadow-md transition-all hover:scale-[1.02] hover:shadow-lg sm:flex"
+						class="border-2 shadow-md transition-all hover:scale-[1.02] hover:shadow-lg flex"
 					>
 						{#if actionLoading}
 							<Loader2 class="mr-1 h-4 w-4 animate-spin sm:mr-2 sm:h-5 sm:w-5" />
@@ -391,7 +391,7 @@
 						<span class="sm:inline">Stopping...</span>
 					</Button>
 				{/if}
-				<div class="ml-2 hidden h-10 w-px bg-border/50 sm:ml-4 sm:block"></div>
+				<div class="ml-1 h-10 w-px bg-border/50 sm:ml-4 block"></div>
 				<DropdownMenu>
 					<DropdownMenuTrigger>
 						{#snippet child({ props })}
@@ -400,7 +400,7 @@
 								size="icon"
 								disabled={actionLoading}
 								{...props}
-								class="hidden sm:flex"
+								class="flex h-9 w-9 items-center justify-center"
 							>
 								<MoreVertical class="h-4 w-4" />
 								<span class="sr-only">More actions</span>
@@ -425,7 +425,7 @@
 		</div>
 
 		<div
-			class="mb-6 grid shrink-0 grid-cols-1 gap-4 sm:mb-8 sm:grid-cols-2 sm:gap-5 xl:grid-cols-4"
+			class="mb-6 grid shrink-0 grid-cols-1 gap-3 sm:mb-8 sm:grid-cols-2 sm:gap-4 xl:grid-cols-4 xl:gap-5"
 		>
 			<Card
 				class="group relative overflow-hidden border-0 bg-linear-to-br from-background via-background/95 to-background/90 shadow-xl transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl"
@@ -563,7 +563,7 @@
 										{#each Array(5) as _, i (i)}
 											<div
 												class="heartbeat-bar heartbeat-erratic text-purple-500"
-												style="animation-delay: {i * 0.1}s; height: {20 + Math.random() * 30}px"
+												style="animation-delay: {i * 0.1}s"
 											></div>
 										{/each}
 									</div>
@@ -1175,7 +1175,7 @@
 					<ServerConfiguration {server} />
 				</TabsContent>
 
-				<TabsContent value="mods" class="h-full">
+				<TabsContent value="mods" class="h-full space-y-4">
 					<ServerMods {server} active={activeTab === 'mods'} />
 				</TabsContent>
 
@@ -1236,6 +1236,8 @@
 		width: 4px;
 		height: 40px;
 		border-radius: 2px;
+		transform-origin: center;
+		will-change: transform, opacity;
 		animation: heartbeat 4s ease-in-out infinite;
 	}
 
@@ -1250,11 +1252,11 @@
 	@keyframes heartbeat {
 		0%,
 		100% {
-			height: 8px;
+			transform: scaleY(0.2);
 			opacity: 0.3;
 		}
 		50% {
-			height: 40px;
+			transform: scaleY(1);
 			opacity: 1;
 		}
 	}
@@ -1262,19 +1264,19 @@
 	@keyframes heartbeat-erratic {
 		0%,
 		100% {
-			height: 5px;
+			transform: scaleY(0.125);
 			opacity: 0.2;
 		}
 		25% {
-			height: 25px;
+			transform: scaleY(0.625);
 			opacity: 0.8;
 		}
 		50% {
-			height: 15px;
+			transform: scaleY(0.375);
 			opacity: 0.5;
 		}
 		75% {
-			height: 35px;
+			transform: scaleY(0.875);
 			opacity: 0.9;
 		}
 	}
@@ -1282,11 +1284,11 @@
 	@keyframes heartbeat-slow {
 		0%,
 		100% {
-			height: 8px;
+			transform: scaleY(0.2);
 			opacity: 0.2;
 		}
 		50% {
-			height: 30px;
+			transform: scaleY(0.75);
 			opacity: 0.7;
 		}
 	}

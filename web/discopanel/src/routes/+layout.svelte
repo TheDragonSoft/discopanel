@@ -37,6 +37,7 @@
 	import { onMount } from 'svelte';
 	import { Toaster } from '$lib/components/ui/sonner';
 	import GlobalLoading from '$lib/components/global-loading.svelte';
+	import MobileNavCloser from '$lib/components/mobile-nav-closer.svelte';
 
 	import {
 		Server,
@@ -375,7 +376,34 @@
 				</SidebarFooter>
 			</Sidebar>
 
-			<SidebarInset class="flex h-screen flex-col overflow-y-auto overflow-x-hidden min-w-0 max-w-full">
+			<MobileNavCloser />
+
+			<SidebarInset class="flex min-h-[100dvh] flex-col overflow-y-auto overflow-x-hidden min-w-0 max-w-full">
+				<!-- Mobile Header Bar (< md) -->
+				<header class="flex h-14 md:hidden items-center justify-between border-b border-border/50 bg-background/95 px-4 backdrop-blur-md sticky top-0 z-30 shrink-0">
+					<div class="flex items-center gap-3">
+						<SidebarTrigger class="h-9 w-9" />
+						<a href={resolvePath('/')} class="flex items-center gap-2">
+							<img src="/g1_24x24.png" alt="DiscoPanel Logo" class="h-6 w-6" />
+							<span class="text-base font-bold">DiscoPanel</span>
+						</a>
+					</div>
+					<div class="flex items-center gap-1.5">
+						<Button
+							variant="ghost"
+							size="icon"
+							class="h-8 w-8"
+							onclick={toggleMode}
+							title="Toggle theme"
+						>
+							{#if mode.current === 'light'}
+								<Moon class="h-4 w-4 text-muted-foreground" />
+							{:else}
+								<Sun class="h-4 w-4 text-muted-foreground" />
+							{/if}
+						</Button>
+					</div>
+				</header>
 				<div class="flex-1 min-w-0">
 					{@render children?.()}
 				</div>
