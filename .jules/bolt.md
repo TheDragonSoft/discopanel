@@ -1,0 +1,3 @@
+## 2025-02-23 - Avoid Allocation in Proxy Read Loop
+**Learning:** In highly trafficked methods like proxy decoding (`ReadVarInt`), simple seemingly harmless operations like `buf := make([]byte, 1)` create significant heap allocations within loops, degrading performance. String slicing allocations via `strings.Split` also slow down frequently executed HTTP and Minecraft proxy routing paths compared to using `strings.IndexByte`.
+**Action:** Always inspect tightly bound read/write loops for internal slice instantiations. Pull single-byte or fixed-buffer instantiations to variables outside loops. Substitute functions allocating slices (`strings.Split`) with zero-allocation alternatives (`strings.IndexByte`, `strings.Cut`).
