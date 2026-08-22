@@ -42,13 +42,34 @@
 
 	let { server, active = false }: { server: Server; active?: boolean } = $props();
 
-	let logEntries = $state<LogEntry[]>([]);
+	interface ProcessedLogEntry {
+		id: string;
+		level: string;
+		html: string;
+		message: string;
+	}
+
+	let logEntries = $state<ProcessedLogEntry[]>([]);
 	let command = $state('');
 	let loading = $state(false);
 	let autoScroll = $state(true);
 	let scrollAreaRef = $state<HTMLDivElement | null>(null);
 	let tailLines = $state(500);
 	const MAX_LOG_ENTRIES = 5000;
+
+	let appendSeq = 0;
+	function processLog(entry: LogEntry, idx?: number): ProcessedLogEntry {
+		const s = entry.timestamp?.seconds ? Number(entry.timestamp.seconds) : 0;
+		const n = entry.timestamp?.nanos ?? 0;
+		const lvl = entry.level || 'info';
+		const seq = idx !== undefined ? idx : ++appendSeq;
+		return {
+			id: `${s}_${n}_${lvl}_${seq}`,
+			level: lvl,
+			html: ansiConverter.toHtml(entry.message || ''),
+			message: entry.message || ''
+		};
+	}
 
 	// Ws state
 	let wsConnectionState = $derived(wsClient.state.connectionState);
@@ -103,14 +124,15 @@
 		// Register handlers
 		const unsubLogs = wsClient.onLogs((serverId, logs) => {
 			if (serverId === server.id) {
-				logEntries = logs.length > MAX_LOG_ENTRIES ? logs.slice(-MAX_LOG_ENTRIES) : logs;
+				const processed = logs.map((l, i) => processLog(l, i));
+				logEntries = processed.length > MAX_LOG_ENTRIES ? processed.slice(-MAX_LOG_ENTRIES) : processed;
 			}
 		});
 
 		const unsubLogEntry = wsClient.onLogEntry((serverId, logs) => {
 			if (serverId === server.id && logs.length > 0) {
-				// Just append logs - browser preserves scrollTop naturally
-				const combined = [...logEntries, ...logs];
+				const newItems = logs.map((l) => processLog(l));
+				const combined = [...logEntries, ...newItems];
 				logEntries =
 					combined.length > MAX_LOG_ENTRIES ? combined.slice(-MAX_LOG_ENTRIES) : combined;
 			}
@@ -175,6 +197,7 @@
 			return;
 		}
 
+		loading = true;
 		try {
 			const request = create(GetServerLogsRequestSchema, {
 				id: server.id,
@@ -182,9 +205,12 @@
 			});
 			const response = await rpcClient.server.getServerLogs(request);
 			const logs = response.logs || [];
-			logEntries = logs.length > MAX_LOG_ENTRIES ? logs.slice(-MAX_LOG_ENTRIES) : logs;
+			const processed = logs.map((l, i) => processLog(l, i));
+			logEntries = processed.length > MAX_LOG_ENTRIES ? processed.slice(-MAX_LOG_ENTRIES) : processed;
 		} catch (error) {
 			console.error('Failed to fetch logs:', error);
+		} finally {
+			loading = false;
 		}
 	}
 
@@ -286,27 +312,27 @@
 
 <ResizablePaneGroup
 	direction="vertical"
-	class="h-full max-h-[800px] min-h-[400px] w-full overflow-hidden rounded-lg border bg-black"
+	class="h-full max-h-[800px] min-h-[320px] sm:min-h-[400px] w-full overflow-hidden rounded-lg border bg-black"
 >
 	<ResizablePane defaultSize={75} minSize={30}>
 		<div class="flex h-full flex-col">
-			<div class="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-4 py-2">
+			<div class="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-3 sm:px-4 py-2">
 				<div class="flex items-center gap-2">
-					<Terminal class="h-4 w-4 text-green-500" />
-					<span class="font-mono text-sm text-green-500">Server Console</span>
+					<Terminal class="h-4 w-4 text-green-500 shrink-0" />
+					<span class="font-mono text-xs sm:text-sm text-green-500 font-semibold truncate">Console</span>
 					<Badge
 						variant={server.status === ServerStatus.RUNNING ||
 						server.status === ServerStatus.UNHEALTHY
 							? 'default'
 							: 'secondary'}
-						class="text-xs"
+						class="text-[10px] sm:text-xs px-1.5 py-0"
 					>
 						{getStringForEnum(ServerStatus, server.status)?.toLowerCase()}
 					</Badge>
 					{#if wsConnectionState === 'authenticated'}
-						<Wifi class="h-3 w-3 {getConnectionColor()}" />
+						<Wifi class="h-3 w-3 shrink-0 {getConnectionColor()}" />
 					{:else}
-						<WifiOff class="h-3 w-3 {getConnectionColor()}" />
+						<WifiOff class="h-3 w-3 shrink-0 {getConnectionColor()}" />
 					{/if}
 				</div>
 				<div class="flex items-center gap-1">
@@ -317,12 +343,12 @@
 								variant="ghost"
 								onclick={fetchLogs}
 								disabled={loading}
-								class="h-7 w-7 p-0 text-zinc-400 hover:text-white"
+								class="h-8 w-8 sm:h-7 sm:w-7 p-0 text-zinc-400 hover:text-white"
 							>
 								{#if loading}
-									<Loader2 class="h-3 w-3 animate-spin" />
+									<Loader2 class="h-3.5 w-3.5 animate-spin" />
 								{:else}
-									<RefreshCw class="h-3 w-3" />
+									<RefreshCw class="h-3.5 w-3.5" />
 								{/if}
 							</Button>
 						</Tooltip.Trigger>
@@ -335,12 +361,12 @@
 								variant="ghost"
 								onclick={uploadToMCLogs}
 								disabled={uploading}
-								class="h-7 w-7 p-0 text-zinc-400 hover:text-white"
+								class="h-8 w-8 sm:h-7 sm:w-7 p-0 text-zinc-400 hover:text-white"
 							>
 								{#if uploading}
-									<Loader2 class="h-3 w-3 animate-spin" />
+									<Loader2 class="h-3.5 w-3.5 animate-spin" />
 								{:else}
-									<Upload class="h-3 w-3" />
+									<Upload class="h-3.5 w-3.5" />
 								{/if}
 							</Button>
 						</Tooltip.Trigger>
@@ -353,9 +379,9 @@
 								variant="ghost"
 								onclick={downloadLogs}
 								disabled={logEntries.length === 0}
-								class="h-7 w-7 p-0 text-zinc-400 hover:text-white"
+								class="h-8 w-8 sm:h-7 sm:w-7 p-0 text-zinc-400 hover:text-white"
 							>
-								<Download class="h-3 w-3" />
+								<Download class="h-3.5 w-3.5" />
 							</Button>
 						</Tooltip.Trigger>
 						<Tooltip.Content>Download logs</Tooltip.Content>
@@ -367,9 +393,9 @@
 								variant="ghost"
 								onclick={clearLogs}
 								disabled={logEntries.length === 0}
-								class="h-7 w-7 p-0 text-zinc-400 hover:text-white"
+								class="h-8 w-8 sm:h-7 sm:w-7 p-0 text-zinc-400 hover:text-white"
 							>
-								<Trash2 class="h-3 w-3" />
+								<Trash2 class="h-3.5 w-3.5" />
 							</Button>
 						</Tooltip.Trigger>
 						<Tooltip.Content>Clear console</Tooltip.Content>
@@ -377,7 +403,7 @@
 				</div>
 			</div>
 			<div
-				class="custom-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-auto bg-black px-4 py-2"
+				class="custom-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-auto bg-black px-4 py-2 [overscroll-behavior-y:contain]"
 				bind:this={scrollAreaRef}
 				onscroll={handleScroll}
 			>
@@ -393,10 +419,10 @@
 								: 'Start the server to see output.'}
 						</div>
 					{:else}
-						{#each logEntries as entry, i (i)}
-							<div class="log-line break-all whitespace-pre-wrap" data-type={entry.level}>
+						{#each logEntries as entry (entry.id)}
+							<div class="log-line break-all whitespace-pre-wrap select-text" data-type={entry.level}>
 								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-								{@html ansiConverter.toHtml(entry.message)}
+								{@html entry.html}
 							</div>
 						{/each}
 					{/if}
@@ -407,10 +433,32 @@
 
 	<ResizableHandle class="bg-zinc-800 hover:bg-zinc-700" />
 
-	<div class="flex flex-col bg-zinc-950">
-		<div class="flex shrink-0 gap-2 border-t border-zinc-800 p-3">
-			<div class="flex flex-1 items-center gap-2">
-				<span class="font-mono text-sm text-green-500">$</span>
+	<div class="flex flex-col bg-zinc-950 shrink-0">
+		<!-- Quick Command Chips for Mobile -->
+		<div class="flex items-center gap-1.5 px-3 pt-2 pb-1 overflow-x-auto scrollbar-none border-t border-zinc-900">
+			{#each ['/list', '/tps', '/help', '/save-all', 'Clear'] as quickCmd}
+				<Button
+					variant="outline"
+					size="sm"
+					class="h-6.5 px-2 text-[11px] bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 shrink-0"
+					onclick={() => {
+						if (quickCmd === 'Clear') {
+							clearLogs();
+						} else {
+							command = quickCmd;
+							sendCommand();
+						}
+					}}
+					disabled={server.status !== ServerStatus.RUNNING && server.status !== ServerStatus.UNHEALTHY}
+				>
+					{quickCmd}
+				</Button>
+			{/each}
+		</div>
+
+		<div class="flex shrink-0 gap-2 p-3 pt-2">
+			<div class="flex flex-1 items-center gap-2 rounded-md bg-zinc-900/60 px-2.5 py-1 border border-zinc-800 focus-within:border-primary/60">
+				<span class="font-mono text-sm text-green-500 select-none">$</span>
 				<input
 					type="text"
 					placeholder={server.status === ServerStatus.RUNNING ||
@@ -421,6 +469,11 @@
 					disabled={server.status !== ServerStatus.RUNNING &&
 						server.status !== ServerStatus.UNHEALTHY}
 					onkeydown={(e) => e.key === 'Enter' && sendCommand()}
+					autocapitalize="none"
+					autocorrect="off"
+					autocomplete="off"
+					spellcheck="false"
+					enterkeyhint="send"
 					class="flex-1 bg-transparent font-mono text-sm text-white outline-none placeholder:text-zinc-600"
 				/>
 			</div>
@@ -428,24 +481,24 @@
 				onclick={sendCommand}
 				disabled={server.status === ServerStatus.STOPPED || !command.trim()}
 				size="sm"
-				class="h-7 bg-zinc-800 px-3 text-white hover:bg-zinc-700"
+				class="h-9 w-9 p-0 bg-zinc-800 text-white hover:bg-zinc-700 shrink-0"
 			>
-				<Send class="h-3 w-3" />
+				<Send class="h-3.5 w-3.5" />
 			</Button>
 		</div>
 
 		<div class="flex shrink-0 items-center justify-between px-3 pb-2 text-xs text-zinc-500">
 			<div class="flex items-center gap-4">
-				<label class="flex items-center gap-2">
-					<input type="checkbox" bind:checked={autoScroll} class="h-3 w-3 rounded" />
-					Auto-scroll
+				<label class="flex items-center gap-2 cursor-pointer py-0.5">
+					<input type="checkbox" bind:checked={autoScroll} class="h-3.5 w-3.5 rounded" />
+					<span>Auto-scroll</span>
 				</label>
-				<div class="flex items-center gap-2">
+				<div class="flex items-center gap-1.5">
 					<span>Tail:</span>
 					<select
 						bind:value={tailLines}
 						onchange={handleTailChange}
-						class="rounded border border-zinc-800 bg-zinc-900 px-2 py-0.5 text-xs"
+						class="rounded border border-zinc-800 bg-zinc-900 px-2 py-0.5 text-xs text-zinc-300"
 					>
 						<option value={100}>100</option>
 						<option value={500}>500</option>
@@ -454,7 +507,7 @@
 					</select>
 				</div>
 			</div>
-			<div class="font-mono">
+			<div class="font-mono text-[11px] text-zinc-400">
 				{logEntries.length} lines
 			</div>
 		</div>

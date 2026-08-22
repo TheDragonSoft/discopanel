@@ -119,7 +119,7 @@ type ServerConfig struct {
 	ID        string    `json:"id" gorm:"primaryKey"`
 	ServerID  string    `json:"server_id" gorm:"not null;index;column:server_id"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
-	Server    *Server   `json:"-" gorm:"foreignKey:ServerID;constraint:OnDelete:CASCADE"`
+	Server    *Server   `json:"-" gorm:"-"`
 
 	// JVM Configuration
 	UID                    *int    `json:"uid" env:"UID" default:"1000" desc:"The linux user id to run as" input:"number" label:"User ID"`

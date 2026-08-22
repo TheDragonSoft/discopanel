@@ -199,6 +199,13 @@ func (m *Manager) WriteChunk(sessionID string, chunkIndex int32, data []byte) (c
 	return session.Completed, nil
 }
 
+var uploadBufPool = sync.Pool{
+	New: func() any {
+		b := make([]byte, 256*1024)
+		return &b
+	},
+}
+
 // Writes data from a reader to the session file starting at the given offset
 func (m *Manager) WriteStream(sessionID string, r io.Reader, offset int64) (bytesWritten int64, completed bool, err error) {
 	session, err := m.GetSession(sessionID)
@@ -206,33 +213,42 @@ func (m *Manager) WriteStream(sessionID string, r io.Reader, offset int64) (byte
 		return 0, false, err
 	}
 
-	// Validate state under lock
+	// Validate state and contiguous offset under lock
 	session.mu.Lock()
 	if session.Completed {
 		session.mu.Unlock()
 		return 0, true, ErrSessionCompleted
 	}
-	file := session.file
-	if file == nil {
+	if session.file == nil {
 		session.mu.Unlock()
 		return 0, false, errors.New("session file not open")
 	}
+	if offset != session.BytesReceived {
+		expected := session.BytesReceived
+		session.mu.Unlock()
+		return 0, false, fmt.Errorf("invalid offset %d, expected contiguous offset %d", offset, expected)
+	}
 	session.mu.Unlock()
 
-	buf := make([]byte, 256*1024) // 256KB read buffer
+	bufPtr := uploadBufPool.Get().(*[]byte)
+	defer uploadBufPool.Put(bufPtr)
+	buf := *bufPtr
 	pos := offset
 
 	for {
 		n, readErr := r.Read(buf)
 		if n > 0 {
-			_, writeErr := file.WriteAt(buf[:n], pos)
+			session.mu.Lock()
+			if session.Completed || session.file == nil {
+				session.mu.Unlock()
+				return pos - offset, false, ErrSessionCompleted
+			}
+			_, writeErr := session.file.WriteAt(buf[:n], pos)
 			if writeErr != nil {
+				session.mu.Unlock()
 				return pos - offset, false, fmt.Errorf("failed to write: %w", writeErr)
 			}
 			pos += int64(n)
-
-			// Update progress under lock (brief hold)
-			session.mu.Lock()
 			session.BytesReceived = pos
 			session.mu.Unlock()
 		}
@@ -248,7 +264,7 @@ func (m *Manager) WriteStream(sessionID string, r io.Reader, offset int64) (byte
 	session.mu.Lock()
 	defer session.mu.Unlock()
 
-	if session.BytesReceived >= session.TotalSize && !session.Completed {
+	if session.BytesReceived >= session.TotalSize && !session.Completed && session.file != nil {
 		session.Completed = true
 		if err := session.file.Sync(); err != nil {
 			m.log.Error("Failed to sync file for session %s: %v", sessionID, err)

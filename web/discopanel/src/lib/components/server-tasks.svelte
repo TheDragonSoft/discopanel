@@ -994,40 +994,40 @@
 	<!-- Create/Edit Dialog -->
 	<Dialog.Root bind:open={showCreateDialog}>
 		<Dialog.Content
-			class="flex h-[80vh]! w-[95vw]! max-w-4xl! flex-col gap-0! overflow-hidden p-0!"
+			class="flex h-[100dvh]! sm:h-[80vh]! w-full! sm:w-[95vw]! max-w-4xl! flex-col gap-0! overflow-hidden p-0! rounded-none sm:rounded-lg border-0 sm:border"
 			showCloseButton={false}
 		>
-			<div class="flex h-full">
-				<!-- Sidebar -->
-				<div class="flex w-56 shrink-0 flex-col border-r bg-muted/30">
-					<div class="border-b p-6">
+			<div class="flex flex-col md:flex-row h-full">
+				<!-- Navigation: Horizontal Tabs on mobile (< md), Left Sidebar on Desktop (>= md) -->
+				<div class="flex flex-col md:w-56 shrink-0 border-b md:border-b-0 md:border-r bg-muted/30">
+					<div class="border-b p-3 sm:p-6 hidden md:block">
 						<div class="flex items-center gap-3">
 							<div
-								class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10"
+								class="flex h-10 w-10 sm:h-12 sm:w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10"
 							>
-								<DialogTaskIcon class="h-6 w-6 text-primary" />
+								<DialogTaskIcon class="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
 							</div>
 							<div class="min-w-0 flex-1">
-								<h3 class="truncate font-semibold">
+								<h3 class="truncate font-semibold text-sm sm:text-base">
 									{taskName || (selectedTask ? 'Edit Task' : 'New Task')}
 								</h3>
-								<p class="truncate text-sm text-muted-foreground">{getTaskTypeLabel(taskType)}</p>
+								<p class="truncate text-xs sm:text-sm text-muted-foreground">{getTaskTypeLabel(taskType)}</p>
 							</div>
 						</div>
 					</div>
 
-					<nav class="flex-1 space-y-1 p-4">
+					<nav class="flex md:flex-col overflow-x-auto md:overflow-y-auto scrollbar-none gap-1 p-2 md:p-4">
 						{#each dialogSections as section (section.id)}
 							{@const SectionIcon = section.icon}
 							<button
 								onclick={() => (activeSection = section.id)}
-								class="flex w-full items-center gap-3 rounded-lg px-4 py-3 text-left transition-colors {activeSection ===
+								class="flex shrink-0 items-center gap-2 md:gap-3 rounded-lg px-3 py-2 md:px-4 md:py-3 text-left transition-colors whitespace-nowrap text-xs md:text-sm {activeSection ===
 								section.id
-									? 'bg-primary text-primary-foreground'
-									: 'text-muted-foreground hover:bg-muted hover:text-foreground'}"
+									? 'bg-primary text-primary-foreground font-medium shadow-xs'
+									: 'text-muted-foreground hover:bg-muted hover:text-foreground bg-background/50 md:bg-transparent border md:border-0 border-border/40'}"
 							>
-								<SectionIcon class="h-5 w-5" />
-								<span class="font-medium">{section.label}</span>
+								<SectionIcon class="h-4 w-4 md:h-5 md:w-5 shrink-0" />
+								<span>{section.label}</span>
 							</button>
 						{/each}
 					</nav>
@@ -1036,18 +1036,18 @@
 				<!-- Main Content -->
 				<div class="flex min-w-0 flex-1 flex-col">
 					<!-- Content Header -->
-					<div class="flex items-center justify-between border-b bg-muted/30 px-8 py-6">
+					<div class="flex items-center justify-between border-b bg-muted/30 px-4 py-3 sm:px-8 sm:py-6">
 						<div>
-							<h2 class="text-2xl font-semibold tracking-tight">{currentSection.title}</h2>
-							<p class="mt-1 text-muted-foreground">{currentSection.description}</p>
+							<h2 class="text-lg sm:text-2xl font-semibold tracking-tight">{currentSection.title}</h2>
+							<p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">{currentSection.description}</p>
 						</div>
-						<Button variant="ghost" size="icon" onclick={closeDialog} class="h-10 w-10">
-							<X class="h-5 w-5" />
+						<Button variant="ghost" size="icon" onclick={closeDialog} class="h-8 w-8 sm:h-10 sm:w-10">
+							<X class="h-4 w-4 sm:h-5 sm:w-5" />
 						</Button>
 					</div>
 
 					<!-- Scrollable Content -->
-					<div class="flex-1 overflow-y-auto p-8">
+					<div class="flex-1 overflow-y-auto p-4 sm:p-8">
 						<div class="max-w-2xl space-y-6">
 							{#if activeSection === 'general'}
 								<div class="space-y-3">

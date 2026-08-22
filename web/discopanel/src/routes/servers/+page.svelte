@@ -330,47 +330,47 @@
 									<button
 										title="Start"
 										disabled={loading}
-										class="flex h-7 w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-green-500/10 hover:text-green-500 disabled:opacity-50"
+										class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-green-500/10 hover:text-green-500 disabled:opacity-50"
 										onclick={() => handleServerAction('start', server)}
 									>
-										<Play class="h-3 w-3" />
+										<Play class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
 									</button>
 								{/if}
 								{#if server.status === ServerStatus.RUNNING || server.status === ServerStatus.UNHEALTHY || server.status === ServerStatus.STARTING}
 									<button
 										title="Stop"
 										disabled={loading}
-										class="flex h-7 w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50"
+										class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50"
 										onclick={() => handleServerAction('stop', server)}
 									>
-										<Square class="h-2.5 w-2.5" />
+										<Square class="h-3 w-3 sm:h-2.5 sm:w-2.5" />
 									</button>
 								{/if}
 								{#if server.status === ServerStatus.RUNNING || server.status === ServerStatus.UNHEALTHY}
 									<button
 										title="Restart"
 										disabled={loading}
-										class="flex h-7 w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-yellow-500/10 hover:text-yellow-500 disabled:opacity-50"
+										class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-yellow-500/10 hover:text-yellow-500 disabled:opacity-50"
 										onclick={() => handleServerAction('restart', server)}
 									>
-										<RotateCw class="h-3 w-3" />
+										<RotateCw class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
 									</button>
 								{/if}
 								<button
 									title="Recreate"
 									disabled={loading}
-									class="flex h-7 w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
+									class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
 									onclick={() => handleServerAction('recreate', server)}
 								>
-									<RefreshCcw class="h-3 w-3" />
+									<RefreshCcw class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
 								</button>
 								<button
 									title="Delete"
 									disabled={loading}
-									class="flex h-7 w-7 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
+									class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
 									onclick={() => deleteServer(server)}
 								>
-									<Trash2 class="h-3 w-3" />
+									<Trash2 class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
 								</button>
 							</div>
 						</div>

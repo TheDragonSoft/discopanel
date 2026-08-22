@@ -58,6 +58,77 @@ func NewFileService(store *storage.Store, docker *docker.Client, uploadManager *
 	return svc
 }
 
+var reservedWindowsNames = map[string]bool{
+	"CON": true, "PRN": true, "AUX": true, "NUL": true,
+	"COM1": true, "COM2": true, "COM3": true, "COM4": true, "COM5": true,
+	"COM6": true, "COM7": true, "COM8": true, "COM9": true,
+	"LPT1": true, "LPT2": true, "LPT3": true, "LPT4": true, "LPT5": true,
+	"LPT6": true, "LPT7": true, "LPT8": true, "LPT9": true,
+}
+
+func isValidFilename(name string) bool {
+	if name == "" || name == "." || name == ".." {
+		return false
+	}
+	if strings.Contains(name, "/") || strings.Contains(name, "\\") {
+		return false
+	}
+	if strings.HasSuffix(name, " ") || strings.HasSuffix(name, ".") {
+		return false
+	}
+	base := strings.ToUpper(strings.TrimSuffix(name, filepath.Ext(name)))
+	if reservedWindowsNames[base] || reservedWindowsNames[strings.ToUpper(name)] {
+		return false
+	}
+	return true
+}
+
+// isSafePath checks if targetPath is strictly inside baseDir without escaping via relative traversal or symlinks.
+func isSafePath(baseDir, targetPath string) bool {
+	cleanBase := filepath.Clean(baseDir)
+	cleanTarget := filepath.Clean(targetPath)
+
+	rel, err := filepath.Rel(cleanBase, cleanTarget)
+	if err != nil {
+		return false
+	}
+
+	if rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) || filepath.IsAbs(rel) {
+		return false
+	}
+
+	// If the target path exists on disk, verify symlinks do not escape cleanBase
+	if evalTarget, err := filepath.EvalSymlinks(cleanTarget); err == nil {
+		if evalBase, err := filepath.EvalSymlinks(cleanBase); err == nil {
+			evalRel, err := filepath.Rel(evalBase, evalTarget)
+			if err != nil || evalRel == ".." || strings.HasPrefix(evalRel, ".."+string(filepath.Separator)) || filepath.IsAbs(evalRel) {
+				return false
+			}
+		}
+	} else {
+		// If target doesn't exist yet, check its closest existing ancestor
+		parent := filepath.Dir(cleanTarget)
+		for parent != "." && parent != "/" && parent != cleanBase {
+			if evalParent, err := filepath.EvalSymlinks(parent); err == nil {
+				if evalBase, err := filepath.EvalSymlinks(cleanBase); err == nil {
+					evalRel, err := filepath.Rel(evalBase, evalParent)
+					if err != nil || evalRel == ".." || strings.HasPrefix(evalRel, ".."+string(filepath.Separator)) || filepath.IsAbs(evalRel) {
+						return false
+					}
+				}
+				break
+			}
+			nextParent := filepath.Dir(parent)
+			if nextParent == parent {
+				break
+			}
+			parent = nextParent
+		}
+	}
+
+	return true
+}
+
 // ListFiles lists files in a directory
 func (s *FileService) ListFiles(ctx context.Context, req *connect.Request[v1.ListFilesRequest]) (*connect.Response[v1.ListFilesResponse], error) {
 	msg := req.Msg
@@ -76,7 +147,7 @@ func (s *FileService) ListFiles(ctx context.Context, req *connect.Request[v1.Lis
 
 	// Clean and validate path
 	fullPath := filepath.Join(server.DataPath, path)
-	if !strings.HasPrefix(fullPath, server.DataPath) {
+	if !isSafePath(server.DataPath, fullPath) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid path"))
 	}
 
@@ -110,7 +181,7 @@ func (s *FileService) GetFile(ctx context.Context, req *connect.Request[v1.GetFi
 
 	// Clean and validate path
 	fullPath := filepath.Join(server.DataPath, msg.Path)
-	if !strings.HasPrefix(fullPath, server.DataPath) {
+	if !isSafePath(server.DataPath, fullPath) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid path"))
 	}
 
@@ -172,9 +243,9 @@ func (s *FileService) SaveUploadedFile(ctx context.Context, req *connect.Request
 		targetFilename = originalFilename
 	}
 
-	// Validate filename doesn't contain path separators
-	if strings.Contains(targetFilename, "/") || strings.Contains(targetFilename, "\\") {
-		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("filename cannot contain path separators"))
+	// Validate filename
+	if !isValidFilename(targetFilename) {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid filename"))
 	}
 
 	// Get target path
@@ -185,8 +256,13 @@ func (s *FileService) SaveUploadedFile(ctx context.Context, req *connect.Request
 
 	// Clean and validate path
 	fullPath := filepath.Join(server.DataPath, targetPath)
-	if !strings.HasPrefix(fullPath, server.DataPath) {
+	if !isSafePath(server.DataPath, fullPath) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid path"))
+	}
+
+	destFilePath := filepath.Join(fullPath, targetFilename)
+	if !isSafePath(server.DataPath, destFilePath) {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid target destination path"))
 	}
 
 	// Create directories if needed
@@ -196,7 +272,6 @@ func (s *FileService) SaveUploadedFile(ctx context.Context, req *connect.Request
 	}
 
 	// Move file from temp location to destination
-	destFilePath := filepath.Join(fullPath, targetFilename)
 	if err := os.Rename(tempPath, destFilePath); err != nil {
 		if err := files.CopyFile(tempPath, destFilePath); err != nil {
 			s.log.Error("Failed to move file: %v", err)
@@ -226,7 +301,7 @@ func (s *FileService) UpdateFile(ctx context.Context, req *connect.Request[v1.Up
 
 	// Clean and validate path
 	fullPath := filepath.Join(server.DataPath, msg.Path)
-	if !strings.HasPrefix(fullPath, server.DataPath) {
+	if !isSafePath(server.DataPath, fullPath) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid path"))
 	}
 
@@ -270,7 +345,7 @@ func (s *FileService) DeleteFile(ctx context.Context, req *connect.Request[v1.De
 
 	for _, p := range paths {
 		fullPath := filepath.Join(server.DataPath, p)
-		if !strings.HasPrefix(fullPath, server.DataPath) {
+		if !isSafePath(server.DataPath, fullPath) {
 			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid path: %s", p))
 		}
 		if fullPath == server.DataPath {
@@ -321,8 +396,13 @@ func (s *FileService) RenameFile(ctx context.Context, req *connect.Request[v1.Re
 
 	// Clean and validate old path
 	oldFullPath := filepath.Join(server.DataPath, msg.Path)
-	if !strings.HasPrefix(oldFullPath, server.DataPath) {
+	if !isSafePath(server.DataPath, oldFullPath) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid path"))
+	}
+
+	// Validate new name
+	if !isValidFilename(msg.NewName) {
+		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid new filename"))
 	}
 
 	// Build new path
@@ -331,7 +411,7 @@ func (s *FileService) RenameFile(ctx context.Context, req *connect.Request[v1.Re
 	newFullPath := filepath.Join(server.DataPath, newPath)
 
 	// Validate new path
-	if !strings.HasPrefix(newFullPath, server.DataPath) {
+	if !isSafePath(server.DataPath, newFullPath) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid new path"))
 	}
 
@@ -372,7 +452,7 @@ func (s *FileService) ExtractArchive(ctx context.Context, req *connect.Request[v
 
 	// Clean and validate archive path
 	fullArchivePath := filepath.Join(server.DataPath, msg.Path)
-	if !strings.HasPrefix(fullArchivePath, server.DataPath) {
+	if !isSafePath(server.DataPath, fullArchivePath) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid archive path"))
 	}
 
@@ -467,7 +547,7 @@ func (s *FileService) CreateFolder(ctx context.Context, req *connect.Request[v1.
 	}
 
 	fullPath := filepath.Join(server.DataPath, msg.Path)
-	if !strings.HasPrefix(fullPath, server.DataPath) {
+	if !isSafePath(server.DataPath, fullPath) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid path"))
 	}
 
@@ -493,7 +573,7 @@ func (s *FileService) MoveFile(ctx context.Context, req *connect.Request[v1.Move
 	srcFull := filepath.Join(server.DataPath, msg.SourcePath)
 	dstFull := filepath.Join(server.DataPath, msg.DestinationPath)
 
-	if !strings.HasPrefix(srcFull, server.DataPath) || !strings.HasPrefix(dstFull, server.DataPath) {
+	if !isSafePath(server.DataPath, srcFull) || !isSafePath(server.DataPath, dstFull) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid path"))
 	}
 
@@ -546,7 +626,7 @@ func (s *FileService) CopyFile(ctx context.Context, req *connect.Request[v1.Copy
 	srcFull := filepath.Join(server.DataPath, msg.SourcePath)
 	dstFull := filepath.Join(server.DataPath, msg.DestinationPath)
 
-	if !strings.HasPrefix(srcFull, server.DataPath) || !strings.HasPrefix(dstFull, server.DataPath) {
+	if !isSafePath(server.DataPath, srcFull) || !isSafePath(server.DataPath, dstFull) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid path"))
 	}
 
@@ -600,7 +680,7 @@ func (s *FileService) CreateArchive(ctx context.Context, req *connect.Request[v1
 	// Validate all paths
 	for _, p := range msg.Paths {
 		fullPath := filepath.Join(server.DataPath, p)
-		if !strings.HasPrefix(fullPath, server.DataPath) {
+		if !isSafePath(server.DataPath, fullPath) {
 			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid path: %s", p))
 		}
 	}
@@ -619,7 +699,7 @@ func (s *FileService) CreateArchive(ctx context.Context, req *connect.Request[v1
 		destDir = "."
 	}
 	destFull := filepath.Join(server.DataPath, destDir, archiveName)
-	if !strings.HasPrefix(destFull, server.DataPath) {
+	if !isSafePath(server.DataPath, destFull) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid destination path"))
 	}
 
@@ -653,7 +733,7 @@ func (s *FileService) DownloadArchive(ctx context.Context, req *connect.Request[
 
 	for _, p := range msg.Paths {
 		fullPath := filepath.Join(server.DataPath, p)
-		if !strings.HasPrefix(fullPath, server.DataPath) {
+		if !isSafePath(server.DataPath, fullPath) {
 			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("invalid path: %s", p))
 		}
 	}
@@ -701,7 +781,7 @@ func (s *FileService) InitFileDownload(ctx context.Context, req *connect.Request
 	}
 
 	fullPath := filepath.Join(server.DataPath, msg.Path)
-	if !strings.HasPrefix(fullPath, server.DataPath) {
+	if !isSafePath(server.DataPath, fullPath) {
 		return nil, connect.NewError(connect.CodeInvalidArgument, errors.New("invalid path"))
 	}
 

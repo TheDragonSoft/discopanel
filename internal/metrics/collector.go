@@ -235,6 +235,28 @@ func (c *Collector) collectDiskUsageLoop() {
 	}
 }
 
+// Helper to run tasks concurrently across servers with a bounded worker pool
+func runConcurrently[T any](items []T, maxWorkers int, fn func(item T)) {
+	if len(items) == 0 {
+		return
+	}
+	if maxWorkers <= 0 || maxWorkers > len(items) {
+		maxWorkers = len(items)
+	}
+	sem := make(chan struct{}, maxWorkers)
+	var wg sync.WaitGroup
+	for _, item := range items {
+		wg.Add(1)
+		sem <- struct{}{}
+		go func(it T) {
+			defer wg.Done()
+			defer func() { <-sem }()
+			fn(it)
+		}(item)
+	}
+	wg.Wait()
+}
+
 // Collects CPU and memory stats from Docker
 func (c *Collector) collectDockerStats() {
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -246,22 +268,22 @@ func (c *Collector) collectDockerStats() {
 		return
 	}
 
-	for _, server := range servers {
+	runConcurrently(servers, 8, func(server *storage.Server) {
 		if server.ContainerID == "" {
-			continue
+			return
 		}
 
 		// Check if server is running
 		status, err := c.docker.GetContainerStatus(ctx, server.ContainerID)
 		if err != nil || (status != storage.StatusRunning && status != storage.StatusUnhealthy) {
-			continue
+			return
 		}
 
 		// Get container stats
 		stats, err := c.docker.GetContainerStats(ctx, server.ContainerID)
 		if err != nil {
 			c.log.Debug("Metrics collector: failed to get stats for %s: %v", server.ID, err)
-			continue
+			return
 		}
 
 		c.updateMetrics(server.ID, func(m *ServerMetrics) {
@@ -269,7 +291,7 @@ func (c *Collector) collectDockerStats() {
 			m.MemoryUsage = stats.MemoryUsage
 			m.LastUpdated = time.Now()
 		})
-	}
+	})
 }
 
 // Collects player count and TPS via RCON
@@ -283,15 +305,15 @@ func (c *Collector) collectRCONData() {
 		return
 	}
 
-	for _, server := range servers {
+	runConcurrently(servers, 8, func(server *storage.Server) {
 		if server.ContainerID == "" {
-			continue
+			return
 		}
 
 		// Check if server is running
 		status, err := c.docker.GetContainerStatus(ctx, server.ContainerID)
 		if err != nil || status != storage.StatusRunning {
-			continue
+			return
 		}
 
 		existingMetrics := c.GetMetrics(server.ID)
@@ -332,7 +354,7 @@ func (c *Collector) collectRCONData() {
 				}
 			}
 		}
-	}
+	})
 }
 
 // Collects disk usage for server worlds
@@ -353,20 +375,20 @@ func (c *Collector) collectDiskUsage() {
 		diskTotal = 0
 	}
 
-	for _, server := range servers {
+	runConcurrently(servers, 4, func(server *storage.Server) {
 		if server.DataPath == "" {
-			continue
+			return
 		}
 
 		totalSize, err := files.CalculateDirSize(server.DataPath)
 		if err != nil {
-			continue
+			return
 		}
 
 		// Calculate world directory size, including dimension worlds
 		worldPaths, err := files.FindWorldDirs(server.DataPath)
 		if err != nil {
-			continue
+			return
 		}
 
 		var totalWorldSize int64
@@ -384,7 +406,7 @@ func (c *Collector) collectDiskUsage() {
 			m.WorldSize = totalWorldSize
 			m.LastUpdated = time.Now()
 		})
-	}
+	})
 }
 
 // Updates metrics for a server
@@ -440,9 +462,9 @@ func (c *Collector) collectSLPData() {
 
 	slpClient := minecraft.NewSLPClient(c.collectorConfig.SLPTimeout)
 
-	for _, server := range servers {
+	runConcurrently(servers, 8, func(server *storage.Server) {
 		if server.ContainerID == "" {
-			continue
+			return
 		}
 
 		// Check if server is running
@@ -452,7 +474,7 @@ func (c *Collector) collectSLPData() {
 			c.updateMetrics(server.ID, func(m *ServerMetrics) {
 				m.SLPAvailable = false
 			})
-			continue
+			return
 		}
 
 		// Get container IP
@@ -462,7 +484,7 @@ func (c *Collector) collectSLPData() {
 			c.updateMetrics(server.ID, func(m *ServerMetrics) {
 				m.SLPAvailable = false
 			})
-			continue
+			return
 		}
 
 		// SLP ping w/ server version for protocol
@@ -479,7 +501,7 @@ func (c *Collector) collectSLPData() {
 			c.updateMetrics(server.ID, func(m *ServerMetrics) {
 				m.SLPAvailable = false
 			})
-			continue
+			return
 		}
 
 		// Update
@@ -496,7 +518,7 @@ func (c *Collector) collectSLPData() {
 			m.SLPLastUpdated = time.Now()
 			m.LastUpdated = time.Now()
 		})
-	}
+	})
 }
 
 // Derives lifecycle events (SERVER_HEALTHY, PLAYER_JOIN, PLAYER_LEAVE) from state and emits on event bus

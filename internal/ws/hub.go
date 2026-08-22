@@ -66,6 +66,10 @@ type Client struct {
 	// Subscriptions: serverId -> log channel
 	subscriptions   map[string]chan *v1.LogEntry
 	subscriptionsMu sync.RWMutex
+
+	closed     bool
+	closedOnce sync.Once
+	closedMu   sync.RWMutex
 }
 
 // NewHub creates a new WebSocket hub
@@ -103,7 +107,7 @@ func (h *Hub) Run() {
 			h.clientsMu.Lock()
 			if _, ok := h.clients[client]; ok {
 				delete(h.clients, client)
-				close(client.send)
+				client.closeSend()
 			}
 			h.clientsMu.Unlock()
 			h.log.Debug("WebSocket client disconnected")
@@ -357,7 +361,7 @@ func (c *Client) handleUnsubscribe(msg *v1.UnsubscribeMessage) {
 	c.subscriptionsMu.Lock()
 	if ch, exists := c.subscriptions[msg.ServerId]; exists {
 		delete(c.subscriptions, msg.ServerId)
-		if err == nil && server.ContainerID != "" {
+		if err == nil && server != nil && server.ContainerID != "" {
 			c.hub.logStreamer.Unsubscribe(server.ContainerID, ch)
 		} else {
 			close(ch) // Close the channel to stop the forwardLogs goroutine
@@ -435,6 +439,16 @@ func (c *Client) handleCommand(msg *v1.CommandMessage) {
 	c.sendCommandResult(msg.ServerId, true, output, "")
 }
 
+// closeSend safely closes the send channel once
+func (c *Client) closeSend() {
+	c.closedOnce.Do(func() {
+		c.closedMu.Lock()
+		c.closed = true
+		c.closedMu.Unlock()
+		close(c.send)
+	})
+}
+
 // cleanup removes all subscriptions when client disconnects
 func (c *Client) cleanup() {
 	c.subscriptionsMu.Lock()
@@ -443,8 +457,11 @@ func (c *Client) cleanup() {
 	ctx := context.Background()
 	for serverId, ch := range c.subscriptions {
 		server, err := c.hub.store.GetServer(ctx, serverId)
-		if err == nil && server.ContainerID != "" {
+		if err == nil && server != nil && server.ContainerID != "" {
 			c.hub.logStreamer.Unsubscribe(server.ContainerID, ch)
+		} else {
+			// Channel wasn't unsubscribed via log streamer, close to unblock forwardLogs
+			close(ch)
 		}
 	}
 	c.subscriptions = make(map[string]chan *v1.LogEntry)
@@ -452,9 +469,22 @@ func (c *Client) cleanup() {
 
 // sendMessage marshals and sends a server message
 func (c *Client) sendMessage(msg *v1.WebSocketServerMessage) {
+	c.closedMu.RLock()
+	if c.closed {
+		c.closedMu.RUnlock()
+		return
+	}
+	c.closedMu.RUnlock()
+
 	data, err := proto.Marshal(msg)
 	if err != nil {
 		c.hub.log.Error("Failed to marshal WebSocket message: %v", err)
+		return
+	}
+
+	c.closedMu.RLock()
+	defer c.closedMu.RUnlock()
+	if c.closed {
 		return
 	}
 

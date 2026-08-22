@@ -3,7 +3,6 @@ package proxy
 import (
 	"context"
 	"fmt"
-	"io"
 	"net"
 	"strings"
 	"sync"
@@ -242,13 +241,13 @@ func (p *MinecraftProxy) handleConnection(clientConn net.Conn) {
 
 	go func() {
 		defer wg.Done()
-		io.Copy(backendConn, clientConn)
+		proxyCopy(backendConn, clientConn)
 		backendConn.Close()
 	}()
 
 	go func() {
 		defer wg.Done()
-		io.Copy(clientConn, backendConn)
+		proxyCopy(clientConn, backendConn)
 		clientConn.Close()
 	}()
 

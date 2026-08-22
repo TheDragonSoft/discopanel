@@ -324,7 +324,7 @@
 </script>
 
 <Card
-	class="relative flex h-full min-h-[550px] flex-col rounded-xl border border-border/50 bg-card/50 shadow-sm backdrop-blur-xs overflow-hidden"
+	class="relative rounded-xl border border-border/50 bg-card shadow-sm"
 	ondragenter={handleDragEnter}
 	ondragover={handleDragOver}
 	ondragleave={handleDragLeave}
@@ -333,10 +333,10 @@
 	<!-- Minimalist Drag & Drop Overlay -->
 	{#if isDragging && canHaveMods()}
 		<div
-			class="absolute inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-background/80 dark:bg-zinc-950/80 pointer-events-none select-none transition-opacity duration-150"
+			class="absolute inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs bg-background/80 dark:bg-zinc-950/80 pointer-events-none select-none transition-opacity duration-150 rounded-xl"
 		>
 			<div
-				class="flex h-full w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-primary/60 bg-muted/20 p-6"
+				class="flex h-full min-h-[300px] w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-primary/60 bg-muted/20 p-6"
 			>
 				<Upload class="h-8 w-8 text-primary" />
 				<p class="mt-3 text-base font-semibold text-foreground">Drop mods to upload</p>
@@ -450,7 +450,7 @@
 		</div>
 	{/if}
 
-	<CardContent class="flex-1 p-5 sm:p-6 overflow-y-auto space-y-3">
+	<CardContent class="p-5 sm:p-6 space-y-3">
 		{#if !canHaveMods()}
 			<div class="flex flex-col items-center justify-center py-20 text-muted-foreground">
 				<Package class="mb-4 h-12 w-12 opacity-50" />
@@ -491,7 +491,7 @@
 			<div class="space-y-3">
 				{#each filteredMods as mod (mod.id)}
 					<div
-						class="group flex items-center justify-between gap-4 sm:gap-5 rounded-xl border p-4 sm:p-4.5 bg-card/60 transition-all duration-200 hover:border-primary/40 hover:bg-card/95 hover:shadow-sm {mod.enabled
+						class="group flex items-center justify-between gap-4 sm:gap-5 rounded-xl border p-4 sm:p-4.5 bg-card/60 transition-[border-color,background-color,box-shadow] duration-150 hover:border-primary/40 hover:bg-card/95 hover:shadow-xs [content-visibility:auto] [contain-intrinsic-size:auto_80px] {mod.enabled
 							? 'border-border/60'
 							: 'opacity-70 bg-muted/20 border-dashed border-border/40'}"
 					>
@@ -510,12 +510,14 @@
 
 							<!-- Mod Picture / Icon Thumbnail -->
 							<div
-								class="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-muted/40 shadow-xs transition-transform group-hover:scale-105"
+								class="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-muted/40 shadow-xs transition-transform duration-150 group-hover:scale-105"
 							>
 								{#if mod.iconUrl}
 									<img
 										src={mod.iconUrl}
 										alt={mod.displayName}
+										loading="lazy"
+										decoding="async"
 										class="h-full w-full object-contain p-1 rounded-lg"
 										onerror={(e) => {
 											const target = e.currentTarget as HTMLElement;

@@ -17,7 +17,7 @@
 		bg: '#000000',
 		newline: false,
 		escapeXML: true,
-		stream: true
+		stream: false
 	});
 
 	interface Props {
@@ -25,14 +25,33 @@
 		module: Module;
 	}
 
+	interface ProcessedLogEntry {
+		id: string;
+		level: string;
+		html: string;
+		message: string;
+	}
+
 	let { open = $bindable(), module }: Props = $props();
 
-	let logEntries = $state<LogEntry[]>([]);
+	let logEntries = $state<ProcessedLogEntry[]>([]);
 	let loading = $state(false);
 	let autoScroll = $state(true);
 	let scrollAreaRef = $state<HTMLDivElement | null>(null);
 	let pollingInterval: ReturnType<typeof setInterval> | null = null;
 	let tailLines = $state(500);
+
+	function processLog(entry: LogEntry, idx: number): ProcessedLogEntry {
+		const s = entry.timestamp?.seconds ? Number(entry.timestamp.seconds) : 0;
+		const n = entry.timestamp?.nanos ?? 0;
+		const lvl = entry.level || 'info';
+		return {
+			id: `${s}_${n}_${lvl}_${idx}`,
+			level: lvl,
+			html: ansiConverter.toHtml(entry.message || ''),
+			message: entry.message || ''
+		};
+	}
 
 	// Fetch logs when dialog opens
 	$effect(() => {
@@ -95,14 +114,18 @@
 			return;
 		}
 
+		loading = true;
 		try {
 			const response = await rpcClient.module.getModuleLogs({
 				id: module.id,
 				tail: tailLines
 			});
-			logEntries = response.logs || [];
+			const logs = response.logs || [];
+			logEntries = logs.map((log, i) => processLog(log, i));
 		} catch (error) {
 			console.error('Failed to fetch module logs:', error);
+		} finally {
+			loading = false;
 		}
 	}
 
@@ -222,10 +245,10 @@
 						{/if}
 					</div>
 				{:else}
-					{#each logEntries as entry, i (i)}
+					{#each logEntries as entry (entry.id)}
 						<div class="log-line break-all whitespace-pre-wrap" data-type={entry.level}>
 							<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-							{@html ansiConverter.toHtml(entry.message)}
+							{@html entry.html}
 						</div>
 					{/each}
 				{/if}

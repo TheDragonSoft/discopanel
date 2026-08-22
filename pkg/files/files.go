@@ -119,6 +119,11 @@ func SanitizePathName(name string) string {
 	return safe
 }
 
+const (
+	MaxExtractFileCount = 50000
+	MaxExtractBytes     = 10 * 1024 * 1024 * 1024 // 10GB
+)
+
 // Extract archive to destPath
 func ExtractArchive(ctx context.Context, archivePath string, destPath string, counter *atomic.Int32) (int, error) {
 	archiveFile, err := os.Open(archivePath)
@@ -139,35 +144,67 @@ func ExtractArchive(ctx context.Context, archivePath string, destPath string, co
 		return 0, fmt.Errorf("format does not support extraction")
 	}
 
+	cleanDest := filepath.Clean(destPath)
 	// Make dest
-	if err := os.MkdirAll(destPath, 0755); err != nil {
+	if err := os.MkdirAll(cleanDest, 0755); err != nil {
 		return 0, fmt.Errorf("failed to create destination directory: %w", err)
 	}
 
 	// Extract and walk while recursively extracting
 	filesExtracted := 0
-	err = extractor.Extract(ctx, stream, func(ctx context.Context, f archives.FileInfo) error {
-		// Build path
-		targetPath := filepath.Join(destPath, f.NameInArchive)
+	var totalBytesExtracted int64
 
-		// No sneaky traversals
-		if !strings.HasPrefix(filepath.Clean(targetPath), filepath.Clean(destPath)) {
+	err = extractor.Extract(ctx, stream, func(ctx context.Context, f archives.FileInfo) error {
+		if filesExtracted >= MaxExtractFileCount {
+			return fmt.Errorf("archive exceeds maximum file count limit of %d", MaxExtractFileCount)
+		}
+
+		// Build path
+		targetPath := filepath.Join(cleanDest, f.NameInArchive)
+
+		// Enforce strict containment within destPath
+		cleanTarget := filepath.Clean(targetPath)
+		rel, err := filepath.Rel(cleanDest, cleanTarget)
+		if err != nil || rel == ".." || strings.HasPrefix(rel, ".."+string(filepath.Separator)) || filepath.IsAbs(rel) {
 			return fmt.Errorf("illegal file path in archive: %s", f.NameInArchive)
 		}
 
+		// Reject symlinks pointing outside destPath
+		if f.Mode()&os.ModeSymlink != 0 {
+			if f.LinkTarget != "" {
+				linkDest := f.LinkTarget
+				if !filepath.IsAbs(linkDest) {
+					linkDest = filepath.Join(filepath.Dir(cleanTarget), linkDest)
+				}
+				cleanLinkDest := filepath.Clean(linkDest)
+				linkRel, err := filepath.Rel(cleanDest, cleanLinkDest)
+				if err != nil || linkRel == ".." || strings.HasPrefix(linkRel, ".."+string(filepath.Separator)) || filepath.IsAbs(linkRel) {
+					return fmt.Errorf("symlink %s targets path outside destination: %s", f.NameInArchive, f.LinkTarget)
+				}
+			}
+		}
+
+		// Check if existing parent directory resolves outside cleanDest via symlink
+		parentDir := filepath.Dir(cleanTarget)
+		if evalParent, err := filepath.EvalSymlinks(parentDir); err == nil {
+			if relParent, err := filepath.Rel(cleanDest, evalParent); err != nil || relParent == ".." || strings.HasPrefix(relParent, ".."+string(filepath.Separator)) || filepath.IsAbs(relParent) {
+				return fmt.Errorf("path resolves outside destination via symlink: %s", f.NameInArchive)
+			}
+		}
+
 		if f.IsDir() {
-			return os.MkdirAll(targetPath, 0755)
+			return os.MkdirAll(cleanTarget, 0755)
 		}
 
 		// Make parent(s)
-		if err := os.MkdirAll(filepath.Dir(targetPath), 0755); err != nil {
+		if err := os.MkdirAll(parentDir, 0755); err != nil {
 			return fmt.Errorf("failed to create parent directory: %w", err)
 		}
 
 		// Create file
-		outFile, err := os.Create(targetPath)
+		outFile, err := os.Create(cleanTarget)
 		if err != nil {
-			return fmt.Errorf("failed to create file %s: %w", targetPath, err)
+			return fmt.Errorf("failed to create file %s: %w", cleanTarget, err)
 		}
 		defer outFile.Close()
 
@@ -178,14 +215,19 @@ func ExtractArchive(ctx context.Context, archivePath string, destPath string, co
 		}
 		defer rc.Close()
 
-		// Copy contents
-		if _, err := io.Copy(outFile, rc); err != nil {
-			return fmt.Errorf("failed to extract file %s: %w", targetPath, err)
+		// Copy contents with size tracking
+		written, err := io.Copy(outFile, rc)
+		if err != nil {
+			return fmt.Errorf("failed to extract file %s: %w", cleanTarget, err)
+		}
+		totalBytesExtracted += written
+		if totalBytesExtracted > MaxExtractBytes {
+			return fmt.Errorf("archive exceeds maximum uncompressed size limit of %d bytes", MaxExtractBytes)
 		}
 
 		// Set file perms
 		if f.Mode() != 0 {
-			os.Chmod(targetPath, f.Mode())
+			os.Chmod(cleanTarget, f.Mode())
 		}
 
 		filesExtracted++
@@ -280,6 +322,8 @@ func CreateZipToWriter(paths []string, basePath string, w io.Writer, compress bo
 	zw := zip.NewWriter(w)
 	defer zw.Close()
 
+	cleanBasePath := filepath.Clean(basePath)
+
 	method := func(name string) uint16 {
 		if !compress {
 			return zip.Store
@@ -289,21 +333,28 @@ func CreateZipToWriter(paths []string, basePath string, w io.Writer, compress bo
 
 	count := 0
 	for _, p := range paths {
-		fullPath := filepath.Join(basePath, p)
-		info, err := os.Stat(fullPath)
+		fullPath := filepath.Join(cleanBasePath, p)
+		cleanFullPath := filepath.Clean(fullPath)
+		relPath, err := filepath.Rel(cleanBasePath, cleanFullPath)
+		if err != nil || relPath == ".." || strings.HasPrefix(relPath, ".."+string(filepath.Separator)) || filepath.IsAbs(relPath) {
+			return count, fmt.Errorf("path %s is outside base directory %s", p, basePath)
+		}
+
+		info, err := os.Stat(cleanFullPath)
 		if err != nil {
 			return count, fmt.Errorf("failed to stat %s: %w", p, err)
 		}
 
 		if info.IsDir() {
-			err = filepath.WalkDir(fullPath, func(path string, d fs.DirEntry, err error) error {
+			err = filepath.WalkDir(cleanFullPath, func(path string, d fs.DirEntry, err error) error {
 				if err != nil {
 					return err
 				}
-				rel, _ := filepath.Rel(basePath, path)
+				rel, _ := filepath.Rel(cleanBasePath, path)
+				relSlash := filepath.ToSlash(rel)
 				if d.IsDir() {
 					// Add directory entry with trailing slash
-					_, err := zw.Create(rel + "/")
+					_, err := zw.Create(relSlash + "/")
 					return err
 				}
 				fi, err := d.Info()
@@ -314,8 +365,8 @@ func CreateZipToWriter(paths []string, basePath string, w io.Writer, compress bo
 				if err != nil {
 					return err
 				}
-				header.Name = rel
-				header.Method = method(rel)
+				header.Name = relSlash
+				header.Method = method(relSlash)
 				writer, err := zw.CreateHeader(header)
 				if err != nil {
 					return err
@@ -337,13 +388,14 @@ func CreateZipToWriter(paths []string, basePath string, w io.Writer, compress bo
 			if err != nil {
 				return count, fmt.Errorf("failed to create header for %s: %w", p, err)
 			}
-			header.Name = p
-			header.Method = method(p)
+			pSlash := filepath.ToSlash(relPath)
+			header.Name = pSlash
+			header.Method = method(pSlash)
 			writer, err := zw.CreateHeader(header)
 			if err != nil {
 				return count, fmt.Errorf("failed to create zip entry for %s: %w", p, err)
 			}
-			f, err := os.Open(fullPath)
+			f, err := os.Open(cleanFullPath)
 			if err != nil {
 				return count, fmt.Errorf("failed to open %s: %w", p, err)
 			}
@@ -376,20 +428,31 @@ func CreateZipArchive(paths []string, basePath string, destPath string, compress
 
 // CopyDir recursively copies a directory tree from src to dst.
 func CopyDir(src, dst string) error {
-	srcInfo, err := os.Stat(src)
+	cleanSrc := filepath.Clean(src)
+	cleanDst := filepath.Clean(dst)
+	if cleanSrc == cleanDst {
+		return fmt.Errorf("source and destination are the same directory: %s", src)
+	}
+
+	// Prevent recursive directory copying (dst inside src)
+	if rel, err := filepath.Rel(cleanSrc, cleanDst); err == nil && !strings.HasPrefix(rel, "..") && rel != ".." && !filepath.IsAbs(rel) {
+		return fmt.Errorf("destination directory %s is inside source directory %s", dst, src)
+	}
+
+	srcInfo, err := os.Stat(cleanSrc)
 	if err != nil {
 		return fmt.Errorf("failed to stat source: %w", err)
 	}
-	if err := os.MkdirAll(dst, srcInfo.Mode()); err != nil {
+	if err := os.MkdirAll(cleanDst, srcInfo.Mode()); err != nil {
 		return fmt.Errorf("failed to create destination: %w", err)
 	}
 
-	return filepath.WalkDir(src, func(path string, d fs.DirEntry, err error) error {
+	return filepath.WalkDir(cleanSrc, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
 			return err
 		}
-		rel, _ := filepath.Rel(src, path)
-		target := filepath.Join(dst, rel)
+		rel, _ := filepath.Rel(cleanSrc, path)
+		target := filepath.Join(cleanDst, rel)
 
 		if d.IsDir() {
 			return os.MkdirAll(target, 0755)

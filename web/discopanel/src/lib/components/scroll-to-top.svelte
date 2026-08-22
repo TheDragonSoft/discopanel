@@ -68,11 +68,11 @@
 </script>
 
 {#if showButton}
-	<div class="fixed right-8 bottom-8 z-50">
+	<div class="fixed right-4 bottom-4 sm:right-8 sm:bottom-8 mb-safe mr-safe z-50">
 		<Button
 			size="icon"
 			onclick={scrollToTop}
-			class="bg-primary text-primary-foreground shadow-lg transition-all hover:scale-110 hover:bg-primary/90 hover:shadow-xl"
+			class="h-10 w-10 sm:h-11 sm:w-11 rounded-full bg-primary text-primary-foreground shadow-xl transition-all hover:scale-110 hover:bg-primary/90 active:scale-95"
 		>
 			<ArrowUp class="h-5 w-5" />
 		</Button>

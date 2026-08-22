@@ -213,15 +213,18 @@ func (ls *LogStreamer) AddCommandEntry(containerID, command string, timestamp ti
 	ls.mu.RUnlock()
 
 	if !exists {
-		// Create a new stream if it doesn't exist
+		// Create a new stream if it doesn't exist (double-check under write lock)
 		ls.mu.Lock()
-		stream = &ContainerLogStream{
-			containerID: containerID,
-			logs:        make([]*v1.LogEntry, 0, ls.maxEntries),
-			maxEntries:  ls.maxEntries,
-			active:      false,
+		stream, exists = ls.streams[containerID]
+		if !exists {
+			stream = &ContainerLogStream{
+				containerID: containerID,
+				logs:        make([]*v1.LogEntry, 0, ls.maxEntries),
+				maxEntries:  ls.maxEntries,
+				active:      false,
+			}
+			ls.streams[containerID] = stream
 		}
-		ls.streams[containerID] = stream
 		ls.mu.Unlock()
 	}
 
@@ -366,14 +369,21 @@ func (ls *LogStreamer) Subscribe(containerID string) chan *v1.LogEntry {
 // Unsubscribe removes a subscriber channel for a container
 func (ls *LogStreamer) Unsubscribe(containerID string, ch chan *v1.LogEntry) {
 	ls.subMu.Lock()
-	defer ls.subMu.Unlock()
-
+	closed := false
 	if subs, ok := ls.subscribers[containerID]; ok {
-		delete(subs, ch)
-		close(ch)
-		if len(subs) == 0 {
-			delete(ls.subscribers, containerID)
+		if subs[ch] {
+			delete(subs, ch)
+			closed = true
+			if len(subs) == 0 {
+				delete(ls.subscribers, containerID)
+			}
 		}
+	}
+	ls.subMu.Unlock()
+
+	// Only close if ch was actively subscribed for this container
+	if closed {
+		close(ch)
 	}
 }
 
@@ -400,21 +410,15 @@ func (ls *LogStreamer) MigrateSubscribers(oldContainerID, newContainerID string)
 // broadcast sends a log entry to all subscribers for a container
 func (ls *LogStreamer) broadcast(containerID string, entry *v1.LogEntry) {
 	ls.subMu.RLock()
+	defer ls.subMu.RUnlock()
+
 	subs, ok := ls.subscribers[containerID]
 	if !ok || len(subs) == 0 {
-		ls.subMu.RUnlock()
 		return
 	}
 
-	// Copy subscriber list to avoid holding lock during sends
-	channels := make([]chan *v1.LogEntry, 0, len(subs))
+	// Non-blocking send to all active subscribers under lock to prevent send-on-closed-channel panic
 	for ch := range subs {
-		channels = append(channels, ch)
-	}
-	ls.subMu.RUnlock()
-
-	// Non-blocking send to all subscribers
-	for _, ch := range channels {
 		select {
 		case ch <- entry:
 		default:

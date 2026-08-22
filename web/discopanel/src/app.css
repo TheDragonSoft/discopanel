@@ -114,8 +114,26 @@
 @layer base {
 	* {
 		@apply border-border outline-ring/50;
+		-webkit-tap-highlight-color: transparent;
 	}
+	html,
 	body {
 		@apply bg-background text-foreground;
+		min-height: 100%;
+		min-height: 100dvh;
 	}
 }
+
+@utility pt-safe {
+	padding-top: env(safe-area-inset-top, 0px);
+}
+@utility pb-safe {
+	padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+@utility pl-safe {
+	padding-left: env(safe-area-inset-left, 0px);
+}
+@utility pr-safe {
+	padding-right: env(safe-area-inset-right, 0px);
+}
+
