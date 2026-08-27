@@ -204,34 +204,39 @@ func levenshtein(a, b string) int {
 		return len(ra)
 	}
 
+	// Use the smaller slice for the DP table to save memory allocations
+	if len(ra) < len(rb) {
+		ra, rb = rb, ra
+	}
+
 	prev := make([]int, len(rb)+1)
-	curr := make([]int, len(rb)+1)
 	for j := range prev {
 		prev[j] = j
 	}
-	for i := 1; i <= len(ra); i++ {
-		curr[0] = i
-		for j := 1; j <= len(rb); j++ {
+
+	for i := 0; i < len(ra); i++ {
+		prevJ := prev[0]
+		prev[0] = i + 1
+		for j := 0; j < len(rb); j++ {
 			cost := 1
-			if ra[i-1] == rb[j-1] {
+			if ra[i] == rb[j] {
 				cost = 0
 			}
-			curr[j] = min3(prev[j]+1, curr[j-1]+1, prev[j-1]+cost)
+
+			// inline min3
+			m := prev[j+1] + 1 // upper
+			if prev[j]+1 < m { // left
+				m = prev[j] + 1
+			}
+			if prevJ+cost < m { // upper left
+				m = prevJ + cost
+			}
+
+			prevJ = prev[j+1]
+			prev[j+1] = m
 		}
-		prev, curr = curr, prev
 	}
 	return prev[len(rb)]
-}
-
-func min3(a, b, c int) int {
-	m := a
-	if b < m {
-		m = b
-	}
-	if c < m {
-		m = c
-	}
-	return m
 }
 
 func clamp(v, lo, hi float64) float64 {
