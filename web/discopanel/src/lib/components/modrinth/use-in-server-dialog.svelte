@@ -207,18 +207,21 @@
 			: versions.filter((v) => isVersionCompatible(v, selectedServer))
 	);
 
-	let filteredDisplayVersions = $derived(
-		displayVersions.filter((v) => {
-			if (!versionSearchQuery.trim()) return true;
-			const q = versionSearchQuery.toLowerCase().trim();
+	let filteredDisplayVersions = $derived.by(() => {
+		// ⚡ Bolt: Escaping early on empty string skips `.filter()`.
+		// Moving `.toLowerCase().trim()` out of the loop prevents the query from being
+		// processed up to `displayVersions.length` times for a single search keystroke.
+		if (!versionSearchQuery.trim()) return displayVersions;
+		const q = versionSearchQuery.toLowerCase().trim();
+		return displayVersions.filter((v) => {
 			const nameMatch = (v.name || '').toLowerCase().includes(q);
 			const verNumberMatch = (v.version_number || '').toLowerCase().includes(q);
 			const gameVerMatch = v.game_versions.some((gv) => gv.toLowerCase().includes(q));
 			const loaderMatch = v.loaders.some((l) => l.toLowerCase().includes(q));
 			const fileMatch = v.files.some((f) => f.filename.toLowerCase().includes(q));
 			return nameMatch || verNumberMatch || gameVerMatch || loaderMatch || fileMatch;
-		})
-	);
+		});
+	});
 
 	function autoSelectBestVersion() {
 		if (versions.length === 0) return;
