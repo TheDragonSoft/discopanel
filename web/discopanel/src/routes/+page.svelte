@@ -69,32 +69,63 @@
 		isRefreshing = false;
 	}
 
-	let stats = $derived({
-		total: dashboardServers.length,
-		running: dashboardServers.filter((s) => s.status === ServerStatus.RUNNING).length,
-		stopped: dashboardServers.filter((s) => s.status === ServerStatus.STOPPED).length,
-		error: dashboardServers.filter(
-			(s) => s.status === ServerStatus.ERROR || s.status === ServerStatus.UNHEALTHY
-		).length,
-		totalMemory: dashboardServers.reduce((acc, s) => acc + (s.memory || 0), 0),
-		usedMemory: dashboardServers
-			.filter((s) => s.status === ServerStatus.RUNNING)
-			.reduce((acc, s) => acc + Number(s.memoryUsage || s.memory || 0), 0),
-		totalPlayers: dashboardServers
-			.filter((s) => s.status === ServerStatus.RUNNING)
-			.reduce((acc, s) => acc + (s.playersOnline || 0), 0),
-		totalMaxPlayers: dashboardServers.reduce((acc, s) => acc + (s.maxPlayers || 0), 0),
-		avgTps: dashboardServers
-			.filter((s) => s.tps && s.tps > 0)
-			.reduce((acc, s, _, arr) => acc + (s.tps || 0) / arr.length, 0),
-		totalDiskUsage: dashboardServers.reduce((acc, s) => acc + Number(s.diskUsage || 0), 0),
-		totalDiskSize:
-			dashboardServers.length > 0
+	// ⚡ Bolt Optimization: Single-pass over dashboardServers instead of multiple filter/reduces
+	let stats = $derived.by(() => {
+		let running = 0;
+		let stopped = 0;
+		let error = 0;
+		let totalMemory = 0;
+		let usedMemory = 0;
+		let totalPlayers = 0;
+		let totalMaxPlayers = 0;
+		let totalDiskUsage = 0;
+
+		let tpsSum = 0;
+		let tpsCount = 0;
+		let cpuSum = 0;
+		let cpuCount = 0;
+
+		for (const s of dashboardServers) {
+			if (s.status === ServerStatus.RUNNING) {
+				running++;
+				usedMemory += Number(s.memoryUsage || s.memory || 0);
+				totalPlayers += s.playersOnline || 0;
+			} else if (s.status === ServerStatus.STOPPED) {
+				stopped++;
+			} else if (s.status === ServerStatus.ERROR || s.status === ServerStatus.UNHEALTHY) {
+				error++;
+			}
+
+			totalMemory += s.memory || 0;
+			totalMaxPlayers += s.maxPlayers || 0;
+			totalDiskUsage += Number(s.diskUsage || 0);
+
+			if (s.tps && s.tps > 0) {
+				tpsSum += s.tps;
+				tpsCount++;
+			}
+			if (s.cpuPercent && s.cpuPercent > 0) {
+				cpuSum += s.cpuPercent;
+				cpuCount++;
+			}
+		}
+
+		return {
+			total: dashboardServers.length,
+			running,
+			stopped,
+			error,
+			totalMemory,
+			usedMemory,
+			totalPlayers,
+			totalMaxPlayers,
+			avgTps: tpsCount > 0 ? tpsSum / tpsCount : 0,
+			totalDiskUsage,
+			totalDiskSize: dashboardServers.length > 0
 				? ` / ${dashboardServers?.[0]?.diskTotal && formatBytes(Number(dashboardServers[0].diskTotal))}`
 				: '',
-		avgCpu: dashboardServers
-			.filter((s) => s.cpuPercent && s.cpuPercent > 0)
-			.reduce((acc, s, _, arr) => acc + (s.cpuPercent || 0) / arr.length, 0)
+			avgCpu: cpuCount > 0 ? cpuSum / cpuCount : 0
+		};
 	});
 
 	let recentActivity = $derived(
@@ -114,19 +145,27 @@
 			}))
 	);
 
-	let serversByStatus = $derived({
-		healthy: dashboardServers.filter(
-			(s) => s.status === ServerStatus.RUNNING && (!s.tps || s.tps >= 18)
-		),
-		warning: dashboardServers.filter(
-			(s) => s.status === ServerStatus.RUNNING && s.tps && s.tps < 18 && s.tps >= 15
-		),
-		critical: dashboardServers.filter(
-			(s) =>
-				s.status === ServerStatus.ERROR ||
-				s.status === ServerStatus.UNHEALTHY ||
-				(s.status === ServerStatus.RUNNING && s.tps && s.tps < 15)
-		)
+	// ⚡ Bolt Optimization: Bucket servers into status in a single pass instead of 3 filter loops
+	let serversByStatus = $derived.by(() => {
+		const healthy: ServerType[] = [];
+		const warning: ServerType[] = [];
+		const critical: ServerType[] = [];
+
+		for (const s of dashboardServers) {
+			if (s.status === ServerStatus.RUNNING) {
+				if (!s.tps || s.tps >= 18) {
+					healthy.push(s);
+				} else if (s.tps >= 15) {
+					warning.push(s);
+				} else {
+					critical.push(s);
+				}
+			} else if (s.status === ServerStatus.ERROR || s.status === ServerStatus.UNHEALTHY) {
+				critical.push(s);
+			}
+		}
+
+		return { healthy, warning, critical };
 	});
 
 	onMount(() => {
