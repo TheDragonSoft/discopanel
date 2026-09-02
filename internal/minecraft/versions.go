@@ -126,7 +126,8 @@ func GetVersions() []string {
 		return []string{}
 	}
 
-	var versions []string
+	// Pre-allocate capacity to avoid underlying array reallocations during append
+	versions := make([]string, 0, len(manifest.Versions))
 	for _, version := range manifest.Versions {
 		if version.Type == "release" {
 			versions = append(versions, version.ID)
@@ -143,7 +144,8 @@ func GetAllVersions() []string {
 		return []string{}
 	}
 
-	var versions []string
+	// Pre-allocate exact capacity required to avoid underlying array reallocations during append
+	versions := make([]string, 0, len(manifest.Versions))
 	for _, version := range manifest.Versions {
 		versions = append(versions, version.ID)
 	}
