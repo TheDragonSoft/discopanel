@@ -37,8 +37,13 @@ func Score(query, candidate string) float64 {
 		return 1.0
 	}
 
+	queryTokens := tokenSet(q)
+	return scoreWithPrecomputed(q, c, queryTokens)
+}
+
+func scoreWithPrecomputed(q, c string, queryTokens map[string]bool) float64 {
 	best := containmentScore(q, c)
-	if s := tokenScore(q, c); s > best {
+	if s := tokenScoreWithPrecomputed(queryTokens, c); s > best {
 		best = s
 	}
 	if s := editScore(q, c); s > best {
@@ -49,12 +54,27 @@ func Score(query, candidate string) float64 {
 
 // Gets highest scoring candidate for query
 func Best(query string, candidates []string) (Match, bool) {
+	q := normalize(query)
+	if q == "" {
+		return Match{Index: -1}, false
+	}
+	queryTokens := tokenSet(q)
+
 	best := Match{Index: -1}
 	found := false
-	for i, c := range candidates {
-		s := Score(query, c)
+	for i, cOrig := range candidates {
+		c := normalize(cOrig)
+		if c == "" {
+			continue
+		}
+		var s float64
+		if q == c {
+			s = 1.0
+		} else {
+			s = scoreWithPrecomputed(q, c, queryTokens)
+		}
 		if !found || s > best.Score {
-			best = Match{Value: c, Index: i, Score: s}
+			best = Match{Value: cOrig, Index: i, Score: s}
 			found = true
 		}
 	}
@@ -72,9 +92,26 @@ func BestAbove(query string, candidates []string, min float64) (Match, bool) {
 
 // Best for an arbitrary item type
 func BestFunc[T any](query string, items []T, key func(T) string) (best T, score float64, ok bool) {
+	q := normalize(query)
+	if q == "" {
+		return best, 0, false
+	}
+	queryTokens := tokenSet(q)
+
 	for i, it := range items {
-		s := Score(query, key(it))
-		if i == 0 || s > score {
+		cOrig := key(it)
+		c := normalize(cOrig)
+		if c == "" {
+			continue
+		}
+		var s float64
+		if q == c {
+			s = 1.0
+		} else {
+			s = scoreWithPrecomputed(q, c, queryTokens)
+		}
+
+		if i == 0 || s > score || !ok {
 			best, score, ok = it, s, true
 		}
 	}
@@ -136,12 +173,11 @@ func bestContainmentIndex(long, short string) int {
 }
 
 // Rewards candidates whose whole words all appear as whole words in query
-func tokenScore(q, c string) float64 {
+func tokenScoreWithPrecomputed(queryTokens map[string]bool, c string) float64 {
 	candidateTokens := tokens(c)
 	if len(candidateTokens) == 0 {
 		return 0
 	}
-	queryTokens := tokenSet(q)
 	matched := 0
 	for _, t := range candidateTokens {
 		if queryTokens[t] {
