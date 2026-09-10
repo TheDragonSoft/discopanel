@@ -15,10 +15,11 @@ func ReadVarInt(r io.Reader) (VarInt, error) {
 	var value int32
 	var position int
 	var currentByte byte
+	// ⚡ Bolt: allocate 1-byte buffer outside the loop to avoid memory allocations on every read
+	var buf [1]byte
 
 	for {
-		buf := make([]byte, 1)
-		n, err := r.Read(buf)
+		n, err := r.Read(buf[:])
 		if err != nil {
 			return 0, fmt.Errorf("failed to read varint byte: %w", err)
 		}
