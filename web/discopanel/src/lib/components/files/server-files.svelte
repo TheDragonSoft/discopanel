@@ -86,10 +86,13 @@
 	// --- Derived ---
 	let flatFiles = $derived.by(() => {
 		const result: FileInfo[] = [];
+		// ⚡ Bolt: Hoist toLowerCase() out of the recursive walk loop for better filter performance
+		const lowerFilterText = filterText ? filterText.toLowerCase() : '';
+
 		function walk(items: FileInfo[]) {
 			for (const item of items) {
-				if (filterText) {
-					const match = item.name.toLowerCase().includes(filterText.toLowerCase());
+				if (lowerFilterText) {
+					const match = item.name.toLowerCase().includes(lowerFilterText);
 					if (match) result.push(item);
 					if (item.isDir && item.children) walk(item.children);
 				} else {
