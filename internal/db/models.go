@@ -91,6 +91,7 @@ type Server struct {
 	DataPath        string               `json:"data_path" gorm:"not null;column:data_path"`
 	Detached        bool                 `json:"detached" gorm:"default:false;column:detached"`                             // Detach server container from DiscoPanel lifecycle (default: false)
 	AutoStart       bool                 `json:"auto_start" gorm:"default:false;column:auto_start"`                         // Start server when DiscoPanel starts (default: false)
+	WakeOnConnect   bool                 `json:"wake_on_connect" gorm:"default:false;column:wake_on_connect"`               // Start the server when a client connects through the proxy (lazy servers)
 	TPSCommand      string               `json:"tps_command" gorm:"column:tps_command"`                                     // The TPS command for this server (empty if not supported)
 	AdditionalPorts []*v1.AdditionalPort `json:"additional_ports" gorm:"column:additional_ports;serializer:json"`           // Additional port configurations
 	DockerOverrides *v1.DockerOverrides  `json:"docker_overrides" gorm:"column:docker_overrides;type:text;serializer:json"` // Docker container overrides
@@ -145,6 +146,9 @@ type ServerConfig struct {
 	Type                           *string `json:"type" env:"TYPE" default:"VANILLA" desc:"The server type" input:"text" label:"Server Type" system:"true"`
 	CustomServer                   *string `json:"customServer" env:"CUSTOM_SERVER" default:"" desc:"URL or container path to custom server jar" input:"text" label:"Custom Server JAR"`
 	CustomJarExec                  *string `json:"customJarExec" env:"CUSTOM_JAR_EXEC" default:"" desc:"Custom jar execution command (e.g. -cp classpath MainClass or -jar file.jar)" input:"text" label:"Custom JAR Execution"`
+	NeoForgeVersion                *string `json:"neoforgeVersion" env:"NEOFORGE_VERSION" default:"" desc:"Specific NeoForge build to install (empty = latest stable; use 'beta' for beta releases of brand-new Minecraft versions)" input:"text" label:"NeoForge Version"`
+	FabricLoaderVersion            *string `json:"fabricLoaderVersion" env:"FABRIC_LOADER_VERSION" default:"" desc:"Specific Fabric loader version to install (empty = latest)" input:"text" label:"Fabric Loader Version"`
+	PaperBuild                     *string `json:"paperBuild" env:"PAPER_BUILD" default:"" desc:"Specific Paper build number to pin (empty = latest)" input:"text" label:"Paper Build"`
 	EULA                           *string `json:"eula" env:"EULA" default:"TRUE" desc:"This MUST be set to TRUE" input:"checkbox" required:"true" label:"Accept EULA" system:"true"`
 	Version                        *string `json:"version" env:"VERSION" default:"LATEST" desc:"The minecraft version" input:"text" label:"Minecraft Version" system:"true"`
 	MOTD                           *string `json:"motd" env:"MOTD" default:"" desc:"Server log in message" input:"text" label:"Message of the Day"`

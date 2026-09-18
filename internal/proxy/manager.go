@@ -6,11 +6,19 @@ import (
 	"maps"
 	"strings"
 	"sync"
+	"time"
 
 	"github.com/docker/docker/client"
 	"github.com/nickheyer/discopanel/internal/config"
 	db "github.com/nickheyer/discopanel/internal/db"
 	"github.com/nickheyer/discopanel/pkg/logger"
+)
+
+// Wake-on-connect wait configuration: how long a proxied connection waits for
+// a stopped server to come up, and how often its status is polled.
+const (
+	wakeMaxWait      = 3 * time.Minute
+	wakePollInterval = 3 * time.Second
 )
 
 // Manager handles the lifecycle of the proxy and manages routes
@@ -21,6 +29,9 @@ type Manager struct {
 	logger      *logger.Logger
 	mu          sync.Mutex
 	networkName string
+
+	// wakeHandler starts a stopped server (set by the application wiring).
+	wakeHandler func(serverID string) error
 }
 
 // NewManager creates a new proxy manager
@@ -66,6 +77,7 @@ func (m *Manager) Start() error {
 			ListenAddr: listenAddr,
 			Logger:     m.logger,
 		})
+		proxy.wakeResolver = m.wakeResolve
 
 		m.proxies[listener.Port] = proxy
 		m.logger.Info("Created Minecraft proxy for listener %s on port %d", listener.Name, listener.Port)
@@ -433,6 +445,67 @@ func (m *Manager) RestoreModuleRoutes() {
 	}
 }
 
+// SetWakeHandler registers the callback used to start a stopped server when a
+// client connects through the proxy while wake-on-connect is enabled.
+func (m *Manager) SetWakeHandler(h func(serverID string) error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.wakeHandler = h
+}
+
+// wakeResolve is called by Minecraft proxies when no active route matches a
+// hostname. For servers with wake-on-connect enabled it starts the server (or
+// waits for one that is already starting) and returns its fresh backend
+// address once the container is reachable.
+func (m *Manager) wakeResolve(hostname string) (string, int, bool) {
+	servers, err := m.store.ListServers(context.Background())
+	if err != nil {
+		return "", 0, false
+	}
+
+	var target *db.Server
+	for _, server := range servers {
+		if server.WakeOnConnect && server.ProxyHostname != "" && strings.EqualFold(server.ProxyHostname, hostname) {
+			target = server
+			break
+		}
+	}
+	if target == nil || target.ContainerID == "" {
+		return "", 0, false
+	}
+
+	// The container may already be up (route just stale) - check first.
+	if ip, err := GetContainerIP(target.ContainerID, m.networkName); err == nil && ip != "" {
+		return ip, 25565, true
+	}
+
+	m.mu.Lock()
+	handler := m.wakeHandler
+	m.mu.Unlock()
+	if handler == nil {
+		return "", 0, false
+	}
+
+	m.logger.Info("Wake-on-connect: starting server %s for hostname %s", target.Name, hostname)
+	if err := handler(target.ID); err != nil {
+		// StartContainer on an already-starting container may fail; that is
+		// not fatal - the poll loop below decides when the server is ready.
+		m.logger.Debug("Wake-on-connect: start handler for %s returned: %v", target.Name, err)
+	}
+
+	deadline := time.Now().Add(wakeMaxWait)
+	for time.Now().Before(deadline) {
+		time.Sleep(wakePollInterval)
+		if ip, err := GetContainerIP(target.ContainerID, m.networkName); err == nil && ip != "" {
+			m.logger.Info("Wake-on-connect: server %s is up at %s after %s", target.Name, ip, time.Until(deadline).Round(time.Second))
+			return ip, 25565, true
+		}
+	}
+
+	m.logger.Error("Wake-on-connect: server %s did not come up within %v", target.Name, wakeMaxWait)
+	return "", 0, false
+}
+
 // AddModuleRoute adds a proxy route for a module's ports
 // Modules use their own ports on the same hostname as their parent server
 func (m *Manager) AddModuleRoute(module *db.Module, server *db.Server) error {
@@ -509,6 +582,10 @@ func (m *Manager) addPortRouteUnlocked(routeID, hostname, containerIP string, ho
 		// Start the proxy
 		if err := proxy.Start(); err != nil {
 			return fmt.Errorf("failed to start module proxy on port %d: %w", hostPort, err)
+		}
+
+		if mcProxy, ok := proxy.(*MinecraftProxy); ok {
+			mcProxy.wakeResolver = m.wakeResolve
 		}
 
 		m.proxies[hostPort] = proxy

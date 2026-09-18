@@ -28,6 +28,7 @@ import (
 	"github.com/nickheyer/discopanel/internal/proxy"
 	"github.com/nickheyer/discopanel/internal/rbac"
 	"github.com/nickheyer/discopanel/pkg/files"
+	"github.com/nickheyer/discopanel/pkg/upload"
 	"github.com/nickheyer/discopanel/pkg/logger"
 	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
 	"github.com/nickheyer/discopanel/pkg/proto/discopanel/v1/discopanelv1connect"
@@ -50,10 +51,11 @@ type ServerService struct {
 	moduleManager    *module.Manager
 	bus              *events.Bus
 	enforcer         *rbac.Enforcer
+	uploadManager    *upload.Manager
 }
 
 // NewServerService creates a new server service
-func NewServerService(store *storage.Store, docker *docker.Client, sender *command.Sender, config *config.Config, proxy *proxy.Manager, logStreamer *logger.LogStreamer, metricsCollector *metrics.Collector, moduleManager *module.Manager, bus *events.Bus, enforcer *rbac.Enforcer, log *logger.Logger) *ServerService {
+func NewServerService(store *storage.Store, docker *docker.Client, sender *command.Sender, config *config.Config, proxy *proxy.Manager, logStreamer *logger.LogStreamer, metricsCollector *metrics.Collector, moduleManager *module.Manager, bus *events.Bus, enforcer *rbac.Enforcer, uploadManager *upload.Manager, log *logger.Logger) *ServerService {
 	return &ServerService{
 		store:            store,
 		docker:           docker,
@@ -66,6 +68,7 @@ func NewServerService(store *storage.Store, docker *docker.Client, sender *comma
 		moduleManager:    moduleManager,
 		bus:              bus,
 		enforcer:         enforcer,
+		uploadManager:    uploadManager,
 	}
 }
 
@@ -94,6 +97,7 @@ func dbServerToProto(server *storage.Server) *v1.Server {
 		JavaVersion:     int32(javaVersion),
 		DockerImage:     server.DockerImage,
 		AutoStart:       server.AutoStart,
+		WakeOnConnect:   &server.WakeOnConnect,
 		Detached:        server.Detached,
 		TpsCommand:      server.TPSCommand,
 		MemoryUsage:     int64(server.MemoryUsage),
@@ -236,6 +240,36 @@ func dbStatusToProto(status storage.ServerStatus) v1.ServerStatus {
 	default:
 		return v1.ServerStatus_SERVER_STATUS_UNSPECIFIED
 	}
+}
+
+// checkMemoryQuota enforces the global memory admission control: the sum of
+// all servers' memory allocations (excluding excludeServerID, used when an
+// existing server changes its allocation) must stay within the configured
+// docker.max_total_memory_mb. A limit of 0 means unlimited.
+func (s *ServerService) checkMemoryQuota(ctx context.Context, newMemoryMB int, excludeServerID string) error {
+	limit := s.config.Docker.MaxTotalMemoryMB
+	if limit <= 0 {
+		return nil
+	}
+
+	servers, err := s.store.ListServers(ctx)
+	if err != nil {
+		return fmt.Errorf("failed to check memory quota")
+	}
+
+	total := int64(newMemoryMB)
+	for _, server := range servers {
+		if server.ID == excludeServerID {
+			continue
+		}
+		total += int64(server.Memory)
+	}
+
+	if total > limit {
+		return fmt.Errorf("memory quota exceeded: this server needs %d MB and servers already allocate %d MB, but the global limit is %d MB (docker.max_total_memory_mb)",
+			newMemoryMB, total-int64(newMemoryMB), limit)
+	}
+	return nil
 }
 
 // ListServers lists all servers
@@ -602,6 +636,11 @@ func (s *ServerService) CreateServer(ctx context.Context, req *connect.Request[v
 		}
 	}
 
+	// Global memory quota admission control (#139)
+	if err := s.checkMemoryQuota(ctx, server.Memory, ""); err != nil {
+		return nil, connect.NewError(connect.CodeFailedPrecondition, err)
+	}
+
 	// Create data directory
 	if err := os.MkdirAll(server.DataPath, 0755); err != nil {
 		s.log.Error("Failed to create data directory: %v", err)
@@ -819,6 +858,9 @@ func (s *ServerService) UpdateServer(ctx context.Context, req *connect.Request[v
 		needsRecreation = true
 	}
 	if msg.Memory > 0 && int(msg.Memory) != originalMemory {
+		if err := s.checkMemoryQuota(ctx, int(msg.Memory), server.ID); err != nil {
+			return nil, connect.NewError(connect.CodeFailedPrecondition, err)
+		}
 		server.Memory = int(msg.Memory)
 		needsRecreation = true
 		if err := s.store.UpdateServerConfigMemory(ctx, server.ID, int(msg.Memory)); err != nil {
@@ -840,6 +882,9 @@ func (s *ServerService) UpdateServer(ctx context.Context, req *connect.Request[v
 	}
 	if msg.AutoStart != nil {
 		server.AutoStart = *msg.AutoStart
+	}
+	if msg.WakeOnConnect != nil {
+		server.WakeOnConnect = *msg.WakeOnConnect
 	}
 	if msg.Detached != nil {
 		server.Detached = *msg.Detached

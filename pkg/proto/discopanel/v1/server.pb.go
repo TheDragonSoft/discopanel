@@ -863,6 +863,7 @@ type UpdateServerRequest struct {
 	ModpackVersionId string                 `protobuf:"bytes,14,opt,name=modpack_version_id,json=modpackVersionId,proto3" json:"modpack_version_id,omitempty"`
 	AdditionalPorts  []*AdditionalPort      `protobuf:"bytes,15,rep,name=additional_ports,json=additionalPorts,proto3" json:"additional_ports,omitempty"`
 	DockerOverrides  *DockerOverrides       `protobuf:"bytes,16,opt,name=docker_overrides,json=dockerOverrides,proto3" json:"docker_overrides,omitempty"`
+	WakeOnConnect    *bool                  `protobuf:"varint,17,opt,name=wake_on_connect,json=wakeOnConnect,proto3,oneof" json:"wake_on_connect,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -1009,6 +1010,13 @@ func (x *UpdateServerRequest) GetDockerOverrides() *DockerOverrides {
 	return nil
 }
 
+func (x *UpdateServerRequest) GetWakeOnConnect() bool {
+	if x != nil && x.WakeOnConnect != nil {
+		return *x.WakeOnConnect
+	}
+	return false
+}
+
 // Updated server instance
 type UpdateServerResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1054,6 +1062,152 @@ func (x *UpdateServerResponse) GetServer() *Server {
 	return nil
 }
 
+// Import an existing server from an uploaded ZIP archive
+type ImportServerRequest struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Name            string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"` // Server name (required)
+	Description     string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
+	UploadSessionId string                 `protobuf:"bytes,3,opt,name=upload_session_id,json=uploadSessionId,proto3" json:"upload_session_id,omitempty"` // Completed chunked upload session containing the server ZIP
+	McVersion       string                 `protobuf:"bytes,4,opt,name=mc_version,json=mcVersion,proto3" json:"mc_version,omitempty"`                     // Minecraft version (defaults to LATEST resolution at start)
+	ModLoader       string                 `protobuf:"bytes,5,opt,name=mod_loader,json=modLoader,proto3" json:"mod_loader,omitempty"`                     // Mod loader (defaults to vanilla)
+	Memory          int32                  `protobuf:"varint,6,opt,name=memory,proto3" json:"memory,omitempty"`                                           // Memory allocation in MB (defaults to 4096)
+	MaxPlayers      int32                  `protobuf:"varint,7,opt,name=max_players,json=maxPlayers,proto3" json:"max_players,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *ImportServerRequest) Reset() {
+	*x = ImportServerRequest{}
+	mi := &file_discopanel_v1_server_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImportServerRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImportServerRequest) ProtoMessage() {}
+
+func (x *ImportServerRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_server_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImportServerRequest.ProtoReflect.Descriptor instead.
+func (*ImportServerRequest) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ImportServerRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ImportServerRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *ImportServerRequest) GetUploadSessionId() string {
+	if x != nil {
+		return x.UploadSessionId
+	}
+	return ""
+}
+
+func (x *ImportServerRequest) GetMcVersion() string {
+	if x != nil {
+		return x.McVersion
+	}
+	return ""
+}
+
+func (x *ImportServerRequest) GetModLoader() string {
+	if x != nil {
+		return x.ModLoader
+	}
+	return ""
+}
+
+func (x *ImportServerRequest) GetMemory() int32 {
+	if x != nil {
+		return x.Memory
+	}
+	return 0
+}
+
+func (x *ImportServerRequest) GetMaxPlayers() int32 {
+	if x != nil {
+		return x.MaxPlayers
+	}
+	return 0
+}
+
+// Imported server instance
+type ImportServerResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Server        *Server                `protobuf:"bytes,1,opt,name=server,proto3" json:"server,omitempty"`
+	ImportedFiles string                 `protobuf:"bytes,2,opt,name=imported_files,json=importedFiles,proto3" json:"imported_files,omitempty"` // Number of files extracted from the archive
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ImportServerResponse) Reset() {
+	*x = ImportServerResponse{}
+	mi := &file_discopanel_v1_server_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ImportServerResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ImportServerResponse) ProtoMessage() {}
+
+func (x *ImportServerResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_server_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ImportServerResponse.ProtoReflect.Descriptor instead.
+func (*ImportServerResponse) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ImportServerResponse) GetServer() *Server {
+	if x != nil {
+		return x.Server
+	}
+	return nil
+}
+
+func (x *ImportServerResponse) GetImportedFiles() string {
+	if x != nil {
+		return x.ImportedFiles
+	}
+	return ""
+}
+
 // Server to delete
 type DeleteServerRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1064,7 +1218,7 @@ type DeleteServerRequest struct {
 
 func (x *DeleteServerRequest) Reset() {
 	*x = DeleteServerRequest{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[16]
+	mi := &file_discopanel_v1_server_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1076,7 +1230,7 @@ func (x *DeleteServerRequest) String() string {
 func (*DeleteServerRequest) ProtoMessage() {}
 
 func (x *DeleteServerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[16]
+	mi := &file_discopanel_v1_server_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1089,7 +1243,7 @@ func (x *DeleteServerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteServerRequest.ProtoReflect.Descriptor instead.
 func (*DeleteServerRequest) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{16}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *DeleteServerRequest) GetId() string {
@@ -1108,7 +1262,7 @@ type DeleteServerResponse struct {
 
 func (x *DeleteServerResponse) Reset() {
 	*x = DeleteServerResponse{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[17]
+	mi := &file_discopanel_v1_server_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1120,7 +1274,7 @@ func (x *DeleteServerResponse) String() string {
 func (*DeleteServerResponse) ProtoMessage() {}
 
 func (x *DeleteServerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[17]
+	mi := &file_discopanel_v1_server_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1133,7 +1287,7 @@ func (x *DeleteServerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteServerResponse.ProtoReflect.Descriptor instead.
 func (*DeleteServerResponse) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{17}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{19}
 }
 
 // Server to start
@@ -1146,7 +1300,7 @@ type StartServerRequest struct {
 
 func (x *StartServerRequest) Reset() {
 	*x = StartServerRequest{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[18]
+	mi := &file_discopanel_v1_server_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1158,7 +1312,7 @@ func (x *StartServerRequest) String() string {
 func (*StartServerRequest) ProtoMessage() {}
 
 func (x *StartServerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[18]
+	mi := &file_discopanel_v1_server_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1171,7 +1325,7 @@ func (x *StartServerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartServerRequest.ProtoReflect.Descriptor instead.
 func (*StartServerRequest) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{18}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *StartServerRequest) GetId() string {
@@ -1191,7 +1345,7 @@ type StartServerResponse struct {
 
 func (x *StartServerResponse) Reset() {
 	*x = StartServerResponse{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[19]
+	mi := &file_discopanel_v1_server_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1203,7 +1357,7 @@ func (x *StartServerResponse) String() string {
 func (*StartServerResponse) ProtoMessage() {}
 
 func (x *StartServerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[19]
+	mi := &file_discopanel_v1_server_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1216,7 +1370,7 @@ func (x *StartServerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartServerResponse.ProtoReflect.Descriptor instead.
 func (*StartServerResponse) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{19}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *StartServerResponse) GetStatus() string {
@@ -1236,7 +1390,7 @@ type StopServerRequest struct {
 
 func (x *StopServerRequest) Reset() {
 	*x = StopServerRequest{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[20]
+	mi := &file_discopanel_v1_server_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1248,7 +1402,7 @@ func (x *StopServerRequest) String() string {
 func (*StopServerRequest) ProtoMessage() {}
 
 func (x *StopServerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[20]
+	mi := &file_discopanel_v1_server_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1261,7 +1415,7 @@ func (x *StopServerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StopServerRequest.ProtoReflect.Descriptor instead.
 func (*StopServerRequest) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{20}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *StopServerRequest) GetId() string {
@@ -1281,7 +1435,7 @@ type StopServerResponse struct {
 
 func (x *StopServerResponse) Reset() {
 	*x = StopServerResponse{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[21]
+	mi := &file_discopanel_v1_server_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1293,7 +1447,7 @@ func (x *StopServerResponse) String() string {
 func (*StopServerResponse) ProtoMessage() {}
 
 func (x *StopServerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[21]
+	mi := &file_discopanel_v1_server_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1306,7 +1460,7 @@ func (x *StopServerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StopServerResponse.ProtoReflect.Descriptor instead.
 func (*StopServerResponse) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{21}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *StopServerResponse) GetStatus() string {
@@ -1326,7 +1480,7 @@ type RestartServerRequest struct {
 
 func (x *RestartServerRequest) Reset() {
 	*x = RestartServerRequest{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[22]
+	mi := &file_discopanel_v1_server_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1338,7 +1492,7 @@ func (x *RestartServerRequest) String() string {
 func (*RestartServerRequest) ProtoMessage() {}
 
 func (x *RestartServerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[22]
+	mi := &file_discopanel_v1_server_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1351,7 +1505,7 @@ func (x *RestartServerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestartServerRequest.ProtoReflect.Descriptor instead.
 func (*RestartServerRequest) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{22}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *RestartServerRequest) GetId() string {
@@ -1371,7 +1525,7 @@ type RestartServerResponse struct {
 
 func (x *RestartServerResponse) Reset() {
 	*x = RestartServerResponse{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[23]
+	mi := &file_discopanel_v1_server_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1383,7 +1537,7 @@ func (x *RestartServerResponse) String() string {
 func (*RestartServerResponse) ProtoMessage() {}
 
 func (x *RestartServerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[23]
+	mi := &file_discopanel_v1_server_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1396,7 +1550,7 @@ func (x *RestartServerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RestartServerResponse.ProtoReflect.Descriptor instead.
 func (*RestartServerResponse) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{23}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *RestartServerResponse) GetStatus() string {
@@ -1416,7 +1570,7 @@ type RecreateServerRequest struct {
 
 func (x *RecreateServerRequest) Reset() {
 	*x = RecreateServerRequest{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[24]
+	mi := &file_discopanel_v1_server_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1428,7 +1582,7 @@ func (x *RecreateServerRequest) String() string {
 func (*RecreateServerRequest) ProtoMessage() {}
 
 func (x *RecreateServerRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[24]
+	mi := &file_discopanel_v1_server_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1441,7 +1595,7 @@ func (x *RecreateServerRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RecreateServerRequest.ProtoReflect.Descriptor instead.
 func (*RecreateServerRequest) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{24}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *RecreateServerRequest) GetId() string {
@@ -1461,7 +1615,7 @@ type RecreateServerResponse struct {
 
 func (x *RecreateServerResponse) Reset() {
 	*x = RecreateServerResponse{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[25]
+	mi := &file_discopanel_v1_server_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1473,7 +1627,7 @@ func (x *RecreateServerResponse) String() string {
 func (*RecreateServerResponse) ProtoMessage() {}
 
 func (x *RecreateServerResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[25]
+	mi := &file_discopanel_v1_server_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1486,7 +1640,7 @@ func (x *RecreateServerResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RecreateServerResponse.ProtoReflect.Descriptor instead.
 func (*RecreateServerResponse) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{25}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *RecreateServerResponse) GetStatus() string {
@@ -1508,7 +1662,7 @@ type SendCommandRequest struct {
 
 func (x *SendCommandRequest) Reset() {
 	*x = SendCommandRequest{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[26]
+	mi := &file_discopanel_v1_server_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1520,7 +1674,7 @@ func (x *SendCommandRequest) String() string {
 func (*SendCommandRequest) ProtoMessage() {}
 
 func (x *SendCommandRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[26]
+	mi := &file_discopanel_v1_server_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1533,7 +1687,7 @@ func (x *SendCommandRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendCommandRequest.ProtoReflect.Descriptor instead.
 func (*SendCommandRequest) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{26}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *SendCommandRequest) GetId() string {
@@ -1569,7 +1723,7 @@ type SendCommandResponse struct {
 
 func (x *SendCommandResponse) Reset() {
 	*x = SendCommandResponse{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[27]
+	mi := &file_discopanel_v1_server_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1581,7 +1735,7 @@ func (x *SendCommandResponse) String() string {
 func (*SendCommandResponse) ProtoMessage() {}
 
 func (x *SendCommandResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[27]
+	mi := &file_discopanel_v1_server_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1594,7 +1748,7 @@ func (x *SendCommandResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendCommandResponse.ProtoReflect.Descriptor instead.
 func (*SendCommandResponse) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{27}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *SendCommandResponse) GetSuccess() bool {
@@ -1628,7 +1782,7 @@ type UploadToMCLogsRequest struct {
 
 func (x *UploadToMCLogsRequest) Reset() {
 	*x = UploadToMCLogsRequest{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[28]
+	mi := &file_discopanel_v1_server_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1640,7 +1794,7 @@ func (x *UploadToMCLogsRequest) String() string {
 func (*UploadToMCLogsRequest) ProtoMessage() {}
 
 func (x *UploadToMCLogsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[28]
+	mi := &file_discopanel_v1_server_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1653,7 +1807,7 @@ func (x *UploadToMCLogsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadToMCLogsRequest.ProtoReflect.Descriptor instead.
 func (*UploadToMCLogsRequest) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{28}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *UploadToMCLogsRequest) GetId() string {
@@ -1673,7 +1827,7 @@ type UploadToMCLogsResponse struct {
 
 func (x *UploadToMCLogsResponse) Reset() {
 	*x = UploadToMCLogsResponse{}
-	mi := &file_discopanel_v1_server_proto_msgTypes[29]
+	mi := &file_discopanel_v1_server_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1685,7 +1839,7 @@ func (x *UploadToMCLogsResponse) String() string {
 func (*UploadToMCLogsResponse) ProtoMessage() {}
 
 func (x *UploadToMCLogsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_discopanel_v1_server_proto_msgTypes[29]
+	mi := &file_discopanel_v1_server_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1698,7 +1852,7 @@ func (x *UploadToMCLogsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadToMCLogsResponse.ProtoReflect.Descriptor instead.
 func (*UploadToMCLogsResponse) Descriptor() ([]byte, []int) {
-	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{29}
+	return file_discopanel_v1_server_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *UploadToMCLogsResponse) GetUrl() string {
@@ -1774,7 +1928,7 @@ const file_discopanel_v1_server_proto_rawDesc = "" +
 	"\x10additional_ports\x18\x11 \x03(\v2\x1d.discopanel.v1.AdditionalPortR\x0fadditionalPorts\x12I\n" +
 	"\x10docker_overrides\x18\x12 \x01(\v2\x1e.discopanel.v1.DockerOverridesR\x0fdockerOverrides\"E\n" +
 	"\x14CreateServerResponse\x12-\n" +
-	"\x06server\x18\x01 \x01(\v2\x15.discopanel.v1.ServerR\x06server\"\x90\x05\n" +
+	"\x06server\x18\x01 \x01(\v2\x15.discopanel.v1.ServerR\x06server\"\xd1\x05\n" +
 	"\x13UpdateServerRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -1798,13 +1952,29 @@ const file_discopanel_v1_server_proto_rawDesc = "" +
 	"modpack_id\x18\r \x01(\tR\tmodpackId\x12,\n" +
 	"\x12modpack_version_id\x18\x0e \x01(\tR\x10modpackVersionId\x12H\n" +
 	"\x10additional_ports\x18\x0f \x03(\v2\x1d.discopanel.v1.AdditionalPortR\x0fadditionalPorts\x12I\n" +
-	"\x10docker_overrides\x18\x10 \x01(\v2\x1e.discopanel.v1.DockerOverridesR\x0fdockerOverridesB\a\n" +
+	"\x10docker_overrides\x18\x10 \x01(\v2\x1e.discopanel.v1.DockerOverridesR\x0fdockerOverrides\x12+\n" +
+	"\x0fwake_on_connect\x18\x11 \x01(\bH\x04R\rwakeOnConnect\x88\x01\x01B\a\n" +
 	"\x05_portB\r\n" +
 	"\v_auto_startB\v\n" +
 	"\t_detachedB\x0e\n" +
-	"\f_tps_command\"E\n" +
+	"\f_tps_commandB\x12\n" +
+	"\x10_wake_on_connect\"E\n" +
 	"\x14UpdateServerResponse\x12-\n" +
-	"\x06server\x18\x01 \x01(\v2\x15.discopanel.v1.ServerR\x06server\"%\n" +
+	"\x06server\x18\x01 \x01(\v2\x15.discopanel.v1.ServerR\x06server\"\xee\x01\n" +
+	"\x13ImportServerRequest\x12\x12\n" +
+	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x02 \x01(\tR\vdescription\x12*\n" +
+	"\x11upload_session_id\x18\x03 \x01(\tR\x0fuploadSessionId\x12\x1d\n" +
+	"\n" +
+	"mc_version\x18\x04 \x01(\tR\tmcVersion\x12\x1d\n" +
+	"\n" +
+	"mod_loader\x18\x05 \x01(\tR\tmodLoader\x12\x16\n" +
+	"\x06memory\x18\x06 \x01(\x05R\x06memory\x12\x1f\n" +
+	"\vmax_players\x18\a \x01(\x05R\n" +
+	"maxPlayers\"l\n" +
+	"\x14ImportServerResponse\x12-\n" +
+	"\x06server\x18\x01 \x01(\v2\x15.discopanel.v1.ServerR\x06server\x12%\n" +
+	"\x0eimported_files\x18\x02 \x01(\tR\rimportedFiles\"%\n" +
 	"\x13DeleteServerRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"\x16\n" +
 	"\x14DeleteServerResponse\"$\n" +
@@ -1836,7 +2006,7 @@ const file_discopanel_v1_server_proto_rawDesc = "" +
 	"\x15UploadToMCLogsRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\"*\n" +
 	"\x16UploadToMCLogsResponse\x12\x10\n" +
-	"\x03url\x18\x01 \x01(\tR\x03url2\x88\n" +
+	"\x03url\x18\x01 \x01(\tR\x03url2\xe1\n" +
 	"\n" +
 	"\rServerService\x12T\n" +
 	"\vListServers\x12!.discopanel.v1.ListServersRequest\x1a\".discopanel.v1.ListServersResponse\x12N\n" +
@@ -1853,7 +2023,8 @@ const file_discopanel_v1_server_proto_rawDesc = "" +
 	"\rRestartServer\x12#.discopanel.v1.RestartServerRequest\x1a$.discopanel.v1.RestartServerResponse\x12]\n" +
 	"\x0eRecreateServer\x12$.discopanel.v1.RecreateServerRequest\x1a%.discopanel.v1.RecreateServerResponse\x12T\n" +
 	"\vSendCommand\x12!.discopanel.v1.SendCommandRequest\x1a\".discopanel.v1.SendCommandResponse\x12]\n" +
-	"\x0eUploadToMCLogs\x12$.discopanel.v1.UploadToMCLogsRequest\x1a%.discopanel.v1.UploadToMCLogsResponseBFZDgithub.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1b\x06proto3"
+	"\x0eUploadToMCLogs\x12$.discopanel.v1.UploadToMCLogsRequest\x1a%.discopanel.v1.UploadToMCLogsResponse\x12W\n" +
+	"\fImportServer\x12\".discopanel.v1.ImportServerRequest\x1a#.discopanel.v1.ImportServerResponseBFZDgithub.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1b\x06proto3"
 
 var (
 	file_discopanel_v1_server_proto_rawDescOnce sync.Once
@@ -1867,7 +2038,7 @@ func file_discopanel_v1_server_proto_rawDescGZIP() []byte {
 	return file_discopanel_v1_server_proto_rawDescData
 }
 
-var file_discopanel_v1_server_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_discopanel_v1_server_proto_msgTypes = make([]protoimpl.MessageInfo, 32)
 var file_discopanel_v1_server_proto_goTypes = []any{
 	(*ListServersRequest)(nil),           // 0: discopanel.v1.ListServersRequest
 	(*ListServersResponse)(nil),          // 1: discopanel.v1.ListServersResponse
@@ -1885,72 +2056,77 @@ var file_discopanel_v1_server_proto_goTypes = []any{
 	(*CreateServerResponse)(nil),         // 13: discopanel.v1.CreateServerResponse
 	(*UpdateServerRequest)(nil),          // 14: discopanel.v1.UpdateServerRequest
 	(*UpdateServerResponse)(nil),         // 15: discopanel.v1.UpdateServerResponse
-	(*DeleteServerRequest)(nil),          // 16: discopanel.v1.DeleteServerRequest
-	(*DeleteServerResponse)(nil),         // 17: discopanel.v1.DeleteServerResponse
-	(*StartServerRequest)(nil),           // 18: discopanel.v1.StartServerRequest
-	(*StartServerResponse)(nil),          // 19: discopanel.v1.StartServerResponse
-	(*StopServerRequest)(nil),            // 20: discopanel.v1.StopServerRequest
-	(*StopServerResponse)(nil),           // 21: discopanel.v1.StopServerResponse
-	(*RestartServerRequest)(nil),         // 22: discopanel.v1.RestartServerRequest
-	(*RestartServerResponse)(nil),        // 23: discopanel.v1.RestartServerResponse
-	(*RecreateServerRequest)(nil),        // 24: discopanel.v1.RecreateServerRequest
-	(*RecreateServerResponse)(nil),       // 25: discopanel.v1.RecreateServerResponse
-	(*SendCommandRequest)(nil),           // 26: discopanel.v1.SendCommandRequest
-	(*SendCommandResponse)(nil),          // 27: discopanel.v1.SendCommandResponse
-	(*UploadToMCLogsRequest)(nil),        // 28: discopanel.v1.UploadToMCLogsRequest
-	(*UploadToMCLogsResponse)(nil),       // 29: discopanel.v1.UploadToMCLogsResponse
-	(*Server)(nil),                       // 30: discopanel.v1.Server
-	(*timestamppb.Timestamp)(nil),        // 31: google.protobuf.Timestamp
-	(ModLoader)(0),                       // 32: discopanel.v1.ModLoader
-	(*AdditionalPort)(nil),               // 33: discopanel.v1.AdditionalPort
-	(*DockerOverrides)(nil),              // 34: discopanel.v1.DockerOverrides
+	(*ImportServerRequest)(nil),          // 16: discopanel.v1.ImportServerRequest
+	(*ImportServerResponse)(nil),         // 17: discopanel.v1.ImportServerResponse
+	(*DeleteServerRequest)(nil),          // 18: discopanel.v1.DeleteServerRequest
+	(*DeleteServerResponse)(nil),         // 19: discopanel.v1.DeleteServerResponse
+	(*StartServerRequest)(nil),           // 20: discopanel.v1.StartServerRequest
+	(*StartServerResponse)(nil),          // 21: discopanel.v1.StartServerResponse
+	(*StopServerRequest)(nil),            // 22: discopanel.v1.StopServerRequest
+	(*StopServerResponse)(nil),           // 23: discopanel.v1.StopServerResponse
+	(*RestartServerRequest)(nil),         // 24: discopanel.v1.RestartServerRequest
+	(*RestartServerResponse)(nil),        // 25: discopanel.v1.RestartServerResponse
+	(*RecreateServerRequest)(nil),        // 26: discopanel.v1.RecreateServerRequest
+	(*RecreateServerResponse)(nil),       // 27: discopanel.v1.RecreateServerResponse
+	(*SendCommandRequest)(nil),           // 28: discopanel.v1.SendCommandRequest
+	(*SendCommandResponse)(nil),          // 29: discopanel.v1.SendCommandResponse
+	(*UploadToMCLogsRequest)(nil),        // 30: discopanel.v1.UploadToMCLogsRequest
+	(*UploadToMCLogsResponse)(nil),       // 31: discopanel.v1.UploadToMCLogsResponse
+	(*Server)(nil),                       // 32: discopanel.v1.Server
+	(*timestamppb.Timestamp)(nil),        // 33: google.protobuf.Timestamp
+	(ModLoader)(0),                       // 34: discopanel.v1.ModLoader
+	(*AdditionalPort)(nil),               // 35: discopanel.v1.AdditionalPort
+	(*DockerOverrides)(nil),              // 36: discopanel.v1.DockerOverrides
 }
 var file_discopanel_v1_server_proto_depIdxs = []int32{
-	30, // 0: discopanel.v1.ListServersResponse.servers:type_name -> discopanel.v1.Server
-	30, // 1: discopanel.v1.GetServerResponse.server:type_name -> discopanel.v1.Server
-	31, // 2: discopanel.v1.LogEntry.timestamp:type_name -> google.protobuf.Timestamp
+	32, // 0: discopanel.v1.ListServersResponse.servers:type_name -> discopanel.v1.Server
+	32, // 1: discopanel.v1.GetServerResponse.server:type_name -> discopanel.v1.Server
+	33, // 2: discopanel.v1.LogEntry.timestamp:type_name -> google.protobuf.Timestamp
 	5,  // 3: discopanel.v1.GetServerLogsResponse.logs:type_name -> discopanel.v1.LogEntry
 	10, // 4: discopanel.v1.GetNextAvailablePortResponse.used_ports:type_name -> discopanel.v1.UsedPort
-	32, // 5: discopanel.v1.CreateServerRequest.mod_loader:type_name -> discopanel.v1.ModLoader
-	33, // 6: discopanel.v1.CreateServerRequest.additional_ports:type_name -> discopanel.v1.AdditionalPort
-	34, // 7: discopanel.v1.CreateServerRequest.docker_overrides:type_name -> discopanel.v1.DockerOverrides
-	30, // 8: discopanel.v1.CreateServerResponse.server:type_name -> discopanel.v1.Server
-	33, // 9: discopanel.v1.UpdateServerRequest.additional_ports:type_name -> discopanel.v1.AdditionalPort
-	34, // 10: discopanel.v1.UpdateServerRequest.docker_overrides:type_name -> discopanel.v1.DockerOverrides
-	30, // 11: discopanel.v1.UpdateServerResponse.server:type_name -> discopanel.v1.Server
-	0,  // 12: discopanel.v1.ServerService.ListServers:input_type -> discopanel.v1.ListServersRequest
-	2,  // 13: discopanel.v1.ServerService.GetServer:input_type -> discopanel.v1.GetServerRequest
-	4,  // 14: discopanel.v1.ServerService.GetServerLogs:input_type -> discopanel.v1.GetServerLogsRequest
-	7,  // 15: discopanel.v1.ServerService.ClearServerLogs:input_type -> discopanel.v1.ClearServerLogsRequest
-	9,  // 16: discopanel.v1.ServerService.GetNextAvailablePort:input_type -> discopanel.v1.GetNextAvailablePortRequest
-	12, // 17: discopanel.v1.ServerService.CreateServer:input_type -> discopanel.v1.CreateServerRequest
-	14, // 18: discopanel.v1.ServerService.UpdateServer:input_type -> discopanel.v1.UpdateServerRequest
-	16, // 19: discopanel.v1.ServerService.DeleteServer:input_type -> discopanel.v1.DeleteServerRequest
-	18, // 20: discopanel.v1.ServerService.StartServer:input_type -> discopanel.v1.StartServerRequest
-	20, // 21: discopanel.v1.ServerService.StopServer:input_type -> discopanel.v1.StopServerRequest
-	22, // 22: discopanel.v1.ServerService.RestartServer:input_type -> discopanel.v1.RestartServerRequest
-	24, // 23: discopanel.v1.ServerService.RecreateServer:input_type -> discopanel.v1.RecreateServerRequest
-	26, // 24: discopanel.v1.ServerService.SendCommand:input_type -> discopanel.v1.SendCommandRequest
-	28, // 25: discopanel.v1.ServerService.UploadToMCLogs:input_type -> discopanel.v1.UploadToMCLogsRequest
-	1,  // 26: discopanel.v1.ServerService.ListServers:output_type -> discopanel.v1.ListServersResponse
-	3,  // 27: discopanel.v1.ServerService.GetServer:output_type -> discopanel.v1.GetServerResponse
-	6,  // 28: discopanel.v1.ServerService.GetServerLogs:output_type -> discopanel.v1.GetServerLogsResponse
-	8,  // 29: discopanel.v1.ServerService.ClearServerLogs:output_type -> discopanel.v1.ClearServerLogsResponse
-	11, // 30: discopanel.v1.ServerService.GetNextAvailablePort:output_type -> discopanel.v1.GetNextAvailablePortResponse
-	13, // 31: discopanel.v1.ServerService.CreateServer:output_type -> discopanel.v1.CreateServerResponse
-	15, // 32: discopanel.v1.ServerService.UpdateServer:output_type -> discopanel.v1.UpdateServerResponse
-	17, // 33: discopanel.v1.ServerService.DeleteServer:output_type -> discopanel.v1.DeleteServerResponse
-	19, // 34: discopanel.v1.ServerService.StartServer:output_type -> discopanel.v1.StartServerResponse
-	21, // 35: discopanel.v1.ServerService.StopServer:output_type -> discopanel.v1.StopServerResponse
-	23, // 36: discopanel.v1.ServerService.RestartServer:output_type -> discopanel.v1.RestartServerResponse
-	25, // 37: discopanel.v1.ServerService.RecreateServer:output_type -> discopanel.v1.RecreateServerResponse
-	27, // 38: discopanel.v1.ServerService.SendCommand:output_type -> discopanel.v1.SendCommandResponse
-	29, // 39: discopanel.v1.ServerService.UploadToMCLogs:output_type -> discopanel.v1.UploadToMCLogsResponse
-	26, // [26:40] is the sub-list for method output_type
-	12, // [12:26] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	34, // 5: discopanel.v1.CreateServerRequest.mod_loader:type_name -> discopanel.v1.ModLoader
+	35, // 6: discopanel.v1.CreateServerRequest.additional_ports:type_name -> discopanel.v1.AdditionalPort
+	36, // 7: discopanel.v1.CreateServerRequest.docker_overrides:type_name -> discopanel.v1.DockerOverrides
+	32, // 8: discopanel.v1.CreateServerResponse.server:type_name -> discopanel.v1.Server
+	35, // 9: discopanel.v1.UpdateServerRequest.additional_ports:type_name -> discopanel.v1.AdditionalPort
+	36, // 10: discopanel.v1.UpdateServerRequest.docker_overrides:type_name -> discopanel.v1.DockerOverrides
+	32, // 11: discopanel.v1.UpdateServerResponse.server:type_name -> discopanel.v1.Server
+	32, // 12: discopanel.v1.ImportServerResponse.server:type_name -> discopanel.v1.Server
+	0,  // 13: discopanel.v1.ServerService.ListServers:input_type -> discopanel.v1.ListServersRequest
+	2,  // 14: discopanel.v1.ServerService.GetServer:input_type -> discopanel.v1.GetServerRequest
+	4,  // 15: discopanel.v1.ServerService.GetServerLogs:input_type -> discopanel.v1.GetServerLogsRequest
+	7,  // 16: discopanel.v1.ServerService.ClearServerLogs:input_type -> discopanel.v1.ClearServerLogsRequest
+	9,  // 17: discopanel.v1.ServerService.GetNextAvailablePort:input_type -> discopanel.v1.GetNextAvailablePortRequest
+	12, // 18: discopanel.v1.ServerService.CreateServer:input_type -> discopanel.v1.CreateServerRequest
+	14, // 19: discopanel.v1.ServerService.UpdateServer:input_type -> discopanel.v1.UpdateServerRequest
+	18, // 20: discopanel.v1.ServerService.DeleteServer:input_type -> discopanel.v1.DeleteServerRequest
+	20, // 21: discopanel.v1.ServerService.StartServer:input_type -> discopanel.v1.StartServerRequest
+	22, // 22: discopanel.v1.ServerService.StopServer:input_type -> discopanel.v1.StopServerRequest
+	24, // 23: discopanel.v1.ServerService.RestartServer:input_type -> discopanel.v1.RestartServerRequest
+	26, // 24: discopanel.v1.ServerService.RecreateServer:input_type -> discopanel.v1.RecreateServerRequest
+	28, // 25: discopanel.v1.ServerService.SendCommand:input_type -> discopanel.v1.SendCommandRequest
+	30, // 26: discopanel.v1.ServerService.UploadToMCLogs:input_type -> discopanel.v1.UploadToMCLogsRequest
+	16, // 27: discopanel.v1.ServerService.ImportServer:input_type -> discopanel.v1.ImportServerRequest
+	1,  // 28: discopanel.v1.ServerService.ListServers:output_type -> discopanel.v1.ListServersResponse
+	3,  // 29: discopanel.v1.ServerService.GetServer:output_type -> discopanel.v1.GetServerResponse
+	6,  // 30: discopanel.v1.ServerService.GetServerLogs:output_type -> discopanel.v1.GetServerLogsResponse
+	8,  // 31: discopanel.v1.ServerService.ClearServerLogs:output_type -> discopanel.v1.ClearServerLogsResponse
+	11, // 32: discopanel.v1.ServerService.GetNextAvailablePort:output_type -> discopanel.v1.GetNextAvailablePortResponse
+	13, // 33: discopanel.v1.ServerService.CreateServer:output_type -> discopanel.v1.CreateServerResponse
+	15, // 34: discopanel.v1.ServerService.UpdateServer:output_type -> discopanel.v1.UpdateServerResponse
+	19, // 35: discopanel.v1.ServerService.DeleteServer:output_type -> discopanel.v1.DeleteServerResponse
+	21, // 36: discopanel.v1.ServerService.StartServer:output_type -> discopanel.v1.StartServerResponse
+	23, // 37: discopanel.v1.ServerService.StopServer:output_type -> discopanel.v1.StopServerResponse
+	25, // 38: discopanel.v1.ServerService.RestartServer:output_type -> discopanel.v1.RestartServerResponse
+	27, // 39: discopanel.v1.ServerService.RecreateServer:output_type -> discopanel.v1.RecreateServerResponse
+	29, // 40: discopanel.v1.ServerService.SendCommand:output_type -> discopanel.v1.SendCommandResponse
+	31, // 41: discopanel.v1.ServerService.UploadToMCLogs:output_type -> discopanel.v1.UploadToMCLogsResponse
+	17, // 42: discopanel.v1.ServerService.ImportServer:output_type -> discopanel.v1.ImportServerResponse
+	28, // [28:43] is the sub-list for method output_type
+	13, // [13:28] is the sub-list for method input_type
+	13, // [13:13] is the sub-list for extension type_name
+	13, // [13:13] is the sub-list for extension extendee
+	0,  // [0:13] is the sub-list for field type_name
 }
 
 func init() { file_discopanel_v1_server_proto_init() }
@@ -1960,14 +2136,14 @@ func file_discopanel_v1_server_proto_init() {
 	}
 	file_discopanel_v1_common_proto_init()
 	file_discopanel_v1_server_proto_msgTypes[14].OneofWrappers = []any{}
-	file_discopanel_v1_server_proto_msgTypes[26].OneofWrappers = []any{}
+	file_discopanel_v1_server_proto_msgTypes[28].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_discopanel_v1_server_proto_rawDesc), len(file_discopanel_v1_server_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   30,
+			NumMessages:   32,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

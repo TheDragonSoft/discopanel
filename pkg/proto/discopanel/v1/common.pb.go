@@ -325,7 +325,8 @@ type Server struct {
 	PlayersOnline int32   `protobuf:"varint,25,opt,name=players_online,json=playersOnline,proto3" json:"players_online,omitempty"`
 	WorldSize     int64   `protobuf:"varint,39,opt,name=world_size,json=worldSize,proto3" json:"world_size,omitempty"`
 	Tps           float64 `protobuf:"fixed64,26,opt,name=tps,proto3" json:"tps,omitempty"`
-	DiskFree      int64   `protobuf:"varint,40,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"` // Available (free) disk space in bytes on the data drive
+	DiskFree      int64   `protobuf:"varint,40,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"`                        // Available (free) disk space in bytes on the data drive
+	WakeOnConnect *bool   `protobuf:"varint,41,opt,name=wake_on_connect,json=wakeOnConnect,proto3,oneof" json:"wake_on_connect,omitempty"` // Start the server automatically when a client connects through the proxy
 	// Additional configuration
 	AdditionalPorts []*AdditionalPort      `protobuf:"bytes,27,rep,name=additional_ports,json=additionalPorts,proto3" json:"additional_ports,omitempty"`
 	DockerOverrides *DockerOverrides       `protobuf:"bytes,28,opt,name=docker_overrides,json=dockerOverrides,proto3" json:"docker_overrides,omitempty"`
@@ -568,6 +569,13 @@ func (x *Server) GetDiskFree() int64 {
 		return x.DiskFree
 	}
 	return 0
+}
+
+func (x *Server) GetWakeOnConnect() bool {
+	if x != nil && x.WakeOnConnect != nil {
+		return *x.WakeOnConnect
+	}
+	return false
 }
 
 func (x *Server) GetAdditionalPorts() []*AdditionalPort {
@@ -823,6 +831,7 @@ type DockerOverrides struct {
 	Entrypoint    []string               `protobuf:"bytes,18,rep,name=entrypoint,proto3" json:"entrypoint,omitempty"`                                                                            // Override default entrypoint
 	Command       []string               `protobuf:"bytes,19,rep,name=command,proto3" json:"command,omitempty"`                                                                                  // Override default command
 	Dns           []string               `protobuf:"bytes,20,rep,name=dns,proto3" json:"dns,omitempty"`                                                                                          // Custom DNS servers
+	Image         string                 `protobuf:"bytes,21,opt,name=image,proto3" json:"image,omitempty"`                                                                                      // Override the container image entirely (full image:tag, e.g. third-party images for legacy Minecraft editions)
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -995,6 +1004,13 @@ func (x *DockerOverrides) GetDns() []string {
 		return x.Dns
 	}
 	return nil
+}
+
+func (x *DockerOverrides) GetImage() string {
+	if x != nil {
+		return x.Image
+	}
+	return ""
 }
 
 // TCP proxy listener endpoint
@@ -1356,7 +1372,7 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\n" +
 	"last_login\x18\t \x01(\v2\x1a.google.protobuf.TimestampH\x01R\tlastLogin\x88\x01\x01B\b\n" +
 	"\x06_emailB\r\n" +
-	"\v_last_login\"\xeb\v\n" +
+	"\v_last_login\"\xac\f\n" +
 	"\x06Server\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -1396,7 +1412,8 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\n" +
 	"world_size\x18' \x01(\x03R\tworldSize\x12\x10\n" +
 	"\x03tps\x18\x1a \x01(\x01R\x03tps\x12\x1b\n" +
-	"\tdisk_free\x18( \x01(\x03R\bdiskFree\x12H\n" +
+	"\tdisk_free\x18( \x01(\x03R\bdiskFree\x12+\n" +
+	"\x0fwake_on_connect\x18) \x01(\bH\x01R\rwakeOnConnect\x88\x01\x01\x12H\n" +
 	"\x10additional_ports\x18\x1b \x03(\v2\x1d.discopanel.v1.AdditionalPortR\x0fadditionalPorts\x12I\n" +
 	"\x10docker_overrides\x18\x1c \x01(\v2\x1e.discopanel.v1.DockerOverridesR\x0fdockerOverrides\x129\n" +
 	"\n" +
@@ -1411,7 +1428,8 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\rplayer_sample\x18$ \x03(\tR\fplayerSample\x12&\n" +
 	"\x0fmax_players_slp\x18% \x01(\x05R\rmaxPlayersSlp\x12\x18\n" +
 	"\afavicon\x18& \x01(\tR\afaviconB\x0f\n" +
-	"\r_last_started\"\x84\x01\n" +
+	"\r_last_startedB\x12\n" +
+	"\x10_wake_on_connect\"\x84\x01\n" +
 	"\x0eAdditionalPort\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12%\n" +
 	"\x0econtainer_port\x18\x02 \x01(\x05R\rcontainerPort\x12\x1b\n" +
@@ -1423,7 +1441,7 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\tread_only\x18\x03 \x01(\bR\breadOnly\x12\x12\n" +
 	"\x04type\x18\x04 \x01(\tR\x04type\x12\x1d\n" +
 	"\n" +
-	"create_dir\x18\x05 \x01(\bR\tcreateDir\"\xce\x06\n" +
+	"create_dir\x18\x05 \x01(\bR\tcreateDir\"\xe4\x06\n" +
 	"\x0fDockerOverrides\x12Q\n" +
 	"\venvironment\x18\x01 \x03(\v2/.discopanel.v1.DockerOverrides.EnvironmentEntryR\venvironment\x124\n" +
 	"\avolumes\x18\x02 \x03(\v2\x1a.discopanel.v1.VolumeMountR\avolumes\x12!\n" +
@@ -1451,7 +1469,8 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"entrypoint\x18\x12 \x03(\tR\n" +
 	"entrypoint\x12\x18\n" +
 	"\acommand\x18\x13 \x03(\tR\acommand\x12\x10\n" +
-	"\x03dns\x18\x14 \x03(\tR\x03dns\x1a>\n" +
+	"\x03dns\x18\x14 \x03(\tR\x03dns\x12\x14\n" +
+	"\x05image\x18\x15 \x01(\tR\x05image\x1a>\n" +
 	"\x10EnvironmentEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a9\n" +

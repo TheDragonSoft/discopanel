@@ -37,7 +37,7 @@
 		Copy
 	} from '@lucide/svelte';
 	import type { Server } from '$lib/proto/discopanel/v1/common_pb';
-	import type { ScheduledTask, TaskExecution } from '$lib/proto/discopanel/v1/task_pb';
+	import type { ScheduledTask, TaskExecution, ServerBackup } from '$lib/proto/discopanel/v1/task_pb';
 	import {
 		TaskType,
 		TaskStatus,
@@ -49,7 +49,10 @@
 		TriggerTaskRequestSchema,
 		DeleteTaskRequestSchema,
 		ListTasksRequestSchema,
-		ListTaskExecutionsRequestSchema
+		ListTaskExecutionsRequestSchema,
+		ListServerBackupsRequestSchema,
+		RestoreServerBackupRequestSchema,
+		DeleteServerBackupRequestSchema
 	} from '$lib/proto/discopanel/v1/task_pb';
 	import { TriggeredEventType } from '$lib/proto/discopanel/v1/event_pb';
 	import { SERVER_EVENT_TYPES, getEventTypeLabel } from '$lib/utils/events';
@@ -62,6 +65,10 @@
 	let loading = $state(true);
 	let tasks = $state<ScheduledTask[]>([]);
 	let initialized = $state(false);
+	// Backups
+	let backups = $state<ServerBackup[]>([]);
+	let backupsLoading = $state(false);
+	let restoringBackup = $state<string | null>(null);
 	// svelte-ignore state_referenced_locally
 	let previousServerId = $state(server.id);
 
@@ -350,6 +357,69 @@
 			toast.error('Failed to load tasks');
 		} finally {
 			loading = false;
+		}
+		await loadBackups();
+	}
+
+	function formatBackupSize(bytes: number): string {
+		if (!bytes || bytes < 1024) return `${bytes ?? 0} B`;
+		const units = ['KiB', 'MiB', 'GiB', 'TiB'];
+		let size = bytes / 1024;
+		let unit = 0;
+		while (size >= 1024 && unit < units.length - 1) {
+			size /= 1024;
+			unit++;
+		}
+		return `${size.toFixed(1)} ${units[unit]}`;
+	}
+
+	async function loadBackups() {
+		try {
+			backupsLoading = true;
+			const request = create(ListServerBackupsRequestSchema, { serverId: server.id });
+			const response = await rpcClient.task.listServerBackups(request);
+			backups = response.backups;
+		} catch (_e) {
+			// Backups are optional (backup dir may not be configured); don't toast
+			backups = [];
+		} finally {
+			backupsLoading = false;
+		}
+	}
+
+	async function restoreBackup(backup: ServerBackup) {
+		const confirmed = window.confirm(
+			`Restore "${backup.filename}"? Existing files in the server directory will be overwritten by the backup. The server must be stopped.`
+		);
+		if (!confirmed) return;
+		try {
+			restoringBackup = backup.filename;
+			const request = create(RestoreServerBackupRequestSchema, {
+				serverId: server.id,
+				filename: backup.filename
+			});
+			await rpcClient.task.restoreServerBackup(request);
+			toast.success('Backup restored');
+		} catch (e) {
+			toast.error(`Failed to restore backup: ${e instanceof Error ? e.message : 'unknown error'}`);
+		} finally {
+			restoringBackup = null;
+		}
+	}
+
+	async function deleteBackup(backup: ServerBackup) {
+		const confirmed = window.confirm(`Delete backup "${backup.filename}"? This cannot be undone.`);
+		if (!confirmed) return;
+		try {
+			const request = create(DeleteServerBackupRequestSchema, {
+				serverId: server.id,
+				filename: backup.filename
+			});
+			await rpcClient.task.deleteServerBackup(request);
+			toast.success('Backup deleted');
+			await loadBackups();
+		} catch (e) {
+			toast.error(`Failed to delete backup: ${e instanceof Error ? e.message : 'unknown error'}`);
 		}
 	}
 
@@ -846,6 +916,74 @@
 				</Button>
 			</div>
 		</div>
+
+		<!-- Backups -->
+		<Card>
+			<CardContent class="p-4">
+				<div class="mb-3 flex items-center justify-between">
+					<div class="flex items-center gap-2">
+						<Archive class="h-5 w-5 text-primary" />
+						<h4 class="font-medium">Backups</h4>
+						<Badge variant="outline" class="text-xs">{backups.length}</Badge>
+					</div>
+					<Button variant="ghost" size="sm" onclick={loadBackups} disabled={backupsLoading}>
+						{#if backupsLoading}
+							<Loader2 class="h-4 w-4 animate-spin" />
+						{:else}
+							<RefreshCw class="h-4 w-4" />
+						{/if}
+					</Button>
+				</div>
+				{#if backups.length === 0}
+					<p class="text-sm text-muted-foreground">
+						No backups yet. Create a backup task above, and archives will appear here for restore
+						and download.
+					</p>
+				{:else}
+					<div class="space-y-2">
+						{#each backups as backup (backup.filename)}
+							<div
+								class="flex items-center justify-between gap-3 rounded-lg border border-border/60 px-3 py-2"
+							>
+								<div class="flex min-w-0 items-center gap-3">
+									<Archive class="h-4 w-4 shrink-0 text-muted-foreground" />
+									<div class="min-w-0">
+										<p class="truncate text-sm font-medium">{backup.filename}</p>
+										<p class="text-xs text-muted-foreground">
+											{formatBackupSize(Number(backup.sizeBytes))} ·{' '}
+											{new Date(Number(backup.createdAt?.seconds) * 1000).toLocaleString()}
+										</p>
+									</div>
+								</div>
+								<div class="flex shrink-0 items-center gap-1">
+									<Button
+										variant="outline"
+										size="sm"
+										onclick={() => restoreBackup(backup)}
+										disabled={restoringBackup !== null}
+									>
+										{#if restoringBackup === backup.filename}
+											<Loader2 class="mr-2 h-4 w-4 animate-spin" />
+										{:else}
+											<RotateCcw class="mr-2 h-4 w-4" />
+										{/if}
+										Restore
+									</Button>
+									<Button
+										variant="ghost"
+										size="sm"
+										class="text-destructive hover:text-destructive"
+										onclick={() => deleteBackup(backup)}
+									>
+										<Trash2 class="h-4 w-4" />
+									</Button>
+								</div>
+							</div>
+						{/each}
+					</div>
+				{/if}
+			</CardContent>
+		</Card>
 
 		<!-- Tasks List -->
 		{#if tasks.length === 0}

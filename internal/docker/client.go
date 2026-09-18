@@ -143,8 +143,10 @@ func GetOptimalDockerTag(mcVersion string, modLoader models.ModLoader, preferGra
 	// Fetch Docker images from API
 	images, err := fetchDockerImages()
 	if err != nil {
-		// Could not fetch Docker images, use stable
-		return "stable"
+		// Could not fetch Docker images: fall back to the Java-specific tag
+		// rather than "stable" so the container still runs the Java version
+		// the server actually needs (itzg publishes javaN tags directly).
+		return fmt.Sprintf("java%s", javaVersion)
 	}
 
 	// Find matching tag
@@ -181,6 +183,8 @@ type ClientConfig struct {
 	RegistryURL string
 	DNS         string
 	Labels      map[string]string
+	LogDriver   string
+	LogOpts     map[string]string
 }
 
 type ContainerLogStreamer interface {
@@ -368,6 +372,12 @@ func (c *Client) CreateContainer(ctx context.Context, server *models.Server, ser
 		imageName = getDockerImage(server.ModLoader, server.MCVersion)
 	}
 
+	// Full image override via docker overrides (e.g. third-party images for
+	// legacy Minecraft editions). Must be a complete image:tag reference.
+	if server.DockerOverrides != nil && server.DockerOverrides.GetImage() != "" {
+		imageName = server.DockerOverrides.GetImage()
+	}
+
 	// Try pulling latest
 	if err := c.pullImage(ctx, imageName); err != nil {
 		return "", fmt.Errorf("failed to pull image: %w", err)
@@ -375,6 +385,13 @@ func (c *Client) CreateContainer(ctx context.Context, server *models.Server, ser
 
 	// Build environment variables
 	env := buildEnvFromConfig(serverConfig)
+
+	// Pin the Java version explicitly: the image tag should already match,
+	// but this guarantees the required JVM is used (the itzg image downloads
+	// the requested version if the image doesn't bundle it).
+	if javaVersion := server.JavaVersion; javaVersion != "" && javaVersion != "0" {
+		env = append(env, fmt.Sprintf("JAVA_VERSION=%s", javaVersion))
+	}
 
 	// Determine container port - proxy servers always use default port internally
 	useProxy := server.ProxyHostname != ""
@@ -454,6 +471,18 @@ func (c *Client) CreateContainer(ctx context.Context, server *models.Server, ser
 		},
 	}
 
+	// Log driver: configurable so setups where the driver is unavailable
+	// (e.g. Podman lacking the "local" driver) can override it. Defaults to
+	// json-file with rotation.
+	logDriver := c.config.LogDriver
+	if logDriver == "" {
+		logDriver = "json-file"
+	}
+	logOpts := c.config.LogOpts
+	if logOpts == nil {
+		logOpts = map[string]string{"max-size": "10m", "max-file": "3"}
+	}
+
 	hostConfig := &container.HostConfig{
 		PortBindings: portBindings,
 		Mounts: []mount.Mount{
@@ -465,8 +494,8 @@ func (c *Client) CreateContainer(ctx context.Context, server *models.Server, ser
 			MemorySwap: int64(server.Memory) * 1024 * 1024,
 		},
 		LogConfig: container.LogConfig{
-			Type:   "json-file",
-			Config: map[string]string{"max-size": "10m", "max-file": "3"},
+			Type:   logDriver,
+			Config: logOpts,
 		},
 	}
 

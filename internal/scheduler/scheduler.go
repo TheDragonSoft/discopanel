@@ -285,7 +285,10 @@ func (s *Scheduler) executeTask(task *storage.ScheduledTask, trigger string, eve
 	// Check if server is online (if required). Webhook tasks always fire —
 	// they notify, they don't operate on the server, and most useful events
 	// (server_stop, server_restart) happen while the server is not running.
-	if task.RequireOnline && task.TaskType != storage.TaskTypeWebhook && server.Status != storage.StatusRunning {
+	// Backup tasks also run against offline servers: the point of a
+	// "backup on server stop" task is to archive the world after shutdown,
+	// and consistency is handled via RCON save pause when the server is up.
+	if task.RequireOnline && task.TaskType != storage.TaskTypeWebhook && task.TaskType != storage.TaskTypeBackup && server.Status != storage.StatusRunning {
 		s.log.Debug("Task %s: skipped (server offline)", task.Name)
 
 		// Create skipped execution record

@@ -7,7 +7,9 @@ import (
 
 	"connectrpc.com/connect"
 	"github.com/google/uuid"
+	"github.com/nickheyer/discopanel/internal/config"
 	storage "github.com/nickheyer/discopanel/internal/db"
+	"github.com/nickheyer/discopanel/internal/docker"
 	"github.com/nickheyer/discopanel/internal/scheduler"
 	"github.com/nickheyer/discopanel/internal/webhook"
 	"github.com/nickheyer/discopanel/pkg/logger"
@@ -23,14 +25,18 @@ var _ discopanelv1connect.TaskServiceHandler = (*TaskService)(nil)
 type TaskService struct {
 	store     *storage.Store
 	scheduler *scheduler.Scheduler
+	config    *config.Config
+	docker    *docker.Client
 	log       *logger.Logger
 }
 
 // NewTaskService creates a new task service
-func NewTaskService(store *storage.Store, sched *scheduler.Scheduler, log *logger.Logger) *TaskService {
+func NewTaskService(store *storage.Store, sched *scheduler.Scheduler, appCfg *config.Config, dockerClient *docker.Client, log *logger.Logger) *TaskService {
 	return &TaskService{
 		store:     store,
 		scheduler: sched,
+		config:    appCfg,
+		docker:    dockerClient,
 		log:       log,
 	}
 }

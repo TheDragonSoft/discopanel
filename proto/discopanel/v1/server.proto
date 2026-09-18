@@ -37,6 +37,9 @@ service ServerService {
   rpc SendCommand(SendCommandRequest) returns (SendCommandResponse);
   // Upload server logs to mclo.gs
   rpc UploadToMCLogs(UploadToMCLogsRequest) returns (UploadToMCLogsResponse);
+  // Import an existing server from a ZIP archive of its server directory
+  // (e.g. migrated from another panel)
+  rpc ImportServer(ImportServerRequest) returns (ImportServerResponse);
 }
 
 // Server list options
@@ -149,11 +152,29 @@ message UpdateServerRequest {
   string modpack_version_id = 14;
   repeated AdditionalPort additional_ports = 15;
   DockerOverrides docker_overrides = 16;
+  optional bool wake_on_connect = 17;
 }
 
 // Updated server instance
 message UpdateServerResponse {
   Server server = 1;
+}
+
+// Import an existing server from an uploaded ZIP archive
+message ImportServerRequest {
+  string name = 1;             // Server name (required)
+  string description = 2;
+  string upload_session_id = 3; // Completed chunked upload session containing the server ZIP
+  string mc_version = 4;        // Minecraft version (defaults to LATEST resolution at start)
+  string mod_loader = 5;        // Mod loader (defaults to vanilla)
+  int32 memory = 6;             // Memory allocation in MB (defaults to 4096)
+  int32 max_players = 7;
+}
+
+// Imported server instance
+message ImportServerResponse {
+  Server server = 1;
+  string imported_files = 2; // Number of files extracted from the archive
 }
 
 // Server to delete

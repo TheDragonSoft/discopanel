@@ -77,6 +77,8 @@ func main() {
 		RegistryURL: cfg.Docker.RegistryURL,
 		DNS:         cfg.Docker.DNS,
 		Labels:      cfg.Docker.Labels,
+		LogDriver:   cfg.Docker.LogDriver,
+		LogOpts:     cfg.Docker.LogOpts,
 	})
 	if err != nil {
 		log.Fatal("Failed to initialize Docker client: %v", err)
@@ -179,6 +181,37 @@ func main() {
 
 	// Initialize the central event bus
 	eventBus := events.NewBus(log)
+
+	// Wake-on-connect: the proxy manager starts stopped servers when a client
+	// connects to their hostname while wake_on_connect is enabled.
+	proxyManager.SetWakeHandler(func(serverID string) error {
+		wakeCtx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+		defer cancel()
+
+		server, err := store.GetServer(wakeCtx, serverID)
+		if err != nil {
+			return err
+		}
+		if server.ContainerID == "" {
+			return fmt.Errorf("server %s has no container", server.Name)
+		}
+		if err := dockerClient.StartContainer(wakeCtx, server.ContainerID); err != nil {
+			// Already starting/running containers error here; the caller
+			// polls for actual readiness, so log and continue.
+			log.Debug("Wake-on-connect: start for %s returned: %v", server.Name, err)
+		}
+		server.Status = storage.StatusStarting
+		now := time.Now()
+		server.LastStarted = &now
+		if err := store.UpdateServer(wakeCtx, server); err != nil {
+			return err
+		}
+		eventBus.Emit(wakeCtx, events.Event{
+			Type:     v1.TriggeredEventType_TRIGGERED_EVENT_TYPE_SERVER_START,
+			ServerID: server.ID,
+		})
+		return nil
+	})
 
 	// Initialize metrics collector
 	metricsCollector := metrics.NewCollector(store, dockerClient, sender, cfg, eventBus, log)

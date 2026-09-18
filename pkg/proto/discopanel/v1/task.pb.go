@@ -2239,6 +2239,361 @@ func (x *GetSchedulerStatusResponse) GetNextCheck() *timestamppb.Timestamp {
 	return nil
 }
 
+// A single backup archive of a server
+type ServerBackup struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	Filename      string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"` // Archive filename within the server's backup directory
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`         // Backup name (filename prefix before the timestamp)
+	SizeBytes     int64                  `protobuf:"varint,4,opt,name=size_bytes,json=sizeBytes,proto3" json:"size_bytes,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ServerBackup) Reset() {
+	*x = ServerBackup{}
+	mi := &file_discopanel_v1_task_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ServerBackup) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ServerBackup) ProtoMessage() {}
+
+func (x *ServerBackup) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_task_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ServerBackup.ProtoReflect.Descriptor instead.
+func (*ServerBackup) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_task_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *ServerBackup) GetServerId() string {
+	if x != nil {
+		return x.ServerId
+	}
+	return ""
+}
+
+func (x *ServerBackup) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+func (x *ServerBackup) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *ServerBackup) GetSizeBytes() int64 {
+	if x != nil {
+		return x.SizeBytes
+	}
+	return 0
+}
+
+func (x *ServerBackup) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+// List backups request
+type ListServerBackupsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListServerBackupsRequest) Reset() {
+	*x = ListServerBackupsRequest{}
+	mi := &file_discopanel_v1_task_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListServerBackupsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListServerBackupsRequest) ProtoMessage() {}
+
+func (x *ListServerBackupsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_task_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListServerBackupsRequest.ProtoReflect.Descriptor instead.
+func (*ListServerBackupsRequest) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_task_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *ListServerBackupsRequest) GetServerId() string {
+	if x != nil {
+		return x.ServerId
+	}
+	return ""
+}
+
+// List of backup archives
+type ListServerBackupsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Backups       []*ServerBackup        `protobuf:"bytes,1,rep,name=backups,proto3" json:"backups,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListServerBackupsResponse) Reset() {
+	*x = ListServerBackupsResponse{}
+	mi := &file_discopanel_v1_task_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListServerBackupsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListServerBackupsResponse) ProtoMessage() {}
+
+func (x *ListServerBackupsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_task_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListServerBackupsResponse.ProtoReflect.Descriptor instead.
+func (*ListServerBackupsResponse) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_task_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *ListServerBackupsResponse) GetBackups() []*ServerBackup {
+	if x != nil {
+		return x.Backups
+	}
+	return nil
+}
+
+// Restore backup request
+type RestoreServerBackupRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	Filename      string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RestoreServerBackupRequest) Reset() {
+	*x = RestoreServerBackupRequest{}
+	mi := &file_discopanel_v1_task_proto_msgTypes[33]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RestoreServerBackupRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RestoreServerBackupRequest) ProtoMessage() {}
+
+func (x *RestoreServerBackupRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_task_proto_msgTypes[33]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RestoreServerBackupRequest.ProtoReflect.Descriptor instead.
+func (*RestoreServerBackupRequest) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_task_proto_rawDescGZIP(), []int{33}
+}
+
+func (x *RestoreServerBackupRequest) GetServerId() string {
+	if x != nil {
+		return x.ServerId
+	}
+	return ""
+}
+
+func (x *RestoreServerBackupRequest) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+// Restore backup response
+type RestoreServerBackupResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"` // "restored"
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *RestoreServerBackupResponse) Reset() {
+	*x = RestoreServerBackupResponse{}
+	mi := &file_discopanel_v1_task_proto_msgTypes[34]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *RestoreServerBackupResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*RestoreServerBackupResponse) ProtoMessage() {}
+
+func (x *RestoreServerBackupResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_task_proto_msgTypes[34]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use RestoreServerBackupResponse.ProtoReflect.Descriptor instead.
+func (*RestoreServerBackupResponse) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_task_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *RestoreServerBackupResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+// Delete backup request
+type DeleteServerBackupRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	Filename      string                 `protobuf:"bytes,2,opt,name=filename,proto3" json:"filename,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteServerBackupRequest) Reset() {
+	*x = DeleteServerBackupRequest{}
+	mi := &file_discopanel_v1_task_proto_msgTypes[35]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteServerBackupRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteServerBackupRequest) ProtoMessage() {}
+
+func (x *DeleteServerBackupRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_task_proto_msgTypes[35]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteServerBackupRequest.ProtoReflect.Descriptor instead.
+func (*DeleteServerBackupRequest) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_task_proto_rawDescGZIP(), []int{35}
+}
+
+func (x *DeleteServerBackupRequest) GetServerId() string {
+	if x != nil {
+		return x.ServerId
+	}
+	return ""
+}
+
+func (x *DeleteServerBackupRequest) GetFilename() string {
+	if x != nil {
+		return x.Filename
+	}
+	return ""
+}
+
+// Empty response for successful deletion
+type DeleteServerBackupResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteServerBackupResponse) Reset() {
+	*x = DeleteServerBackupResponse{}
+	mi := &file_discopanel_v1_task_proto_msgTypes[36]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteServerBackupResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteServerBackupResponse) ProtoMessage() {}
+
+func (x *DeleteServerBackupResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_task_proto_msgTypes[36]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteServerBackupResponse.ProtoReflect.Descriptor instead.
+func (*DeleteServerBackupResponse) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_task_proto_rawDescGZIP(), []int{36}
+}
+
 var File_discopanel_v1_task_proto protoreflect.FileDescriptor
 
 const file_discopanel_v1_task_proto_rawDesc = "" +
@@ -2425,7 +2780,28 @@ const file_discopanel_v1_task_proto_rawDesc = "" +
 	"\n" +
 	"last_check\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tlastCheck\x129\n" +
 	"\n" +
-	"next_check\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tnextCheck*\xbf\x01\n" +
+	"next_check\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tnextCheck\"\xb5\x01\n" +
+	"\fServerBackup\x12\x1b\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1a\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12\x1d\n" +
+	"\n" +
+	"size_bytes\x18\x04 \x01(\x03R\tsizeBytes\x129\n" +
+	"\n" +
+	"created_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"7\n" +
+	"\x18ListServerBackupsRequest\x12\x1b\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\"R\n" +
+	"\x19ListServerBackupsResponse\x125\n" +
+	"\abackups\x18\x01 \x03(\v2\x1b.discopanel.v1.ServerBackupR\abackups\"U\n" +
+	"\x1aRestoreServerBackupRequest\x12\x1b\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1a\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename\"5\n" +
+	"\x1bRestoreServerBackupResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"T\n" +
+	"\x19DeleteServerBackupRequest\x12\x1b\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1a\n" +
+	"\bfilename\x18\x02 \x01(\tR\bfilename\"\x1c\n" +
+	"\x1aDeleteServerBackupResponse*\xbf\x01\n" +
 	"\bTaskType\x12\x19\n" +
 	"\x15TASK_TYPE_UNSPECIFIED\x10\x00\x12\x15\n" +
 	"\x11TASK_TYPE_COMMAND\x10\x01\x12\x14\n" +
@@ -2455,7 +2831,7 @@ const file_discopanel_v1_task_proto_rawDesc = "" +
 	"\x17EXECUTION_STATUS_FAILED\x10\x04\x12\x1c\n" +
 	"\x18EXECUTION_STATUS_SKIPPED\x10\x05\x12\x1e\n" +
 	"\x1aEXECUTION_STATUS_CANCELLED\x10\x06\x12\x1c\n" +
-	"\x18EXECUTION_STATUS_TIMEOUT\x10\a2\xd7\b\n" +
+	"\x18EXECUTION_STATUS_TIMEOUT\x10\a2\x98\v\n" +
 	"\vTaskService\x12N\n" +
 	"\tListTasks\x12\x1f.discopanel.v1.ListTasksRequest\x1a .discopanel.v1.ListTasksResponse\x12H\n" +
 	"\aGetTask\x12\x1d.discopanel.v1.GetTaskRequest\x1a\x1e.discopanel.v1.GetTaskResponse\x12Q\n" +
@@ -2472,7 +2848,10 @@ const file_discopanel_v1_task_proto_rawDesc = "" +
 	"\x14ListServerExecutions\x12*.discopanel.v1.ListServerExecutionsRequest\x1a+.discopanel.v1.ListServerExecutionsResponse\x12c\n" +
 	"\x10GetTaskExecution\x12&.discopanel.v1.GetTaskExecutionRequest\x1a'.discopanel.v1.GetTaskExecutionResponse\x12`\n" +
 	"\x0fCancelExecution\x12%.discopanel.v1.CancelExecutionRequest\x1a&.discopanel.v1.CancelExecutionResponse\x12i\n" +
-	"\x12GetSchedulerStatus\x12(.discopanel.v1.GetSchedulerStatusRequest\x1a).discopanel.v1.GetSchedulerStatusResponseBFZDgithub.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1b\x06proto3"
+	"\x12GetSchedulerStatus\x12(.discopanel.v1.GetSchedulerStatusRequest\x1a).discopanel.v1.GetSchedulerStatusResponse\x12f\n" +
+	"\x11ListServerBackups\x12'.discopanel.v1.ListServerBackupsRequest\x1a(.discopanel.v1.ListServerBackupsResponse\x12l\n" +
+	"\x13RestoreServerBackup\x12).discopanel.v1.RestoreServerBackupRequest\x1a*.discopanel.v1.RestoreServerBackupResponse\x12i\n" +
+	"\x12DeleteServerBackup\x12(.discopanel.v1.DeleteServerBackupRequest\x1a).discopanel.v1.DeleteServerBackupResponseBFZDgithub.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1b\x06proto3"
 
 var (
 	file_discopanel_v1_task_proto_rawDescOnce sync.Once
@@ -2487,7 +2866,7 @@ func file_discopanel_v1_task_proto_rawDescGZIP() []byte {
 }
 
 var file_discopanel_v1_task_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_discopanel_v1_task_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
+var file_discopanel_v1_task_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_discopanel_v1_task_proto_goTypes = []any{
 	(TaskType)(0),                        // 0: discopanel.v1.TaskType
 	(TaskStatus)(0),                      // 1: discopanel.v1.TaskStatus
@@ -2523,35 +2902,42 @@ var file_discopanel_v1_task_proto_goTypes = []any{
 	(*CancelExecutionResponse)(nil),      // 31: discopanel.v1.CancelExecutionResponse
 	(*GetSchedulerStatusRequest)(nil),    // 32: discopanel.v1.GetSchedulerStatusRequest
 	(*GetSchedulerStatusResponse)(nil),   // 33: discopanel.v1.GetSchedulerStatusResponse
-	nil,                                  // 34: discopanel.v1.WebhookTaskConfig.HeadersEntry
-	(*timestamppb.Timestamp)(nil),        // 35: google.protobuf.Timestamp
-	(TriggeredEventType)(0),              // 36: discopanel.v1.TriggeredEventType
+	(*ServerBackup)(nil),                 // 34: discopanel.v1.ServerBackup
+	(*ListServerBackupsRequest)(nil),     // 35: discopanel.v1.ListServerBackupsRequest
+	(*ListServerBackupsResponse)(nil),    // 36: discopanel.v1.ListServerBackupsResponse
+	(*RestoreServerBackupRequest)(nil),   // 37: discopanel.v1.RestoreServerBackupRequest
+	(*RestoreServerBackupResponse)(nil),  // 38: discopanel.v1.RestoreServerBackupResponse
+	(*DeleteServerBackupRequest)(nil),    // 39: discopanel.v1.DeleteServerBackupRequest
+	(*DeleteServerBackupResponse)(nil),   // 40: discopanel.v1.DeleteServerBackupResponse
+	nil,                                  // 41: discopanel.v1.WebhookTaskConfig.HeadersEntry
+	(*timestamppb.Timestamp)(nil),        // 42: google.protobuf.Timestamp
+	(TriggeredEventType)(0),              // 43: discopanel.v1.TriggeredEventType
 }
 var file_discopanel_v1_task_proto_depIdxs = []int32{
 	0,  // 0: discopanel.v1.ScheduledTask.task_type:type_name -> discopanel.v1.TaskType
 	1,  // 1: discopanel.v1.ScheduledTask.status:type_name -> discopanel.v1.TaskStatus
 	2,  // 2: discopanel.v1.ScheduledTask.schedule:type_name -> discopanel.v1.ScheduleType
-	35, // 3: discopanel.v1.ScheduledTask.run_at:type_name -> google.protobuf.Timestamp
-	35, // 4: discopanel.v1.ScheduledTask.next_run:type_name -> google.protobuf.Timestamp
-	35, // 5: discopanel.v1.ScheduledTask.last_run:type_name -> google.protobuf.Timestamp
-	35, // 6: discopanel.v1.ScheduledTask.created_at:type_name -> google.protobuf.Timestamp
-	35, // 7: discopanel.v1.ScheduledTask.updated_at:type_name -> google.protobuf.Timestamp
-	36, // 8: discopanel.v1.ScheduledTask.event_triggers:type_name -> discopanel.v1.TriggeredEventType
+	42, // 3: discopanel.v1.ScheduledTask.run_at:type_name -> google.protobuf.Timestamp
+	42, // 4: discopanel.v1.ScheduledTask.next_run:type_name -> google.protobuf.Timestamp
+	42, // 5: discopanel.v1.ScheduledTask.last_run:type_name -> google.protobuf.Timestamp
+	42, // 6: discopanel.v1.ScheduledTask.created_at:type_name -> google.protobuf.Timestamp
+	42, // 7: discopanel.v1.ScheduledTask.updated_at:type_name -> google.protobuf.Timestamp
+	43, // 8: discopanel.v1.ScheduledTask.event_triggers:type_name -> discopanel.v1.TriggeredEventType
 	3,  // 9: discopanel.v1.TaskExecution.status:type_name -> discopanel.v1.ExecutionStatus
-	35, // 10: discopanel.v1.TaskExecution.started_at:type_name -> google.protobuf.Timestamp
-	35, // 11: discopanel.v1.TaskExecution.ended_at:type_name -> google.protobuf.Timestamp
-	34, // 12: discopanel.v1.WebhookTaskConfig.headers:type_name -> discopanel.v1.WebhookTaskConfig.HeadersEntry
+	42, // 10: discopanel.v1.TaskExecution.started_at:type_name -> google.protobuf.Timestamp
+	42, // 11: discopanel.v1.TaskExecution.ended_at:type_name -> google.protobuf.Timestamp
+	41, // 12: discopanel.v1.WebhookTaskConfig.headers:type_name -> discopanel.v1.WebhookTaskConfig.HeadersEntry
 	4,  // 13: discopanel.v1.ListTasksResponse.tasks:type_name -> discopanel.v1.ScheduledTask
 	4,  // 14: discopanel.v1.GetTaskResponse.task:type_name -> discopanel.v1.ScheduledTask
 	0,  // 15: discopanel.v1.CreateTaskRequest.task_type:type_name -> discopanel.v1.TaskType
 	2,  // 16: discopanel.v1.CreateTaskRequest.schedule:type_name -> discopanel.v1.ScheduleType
-	35, // 17: discopanel.v1.CreateTaskRequest.run_at:type_name -> google.protobuf.Timestamp
-	36, // 18: discopanel.v1.CreateTaskRequest.event_triggers:type_name -> discopanel.v1.TriggeredEventType
+	42, // 17: discopanel.v1.CreateTaskRequest.run_at:type_name -> google.protobuf.Timestamp
+	43, // 18: discopanel.v1.CreateTaskRequest.event_triggers:type_name -> discopanel.v1.TriggeredEventType
 	4,  // 19: discopanel.v1.CreateTaskResponse.task:type_name -> discopanel.v1.ScheduledTask
 	0,  // 20: discopanel.v1.UpdateTaskRequest.task_type:type_name -> discopanel.v1.TaskType
 	2,  // 21: discopanel.v1.UpdateTaskRequest.schedule:type_name -> discopanel.v1.ScheduleType
-	35, // 22: discopanel.v1.UpdateTaskRequest.run_at:type_name -> google.protobuf.Timestamp
-	36, // 23: discopanel.v1.UpdateTaskRequest.event_triggers:type_name -> discopanel.v1.TriggeredEventType
+	42, // 22: discopanel.v1.UpdateTaskRequest.run_at:type_name -> google.protobuf.Timestamp
+	43, // 23: discopanel.v1.UpdateTaskRequest.event_triggers:type_name -> discopanel.v1.TriggeredEventType
 	4,  // 24: discopanel.v1.UpdateTaskResponse.task:type_name -> discopanel.v1.ScheduledTask
 	1,  // 25: discopanel.v1.ToggleTaskRequest.status:type_name -> discopanel.v1.TaskStatus
 	4,  // 26: discopanel.v1.ToggleTaskResponse.task:type_name -> discopanel.v1.ScheduledTask
@@ -2560,37 +2946,45 @@ var file_discopanel_v1_task_proto_depIdxs = []int32{
 	5,  // 29: discopanel.v1.ListServerExecutionsResponse.executions:type_name -> discopanel.v1.TaskExecution
 	5,  // 30: discopanel.v1.GetTaskExecutionResponse.execution:type_name -> discopanel.v1.TaskExecution
 	5,  // 31: discopanel.v1.CancelExecutionResponse.execution:type_name -> discopanel.v1.TaskExecution
-	35, // 32: discopanel.v1.GetSchedulerStatusResponse.last_check:type_name -> google.protobuf.Timestamp
-	35, // 33: discopanel.v1.GetSchedulerStatusResponse.next_check:type_name -> google.protobuf.Timestamp
-	10, // 34: discopanel.v1.TaskService.ListTasks:input_type -> discopanel.v1.ListTasksRequest
-	12, // 35: discopanel.v1.TaskService.GetTask:input_type -> discopanel.v1.GetTaskRequest
-	14, // 36: discopanel.v1.TaskService.CreateTask:input_type -> discopanel.v1.CreateTaskRequest
-	16, // 37: discopanel.v1.TaskService.UpdateTask:input_type -> discopanel.v1.UpdateTaskRequest
-	18, // 38: discopanel.v1.TaskService.DeleteTask:input_type -> discopanel.v1.DeleteTaskRequest
-	20, // 39: discopanel.v1.TaskService.ToggleTask:input_type -> discopanel.v1.ToggleTaskRequest
-	22, // 40: discopanel.v1.TaskService.TriggerTask:input_type -> discopanel.v1.TriggerTaskRequest
-	24, // 41: discopanel.v1.TaskService.ListTaskExecutions:input_type -> discopanel.v1.ListTaskExecutionsRequest
-	26, // 42: discopanel.v1.TaskService.ListServerExecutions:input_type -> discopanel.v1.ListServerExecutionsRequest
-	28, // 43: discopanel.v1.TaskService.GetTaskExecution:input_type -> discopanel.v1.GetTaskExecutionRequest
-	30, // 44: discopanel.v1.TaskService.CancelExecution:input_type -> discopanel.v1.CancelExecutionRequest
-	32, // 45: discopanel.v1.TaskService.GetSchedulerStatus:input_type -> discopanel.v1.GetSchedulerStatusRequest
-	11, // 46: discopanel.v1.TaskService.ListTasks:output_type -> discopanel.v1.ListTasksResponse
-	13, // 47: discopanel.v1.TaskService.GetTask:output_type -> discopanel.v1.GetTaskResponse
-	15, // 48: discopanel.v1.TaskService.CreateTask:output_type -> discopanel.v1.CreateTaskResponse
-	17, // 49: discopanel.v1.TaskService.UpdateTask:output_type -> discopanel.v1.UpdateTaskResponse
-	19, // 50: discopanel.v1.TaskService.DeleteTask:output_type -> discopanel.v1.DeleteTaskResponse
-	21, // 51: discopanel.v1.TaskService.ToggleTask:output_type -> discopanel.v1.ToggleTaskResponse
-	23, // 52: discopanel.v1.TaskService.TriggerTask:output_type -> discopanel.v1.TriggerTaskResponse
-	25, // 53: discopanel.v1.TaskService.ListTaskExecutions:output_type -> discopanel.v1.ListTaskExecutionsResponse
-	27, // 54: discopanel.v1.TaskService.ListServerExecutions:output_type -> discopanel.v1.ListServerExecutionsResponse
-	29, // 55: discopanel.v1.TaskService.GetTaskExecution:output_type -> discopanel.v1.GetTaskExecutionResponse
-	31, // 56: discopanel.v1.TaskService.CancelExecution:output_type -> discopanel.v1.CancelExecutionResponse
-	33, // 57: discopanel.v1.TaskService.GetSchedulerStatus:output_type -> discopanel.v1.GetSchedulerStatusResponse
-	46, // [46:58] is the sub-list for method output_type
-	34, // [34:46] is the sub-list for method input_type
-	34, // [34:34] is the sub-list for extension type_name
-	34, // [34:34] is the sub-list for extension extendee
-	0,  // [0:34] is the sub-list for field type_name
+	42, // 32: discopanel.v1.GetSchedulerStatusResponse.last_check:type_name -> google.protobuf.Timestamp
+	42, // 33: discopanel.v1.GetSchedulerStatusResponse.next_check:type_name -> google.protobuf.Timestamp
+	42, // 34: discopanel.v1.ServerBackup.created_at:type_name -> google.protobuf.Timestamp
+	34, // 35: discopanel.v1.ListServerBackupsResponse.backups:type_name -> discopanel.v1.ServerBackup
+	10, // 36: discopanel.v1.TaskService.ListTasks:input_type -> discopanel.v1.ListTasksRequest
+	12, // 37: discopanel.v1.TaskService.GetTask:input_type -> discopanel.v1.GetTaskRequest
+	14, // 38: discopanel.v1.TaskService.CreateTask:input_type -> discopanel.v1.CreateTaskRequest
+	16, // 39: discopanel.v1.TaskService.UpdateTask:input_type -> discopanel.v1.UpdateTaskRequest
+	18, // 40: discopanel.v1.TaskService.DeleteTask:input_type -> discopanel.v1.DeleteTaskRequest
+	20, // 41: discopanel.v1.TaskService.ToggleTask:input_type -> discopanel.v1.ToggleTaskRequest
+	22, // 42: discopanel.v1.TaskService.TriggerTask:input_type -> discopanel.v1.TriggerTaskRequest
+	24, // 43: discopanel.v1.TaskService.ListTaskExecutions:input_type -> discopanel.v1.ListTaskExecutionsRequest
+	26, // 44: discopanel.v1.TaskService.ListServerExecutions:input_type -> discopanel.v1.ListServerExecutionsRequest
+	28, // 45: discopanel.v1.TaskService.GetTaskExecution:input_type -> discopanel.v1.GetTaskExecutionRequest
+	30, // 46: discopanel.v1.TaskService.CancelExecution:input_type -> discopanel.v1.CancelExecutionRequest
+	32, // 47: discopanel.v1.TaskService.GetSchedulerStatus:input_type -> discopanel.v1.GetSchedulerStatusRequest
+	35, // 48: discopanel.v1.TaskService.ListServerBackups:input_type -> discopanel.v1.ListServerBackupsRequest
+	37, // 49: discopanel.v1.TaskService.RestoreServerBackup:input_type -> discopanel.v1.RestoreServerBackupRequest
+	39, // 50: discopanel.v1.TaskService.DeleteServerBackup:input_type -> discopanel.v1.DeleteServerBackupRequest
+	11, // 51: discopanel.v1.TaskService.ListTasks:output_type -> discopanel.v1.ListTasksResponse
+	13, // 52: discopanel.v1.TaskService.GetTask:output_type -> discopanel.v1.GetTaskResponse
+	15, // 53: discopanel.v1.TaskService.CreateTask:output_type -> discopanel.v1.CreateTaskResponse
+	17, // 54: discopanel.v1.TaskService.UpdateTask:output_type -> discopanel.v1.UpdateTaskResponse
+	19, // 55: discopanel.v1.TaskService.DeleteTask:output_type -> discopanel.v1.DeleteTaskResponse
+	21, // 56: discopanel.v1.TaskService.ToggleTask:output_type -> discopanel.v1.ToggleTaskResponse
+	23, // 57: discopanel.v1.TaskService.TriggerTask:output_type -> discopanel.v1.TriggerTaskResponse
+	25, // 58: discopanel.v1.TaskService.ListTaskExecutions:output_type -> discopanel.v1.ListTaskExecutionsResponse
+	27, // 59: discopanel.v1.TaskService.ListServerExecutions:output_type -> discopanel.v1.ListServerExecutionsResponse
+	29, // 60: discopanel.v1.TaskService.GetTaskExecution:output_type -> discopanel.v1.GetTaskExecutionResponse
+	31, // 61: discopanel.v1.TaskService.CancelExecution:output_type -> discopanel.v1.CancelExecutionResponse
+	33, // 62: discopanel.v1.TaskService.GetSchedulerStatus:output_type -> discopanel.v1.GetSchedulerStatusResponse
+	36, // 63: discopanel.v1.TaskService.ListServerBackups:output_type -> discopanel.v1.ListServerBackupsResponse
+	38, // 64: discopanel.v1.TaskService.RestoreServerBackup:output_type -> discopanel.v1.RestoreServerBackupResponse
+	40, // 65: discopanel.v1.TaskService.DeleteServerBackup:output_type -> discopanel.v1.DeleteServerBackupResponse
+	51, // [51:66] is the sub-list for method output_type
+	36, // [36:51] is the sub-list for method input_type
+	36, // [36:36] is the sub-list for extension type_name
+	36, // [36:36] is the sub-list for extension extendee
+	0,  // [0:36] is the sub-list for field type_name
 }
 
 func init() { file_discopanel_v1_task_proto_init() }
@@ -2606,7 +3000,7 @@ func file_discopanel_v1_task_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_discopanel_v1_task_proto_rawDesc), len(file_discopanel_v1_task_proto_rawDesc)),
 			NumEnums:      4,
-			NumMessages:   31,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

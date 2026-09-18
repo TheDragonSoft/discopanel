@@ -49,6 +49,7 @@ var ProcedurePermissions = map[string]ProcedurePermission{
 	"/discopanel.v1.ServerService/ClearServerLogs":      {Resource: ResourceServers, Action: ActionUpdate, ObjectIDField: "id"},
 	"/discopanel.v1.ServerService/GetNextAvailablePort": {Resource: ResourceServers, Action: ActionRead},
 	"/discopanel.v1.ServerService/CreateServer":         {Resource: ResourceServers, Action: ActionCreate},
+	"/discopanel.v1.ServerService/ImportServer":         {Resource: ResourceServers, Action: ActionCreate},
 	"/discopanel.v1.ServerService/UpdateServer":         {Resource: ResourceServers, Action: ActionUpdate, ObjectIDField: "id"},
 	"/discopanel.v1.ServerService/DeleteServer":         {Resource: ResourceServers, Action: ActionDelete, ObjectIDField: "id"},
 	"/discopanel.v1.ServerService/StartServer":          {Resource: ResourceServers, Action: ActionStart, ObjectIDField: "id"},
@@ -154,6 +155,9 @@ var ProcedurePermissions = map[string]ProcedurePermission{
 	"/discopanel.v1.TaskService/GetTaskExecution":     {Resource: ResourceTasks, Action: ActionRead, ObjectIDField: "id"},
 	"/discopanel.v1.TaskService/CancelExecution":      {Resource: ResourceTasks, Action: ActionUpdate, ObjectIDField: "id"},
 	"/discopanel.v1.TaskService/GetSchedulerStatus":   {Resource: ResourceTasks, Action: ActionRead},
+	"/discopanel.v1.TaskService/ListServerBackups":    {Resource: ResourceTasks, Action: ActionRead, ObjectIDField: "server_id"},
+	"/discopanel.v1.TaskService/RestoreServerBackup":  {Resource: ResourceTasks, Action: ActionUpdate, ObjectIDField: "server_id"},
+	"/discopanel.v1.TaskService/DeleteServerBackup":   {Resource: ResourceTasks, Action: ActionDelete, ObjectIDField: "server_id"},
 
 	// ── UserService ────────────────────────────────────────────────────
 	"/discopanel.v1.UserService/ListUsers":  {Resource: ResourceUsers, Action: ActionRead},

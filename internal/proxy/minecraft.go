@@ -22,6 +22,11 @@ type MinecraftProxy struct {
 	runningMutex sync.RWMutex
 	ctx          context.Context
 	cancel       context.CancelFunc
+
+	// wakeResolver is consulted when no active route matches a hostname.
+	// Used for wake-on-connect: it may start the stopped server and block
+	// until it is ready, then return its fresh backend address.
+	wakeResolver func(hostname string) (backendHost string, backendPort int, ok bool)
 }
 
 // NewMinecraftProxy creates a new Minecraft proxy instance
@@ -182,7 +187,27 @@ func (p *MinecraftProxy) handleConnection(clientConn net.Conn) {
 	route, exists := p.routes[hostname]
 	p.routesMutex.RUnlock()
 
-	if !exists || !route.Active {
+	var backendHost string
+	var backendPort int
+	if exists && route.Active {
+		backendHost = route.BackendHost
+		backendPort = route.BackendPort
+	} else if p.wakeResolver != nil {
+		// No active route: give wake-on-connect a chance to start the server
+		// and wait until it comes up.
+		host, port, ok := p.wakeResolver(hostname)
+		if !ok {
+			p.logger.Debug("No active route found for hostname: %s", hostname)
+			p.routesMutex.RLock()
+			p.logger.Debug("Available routes:")
+			for r := range p.routes {
+				p.logger.Debug("%s", r)
+			}
+			p.routesMutex.RUnlock()
+			return
+		}
+		backendHost, backendPort = host, port
+	} else {
 		p.logger.Debug("No active route found for hostname: %s", hostname)
 		p.routesMutex.RLock()
 		p.logger.Debug("Available routes:")
@@ -194,7 +219,7 @@ func (p *MinecraftProxy) handleConnection(clientConn net.Conn) {
 	}
 
 	// Connect to backend
-	backendAddr := net.JoinHostPort(route.BackendHost, fmt.Sprintf("%d", route.BackendPort))
+	backendAddr := net.JoinHostPort(backendHost, fmt.Sprintf("%d", backendPort))
 	backendConn, err := net.DialTimeout("tcp", backendAddr, 5*time.Second)
 	if err != nil {
 		p.logger.Error("Failed to connect to backend %s: %v", backendAddr, err)
@@ -223,7 +248,7 @@ func (p *MinecraftProxy) handleConnection(clientConn net.Conn) {
 	} else {
 		handshake.ServerAddress = "localhost"
 	}
-	handshake.ServerPort = uint16(route.BackendPort)
+	handshake.ServerPort = uint16(backendPort)
 
 	// Forward the modified handshake to the backend
 	if err := WriteHandshakePacket(backendConn, handshake); err != nil {

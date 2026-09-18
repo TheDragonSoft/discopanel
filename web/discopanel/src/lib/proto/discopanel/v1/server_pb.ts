@@ -14,7 +14,7 @@ import type { Message } from "@bufbuild/protobuf";
  * Describes the file discopanel/v1/server.proto.
  */
 export const file_discopanel_v1_server: GenFile = /*@__PURE__*/
-  fileDesc("ChpkaXNjb3BhbmVsL3YxL3NlcnZlci5wcm90bxINZGlzY29wYW5lbC52MSIoChJMaXN0U2VydmVyc1JlcXVlc3QSEgoKZnVsbF9zdGF0cxgBIAEoCCI9ChNMaXN0U2VydmVyc1Jlc3BvbnNlEiYKB3NlcnZlcnMYASADKAsyFS5kaXNjb3BhbmVsLnYxLlNlcnZlciIeChBHZXRTZXJ2ZXJSZXF1ZXN0EgoKAmlkGAEgASgJIjoKEUdldFNlcnZlclJlc3BvbnNlEiUKBnNlcnZlchgBIAEoCzIVLmRpc2NvcGFuZWwudjEuU2VydmVyIjAKFEdldFNlcnZlckxvZ3NSZXF1ZXN0EgoKAmlkGAEgASgJEgwKBHRhaWwYAiABKAUijwEKCExvZ0VudHJ5Ei0KCXRpbWVzdGFtcBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDwoHbWVzc2FnZRgCIAEoCRINCgVsZXZlbBgDIAEoCRIOCgZzb3VyY2UYBCABKAkSEgoKaXNfY29tbWFuZBgFIAEoCBIQCghpc19lcnJvchgGIAEoCCJNChVHZXRTZXJ2ZXJMb2dzUmVzcG9uc2USJQoEbG9ncxgBIAMoCzIXLmRpc2NvcGFuZWwudjEuTG9nRW50cnkSDQoFdG90YWwYAiABKAUiJAoWQ2xlYXJTZXJ2ZXJMb2dzUmVxdWVzdBIKCgJpZBgBIAEoCSIZChdDbGVhclNlcnZlckxvZ3NSZXNwb25zZSIdChtHZXROZXh0QXZhaWxhYmxlUG9ydFJlcXVlc3QiKAoIVXNlZFBvcnQSDAoEcG9ydBgBIAEoBRIOCgZpbl91c2UYAiABKAgiWQocR2V0TmV4dEF2YWlsYWJsZVBvcnRSZXNwb25zZRIMCgRwb3J0GAEgASgFEisKCnVzZWRfcG9ydHMYAiADKAsyFy5kaXNjb3BhbmVsLnYxLlVzZWRQb3J0IvADChNDcmVhdGVTZXJ2ZXJSZXF1ZXN0EgwKBG5hbWUYASABKAkSEwoLZGVzY3JpcHRpb24YAiABKAkSLAoKbW9kX2xvYWRlchgDIAEoDjIYLmRpc2NvcGFuZWwudjEuTW9kTG9hZGVyEhIKCm1jX3ZlcnNpb24YBCABKAkSDAoEcG9ydBgFIAEoBRITCgttYXhfcGxheWVycxgGIAEoBRIOCgZtZW1vcnkYByABKAUSFAoMZG9ja2VyX2ltYWdlGAggASgJEhIKCmF1dG9fc3RhcnQYCSABKAgSEAoIZGV0YWNoZWQYCiABKAgSGQoRc3RhcnRfaW1tZWRpYXRlbHkYCyABKAgSEgoKbW9kcGFja19pZBgMIAEoCRIaChJtb2RwYWNrX3ZlcnNpb25faWQYDSABKAkSFgoOcHJveHlfaG9zdG5hbWUYDiABKAkSGQoRcHJveHlfbGlzdGVuZXJfaWQYDyABKAkSFAoMdXNlX2Jhc2VfdXJsGBAgASgIEjcKEGFkZGl0aW9uYWxfcG9ydHMYESADKAsyHS5kaXNjb3BhbmVsLnYxLkFkZGl0aW9uYWxQb3J0EjgKEGRvY2tlcl9vdmVycmlkZXMYEiABKAsyHi5kaXNjb3BhbmVsLnYxLkRvY2tlck92ZXJyaWRlcyI9ChRDcmVhdGVTZXJ2ZXJSZXNwb25zZRIlCgZzZXJ2ZXIYASABKAsyFS5kaXNjb3BhbmVsLnYxLlNlcnZlciLcAwoTVXBkYXRlU2VydmVyUmVxdWVzdBIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEhEKBHBvcnQYBCABKAVIAIgBARITCgttYXhfcGxheWVycxgFIAEoBRIOCgZtZW1vcnkYBiABKAUSEgoKbW9kX2xvYWRlchgHIAEoCRISCgptY192ZXJzaW9uGAggASgJEhQKDGRvY2tlcl9pbWFnZRgJIAEoCRIXCgphdXRvX3N0YXJ0GAogASgISAGIAQESFQoIZGV0YWNoZWQYCyABKAhIAogBARIYCgt0cHNfY29tbWFuZBgMIAEoCUgDiAEBEhIKCm1vZHBhY2tfaWQYDSABKAkSGgoSbW9kcGFja192ZXJzaW9uX2lkGA4gASgJEjcKEGFkZGl0aW9uYWxfcG9ydHMYDyADKAsyHS5kaXNjb3BhbmVsLnYxLkFkZGl0aW9uYWxQb3J0EjgKEGRvY2tlcl9vdmVycmlkZXMYECABKAsyHi5kaXNjb3BhbmVsLnYxLkRvY2tlck92ZXJyaWRlc0IHCgVfcG9ydEINCgtfYXV0b19zdGFydEILCglfZGV0YWNoZWRCDgoMX3Rwc19jb21tYW5kIj0KFFVwZGF0ZVNlcnZlclJlc3BvbnNlEiUKBnNlcnZlchgBIAEoCzIVLmRpc2NvcGFuZWwudjEuU2VydmVyIiEKE0RlbGV0ZVNlcnZlclJlcXVlc3QSCgoCaWQYASABKAkiFgoURGVsZXRlU2VydmVyUmVzcG9uc2UiIAoSU3RhcnRTZXJ2ZXJSZXF1ZXN0EgoKAmlkGAEgASgJIiUKE1N0YXJ0U2VydmVyUmVzcG9uc2USDgoGc3RhdHVzGAEgASgJIh8KEVN0b3BTZXJ2ZXJSZXF1ZXN0EgoKAmlkGAEgASgJIiQKElN0b3BTZXJ2ZXJSZXNwb25zZRIOCgZzdGF0dXMYASABKAkiIgoUUmVzdGFydFNlcnZlclJlcXVlc3QSCgoCaWQYASABKAkiJwoVUmVzdGFydFNlcnZlclJlc3BvbnNlEg4KBnN0YXR1cxgBIAEoCSIjChVSZWNyZWF0ZVNlcnZlclJlcXVlc3QSCgoCaWQYASABKAkiKAoWUmVjcmVhdGVTZXJ2ZXJSZXNwb25zZRIOCgZzdGF0dXMYASABKAkiUQoSU2VuZENvbW1hbmRSZXF1ZXN0EgoKAmlkGAEgASgJEg8KB2NvbW1hbmQYAiABKAkSEwoGc2lsZW50GAMgASgISACIAQFCCQoHX3NpbGVudCJFChNTZW5kQ29tbWFuZFJlc3BvbnNlEg8KB3N1Y2Nlc3MYASABKAgSDgoGb3V0cHV0GAIgASgJEg0KBWVycm9yGAMgASgJIiMKFVVwbG9hZFRvTUNMb2dzUmVxdWVzdBIKCgJpZBgBIAEoCSIlChZVcGxvYWRUb01DTG9nc1Jlc3BvbnNlEgsKA3VybBgBIAEoCTKICgoNU2VydmVyU2VydmljZRJUCgtMaXN0U2VydmVycxIhLmRpc2NvcGFuZWwudjEuTGlzdFNlcnZlcnNSZXF1ZXN0GiIuZGlzY29wYW5lbC52MS5MaXN0U2VydmVyc1Jlc3BvbnNlEk4KCUdldFNlcnZlchIfLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyUmVxdWVzdBogLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyUmVzcG9uc2USWgoNR2V0U2VydmVyTG9ncxIjLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyTG9nc1JlcXVlc3QaJC5kaXNjb3BhbmVsLnYxLkdldFNlcnZlckxvZ3NSZXNwb25zZRJgCg9DbGVhclNlcnZlckxvZ3MSJS5kaXNjb3BhbmVsLnYxLkNsZWFyU2VydmVyTG9nc1JlcXVlc3QaJi5kaXNjb3BhbmVsLnYxLkNsZWFyU2VydmVyTG9nc1Jlc3BvbnNlEm8KFEdldE5leHRBdmFpbGFibGVQb3J0EiouZGlzY29wYW5lbC52MS5HZXROZXh0QXZhaWxhYmxlUG9ydFJlcXVlc3QaKy5kaXNjb3BhbmVsLnYxLkdldE5leHRBdmFpbGFibGVQb3J0UmVzcG9uc2USVwoMQ3JlYXRlU2VydmVyEiIuZGlzY29wYW5lbC52MS5DcmVhdGVTZXJ2ZXJSZXF1ZXN0GiMuZGlzY29wYW5lbC52MS5DcmVhdGVTZXJ2ZXJSZXNwb25zZRJXCgxVcGRhdGVTZXJ2ZXISIi5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlclJlcXVlc3QaIy5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlclJlc3BvbnNlElcKDERlbGV0ZVNlcnZlchIiLmRpc2NvcGFuZWwudjEuRGVsZXRlU2VydmVyUmVxdWVzdBojLmRpc2NvcGFuZWwudjEuRGVsZXRlU2VydmVyUmVzcG9uc2USVAoLU3RhcnRTZXJ2ZXISIS5kaXNjb3BhbmVsLnYxLlN0YXJ0U2VydmVyUmVxdWVzdBoiLmRpc2NvcGFuZWwudjEuU3RhcnRTZXJ2ZXJSZXNwb25zZRJRCgpTdG9wU2VydmVyEiAuZGlzY29wYW5lbC52MS5TdG9wU2VydmVyUmVxdWVzdBohLmRpc2NvcGFuZWwudjEuU3RvcFNlcnZlclJlc3BvbnNlEloKDVJlc3RhcnRTZXJ2ZXISIy5kaXNjb3BhbmVsLnYxLlJlc3RhcnRTZXJ2ZXJSZXF1ZXN0GiQuZGlzY29wYW5lbC52MS5SZXN0YXJ0U2VydmVyUmVzcG9uc2USXQoOUmVjcmVhdGVTZXJ2ZXISJC5kaXNjb3BhbmVsLnYxLlJlY3JlYXRlU2VydmVyUmVxdWVzdBolLmRpc2NvcGFuZWwudjEuUmVjcmVhdGVTZXJ2ZXJSZXNwb25zZRJUCgtTZW5kQ29tbWFuZBIhLmRpc2NvcGFuZWwudjEuU2VuZENvbW1hbmRSZXF1ZXN0GiIuZGlzY29wYW5lbC52MS5TZW5kQ29tbWFuZFJlc3BvbnNlEl0KDlVwbG9hZFRvTUNMb2dzEiQuZGlzY29wYW5lbC52MS5VcGxvYWRUb01DTG9nc1JlcXVlc3QaJS5kaXNjb3BhbmVsLnYxLlVwbG9hZFRvTUNMb2dzUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw", [file_discopanel_v1_common, file_google_protobuf_timestamp]);
+  fileDesc("ChpkaXNjb3BhbmVsL3YxL3NlcnZlci5wcm90bxINZGlzY29wYW5lbC52MSIoChJMaXN0U2VydmVyc1JlcXVlc3QSEgoKZnVsbF9zdGF0cxgBIAEoCCI9ChNMaXN0U2VydmVyc1Jlc3BvbnNlEiYKB3NlcnZlcnMYASADKAsyFS5kaXNjb3BhbmVsLnYxLlNlcnZlciIeChBHZXRTZXJ2ZXJSZXF1ZXN0EgoKAmlkGAEgASgJIjoKEUdldFNlcnZlclJlc3BvbnNlEiUKBnNlcnZlchgBIAEoCzIVLmRpc2NvcGFuZWwudjEuU2VydmVyIjAKFEdldFNlcnZlckxvZ3NSZXF1ZXN0EgoKAmlkGAEgASgJEgwKBHRhaWwYAiABKAUijwEKCExvZ0VudHJ5Ei0KCXRpbWVzdGFtcBgBIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDwoHbWVzc2FnZRgCIAEoCRINCgVsZXZlbBgDIAEoCRIOCgZzb3VyY2UYBCABKAkSEgoKaXNfY29tbWFuZBgFIAEoCBIQCghpc19lcnJvchgGIAEoCCJNChVHZXRTZXJ2ZXJMb2dzUmVzcG9uc2USJQoEbG9ncxgBIAMoCzIXLmRpc2NvcGFuZWwudjEuTG9nRW50cnkSDQoFdG90YWwYAiABKAUiJAoWQ2xlYXJTZXJ2ZXJMb2dzUmVxdWVzdBIKCgJpZBgBIAEoCSIZChdDbGVhclNlcnZlckxvZ3NSZXNwb25zZSIdChtHZXROZXh0QXZhaWxhYmxlUG9ydFJlcXVlc3QiKAoIVXNlZFBvcnQSDAoEcG9ydBgBIAEoBRIOCgZpbl91c2UYAiABKAgiWQocR2V0TmV4dEF2YWlsYWJsZVBvcnRSZXNwb25zZRIMCgRwb3J0GAEgASgFEisKCnVzZWRfcG9ydHMYAiADKAsyFy5kaXNjb3BhbmVsLnYxLlVzZWRQb3J0IvADChNDcmVhdGVTZXJ2ZXJSZXF1ZXN0EgwKBG5hbWUYASABKAkSEwoLZGVzY3JpcHRpb24YAiABKAkSLAoKbW9kX2xvYWRlchgDIAEoDjIYLmRpc2NvcGFuZWwudjEuTW9kTG9hZGVyEhIKCm1jX3ZlcnNpb24YBCABKAkSDAoEcG9ydBgFIAEoBRITCgttYXhfcGxheWVycxgGIAEoBRIOCgZtZW1vcnkYByABKAUSFAoMZG9ja2VyX2ltYWdlGAggASgJEhIKCmF1dG9fc3RhcnQYCSABKAgSEAoIZGV0YWNoZWQYCiABKAgSGQoRc3RhcnRfaW1tZWRpYXRlbHkYCyABKAgSEgoKbW9kcGFja19pZBgMIAEoCRIaChJtb2RwYWNrX3ZlcnNpb25faWQYDSABKAkSFgoOcHJveHlfaG9zdG5hbWUYDiABKAkSGQoRcHJveHlfbGlzdGVuZXJfaWQYDyABKAkSFAoMdXNlX2Jhc2VfdXJsGBAgASgIEjcKEGFkZGl0aW9uYWxfcG9ydHMYESADKAsyHS5kaXNjb3BhbmVsLnYxLkFkZGl0aW9uYWxQb3J0EjgKEGRvY2tlcl9vdmVycmlkZXMYEiABKAsyHi5kaXNjb3BhbmVsLnYxLkRvY2tlck92ZXJyaWRlcyI9ChRDcmVhdGVTZXJ2ZXJSZXNwb25zZRIlCgZzZXJ2ZXIYASABKAsyFS5kaXNjb3BhbmVsLnYxLlNlcnZlciKOBAoTVXBkYXRlU2VydmVyUmVxdWVzdBIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEhEKBHBvcnQYBCABKAVIAIgBARITCgttYXhfcGxheWVycxgFIAEoBRIOCgZtZW1vcnkYBiABKAUSEgoKbW9kX2xvYWRlchgHIAEoCRISCgptY192ZXJzaW9uGAggASgJEhQKDGRvY2tlcl9pbWFnZRgJIAEoCRIXCgphdXRvX3N0YXJ0GAogASgISAGIAQESFQoIZGV0YWNoZWQYCyABKAhIAogBARIYCgt0cHNfY29tbWFuZBgMIAEoCUgDiAEBEhIKCm1vZHBhY2tfaWQYDSABKAkSGgoSbW9kcGFja192ZXJzaW9uX2lkGA4gASgJEjcKEGFkZGl0aW9uYWxfcG9ydHMYDyADKAsyHS5kaXNjb3BhbmVsLnYxLkFkZGl0aW9uYWxQb3J0EjgKEGRvY2tlcl9vdmVycmlkZXMYECABKAsyHi5kaXNjb3BhbmVsLnYxLkRvY2tlck92ZXJyaWRlcxIcCg93YWtlX29uX2Nvbm5lY3QYESABKAhIBIgBAUIHCgVfcG9ydEINCgtfYXV0b19zdGFydEILCglfZGV0YWNoZWRCDgoMX3Rwc19jb21tYW5kQhIKEF93YWtlX29uX2Nvbm5lY3QiPQoUVXBkYXRlU2VydmVyUmVzcG9uc2USJQoGc2VydmVyGAEgASgLMhUuZGlzY29wYW5lbC52MS5TZXJ2ZXIioAEKE0ltcG9ydFNlcnZlclJlcXVlc3QSDAoEbmFtZRgBIAEoCRITCgtkZXNjcmlwdGlvbhgCIAEoCRIZChF1cGxvYWRfc2Vzc2lvbl9pZBgDIAEoCRISCgptY192ZXJzaW9uGAQgASgJEhIKCm1vZF9sb2FkZXIYBSABKAkSDgoGbWVtb3J5GAYgASgFEhMKC21heF9wbGF5ZXJzGAcgASgFIlUKFEltcG9ydFNlcnZlclJlc3BvbnNlEiUKBnNlcnZlchgBIAEoCzIVLmRpc2NvcGFuZWwudjEuU2VydmVyEhYKDmltcG9ydGVkX2ZpbGVzGAIgASgJIiEKE0RlbGV0ZVNlcnZlclJlcXVlc3QSCgoCaWQYASABKAkiFgoURGVsZXRlU2VydmVyUmVzcG9uc2UiIAoSU3RhcnRTZXJ2ZXJSZXF1ZXN0EgoKAmlkGAEgASgJIiUKE1N0YXJ0U2VydmVyUmVzcG9uc2USDgoGc3RhdHVzGAEgASgJIh8KEVN0b3BTZXJ2ZXJSZXF1ZXN0EgoKAmlkGAEgASgJIiQKElN0b3BTZXJ2ZXJSZXNwb25zZRIOCgZzdGF0dXMYASABKAkiIgoUUmVzdGFydFNlcnZlclJlcXVlc3QSCgoCaWQYASABKAkiJwoVUmVzdGFydFNlcnZlclJlc3BvbnNlEg4KBnN0YXR1cxgBIAEoCSIjChVSZWNyZWF0ZVNlcnZlclJlcXVlc3QSCgoCaWQYASABKAkiKAoWUmVjcmVhdGVTZXJ2ZXJSZXNwb25zZRIOCgZzdGF0dXMYASABKAkiUQoSU2VuZENvbW1hbmRSZXF1ZXN0EgoKAmlkGAEgASgJEg8KB2NvbW1hbmQYAiABKAkSEwoGc2lsZW50GAMgASgISACIAQFCCQoHX3NpbGVudCJFChNTZW5kQ29tbWFuZFJlc3BvbnNlEg8KB3N1Y2Nlc3MYASABKAgSDgoGb3V0cHV0GAIgASgJEg0KBWVycm9yGAMgASgJIiMKFVVwbG9hZFRvTUNMb2dzUmVxdWVzdBIKCgJpZBgBIAEoCSIlChZVcGxvYWRUb01DTG9nc1Jlc3BvbnNlEgsKA3VybBgBIAEoCTLhCgoNU2VydmVyU2VydmljZRJUCgtMaXN0U2VydmVycxIhLmRpc2NvcGFuZWwudjEuTGlzdFNlcnZlcnNSZXF1ZXN0GiIuZGlzY29wYW5lbC52MS5MaXN0U2VydmVyc1Jlc3BvbnNlEk4KCUdldFNlcnZlchIfLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyUmVxdWVzdBogLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyUmVzcG9uc2USWgoNR2V0U2VydmVyTG9ncxIjLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyTG9nc1JlcXVlc3QaJC5kaXNjb3BhbmVsLnYxLkdldFNlcnZlckxvZ3NSZXNwb25zZRJgCg9DbGVhclNlcnZlckxvZ3MSJS5kaXNjb3BhbmVsLnYxLkNsZWFyU2VydmVyTG9nc1JlcXVlc3QaJi5kaXNjb3BhbmVsLnYxLkNsZWFyU2VydmVyTG9nc1Jlc3BvbnNlEm8KFEdldE5leHRBdmFpbGFibGVQb3J0EiouZGlzY29wYW5lbC52MS5HZXROZXh0QXZhaWxhYmxlUG9ydFJlcXVlc3QaKy5kaXNjb3BhbmVsLnYxLkdldE5leHRBdmFpbGFibGVQb3J0UmVzcG9uc2USVwoMQ3JlYXRlU2VydmVyEiIuZGlzY29wYW5lbC52MS5DcmVhdGVTZXJ2ZXJSZXF1ZXN0GiMuZGlzY29wYW5lbC52MS5DcmVhdGVTZXJ2ZXJSZXNwb25zZRJXCgxVcGRhdGVTZXJ2ZXISIi5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlclJlcXVlc3QaIy5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlclJlc3BvbnNlElcKDERlbGV0ZVNlcnZlchIiLmRpc2NvcGFuZWwudjEuRGVsZXRlU2VydmVyUmVxdWVzdBojLmRpc2NvcGFuZWwudjEuRGVsZXRlU2VydmVyUmVzcG9uc2USVAoLU3RhcnRTZXJ2ZXISIS5kaXNjb3BhbmVsLnYxLlN0YXJ0U2VydmVyUmVxdWVzdBoiLmRpc2NvcGFuZWwudjEuU3RhcnRTZXJ2ZXJSZXNwb25zZRJRCgpTdG9wU2VydmVyEiAuZGlzY29wYW5lbC52MS5TdG9wU2VydmVyUmVxdWVzdBohLmRpc2NvcGFuZWwudjEuU3RvcFNlcnZlclJlc3BvbnNlEloKDVJlc3RhcnRTZXJ2ZXISIy5kaXNjb3BhbmVsLnYxLlJlc3RhcnRTZXJ2ZXJSZXF1ZXN0GiQuZGlzY29wYW5lbC52MS5SZXN0YXJ0U2VydmVyUmVzcG9uc2USXQoOUmVjcmVhdGVTZXJ2ZXISJC5kaXNjb3BhbmVsLnYxLlJlY3JlYXRlU2VydmVyUmVxdWVzdBolLmRpc2NvcGFuZWwudjEuUmVjcmVhdGVTZXJ2ZXJSZXNwb25zZRJUCgtTZW5kQ29tbWFuZBIhLmRpc2NvcGFuZWwudjEuU2VuZENvbW1hbmRSZXF1ZXN0GiIuZGlzY29wYW5lbC52MS5TZW5kQ29tbWFuZFJlc3BvbnNlEl0KDlVwbG9hZFRvTUNMb2dzEiQuZGlzY29wYW5lbC52MS5VcGxvYWRUb01DTG9nc1JlcXVlc3QaJS5kaXNjb3BhbmVsLnYxLlVwbG9hZFRvTUNMb2dzUmVzcG9uc2USVwoMSW1wb3J0U2VydmVyEiIuZGlzY29wYW5lbC52MS5JbXBvcnRTZXJ2ZXJSZXF1ZXN0GiMuZGlzY29wYW5lbC52MS5JbXBvcnRTZXJ2ZXJSZXNwb25zZUJGWkRnaXRodWIuY29tL25pY2toZXllci9kaXNjb3BhbmVsL3BrZy9wcm90by9kaXNjb3BhbmVsL3YxO2Rpc2NvcGFuZWx2MWIGcHJvdG8z", [file_discopanel_v1_common, file_google_protobuf_timestamp]);
 
 /**
  * Server list options
@@ -489,6 +489,11 @@ export type UpdateServerRequest = Message<"discopanel.v1.UpdateServerRequest"> &
    * @generated from field: discopanel.v1.DockerOverrides docker_overrides = 16;
    */
   dockerOverrides?: DockerOverrides | undefined;
+
+  /**
+   * @generated from field: optional bool wake_on_connect = 17;
+   */
+  wakeOnConnect?: boolean | undefined;
 };
 
 /**
@@ -518,6 +523,91 @@ export const UpdateServerResponseSchema: GenMessage<UpdateServerResponse> = /*@_
   messageDesc(file_discopanel_v1_server, 15);
 
 /**
+ * Import an existing server from an uploaded ZIP archive
+ *
+ * @generated from message discopanel.v1.ImportServerRequest
+ */
+export type ImportServerRequest = Message<"discopanel.v1.ImportServerRequest"> & {
+  /**
+   * Server name (required)
+   *
+   * @generated from field: string name = 1;
+   */
+  name: string;
+
+  /**
+   * @generated from field: string description = 2;
+   */
+  description: string;
+
+  /**
+   * Completed chunked upload session containing the server ZIP
+   *
+   * @generated from field: string upload_session_id = 3;
+   */
+  uploadSessionId: string;
+
+  /**
+   * Minecraft version (defaults to LATEST resolution at start)
+   *
+   * @generated from field: string mc_version = 4;
+   */
+  mcVersion: string;
+
+  /**
+   * Mod loader (defaults to vanilla)
+   *
+   * @generated from field: string mod_loader = 5;
+   */
+  modLoader: string;
+
+  /**
+   * Memory allocation in MB (defaults to 4096)
+   *
+   * @generated from field: int32 memory = 6;
+   */
+  memory: number;
+
+  /**
+   * @generated from field: int32 max_players = 7;
+   */
+  maxPlayers: number;
+};
+
+/**
+ * Describes the message discopanel.v1.ImportServerRequest.
+ * Use `create(ImportServerRequestSchema)` to create a new message.
+ */
+export const ImportServerRequestSchema: GenMessage<ImportServerRequest> = /*@__PURE__*/
+  messageDesc(file_discopanel_v1_server, 16);
+
+/**
+ * Imported server instance
+ *
+ * @generated from message discopanel.v1.ImportServerResponse
+ */
+export type ImportServerResponse = Message<"discopanel.v1.ImportServerResponse"> & {
+  /**
+   * @generated from field: discopanel.v1.Server server = 1;
+   */
+  server?: Server | undefined;
+
+  /**
+   * Number of files extracted from the archive
+   *
+   * @generated from field: string imported_files = 2;
+   */
+  importedFiles: string;
+};
+
+/**
+ * Describes the message discopanel.v1.ImportServerResponse.
+ * Use `create(ImportServerResponseSchema)` to create a new message.
+ */
+export const ImportServerResponseSchema: GenMessage<ImportServerResponse> = /*@__PURE__*/
+  messageDesc(file_discopanel_v1_server, 17);
+
+/**
  * Server to delete
  *
  * @generated from message discopanel.v1.DeleteServerRequest
@@ -534,7 +624,7 @@ export type DeleteServerRequest = Message<"discopanel.v1.DeleteServerRequest"> &
  * Use `create(DeleteServerRequestSchema)` to create a new message.
  */
 export const DeleteServerRequestSchema: GenMessage<DeleteServerRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 16);
+  messageDesc(file_discopanel_v1_server, 18);
 
 /**
  * Empty deletion response
@@ -549,7 +639,7 @@ export type DeleteServerResponse = Message<"discopanel.v1.DeleteServerResponse">
  * Use `create(DeleteServerResponseSchema)` to create a new message.
  */
 export const DeleteServerResponseSchema: GenMessage<DeleteServerResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 17);
+  messageDesc(file_discopanel_v1_server, 19);
 
 /**
  * Server to start
@@ -568,7 +658,7 @@ export type StartServerRequest = Message<"discopanel.v1.StartServerRequest"> & {
  * Use `create(StartServerRequestSchema)` to create a new message.
  */
 export const StartServerRequestSchema: GenMessage<StartServerRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 18);
+  messageDesc(file_discopanel_v1_server, 20);
 
 /**
  * Start operation status
@@ -587,7 +677,7 @@ export type StartServerResponse = Message<"discopanel.v1.StartServerResponse"> &
  * Use `create(StartServerResponseSchema)` to create a new message.
  */
 export const StartServerResponseSchema: GenMessage<StartServerResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 19);
+  messageDesc(file_discopanel_v1_server, 21);
 
 /**
  * Server to stop
@@ -606,7 +696,7 @@ export type StopServerRequest = Message<"discopanel.v1.StopServerRequest"> & {
  * Use `create(StopServerRequestSchema)` to create a new message.
  */
 export const StopServerRequestSchema: GenMessage<StopServerRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 20);
+  messageDesc(file_discopanel_v1_server, 22);
 
 /**
  * Stop operation status
@@ -625,7 +715,7 @@ export type StopServerResponse = Message<"discopanel.v1.StopServerResponse"> & {
  * Use `create(StopServerResponseSchema)` to create a new message.
  */
 export const StopServerResponseSchema: GenMessage<StopServerResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 21);
+  messageDesc(file_discopanel_v1_server, 23);
 
 /**
  * Server to restart
@@ -644,7 +734,7 @@ export type RestartServerRequest = Message<"discopanel.v1.RestartServerRequest">
  * Use `create(RestartServerRequestSchema)` to create a new message.
  */
 export const RestartServerRequestSchema: GenMessage<RestartServerRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 22);
+  messageDesc(file_discopanel_v1_server, 24);
 
 /**
  * Restart operation status
@@ -663,7 +753,7 @@ export type RestartServerResponse = Message<"discopanel.v1.RestartServerResponse
  * Use `create(RestartServerResponseSchema)` to create a new message.
  */
 export const RestartServerResponseSchema: GenMessage<RestartServerResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 23);
+  messageDesc(file_discopanel_v1_server, 25);
 
 /**
  * Server to recreate
@@ -682,7 +772,7 @@ export type RecreateServerRequest = Message<"discopanel.v1.RecreateServerRequest
  * Use `create(RecreateServerRequestSchema)` to create a new message.
  */
 export const RecreateServerRequestSchema: GenMessage<RecreateServerRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 24);
+  messageDesc(file_discopanel_v1_server, 26);
 
 /**
  * Recreate operation status
@@ -701,7 +791,7 @@ export type RecreateServerResponse = Message<"discopanel.v1.RecreateServerRespon
  * Use `create(RecreateServerResponseSchema)` to create a new message.
  */
 export const RecreateServerResponseSchema: GenMessage<RecreateServerResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 25);
+  messageDesc(file_discopanel_v1_server, 27);
 
 /**
  * Console command to execute
@@ -730,7 +820,7 @@ export type SendCommandRequest = Message<"discopanel.v1.SendCommandRequest"> & {
  * Use `create(SendCommandRequestSchema)` to create a new message.
  */
 export const SendCommandRequestSchema: GenMessage<SendCommandRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 26);
+  messageDesc(file_discopanel_v1_server, 28);
 
 /**
  * Command execution result
@@ -759,7 +849,7 @@ export type SendCommandResponse = Message<"discopanel.v1.SendCommandResponse"> &
  * Use `create(SendCommandResponseSchema)` to create a new message.
  */
 export const SendCommandResponseSchema: GenMessage<SendCommandResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 27);
+  messageDesc(file_discopanel_v1_server, 29);
 
 /**
  * Server to upload logs for
@@ -778,7 +868,7 @@ export type UploadToMCLogsRequest = Message<"discopanel.v1.UploadToMCLogsRequest
  * Use `create(UploadToMCLogsRequestSchema)` to create a new message.
  */
 export const UploadToMCLogsRequestSchema: GenMessage<UploadToMCLogsRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 28);
+  messageDesc(file_discopanel_v1_server, 30);
 
 /**
  * mclo.gs upload result
@@ -797,7 +887,7 @@ export type UploadToMCLogsResponse = Message<"discopanel.v1.UploadToMCLogsRespon
  * Use `create(UploadToMCLogsResponseSchema)` to create a new message.
  */
 export const UploadToMCLogsResponseSchema: GenMessage<UploadToMCLogsResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_server, 29);
+  messageDesc(file_discopanel_v1_server, 31);
 
 /**
  * Minecraft server management
@@ -944,6 +1034,17 @@ export const ServerService: GenService<{
     methodKind: "unary";
     input: typeof UploadToMCLogsRequestSchema;
     output: typeof UploadToMCLogsResponseSchema;
+  },
+  /**
+   * Import an existing server from a ZIP archive of its server directory
+   * (e.g. migrated from another panel)
+   *
+   * @generated from rpc discopanel.v1.ServerService.ImportServer
+   */
+  importServer: {
+    methodKind: "unary";
+    input: typeof ImportServerRequestSchema;
+    output: typeof ImportServerResponseSchema;
   },
 }> = /*@__PURE__*/
   serviceDesc(file_discopanel_v1_server, 0);

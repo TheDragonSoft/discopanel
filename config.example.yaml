@@ -39,6 +39,17 @@ docker:
   #   your.label.key: "your_label_value"
   #   other.label.key: "other_label_value"
   labels: '{ }'
+  # Container log driver (json-file works everywhere; "local" is Docker-only
+  # and rejected by e.g. Podman)
+  log_driver: "json-file"
+  # Log driver options (rotation by default)
+  # log_opts:
+  #   max-size: "10m"
+  #   max-file: "3"
+  # Global admission control: maximum total memory (MB) allocated across all
+  # servers. Server creation and memory changes are rejected when the sum of
+  # all server allocations would exceed this. 0 = unlimited.
+  max_total_memory_mb: 0
 
 # Storage configuration
 storage:

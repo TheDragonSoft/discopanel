@@ -33,6 +33,12 @@ service TaskService {
   rpc CancelExecution(CancelExecutionRequest) returns (CancelExecutionResponse);
   // Get scheduler status
   rpc GetSchedulerStatus(GetSchedulerStatusRequest) returns (GetSchedulerStatusResponse);
+  // List backup archives for a server
+  rpc ListServerBackups(ListServerBackupsRequest) returns (ListServerBackupsResponse);
+  // Restore a server from a backup archive (server must be stopped)
+  rpc RestoreServerBackup(RestoreServerBackupRequest) returns (RestoreServerBackupResponse);
+  // Delete a backup archive
+  rpc DeleteServerBackup(DeleteServerBackupRequest) returns (DeleteServerBackupResponse);
 }
 
 // Task type enumeration
@@ -325,3 +331,42 @@ message GetSchedulerStatusResponse {
   google.protobuf.Timestamp last_check = 4;
   google.protobuf.Timestamp next_check = 5;
 }
+
+// A single backup archive of a server
+message ServerBackup {
+  string server_id = 1;
+  string filename = 2;                    // Archive filename within the server's backup directory
+  string name = 3;                        // Backup name (filename prefix before the timestamp)
+  int64 size_bytes = 4;
+  google.protobuf.Timestamp created_at = 5;
+}
+
+// List backups request
+message ListServerBackupsRequest {
+  string server_id = 1;
+}
+
+// List of backup archives
+message ListServerBackupsResponse {
+  repeated ServerBackup backups = 1;
+}
+
+// Restore backup request
+message RestoreServerBackupRequest {
+  string server_id = 1;
+  string filename = 2;
+}
+
+// Restore backup response
+message RestoreServerBackupResponse {
+  string status = 1; // "restored"
+}
+
+// Delete backup request
+message DeleteServerBackupRequest {
+  string server_id = 1;
+  string filename = 2;
+}
+
+// Empty response for successful deletion
+message DeleteServerBackupResponse {}

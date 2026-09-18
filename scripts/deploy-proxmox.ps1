@@ -5,7 +5,9 @@
 param(
     [string]$ProxmoxHost = "192.168.1.200",
     [string]$ProxmoxUser = "root",
-    [string]$ProxmoxPass = "#1@14proxmox",
+    # Never hardcode credentials: pass the password via the DISCOPANEL_PROXMOX_PASS
+    # environment variable or the -ProxmoxPass parameter at invocation time.
+    [string]$ProxmoxPass = $env:DISCOPANEL_PROXMOX_PASS,
     [int]$ContainerId = 104,
     [switch]$SkipBuild
 )

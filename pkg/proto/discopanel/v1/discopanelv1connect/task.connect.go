@@ -62,6 +62,15 @@ const (
 	// TaskServiceGetSchedulerStatusProcedure is the fully-qualified name of the TaskService's
 	// GetSchedulerStatus RPC.
 	TaskServiceGetSchedulerStatusProcedure = "/discopanel.v1.TaskService/GetSchedulerStatus"
+	// TaskServiceListServerBackupsProcedure is the fully-qualified name of the TaskService's
+	// ListServerBackups RPC.
+	TaskServiceListServerBackupsProcedure = "/discopanel.v1.TaskService/ListServerBackups"
+	// TaskServiceRestoreServerBackupProcedure is the fully-qualified name of the TaskService's
+	// RestoreServerBackup RPC.
+	TaskServiceRestoreServerBackupProcedure = "/discopanel.v1.TaskService/RestoreServerBackup"
+	// TaskServiceDeleteServerBackupProcedure is the fully-qualified name of the TaskService's
+	// DeleteServerBackup RPC.
+	TaskServiceDeleteServerBackupProcedure = "/discopanel.v1.TaskService/DeleteServerBackup"
 )
 
 // TaskServiceClient is a client for the discopanel.v1.TaskService service.
@@ -90,6 +99,12 @@ type TaskServiceClient interface {
 	CancelExecution(context.Context, *connect.Request[v1.CancelExecutionRequest]) (*connect.Response[v1.CancelExecutionResponse], error)
 	// Get scheduler status
 	GetSchedulerStatus(context.Context, *connect.Request[v1.GetSchedulerStatusRequest]) (*connect.Response[v1.GetSchedulerStatusResponse], error)
+	// List backup archives for a server
+	ListServerBackups(context.Context, *connect.Request[v1.ListServerBackupsRequest]) (*connect.Response[v1.ListServerBackupsResponse], error)
+	// Restore a server from a backup archive (server must be stopped)
+	RestoreServerBackup(context.Context, *connect.Request[v1.RestoreServerBackupRequest]) (*connect.Response[v1.RestoreServerBackupResponse], error)
+	// Delete a backup archive
+	DeleteServerBackup(context.Context, *connect.Request[v1.DeleteServerBackupRequest]) (*connect.Response[v1.DeleteServerBackupResponse], error)
 }
 
 // NewTaskServiceClient constructs a client for the discopanel.v1.TaskService service. By default,
@@ -175,6 +190,24 @@ func NewTaskServiceClient(httpClient connect.HTTPClient, baseURL string, opts ..
 			connect.WithSchema(taskServiceMethods.ByName("GetSchedulerStatus")),
 			connect.WithClientOptions(opts...),
 		),
+		listServerBackups: connect.NewClient[v1.ListServerBackupsRequest, v1.ListServerBackupsResponse](
+			httpClient,
+			baseURL+TaskServiceListServerBackupsProcedure,
+			connect.WithSchema(taskServiceMethods.ByName("ListServerBackups")),
+			connect.WithClientOptions(opts...),
+		),
+		restoreServerBackup: connect.NewClient[v1.RestoreServerBackupRequest, v1.RestoreServerBackupResponse](
+			httpClient,
+			baseURL+TaskServiceRestoreServerBackupProcedure,
+			connect.WithSchema(taskServiceMethods.ByName("RestoreServerBackup")),
+			connect.WithClientOptions(opts...),
+		),
+		deleteServerBackup: connect.NewClient[v1.DeleteServerBackupRequest, v1.DeleteServerBackupResponse](
+			httpClient,
+			baseURL+TaskServiceDeleteServerBackupProcedure,
+			connect.WithSchema(taskServiceMethods.ByName("DeleteServerBackup")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -192,6 +225,9 @@ type taskServiceClient struct {
 	getTaskExecution     *connect.Client[v1.GetTaskExecutionRequest, v1.GetTaskExecutionResponse]
 	cancelExecution      *connect.Client[v1.CancelExecutionRequest, v1.CancelExecutionResponse]
 	getSchedulerStatus   *connect.Client[v1.GetSchedulerStatusRequest, v1.GetSchedulerStatusResponse]
+	listServerBackups    *connect.Client[v1.ListServerBackupsRequest, v1.ListServerBackupsResponse]
+	restoreServerBackup  *connect.Client[v1.RestoreServerBackupRequest, v1.RestoreServerBackupResponse]
+	deleteServerBackup   *connect.Client[v1.DeleteServerBackupRequest, v1.DeleteServerBackupResponse]
 }
 
 // ListTasks calls discopanel.v1.TaskService.ListTasks.
@@ -254,6 +290,21 @@ func (c *taskServiceClient) GetSchedulerStatus(ctx context.Context, req *connect
 	return c.getSchedulerStatus.CallUnary(ctx, req)
 }
 
+// ListServerBackups calls discopanel.v1.TaskService.ListServerBackups.
+func (c *taskServiceClient) ListServerBackups(ctx context.Context, req *connect.Request[v1.ListServerBackupsRequest]) (*connect.Response[v1.ListServerBackupsResponse], error) {
+	return c.listServerBackups.CallUnary(ctx, req)
+}
+
+// RestoreServerBackup calls discopanel.v1.TaskService.RestoreServerBackup.
+func (c *taskServiceClient) RestoreServerBackup(ctx context.Context, req *connect.Request[v1.RestoreServerBackupRequest]) (*connect.Response[v1.RestoreServerBackupResponse], error) {
+	return c.restoreServerBackup.CallUnary(ctx, req)
+}
+
+// DeleteServerBackup calls discopanel.v1.TaskService.DeleteServerBackup.
+func (c *taskServiceClient) DeleteServerBackup(ctx context.Context, req *connect.Request[v1.DeleteServerBackupRequest]) (*connect.Response[v1.DeleteServerBackupResponse], error) {
+	return c.deleteServerBackup.CallUnary(ctx, req)
+}
+
 // TaskServiceHandler is an implementation of the discopanel.v1.TaskService service.
 type TaskServiceHandler interface {
 	// List all tasks for a server
@@ -280,6 +331,12 @@ type TaskServiceHandler interface {
 	CancelExecution(context.Context, *connect.Request[v1.CancelExecutionRequest]) (*connect.Response[v1.CancelExecutionResponse], error)
 	// Get scheduler status
 	GetSchedulerStatus(context.Context, *connect.Request[v1.GetSchedulerStatusRequest]) (*connect.Response[v1.GetSchedulerStatusResponse], error)
+	// List backup archives for a server
+	ListServerBackups(context.Context, *connect.Request[v1.ListServerBackupsRequest]) (*connect.Response[v1.ListServerBackupsResponse], error)
+	// Restore a server from a backup archive (server must be stopped)
+	RestoreServerBackup(context.Context, *connect.Request[v1.RestoreServerBackupRequest]) (*connect.Response[v1.RestoreServerBackupResponse], error)
+	// Delete a backup archive
+	DeleteServerBackup(context.Context, *connect.Request[v1.DeleteServerBackupRequest]) (*connect.Response[v1.DeleteServerBackupResponse], error)
 }
 
 // NewTaskServiceHandler builds an HTTP handler from the service implementation. It returns the path
@@ -361,6 +418,24 @@ func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption
 		connect.WithSchema(taskServiceMethods.ByName("GetSchedulerStatus")),
 		connect.WithHandlerOptions(opts...),
 	)
+	taskServiceListServerBackupsHandler := connect.NewUnaryHandler(
+		TaskServiceListServerBackupsProcedure,
+		svc.ListServerBackups,
+		connect.WithSchema(taskServiceMethods.ByName("ListServerBackups")),
+		connect.WithHandlerOptions(opts...),
+	)
+	taskServiceRestoreServerBackupHandler := connect.NewUnaryHandler(
+		TaskServiceRestoreServerBackupProcedure,
+		svc.RestoreServerBackup,
+		connect.WithSchema(taskServiceMethods.ByName("RestoreServerBackup")),
+		connect.WithHandlerOptions(opts...),
+	)
+	taskServiceDeleteServerBackupHandler := connect.NewUnaryHandler(
+		TaskServiceDeleteServerBackupProcedure,
+		svc.DeleteServerBackup,
+		connect.WithSchema(taskServiceMethods.ByName("DeleteServerBackup")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/discopanel.v1.TaskService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case TaskServiceListTasksProcedure:
@@ -387,6 +462,12 @@ func NewTaskServiceHandler(svc TaskServiceHandler, opts ...connect.HandlerOption
 			taskServiceCancelExecutionHandler.ServeHTTP(w, r)
 		case TaskServiceGetSchedulerStatusProcedure:
 			taskServiceGetSchedulerStatusHandler.ServeHTTP(w, r)
+		case TaskServiceListServerBackupsProcedure:
+			taskServiceListServerBackupsHandler.ServeHTTP(w, r)
+		case TaskServiceRestoreServerBackupProcedure:
+			taskServiceRestoreServerBackupHandler.ServeHTTP(w, r)
+		case TaskServiceDeleteServerBackupProcedure:
+			taskServiceDeleteServerBackupHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -442,4 +523,16 @@ func (UnimplementedTaskServiceHandler) CancelExecution(context.Context, *connect
 
 func (UnimplementedTaskServiceHandler) GetSchedulerStatus(context.Context, *connect.Request[v1.GetSchedulerStatusRequest]) (*connect.Response[v1.GetSchedulerStatusResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("discopanel.v1.TaskService.GetSchedulerStatus is not implemented"))
+}
+
+func (UnimplementedTaskServiceHandler) ListServerBackups(context.Context, *connect.Request[v1.ListServerBackupsRequest]) (*connect.Response[v1.ListServerBackupsResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("discopanel.v1.TaskService.ListServerBackups is not implemented"))
+}
+
+func (UnimplementedTaskServiceHandler) RestoreServerBackup(context.Context, *connect.Request[v1.RestoreServerBackupRequest]) (*connect.Response[v1.RestoreServerBackupResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("discopanel.v1.TaskService.RestoreServerBackup is not implemented"))
+}
+
+func (UnimplementedTaskServiceHandler) DeleteServerBackup(context.Context, *connect.Request[v1.DeleteServerBackupRequest]) (*connect.Response[v1.DeleteServerBackupResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("discopanel.v1.TaskService.DeleteServerBackup is not implemented"))
 }

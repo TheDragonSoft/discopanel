@@ -64,6 +64,7 @@
 			dockerImage: server.dockerImage,
 			detached: server.detached,
 			autoStart: server.autoStart,
+			wakeOnConnect: server.wakeOnConnect,
 			tpsCommand: server.tpsCommand || '',
 			modpackId: '', // Not used in this context
 			modpackVersionId: '', // Not used in this context
@@ -83,6 +84,7 @@
 			formData.dockerImage !== server.dockerImage ||
 			formData.detached !== server.detached ||
 			formData.autoStart !== server.autoStart ||
+			formData.wakeOnConnect !== server.wakeOnConnect ||
 			formData.tpsCommand !== (server.tpsCommand || '') ||
 			safeToString(formData.additionalPorts) !== safeToString(server.additionalPorts || []) ||
 			safeToString($state.snapshot(formData.dockerOverrides)) !==
@@ -114,6 +116,7 @@
 				dockerImage: server.dockerImage,
 				detached: server.detached,
 				autoStart: server.autoStart,
+				wakeOnConnect: server.wakeOnConnect,
 				tpsCommand: server.tpsCommand || '',
 				modpackId: '', // Not used in this context
 				modpackVersionId: '', // Not used in this context
@@ -402,7 +405,36 @@
 							formData.autoStart = false;
 							return;
 						}
-						formData.autoStart = checked;
+							formData.autoStart = checked;
+					}}
+				/>
+			</div>
+
+			<div class="flex items-center justify-between rounded-lg bg-muted/50 p-4">
+				<div class="space-y-0.5">
+					<Label for="wake_on_connect" class="cursor-pointer text-sm font-medium"
+						>Wake on Connect</Label
+					>
+					<p class="text-xs text-muted-foreground">
+						Lazy server: start automatically when a player connects through the proxy (first
+						connection may take a few minutes while the server boots)
+					</p>
+				</div>
+				<Switch
+					id="wake_on_connect"
+					checked={formData.wakeOnConnect ?? false}
+					disabled={formData.detached || !server.proxyHostname}
+					onCheckedChange={(checked) => {
+						if (formData.detached) {
+							toast.error('Cannot enable wake-on-connect for detached servers');
+							formData.wakeOnConnect = false;
+							return;
+						}
+						if (!server.proxyHostname) {
+							toast.error('Wake-on-connect requires a proxy hostname for this server');
+							return;
+						}
+						formData.wakeOnConnect = checked;
 					}}
 				/>
 			</div>

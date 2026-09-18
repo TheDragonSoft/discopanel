@@ -441,7 +441,8 @@ func getCategoryIndex(key string) int {
 	case "type", "customServer", "customJarExec", "eula", "version", "motd", "icon", "overrideIcon", "serverName",
 		"serverPort", "console", "gui", "stopDuration", "setupOnly", "execDirectly",
 		"stopServerAnnounceDelay", "proxy", "useFlareFlags", "useSimdFlags",
-		"serverPropertiesEscapeUnicode", "bugReportLink", "customServerProperties":
+		"serverPropertiesEscapeUnicode", "bugReportLink", "customServerProperties",
+		"neoforgeVersion", "fabricLoaderVersion", "paperBuild":
 		return 1
 
 	// Game Settings (2)

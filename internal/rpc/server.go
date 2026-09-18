@@ -177,6 +177,7 @@ func (s *Server) setupHandler() {
 
 	// Streaming file upload endpoint
 	mux.Handle("/api/v1/upload/", handlers.NewUploadStreamHandler(s.uploadManager, s.authManager, s.enforcer, s.log))
+	mux.Handle("/api/v1/modpacks/", handlers.NewModpackDownloadHandler(s.store, s.authManager, s.enforcer, s.log))
 
 	// Streaming file download endpoint
 	mux.Handle("/api/v1/download/", handlers.NewDownloadStreamHandler(s.downloadManager, s.authManager, s.enforcer, s.log))
@@ -201,9 +202,9 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 	modService := services.NewModService(s.store, s.docker, s.uploadManager, s.log)
 	modpackService := services.NewModpackService(s.store, s.config, s.uploadManager, s.log)
 	proxyService := services.NewProxyService(s.store, s.docker, s.proxyManager, s.config, s.logStreamer, s.log)
-	serverService := services.NewServerService(s.store, s.docker, s.sender, s.config, s.proxyManager, s.logStreamer, s.metricsCollector, s.moduleManager, s.bus, s.enforcer, s.log)
+	serverService := services.NewServerService(s.store, s.docker, s.sender, s.config, s.proxyManager, s.logStreamer, s.metricsCollector, s.moduleManager, s.bus, s.enforcer, s.uploadManager, s.log)
 	supportService := services.NewSupportService(s.store, s.docker, s.config, s.log)
-	taskService := services.NewTaskService(s.store, s.scheduler, s.log)
+	taskService := services.NewTaskService(s.store, s.scheduler, s.config, s.docker, s.log)
 	userService := services.NewUserService(s.store, s.authManager, s.log)
 	roleService := services.NewRoleService(s.store, s.enforcer, s.log)
 	moduleService := services.NewModuleService(s.store, s.docker, s.moduleManager, s.proxyManager, s.authManager, s.config, s.logStreamer, s.log)

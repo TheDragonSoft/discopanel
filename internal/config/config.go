@@ -73,6 +73,11 @@ type DockerConfig struct {
 	RegistryURL  string            `mapstructure:"registry_url" json:"registry_url"`
 	DNS          string            `mapstructure:"dns" json:"dns"`
 	Labels       map[string]string `mapstructure:"labels" json:"labels"`
+	LogDriver    string            `mapstructure:"log_driver" json:"log_driver"`
+	LogOpts      map[string]string `mapstructure:"log_opts" json:"log_opts"`
+	// MaxTotalMemoryMB caps the sum of memory allocations across all servers
+	// (0 = unlimited). Enforced when creating servers or changing memory.
+	MaxTotalMemoryMB int64 `mapstructure:"max_total_memory_mb" json:"max_total_memory_mb"`
 }
 
 type StorageConfig struct {
