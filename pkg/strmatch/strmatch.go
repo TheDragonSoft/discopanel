@@ -3,6 +3,7 @@ package strmatch
 import (
 	"strings"
 	"unicode"
+	"unicode/utf8"
 )
 
 // Tunable weights for score
@@ -232,31 +233,64 @@ func isWordByte(b byte) bool {
 
 // Computes the edit distance between a and b - rune aware
 func levenshtein(a, b string) int {
-	ra, rb := []rune(a), []rune(b)
-	if len(ra) == 0 {
-		return len(rb)
+	n := utf8.RuneCountInString(a)
+	m := utf8.RuneCountInString(b)
+
+	if n == 0 {
+		return m
 	}
-	if len(rb) == 0 {
-		return len(ra)
+	if m == 0 {
+		return n
 	}
 
-	prev := make([]int, len(rb)+1)
-	curr := make([]int, len(rb)+1)
-	for j := range prev {
-		prev[j] = j
+	if n > m {
+		a, b = b, a
+		n, m = m, n
 	}
-	for i := 1; i <= len(ra); i++ {
-		curr[0] = i
-		for j := 1; j <= len(rb); j++ {
+
+	var rowBuf [64]int
+	var row []int
+	if m < 64 {
+		row = rowBuf[:m+1]
+	} else {
+		row = make([]int, m+1)
+	}
+
+	for j := 0; j <= m; j++ {
+		row[j] = j
+	}
+
+	i := 1
+	for _, ra := range a {
+		prevDiagonal := row[0]
+		row[0] = i
+		j := 1
+		for _, rb := range b {
+			oldDiagonal := prevDiagonal
+			prevDiagonal = row[j]
+
 			cost := 1
-			if ra[i-1] == rb[j-1] {
+			if ra == rb {
 				cost = 0
 			}
-			curr[j] = min3(prev[j]+1, curr[j-1]+1, prev[j-1]+cost)
+
+			del := row[j] + 1
+			ins := row[j-1] + 1
+			sub := oldDiagonal + cost
+
+			res := del
+			if ins < res {
+				res = ins
+			}
+			if sub < res {
+				res = sub
+			}
+			row[j] = res
+			j++
 		}
-		prev, curr = curr, prev
+		i++
 	}
-	return prev[len(rb)]
+	return row[m]
 }
 
 func min3(a, b, c int) int {
