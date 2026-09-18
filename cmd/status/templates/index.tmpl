@@ -246,7 +246,7 @@
             <!-- MOTD -->
             {{if and .Server.Motd (ne .Server.Motd "")}}
             <div class="px-6 py-3 bg-muted/50 border-b border-border">
-                <p class="text-sm text-muted-foreground text-center italic">"{{.Server.Motd}}"</p>
+                <p class="text-sm text-muted-foreground text-center italic">"{{renderMotd .Server.Motd}}"</p>
             </div>
             {{end}}
 

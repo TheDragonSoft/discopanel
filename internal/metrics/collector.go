@@ -25,6 +25,7 @@ type ServerMetrics struct {
 	MemoryUsage   float64 // MB
 	DiskUsage     int64   // bytes (total server data)
 	DiskTotal     int64   // bytes
+	DiskFree      int64   // bytes available on the data drive
 	WorldSize     int64   // bytes (world directory only)
 	PlayersOnline int
 	TPS           float64
@@ -368,11 +369,12 @@ func (c *Collector) collectDiskUsage() {
 		return
 	}
 
-	// Get total disk space once
-	diskTotal, err := files.GetDiskSpace(c.config.Storage.DataDir)
+	// Get total and available disk space once
+	diskTotal, diskFree, err := files.GetDiskSpace(c.config.Storage.DataDir)
 	if err != nil {
 		c.log.Debug("Metrics collector: failed to get disk space: %v", err)
 		diskTotal = 0
+		diskFree = 0
 	}
 
 	runConcurrently(servers, 4, func(server *storage.Server) {
@@ -403,6 +405,7 @@ func (c *Collector) collectDiskUsage() {
 		c.updateMetrics(server.ID, func(m *ServerMetrics) {
 			m.DiskUsage = totalSize
 			m.DiskTotal = diskTotal
+			m.DiskFree = diskFree
 			m.WorldSize = totalWorldSize
 			m.LastUpdated = time.Now()
 		})

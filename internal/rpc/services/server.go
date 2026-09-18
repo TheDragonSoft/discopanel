@@ -23,8 +23,10 @@ import (
 	"github.com/nickheyer/discopanel/internal/events"
 	"github.com/nickheyer/discopanel/internal/metrics"
 	"github.com/nickheyer/discopanel/internal/minecraft"
+	auth "github.com/nickheyer/discopanel/internal/auth"
 	"github.com/nickheyer/discopanel/internal/module"
 	"github.com/nickheyer/discopanel/internal/proxy"
+	"github.com/nickheyer/discopanel/internal/rbac"
 	"github.com/nickheyer/discopanel/pkg/files"
 	"github.com/nickheyer/discopanel/pkg/logger"
 	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
@@ -47,10 +49,11 @@ type ServerService struct {
 	metricsCollector *metrics.Collector
 	moduleManager    *module.Manager
 	bus              *events.Bus
+	enforcer         *rbac.Enforcer
 }
 
 // NewServerService creates a new server service
-func NewServerService(store *storage.Store, docker *docker.Client, sender *command.Sender, config *config.Config, proxy *proxy.Manager, logStreamer *logger.LogStreamer, metricsCollector *metrics.Collector, moduleManager *module.Manager, bus *events.Bus, log *logger.Logger) *ServerService {
+func NewServerService(store *storage.Store, docker *docker.Client, sender *command.Sender, config *config.Config, proxy *proxy.Manager, logStreamer *logger.LogStreamer, metricsCollector *metrics.Collector, moduleManager *module.Manager, bus *events.Bus, enforcer *rbac.Enforcer, log *logger.Logger) *ServerService {
 	return &ServerService{
 		store:            store,
 		docker:           docker,
@@ -62,6 +65,7 @@ func NewServerService(store *storage.Store, docker *docker.Client, sender *comma
 		metricsCollector: metricsCollector,
 		moduleManager:    moduleManager,
 		bus:              bus,
+		enforcer:         enforcer,
 	}
 }
 
@@ -96,6 +100,7 @@ func dbServerToProto(server *storage.Server) *v1.Server {
 		CpuPercent:      server.CPUPercent,
 		DiskUsage:       server.DiskUsage,
 		DiskTotal:       server.DiskTotal,
+		DiskFree:        server.DiskFree,
 		WorldSize:       server.WorldSize,
 		PlayersOnline:   int32(server.PlayersOnline),
 		Tps:             server.TPS,
@@ -241,6 +246,28 @@ func (s *ServerService) ListServers(ctx context.Context, req *connect.Request[v1
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to list servers"))
 	}
 
+	// Callers with only object-scoped (per-server) read permissions pass the
+	// interceptor for this collection endpoint, so filter the results down to
+	// the servers they are actually allowed to read. Global "*" policies pass
+	// per-object enforcement for every server, so admins/regular users are
+	// unaffected.
+	if s.enforcer != nil {
+		if user := auth.GetUserFromContext(ctx); user != nil {
+			permitted := make([]*storage.Server, 0, len(servers))
+			for _, server := range servers {
+				allowed, err := s.enforcer.Enforce(user.Roles, rbac.ResourceServers, rbac.ActionRead, server.ID)
+				if err != nil {
+					s.log.Error("RBAC enforcement error: %v", err)
+					return nil, connect.NewError(connect.CodeInternal, err)
+				}
+				if allowed {
+					permitted = append(permitted, server)
+				}
+			}
+			servers = permitted
+		}
+	}
+
 	// Get all proxy listeners once for efficiency
 	var listeners map[string]*storage.ProxyListener
 	if s.config.Proxy.Enabled {
@@ -275,6 +302,7 @@ func (s *ServerService) ListServers(ctx context.Context, req *connect.Request[v1
 					server.CPUPercent = m.CPUPercent
 					server.DiskUsage = m.DiskUsage
 					server.DiskTotal = m.DiskTotal
+					server.DiskFree = m.DiskFree
 					server.WorldSize = m.WorldSize
 					server.PlayersOnline = m.PlayersOnline
 					server.TPS = m.TPS
@@ -333,6 +361,7 @@ func (s *ServerService) GetServer(ctx context.Context, req *connect.Request[v1.G
 			server.CPUPercent = m.CPUPercent
 			server.DiskUsage = m.DiskUsage
 			server.DiskTotal = m.DiskTotal
+			server.DiskFree = m.DiskFree
 			server.WorldSize = m.WorldSize
 			server.PlayersOnline = m.PlayersOnline
 			server.TPS = m.TPS
@@ -1274,6 +1303,14 @@ func (s *ServerService) RestartServer(ctx context.Context, req *connect.Request[
 	server.LastStarted = &now
 	if err := s.store.UpdateServer(ctx, server); err != nil {
 		s.log.Error("Failed to update server status: %v", err)
+	}
+
+	// Refresh the proxy route: the container may come back with a different
+	// IP, and a stale route would send traffic to the wrong server.
+	if server.ProxyHostname != "" {
+		if err := s.proxy.UpdateServerRoute(server); err != nil {
+			s.log.Error("Failed to update proxy route after restart: %v", err)
+		}
 	}
 
 	// Clear ephemeral configuration fields

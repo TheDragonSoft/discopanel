@@ -1046,7 +1046,19 @@
 							<div
 								class="relative h-3 overflow-hidden rounded-full bg-linear-to-r from-muted/50 to-muted/30"
 							>
-								{#if server.diskUsage !== undefined && Number(server.diskUsage) > 0 && server.diskTotal}
+								{#if server.diskFree && server.diskTotal}
+									<!-- Real filesystem fill: total minus available space -->
+									{@const diskPercent =
+										((Number(server.diskTotal) - Number(server.diskFree)) / Number(server.diskTotal)) * 100}
+									<div
+										class="relative h-full rounded-full bg-linear-to-r from-purple-500 to-pink-500 transition-all duration-700"
+										style="width: {Math.min(diskPercent, 100)}%"
+									>
+										<div
+											class="absolute inset-0 bg-linear-to-r from-transparent via-white/20 to-transparent"
+										></div>
+									</div>
+								{:else if server.diskUsage !== undefined && Number(server.diskUsage) > 0 && server.diskTotal}
 									{@const diskPercent = (Number(server.diskUsage) / Number(server.diskTotal)) * 100}
 									<div
 										class="relative h-full rounded-full bg-linear-to-r from-purple-500 to-pink-500 transition-all duration-700"
@@ -1062,7 +1074,9 @@
 							</div>
 							{#if server.diskUsage !== undefined && Number(server.diskUsage) > 0}
 								<p class="mt-1 text-[10px] text-muted-foreground/50">
-									{#if server.diskTotal}
+									{#if server.diskFree && server.diskTotal}
+										{formatBytes(Number(server.diskFree))} free of {formatBytes(Number(server.diskTotal))}
+									{:else if server.diskTotal}
 										{((Number(server.diskUsage) / Number(server.diskTotal)) * 100).toFixed(1)}% of {formatBytes(
 											Number(server.diskTotal)
 										)} used

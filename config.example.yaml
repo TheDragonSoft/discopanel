@@ -137,7 +137,7 @@ minecraft:
     icon: ""
     overrideIcon: false
     maxPlayers: 20
-    maxWorldSize: 0
+    maxWorldSize: 29999984
     allowNether: true
     announcePlayerAchievements: true
     enableCommandBlock: false
@@ -163,7 +163,7 @@ minecraft:
     serverPort: 0
     playerIdleTimeout: 0
     syncChunkWrites: false
-    enableStatus: false
+    enableStatus: true
     entityBroadcastRangePercentage: 0
     functionPermissionLevel: 0
     networkCompressionThreshold: 0

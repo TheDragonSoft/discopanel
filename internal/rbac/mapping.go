@@ -5,6 +5,11 @@ type ProcedurePermission struct {
 	Resource      string
 	Action        string
 	ObjectIDField string // Protobuf field name to extract for per-object RBAC (empty = "*")
+	// ScopedList marks collection procedures that may be invoked by callers
+	// holding only object-scoped (per-server) permissions. The interceptor
+	// lets them through and the service filters results down to the objects
+	// the caller can actually access.
+	ScopedList bool
 }
 
 // PublicProcedures lists RPC procedures that require no authentication.
@@ -38,7 +43,7 @@ var AuthenticatedOnlyProcedures = map[string]bool{
 // required to invoke it, plus an optional ObjectIDField for per-object scoping.
 var ProcedurePermissions = map[string]ProcedurePermission{
 	// ── ServerService ──────────────────────────────────────────────────
-	"/discopanel.v1.ServerService/ListServers":          {Resource: ResourceServers, Action: ActionRead},
+	"/discopanel.v1.ServerService/ListServers":          {Resource: ResourceServers, Action: ActionRead, ScopedList: true},
 	"/discopanel.v1.ServerService/GetServer":            {Resource: ResourceServers, Action: ActionRead, ObjectIDField: "id"},
 	"/discopanel.v1.ServerService/GetServerLogs":        {Resource: ResourceServers, Action: ActionRead, ObjectIDField: "id"},
 	"/discopanel.v1.ServerService/ClearServerLogs":      {Resource: ResourceServers, Action: ActionUpdate, ObjectIDField: "id"},

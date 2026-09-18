@@ -40,6 +40,7 @@ type Scheduler struct {
 	// Execution tracking
 	runningExecutions map[string]context.CancelFunc // executionID -> cancel func
 	executionMu       sync.RWMutex
+	inFlightTasks     map[string]struct{} // task IDs with an execution in progress
 
 	// Cron parser
 	cronParser cron.Parser
@@ -78,6 +79,7 @@ func NewScheduler(store *storage.Store, docker *docker.Client, sender *command.S
 		checkInterval:     cfg.CheckInterval,
 		stopChan:          make(chan struct{}),
 		runningExecutions: make(map[string]context.CancelFunc),
+		inFlightTasks:     make(map[string]struct{}),
 		cronParser:        cron.NewParser(cron.Minute | cron.Hour | cron.Dom | cron.Month | cron.Dow),
 	}
 }
@@ -208,10 +210,27 @@ func (s *Scheduler) checkAndRunDueTasks() {
 	}
 
 	for _, task := range tasks {
+		// Claim the task before dispatching: next_run only advances after the
+		// run completes, so a task that outlives checkInterval would otherwise
+		// be re-dispatched on every poll until it finishes.
+		s.executionMu.Lock()
+		if _, busy := s.inFlightTasks[task.ID]; busy {
+			s.executionMu.Unlock()
+			s.log.Debug("Task %s: previous run still in progress, skipping dispatch", task.Name)
+			continue
+		}
+		s.inFlightTasks[task.ID] = struct{}{}
+		s.executionMu.Unlock()
+
 		// Execute task asynchronously
 		s.wg.Add(1)
 		go func(t *storage.ScheduledTask) {
 			defer s.wg.Done()
+			defer func() {
+				s.executionMu.Lock()
+				delete(s.inFlightTasks, t.ID)
+				s.executionMu.Unlock()
+			}()
 			s.executeTask(t, "scheduled", v1.TriggeredEventType_TRIGGERED_EVENT_TYPE_UNSPECIFIED, nil)
 		}(task)
 	}

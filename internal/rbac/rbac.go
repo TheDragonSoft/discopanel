@@ -130,6 +130,29 @@ func (e *Enforcer) Enforce(roles []string, resource, action, objectID string) (b
 	return false, nil
 }
 
+// HasScopedPolicy reports whether any of the roles carries a policy for the
+// resource/action pair that is scoped to a specific object (anything other
+// than "*"). Used to let collection procedures through the interceptor when
+// the caller only has per-object permissions; the service then filters the
+// results down to the permitted objects.
+func (e *Enforcer) HasScopedPolicy(roles []string, resource, action string) (bool, error) {
+	for _, role := range roles {
+		policies, err := e.enforcer.GetFilteredPolicy(0, role)
+		if err != nil {
+			return false, err
+		}
+		for _, p := range policies {
+			if len(p) < 4 || p[3] == "*" {
+				continue
+			}
+			if (p[1] == "*" || p[1] == resource) && (p[2] == "*" || p[2] == action) {
+				return true, nil
+			}
+		}
+	}
+	return false, nil
+}
+
 // GetPermissionsForRole returns all permissions currently assigned to the role.
 func (e *Enforcer) GetPermissionsForRole(role string) []Permission {
 	policies, err := e.enforcer.GetFilteredPolicy(0, role)

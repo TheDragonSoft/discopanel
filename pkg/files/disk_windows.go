@@ -8,8 +8,10 @@ import (
 	"unsafe"
 )
 
-// GetDiskSpace returns the total disk space available in bytes for the given path
-func GetDiskSpace(path string) (int64, error) {
+// GetDiskSpace returns the total and available (free) disk space in bytes for
+// the given path. Available space is what unprivileged processes can actually
+// use, which is what "free space" means to a user.
+func GetDiskSpace(path string) (int64, int64, error) {
 	kernel32 := syscall.NewLazyDLL("kernel32.dll")
 	getDiskFreeSpaceEx := kernel32.NewProc("GetDiskFreeSpaceExW")
 
@@ -17,7 +19,7 @@ func GetDiskSpace(path string) (int64, error) {
 
 	pathPtr, err := syscall.UTF16PtrFromString(path)
 	if err != nil {
-		return 0, fmt.Errorf("failed to convert path to UTF16: %w", err)
+		return 0, 0, fmt.Errorf("failed to convert path to UTF16: %w", err)
 	}
 
 	ret, _, err := getDiskFreeSpaceEx.Call(
@@ -28,8 +30,8 @@ func GetDiskSpace(path string) (int64, error) {
 	)
 
 	if ret == 0 {
-		return 0, fmt.Errorf("failed to get disk stats for %s: %w", path, err)
+		return 0, 0, fmt.Errorf("failed to get disk stats for %s: %w", path, err)
 	}
 
-	return totalNumberOfBytes, nil
+	return totalNumberOfBytes, freeBytesAvailable, nil
 }

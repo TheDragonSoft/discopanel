@@ -171,6 +171,9 @@ func main() {
 	}
 	defer proxyManager.Stop()
 
+	// Re-register proxy routes for module containers that survived the restart
+	proxyManager.RestoreModuleRoutes()
+
 	// Initialize command sender
 	sender := command.NewSender(store, cfg, dockerClient)
 
@@ -341,20 +344,30 @@ func main() {
 				}
 
 				for _, server := range servers {
-					if server.ContainerID != "" {
-						status, err := dockerClient.GetContainerStatus(ctx, server.ContainerID)
-						if err == nil && server.Status != status {
-							oldStatus := server.Status
-							server.Status = status
-							if err := store.UpdateServer(ctx, server); err != nil {
-								log.Error("Failed to update server status: %v", err)
-							}
-							// Update proxy route if status changed and server has proxy configured
-							if server.ProxyHostname != "" && oldStatus != status {
-								if err := proxyManager.UpdateServerRoute(server); err != nil {
-									log.Error("Failed to update proxy route for %s: %v", server.Name, err)
-								}
-							}
+					if server.ContainerID == "" {
+						continue
+					}
+					status, err := dockerClient.GetContainerStatus(ctx, server.ContainerID)
+					if err != nil {
+						continue
+					}
+
+					oldStatus := server.Status
+					if oldStatus != status {
+						server.Status = status
+						if err := store.UpdateServer(ctx, server); err != nil {
+							log.Error("Failed to update server status: %v", err)
+						}
+					}
+
+					// Reconcile proxy routes: containers can pick up a different
+					// IP on every start/restart, so refresh the backend IP while
+					// the server is up (a no-op when the route is already
+					// current) and remove the route when it stops.
+					if server.ProxyHostname != "" &&
+						(status == storage.StatusRunning || status == storage.StatusStarting || oldStatus != status) {
+						if err := proxyManager.UpdateServerRoute(server); err != nil {
+							log.Error("Failed to update proxy route for %s: %v", server.Name, err)
 						}
 					}
 				}

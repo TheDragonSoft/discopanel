@@ -92,6 +92,8 @@
 			dashboardServers.length > 0
 				? ` / ${dashboardServers?.[0]?.diskTotal && formatBytes(Number(dashboardServers[0].diskTotal))}`
 				: '',
+		diskFree:
+			dashboardServers.length > 0 ? Number(dashboardServers[0].diskFree || 0) : 0,
 		avgCpu: dashboardServers
 			.filter((s) => s.cpuPercent && s.cpuPercent > 0)
 			.reduce((acc, s, _, arr) => acc + (s.cpuPercent || 0) / arr.length, 0)
@@ -696,6 +698,9 @@
 									<span class="text-sm font-medium"
 										>{formatBytes(stats.totalDiskUsage)}{stats.totalDiskSize}</span
 									>
+									{#if stats.diskFree > 0}
+										<span class="text-xs text-muted-foreground">· {formatBytes(stats.diskFree)} free</span>
+									{/if}
 								{:else}
 									<Database class="h-4 w-4 text-gray-400" />
 									<span class="text-sm text-muted-foreground">No data</span>

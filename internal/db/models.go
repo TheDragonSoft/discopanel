@@ -100,6 +100,7 @@ type Server struct {
 	CPUPercent    float64 `json:"cpu_percent" gorm:"-"`    // Current CPU usage percentage
 	DiskUsage     int64   `json:"disk_usage" gorm:"-"`     // Total server data size in bytes
 	DiskTotal     int64   `json:"disk_total" gorm:"-"`     // Total disk space available in bytes
+	DiskFree      int64   `json:"disk_free" gorm:"-"`      // Available (free) disk space in bytes
 	WorldSize     int64   `json:"world_size" gorm:"-"`     // World directory size in bytes
 	PlayersOnline int     `json:"players_online" gorm:"-"` // Current players online
 	TPS           float64 `json:"tps" gorm:"-"`            // Current TPS (20 is optimal)
@@ -151,7 +152,7 @@ type ServerConfig struct {
 	Icon                           *string `json:"icon" env:"ICON" default:"" desc:"URL or file path for server icon" input:"text" label:"Server Icon"`
 	OverrideIcon                   *bool   `json:"overrideIcon" env:"OVERRIDE_ICON" default:"false" desc:"Override existing server icon" input:"checkbox" label:"Override Icon"`
 	MaxPlayers                     *int    `json:"maxPlayers" env:"MAX_PLAYERS" default:"20" desc:"Maximum number of players" input:"number" label:"Max Players" system:"true"`
-	MaxWorldSize                   *int    `json:"maxWorldSize" env:"MAX_WORLD_SIZE" default:"0" desc:"Maximum world size in blocks (radius)" input:"number" label:"Max World Size"`
+	MaxWorldSize                   *int    `json:"maxWorldSize" env:"MAX_WORLD_SIZE" default:"29999984" desc:"Maximum world size in blocks (radius)" input:"number" label:"Max World Size"`
 	AllowNether                    *bool   `json:"allowNether" env:"ALLOW_NETHER" default:"true" desc:"Allow players to travel to the Nether" input:"checkbox" label:"Allow Nether"`
 	AnnouncePlayerAchievements     *bool   `json:"announcePlayerAchievements" env:"ANNOUNCE_PLAYER_ACHIEVEMENTS" default:"true" desc:"Announce player achievements" input:"checkbox" label:"Announce Player Achievements"`
 	EnableCommandBlock             *bool   `json:"enableCommandBlock" env:"ENABLE_COMMAND_BLOCK" default:"false" desc:"Enable command blocks" input:"checkbox" label:"Enable Command Blocks"`

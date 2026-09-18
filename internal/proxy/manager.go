@@ -199,7 +199,12 @@ func (m *Manager) UpdateServerRoute(server *db.Server) error {
 		}
 
 		routes := proxy.GetRoutes()
-		if _, exists := routes[hostname]; exists {
+		if existing, exists := routes[hostname]; exists {
+			// No-op when the route already points at the container's current
+			// IP, so periodic route reconciliation doesn't spam the log.
+			if existing.BackendHost == containerIP && existing.Active {
+				return nil
+			}
 			proxy.UpdateRoute(hostname, containerIP, 25565)
 		} else {
 			proxy.AddRoute(server.ID, hostname, containerIP, 25565)
@@ -386,6 +391,46 @@ func (m *Manager) AllocateProxyPort(serverID string) (int, error) {
 	}
 
 	return 0, fmt.Errorf("no available proxy ports in range %d-%d", m.config.PortRangeMin, m.config.PortRangeMax)
+}
+
+// RestoreModuleRoutes re-registers proxy routes for module containers that are
+// still running after a panel restart. Server routes are restored in Start(),
+// but module containers survive the restart while their in-process listeners
+// and routes do not.
+func (m *Manager) RestoreModuleRoutes() {
+	if !m.config.Enabled {
+		return
+	}
+
+	ctx := context.Background()
+	modules, err := m.store.ListModules(ctx)
+	if err != nil {
+		m.logger.Error("Failed to list modules for proxy route restore: %v", err)
+		return
+	}
+
+	for _, module := range modules {
+		if module.ContainerID == "" {
+			continue
+		}
+
+		// A module container is only reachable if it still has an IP on the
+		// panel's Docker network, i.e. it is running.
+		if _, err := GetContainerIP(module.ContainerID, m.networkName); err != nil {
+			continue
+		}
+
+		server, err := m.store.GetServer(ctx, module.ServerID)
+		if err != nil || server.ProxyHostname == "" {
+			continue
+		}
+
+		if err := m.AddModuleRoute(module, server); err != nil {
+			m.logger.Error("Failed to restore proxy routes for module %s: %v", module.Name, err)
+		} else {
+			m.logger.Info("Restored proxy routes for running module %s", module.Name)
+		}
+	}
 }
 
 // AddModuleRoute adds a proxy route for a module's ports

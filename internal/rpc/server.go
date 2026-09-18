@@ -201,7 +201,7 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 	modService := services.NewModService(s.store, s.docker, s.uploadManager, s.log)
 	modpackService := services.NewModpackService(s.store, s.config, s.uploadManager, s.log)
 	proxyService := services.NewProxyService(s.store, s.docker, s.proxyManager, s.config, s.logStreamer, s.log)
-	serverService := services.NewServerService(s.store, s.docker, s.sender, s.config, s.proxyManager, s.logStreamer, s.metricsCollector, s.moduleManager, s.bus, s.log)
+	serverService := services.NewServerService(s.store, s.docker, s.sender, s.config, s.proxyManager, s.logStreamer, s.metricsCollector, s.moduleManager, s.bus, s.enforcer, s.log)
 	supportService := services.NewSupportService(s.store, s.docker, s.config, s.log)
 	taskService := services.NewTaskService(s.store, s.scheduler, s.log)
 	userService := services.NewUserService(s.store, s.authManager, s.log)
@@ -312,6 +312,16 @@ func (s *Server) authInterceptor() connect.UnaryInterceptorFunc {
 					if err != nil {
 						s.log.Error("RBAC enforcement error: %v", err)
 						return nil, connect.NewError(connect.CodeInternal, err)
+					}
+					if !allowed && perm.ScopedList {
+						// Collection procedures also pass when the caller only
+						// has object-scoped permissions; the service filters
+						// the results down to permitted objects.
+						allowed, err = s.enforcer.HasScopedPolicy(user.Roles, perm.Resource, perm.Action)
+						if err != nil {
+							s.log.Error("RBAC enforcement error: %v", err)
+							return nil, connect.NewError(connect.CodeInternal, err)
+						}
 					}
 					if !allowed {
 						return nil, connect.NewError(connect.CodePermissionDenied, fmt.Errorf("insufficient permissions for %s/%s", perm.Resource, perm.Action))

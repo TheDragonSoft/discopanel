@@ -5,11 +5,13 @@ import (
 	"embed"
 	"encoding/json"
 	"fmt"
+	"html"
 	"html/template"
 	"net/http"
 	"os"
 	"slices"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -27,6 +29,113 @@ var templateFuncs = template.FuncMap{
 		}
 		return a / b
 	},
+	"renderMotd": renderMotd,
+}
+
+// Minecraft color code -> CSS color, per the vanilla client palette
+var mcColors = map[rune]string{
+	'0': "#000000", '1': "#0000AA", '2': "#00AA00", '3': "#00AAAA",
+	'4': "#AA0000", '5': "#AA00AA", '6': "#FFAA00", '7': "#AAAAAA",
+	'8': "#555555", '9': "#5555FF", 'a': "#55FF55", 'b': "#55FFFF",
+	'c': "#FF5555", 'd': "#FF55FF", 'e': "#FFFF55", 'f': "#FFFFFF",
+}
+
+// renderMotd converts Minecraft § color/format codes into styled HTML so the
+// status page renders the MOTD the way the game client does. Text segments
+// are HTML-escaped since the result is marked safe for the template engine.
+func renderMotd(motd string) template.HTML {
+	if motd == "" {
+		return ""
+	}
+
+	type motdStyle struct {
+		color                        string
+		bold, italic, under, strike bool
+	}
+	var cur motdStyle
+	spanOpen := false
+	var b strings.Builder
+
+	closeSpan := func() {
+		if spanOpen {
+			b.WriteString("</span>")
+			spanOpen = false
+		}
+	}
+	openSpan := func() {
+		var attrs strings.Builder
+		if cur.color != "" {
+			attrs.WriteString("color:")
+			attrs.WriteString(cur.color)
+			attrs.WriteString(";")
+		}
+		if cur.bold {
+			attrs.WriteString("font-weight:bold;")
+		}
+		if cur.italic {
+			attrs.WriteString("font-style:italic;")
+		}
+		var decor []string
+		if cur.under {
+			decor = append(decor, "underline")
+		}
+		if cur.strike {
+			decor = append(decor, "line-through")
+		}
+		if len(decor) > 0 {
+			attrs.WriteString("text-decoration:")
+			attrs.WriteString(strings.Join(decor, " "))
+			attrs.WriteString(";")
+		}
+		b.WriteString(`<span style="`)
+		b.WriteString(attrs.String())
+		b.WriteString(`">`)
+		spanOpen = true
+	}
+
+	runes := []rune(motd)
+	for i := 0; i < len(runes); i++ {
+		r := runes[i]
+		if r == '§' && i+1 < len(runes) {
+			code := []rune(strings.ToLower(string(runes[i+1])))[0]
+			i++
+			next := cur
+			switch {
+			case code == 'r':
+				next = motdStyle{}
+			case mcColors[code] != "":
+				next.color = mcColors[code]
+			case code == 'l':
+				next.bold = true
+			case code == 'o':
+				next.italic = true
+			case code == 'n':
+				next.under = true
+			case code == 'm':
+				next.strike = true
+			default:
+				continue // unknown code: drop it and its specifier
+			}
+			if next != cur {
+				closeSpan()
+				cur = next
+			}
+			continue
+		}
+
+		if r == '\n' {
+			closeSpan()
+			b.WriteString("<br>")
+			continue
+		}
+		if (cur != motdStyle{}) && !spanOpen {
+			openSpan()
+		}
+		b.WriteString(html.EscapeString(string(r)))
+	}
+	closeSpan()
+
+	return template.HTML(b.String())
 }
 
 //go:embed templates/*

@@ -85,6 +85,7 @@ message Server {
   int32 players_online = 25;
   int64 world_size = 39;
   double tps = 26;
+  int64 disk_free = 40; // Available (free) disk space in bytes on the data drive
 
   // Additional configuration
   repeated AdditionalPort additional_ports = 27;
