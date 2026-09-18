@@ -53,6 +53,7 @@ func scoreWithPrecomputed(q, c string, queryTokens map[string]bool) float64 {
 }
 
 // Gets highest scoring candidate for query
+// ⚡ Bolt: added early return for perfect matches to skip unnecessary precomputed scoring
 func Best(query string, candidates []string) (Match, bool) {
 	q := normalize(query)
 	if q == "" {
@@ -76,6 +77,9 @@ func Best(query string, candidates []string) (Match, bool) {
 		if !found || s > best.Score {
 			best = Match{Value: cOrig, Index: i, Score: s}
 			found = true
+			if best.Score == 1.0 {
+				break
+			}
 		}
 	}
 	return best, found
@@ -91,6 +95,7 @@ func BestAbove(query string, candidates []string, min float64) (Match, bool) {
 }
 
 // Best for an arbitrary item type
+// ⚡ Bolt: added early return for perfect matches to skip unnecessary precomputed scoring
 func BestFunc[T any](query string, items []T, key func(T) string) (best T, score float64, ok bool) {
 	q := normalize(query)
 	if q == "" {
@@ -113,6 +118,9 @@ func BestFunc[T any](query string, items []T, key func(T) string) (best T, score
 
 		if i == 0 || s > score || !ok {
 			best, score, ok = it, s, true
+			if score == 1.0 {
+				break
+			}
 		}
 	}
 	return best, score, ok
@@ -231,7 +239,12 @@ func isWordByte(b byte) bool {
 }
 
 // Computes the edit distance between a and b - rune aware
+// ⚡ Bolt: optimized memory allocation by using a single 1D array instead of two,
+// and ensures the inner loop always runs over the shorter slice.
 func levenshtein(a, b string) int {
+	if a == b {
+		return 0
+	}
 	ra, rb := []rune(a), []rune(b)
 	if len(ra) == 0 {
 		return len(rb)
@@ -240,23 +253,29 @@ func levenshtein(a, b string) int {
 		return len(ra)
 	}
 
-	prev := make([]int, len(rb)+1)
+	// Iterate over the shorter slice to minimize memory allocation
+	if len(ra) < len(rb) {
+		ra, rb = rb, ra
+	}
+
 	curr := make([]int, len(rb)+1)
-	for j := range prev {
-		prev[j] = j
+	for j := range curr {
+		curr[j] = j
 	}
 	for i := 1; i <= len(ra); i++ {
+		prevDiag := curr[0]
 		curr[0] = i
 		for j := 1; j <= len(rb); j++ {
+			oldDiag := curr[j]
 			cost := 1
 			if ra[i-1] == rb[j-1] {
 				cost = 0
 			}
-			curr[j] = min3(prev[j]+1, curr[j-1]+1, prev[j-1]+cost)
+			curr[j] = min3(curr[j]+1, curr[j-1]+1, prevDiag+cost)
+			prevDiag = oldDiag
 		}
-		prev, curr = curr, prev
 	}
-	return prev[len(rb)]
+	return curr[len(rb)]
 }
 
 func min3(a, b, c int) int {
