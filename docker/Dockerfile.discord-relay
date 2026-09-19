@@ -1,0 +1,21 @@
+FROM golang:alpine AS builder
+
+WORKDIR /build
+
+# Copy go mod files first for caching
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source code
+COPY cmd/discord-relay/ ./cmd/discord-relay/
+
+# Build the binary
+RUN CGO_ENABLED=0 go build -ldflags="-s -w" -o /discord-relay ./cmd/discord-relay
+
+FROM alpine:latest
+
+RUN apk add --no-cache ca-certificates tzdata
+
+COPY --from=builder /discord-relay /usr/local/bin/discord-relay
+
+ENTRYPOINT ["/usr/local/bin/discord-relay"]
