@@ -17,6 +17,7 @@
 		type AlertEvent
 	} from '$lib/proto/discopanel/v1/metrics_pb';
 	import type { Server } from '$lib/proto/discopanel/v1/common_pb';
+	import { ERROR_BADGE_CLASS, ONLINE_BADGE_CLASS } from '$lib/utils/status-colors';
 	import { Button } from '$lib/components/ui/button';
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
@@ -323,15 +324,9 @@
 	function eventBadge(state: AlertState): { label: string; class: string } {
 		switch (state) {
 			case AlertState.FIRING:
-				return {
-					label: 'Firing',
-					class: 'border-red-500/30 bg-red-500/10 text-red-500'
-				};
+				return { label: 'Firing', class: ERROR_BADGE_CLASS };
 			case AlertState.RESOLVED:
-				return {
-					label: 'Resolved',
-					class: 'border-green-500/30 bg-green-500/10 text-green-500'
-				};
+				return { label: 'Resolved', class: ONLINE_BADGE_CLASS };
 			default:
 				return { label: 'Unknown', class: '' };
 		}

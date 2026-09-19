@@ -87,7 +87,7 @@
 </script>
 
 <div class="h-full flex-1 space-y-8 bg-linear-to-br from-background to-muted/10 p-8 pt-6">
-	<div class="flex items-center justify-between border-b-2 border-border/50 pb-6">
+	<div class="flex flex-wrap items-center justify-between gap-4 border-b-2 border-border/50 pb-6">
 		<div class="flex items-center gap-4">
 			<div
 				class="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary/20 to-primary/10 shadow-lg"
@@ -108,7 +108,9 @@
 	</div>
 
 	<Tabs value={activeTab} onValueChange={(v) => (activeTab = v || activeTab)} class="space-y-6">
-		<TabsList class="flex w-fit gap-1">
+	<!-- TabsList is horizontally scrollable on small screens -->
+	<div class="w-full max-w-full overflow-x-auto pb-1">
+		<TabsList class="flex w-fit max-w-full gap-1">
 			{#if showSettings}
 				<TabsTrigger value="server-config" class="flex items-center gap-2 px-4">
 					<Server class="h-4 w-4" />
@@ -152,6 +154,7 @@
 				</TabsTrigger>
 			{/if}
 		</TabsList>
+	</div>
 
 		{#if showSettings}
 			<TabsContent value="server-config" class="space-y-4">

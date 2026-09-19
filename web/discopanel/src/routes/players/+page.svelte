@@ -59,6 +59,7 @@
 	import { serversStore } from '$lib/stores/servers';
 	import { debounce } from 'lodash-es';
 	import { formatBytes, formatPlaytime, formatTimeAgo, timestampToDate } from '$lib/utils';
+	import { ONLINE_BADGE_CLASS } from '$lib/utils/status-colors';
 
 	const PAGE_SIZE = 100;
 
@@ -177,7 +178,7 @@
 </script>
 
 <div class="h-full flex-1 space-y-8 bg-linear-to-br from-background to-muted/10 p-8 pt-6">
-	<div class="flex items-center justify-between border-b-2 border-border/50 pb-6">
+	<div class="flex flex-wrap items-center justify-between gap-4 border-b-2 border-border/50 pb-6">
 		<div class="flex items-center gap-4">
 			<div
 				class="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary/20 to-primary/10 shadow-lg"
@@ -289,7 +290,7 @@
 				{:else}
 					<div class="flex flex-wrap gap-1.5">
 						{#each onlinePlayers.slice(0, 12) as op (op.playerId + op.serverId)}
-							<Badge variant="outline" class="border-green-500/20 bg-green-500/10 text-xs text-green-600 dark:text-green-400">
+							<Badge variant="outline" class="text-xs {ONLINE_BADGE_CLASS}">
 								{op.name}
 								{#if op.serverName}
 									<span class="ml-1 font-normal opacity-60">@ {op.serverName}</span>
@@ -364,19 +365,20 @@
 					</p>
 				</div>
 			{:else}
-				<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>Name</TableHead>
-							<TableHead>Status</TableHead>
-							<TableHead>First Seen</TableHead>
-							<TableHead>Last Seen</TableHead>
-							<TableHead>Sessions</TableHead>
-							<TableHead>Playtime</TableHead>
-							<TableHead class="text-right">Actions</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
+				<div class="w-full overflow-x-auto">
+					<Table>
+						<TableHeader>
+							<TableRow>
+								<TableHead>Name</TableHead>
+								<TableHead>Status</TableHead>
+								<TableHead>First Seen</TableHead>
+								<TableHead>Last Seen</TableHead>
+								<TableHead>Sessions</TableHead>
+								<TableHead>Playtime</TableHead>
+								<TableHead class="text-right">Actions</TableHead>
+							</TableRow>
+						</TableHeader>
+						<TableBody>
 						{#each players as player (player.id)}
 							<TableRow
 								class="cursor-pointer"
@@ -400,7 +402,7 @@
 									{#if player.online}
 										<Badge
 											variant="outline"
-											class="border-green-500/20 bg-green-500/10 text-xs text-green-600 dark:text-green-400"
+											class="text-xs {ONLINE_BADGE_CLASS}"
 										>
 											<span class="mr-1 h-1.5 w-1.5 animate-pulse rounded-full bg-green-500"></span>
 											Online
@@ -425,7 +427,9 @@
 									<Button
 										variant="ghost"
 										size="sm"
-										class="h-8 w-8 p-0"
+										class="h-9 w-9"
+										aria-label="View details for {player.name}"
+										title="View details for {player.name}"
 										onclick={(e) => {
 											e.stopPropagation();
 											openPlayerDetail(player);
@@ -436,8 +440,9 @@
 								</TableCell>
 							</TableRow>
 						{/each}
-					</TableBody>
-				</Table>
+						</TableBody>
+					</Table>
+				</div>
 
 				{#if total > PAGE_SIZE || offset > 0}
 					<div class="mt-4 flex items-center justify-center gap-2">
@@ -540,30 +545,32 @@
 					{#if selectedPlayer.serverStats.length === 0}
 						<p class="text-sm text-muted-foreground">No per-server activity recorded yet.</p>
 					{:else}
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>Server</TableHead>
-									<TableHead>Playtime</TableHead>
-									<TableHead>Sessions</TableHead>
-									<TableHead>Last Seen</TableHead>
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{#each selectedPlayer.serverStats as stat (stat.serverId)}
+						<div class="w-full overflow-x-auto">
+							<Table>
+								<TableHeader>
 									<TableRow>
-										<TableCell class="font-medium">{stat.serverName || stat.serverId}</TableCell>
-										<TableCell class="font-mono text-sm">
-											{formatPlaytime(stat.playtimeSecs)}
-										</TableCell>
-										<TableCell>{stat.sessionsCount}</TableCell>
-										<TableCell class="text-muted-foreground">
-											{formatTimeAgo(timestampToDate(stat.lastSeen), currentTime)}
-										</TableCell>
+										<TableHead>Server</TableHead>
+										<TableHead>Playtime</TableHead>
+										<TableHead>Sessions</TableHead>
+										<TableHead>Last Seen</TableHead>
 									</TableRow>
-								{/each}
-							</TableBody>
-						</Table>
+								</TableHeader>
+								<TableBody>
+									{#each selectedPlayer.serverStats as stat (stat.serverId)}
+										<TableRow>
+											<TableCell class="font-medium">{stat.serverName || stat.serverId}</TableCell>
+											<TableCell class="font-mono text-sm">
+												{formatPlaytime(stat.playtimeSecs)}
+											</TableCell>
+											<TableCell>{stat.sessionsCount}</TableCell>
+											<TableCell class="text-muted-foreground">
+												{formatTimeAgo(timestampToDate(stat.lastSeen), currentTime)}
+											</TableCell>
+										</TableRow>
+									{/each}
+								</TableBody>
+							</Table>
+						</div>
 					{/if}
 				</div>
 
@@ -587,7 +594,7 @@
 											{#if !session.leftAt}
 												<Badge
 													variant="outline"
-													class="border-green-500/20 bg-green-500/10 text-[10px] text-green-600 dark:text-green-400"
+													class="text-[10px] {ONLINE_BADGE_CLASS}"
 												>
 													Active
 												</Badge>

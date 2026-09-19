@@ -19,13 +19,13 @@
 
 <div class="flex items-center justify-between border-b bg-muted/30 px-3 py-1.5">
 	<div class="flex items-center gap-1 sm:gap-0.5">
-		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onNewFile} title="New File">
+		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onNewFile} aria-label="New File" title="New File">
 			<FilePlus class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 		</Button>
-		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onNewFolder} title="New Folder">
+		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onNewFolder} aria-label="New Folder" title="New Folder">
 			<FolderPlus class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 		</Button>
-		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onUpload} title="Upload Files">
+		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onUpload} aria-label="Upload Files" title="Upload Files">
 			<Upload class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 		</Button>
 	</div>
@@ -47,6 +47,7 @@
 						showSearch = false;
 						onFilterChange('');
 					}}
+					aria-label="Close filter"
 				>
 					<X class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 				</Button>
@@ -57,12 +58,13 @@
 				variant="ghost"
 				class="h-8 w-8 sm:h-7 sm:w-7"
 				onclick={() => (showSearch = true)}
+				aria-label="Filter files"
 				title="Filter"
 			>
 				<Search class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 			</Button>
 		{/if}
-		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onRefresh} title="Refresh">
+		<Button size="icon" variant="ghost" class="h-8 w-8 sm:h-7 sm:w-7" onclick={onRefresh} aria-label="Refresh files" title="Refresh">
 			<RefreshCw class="h-4 w-4 sm:h-3.5 sm:w-3.5" />
 		</Button>
 	</div>

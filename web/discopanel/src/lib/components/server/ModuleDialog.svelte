@@ -596,7 +596,7 @@
 						<h2 class="text-lg sm:text-2xl font-semibold tracking-tight">Add Module</h2>
 						<p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">Select a module template to get started</p>
 					</div>
-					<Button variant="ghost" size="icon" onclick={() => (open = false)} class="h-8 w-8 sm:h-10 sm:w-10">
+					<Button variant="ghost" size="icon" onclick={() => (open = false)} class="h-8 w-8 sm:h-10 sm:w-10" aria-label="Close">
 						<X class="h-4 w-4 sm:h-5 sm:w-5" />
 					</Button>
 				</div>
@@ -734,7 +734,7 @@
 								{/if}
 							</p>
 						</div>
-						<Button variant="ghost" size="icon" onclick={() => (open = false)} class="h-10 w-10">
+						<Button variant="ghost" size="icon" onclick={() => (open = false)} class="h-10 w-10" aria-label="Close">
 							<X class="h-5 w-5" />
 						</Button>
 					</div>

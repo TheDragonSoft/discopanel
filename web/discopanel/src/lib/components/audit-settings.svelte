@@ -59,6 +59,7 @@
 	import type { AuditEntry } from '$lib/proto/discopanel/v1/audit_pb';
 	import { rpcClient, silentCallOptions } from '$lib/api/rpc-client';
 	import { timestampToDate } from '$lib/utils';
+	import { ERROR_BADGE_CLASS, ONLINE_BADGE_CLASS } from '$lib/utils/status-colors';
 
 	const PAGE_SIZE = 100;
 
@@ -313,7 +314,7 @@
 											<TooltipTrigger>
 												<Badge
 													variant="outline"
-													class="cursor-help border-red-500/20 bg-red-500/10 text-xs text-red-600 dark:text-red-400"
+													class="cursor-help text-xs {ERROR_BADGE_CLASS}"
 												>
 													Error
 												</Badge>
@@ -323,10 +324,7 @@
 											</TooltipContent>
 										</Tooltip>
 									{:else}
-										<Badge
-											variant="outline"
-											class="border-green-500/20 bg-green-500/10 text-xs text-green-600 dark:text-green-400"
-										>
+										<Badge variant="outline" class="text-xs {ONLINE_BADGE_CLASS}">
 											OK
 										</Badge>
 									{/if}

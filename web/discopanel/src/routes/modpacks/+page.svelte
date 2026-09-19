@@ -15,6 +15,7 @@
 	import { Badge } from '$lib/components/ui/badge';
 	import { Alert, AlertDescription, AlertTitle } from '$lib/components/ui/alert';
 	import { Progress } from '$lib/components/ui/progress';
+	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { toast } from 'svelte-sonner';
 	import {
 		Heart,
@@ -736,20 +737,35 @@
 		</div>
 	{/if}
 
-	{#if displayModpacks.length === 0}
+	{#if (loading || syncing) && displayModpacks.length === 0}
+		<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+			{#each Array(6) as _, i (i)}
+				<Skeleton class="h-56 rounded-lg" />
+			{/each}
+		</div>
+	{:else if displayModpacks.length === 0}
 		<div class="py-12 text-center">
-			<p class="text-muted-foreground">
+			<div class="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+				<Package class="h-6 w-6 text-muted-foreground" />
+			</div>
+			<h3 class="mb-1 text-sm font-semibold">
 				{#if showFavorites}
-					No favorite modpacks yet. Browse the modpacks list and click the heart icon to add
-					favorites.
-				{:else if loading}
-					Loading modpacks...
-				{:else if syncing}
-					Syncing modpacks...
-				{:else if searchParams.query}
-					No modpacks found matching your search.
+					No favorite modpacks yet
+				{:else if showUploaded}
+					No uploaded modpacks yet
 				{:else}
-					No modpacks found.
+					No modpacks found
+				{/if}
+			</h3>
+			<p class="text-sm text-muted-foreground">
+				{#if showFavorites}
+					Browse the modpacks list and click the heart icon to add favorites.
+				{:else if showUploaded}
+					Use the "Uploaded" button above to upload a modpack ZIP file.
+				{:else if searchParams.query}
+					No modpacks found matching your search. Try different keywords or clear the filters.
+				{:else}
+					Click "Sync" to fetch modpacks from indexers, or upload a modpack ZIP file.
 				{/if}
 			</p>
 		</div>

@@ -374,6 +374,7 @@
 							variant="ghost"
 							size="icon"
 							class="h-7 w-7 group-data-[collapsible=icon]:hidden"
+							aria-label="Toggle theme"
 							onclick={toggleMode}
 						>
 							{#if mode.current === 'light'}
@@ -405,6 +406,7 @@
 							size="icon"
 							class="h-8 w-8"
 							onclick={toggleMode}
+							aria-label="Toggle theme"
 							title="Toggle theme"
 						>
 							{#if mode.current === 'light'}

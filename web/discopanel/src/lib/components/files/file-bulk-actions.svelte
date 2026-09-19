@@ -47,11 +47,12 @@
 				variant="ghost"
 				class="h-7 w-7"
 				onclick={onDownload}
+				aria-label="Download selected"
 				title="Download selected"
 			>
 				<Download class="h-3.5 w-3.5" />
 			</Button>
-			<Button size="icon" variant="ghost" class="h-7 w-7" onclick={onMove} title="Move selected">
+			<Button size="icon" variant="ghost" class="h-7 w-7" onclick={onMove} aria-label="Move selected" title="Move selected">
 				<FolderInput class="h-3.5 w-3.5" />
 			</Button>
 			<Button
@@ -59,6 +60,7 @@
 				variant="ghost"
 				class="h-7 w-7"
 				onclick={onCompress}
+				aria-label="Compress selected"
 				title="Compress selected"
 			>
 				<Archive class="h-3.5 w-3.5" />

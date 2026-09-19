@@ -464,7 +464,7 @@
 							{/if}
 						</p>
 					</div>
-					<Button variant="ghost" size="icon" onclick={() => (open = false)} class="h-10 w-10">
+					<Button variant="ghost" size="icon" onclick={() => (open = false)} class="h-10 w-10" aria-label="Close">
 						<X class="h-5 w-5" />
 					</Button>
 				</div>

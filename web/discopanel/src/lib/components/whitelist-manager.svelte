@@ -354,7 +354,8 @@
 					</p>
 				</div>
 			{:else}
-				<Table>
+				<div class="w-full overflow-x-auto">
+					<Table>
 					<TableHeader>
 						<TableRow>
 							<TableHead>Name</TableHead>
@@ -378,10 +379,10 @@
 													if (e.key === 'Escape') editingId = '';
 												}}
 											/>
-											<Button variant="ghost" size="sm" class="h-8 w-8 p-0" onclick={() => saveNote(entry)}>
+											<Button variant="ghost" size="sm" class="h-8 w-8" aria-label="Save note for {entry.name}" onclick={() => saveNote(entry)}>
 												<Check class="h-4 w-4" />
 											</Button>
-											<Button variant="ghost" size="sm" class="h-8 w-8 p-0" onclick={() => (editingId = '')}>
+											<Button variant="ghost" size="sm" class="h-8 w-8" aria-label="Cancel editing note for {entry.name}" onclick={() => (editingId = '')}>
 												<X class="h-4 w-4" />
 											</Button>
 										</div>
@@ -405,7 +406,8 @@
 									<Button
 										variant="ghost"
 										size="sm"
-										class="h-8 w-8 p-0 text-destructive hover:text-destructive"
+										class="h-8 w-8 text-destructive hover:text-destructive"
+										aria-label="Remove {entry.name} from whitelist"
 										onclick={() => removeEntry(entry)}
 									>
 										<Trash2 class="h-4 w-4" />
@@ -415,6 +417,7 @@
 						{/each}
 					</TableBody>
 				</Table>
+				</div>
 			{/if}
 		</CardContent>
 	</Card>

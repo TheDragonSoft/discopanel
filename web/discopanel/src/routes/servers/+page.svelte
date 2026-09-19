@@ -32,6 +32,11 @@
 	import { type Server, ServerStatus, ModLoader } from '$lib/proto/discopanel/v1/common_pb';
 	import ServerTemplatesDialog from '$lib/components/server-templates-dialog.svelte';
 	import SaveServerTemplateDialog from '$lib/components/save-server-template-dialog.svelte';
+	import {
+		serverStatusBadgeClass,
+		serverStatusDotClass,
+		serverStatusLabel
+	} from '$lib/utils/status-colors';
 
 	let servers = $derived($serversStore);
 	let filteredServers = $state<Server[]>([]);
@@ -117,24 +122,6 @@
 		}
 	}
 
-	function getStatusBadgeColor(status: ServerStatus): string {
-		switch (status) {
-			case ServerStatus.RUNNING:
-				return 'bg-green-500/10 text-green-500 border-green-500/20';
-			case ServerStatus.STARTING:
-			case ServerStatus.STOPPING:
-			case ServerStatus.CREATING:
-			case ServerStatus.RESTARTING:
-				return 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20';
-			case ServerStatus.ERROR:
-			case ServerStatus.UNHEALTHY:
-				return 'bg-red-500/10 text-red-500 border-red-500/20';
-			case ServerStatus.STOPPED:
-			default:
-				return 'bg-gray-500/10 text-gray-500 border-gray-500/20';
-		}
-	}
-
 	function getStatusAccentColor(status: ServerStatus): string {
 		switch (status) {
 			case ServerStatus.RUNNING:
@@ -153,54 +140,13 @@
 		}
 	}
 
-	function getStatusDisplayName(status: ServerStatus): string {
-		switch (status) {
-			case ServerStatus.RUNNING:
-				return 'Running';
-			case ServerStatus.STOPPED:
-				return 'Stopped';
-			case ServerStatus.STARTING:
-				return 'Starting';
-			case ServerStatus.STOPPING:
-				return 'Stopping';
-			case ServerStatus.ERROR:
-				return 'Error';
-			case ServerStatus.CREATING:
-				return 'Creating';
-			case ServerStatus.RESTARTING:
-				return 'Restarting';
-			case ServerStatus.UNHEALTHY:
-				return 'Unhealthy';
-			default:
-				return 'Unknown';
-		}
-	}
-
-	function getStatusDotColor(status: ServerStatus): string {
-		switch (status) {
-			case ServerStatus.RUNNING:
-				return 'bg-green-500 animate-pulse';
-			case ServerStatus.STARTING:
-			case ServerStatus.STOPPING:
-			case ServerStatus.CREATING:
-			case ServerStatus.RESTARTING:
-				return 'bg-yellow-500 animate-pulse';
-			case ServerStatus.ERROR:
-			case ServerStatus.UNHEALTHY:
-				return 'bg-red-500 animate-pulse';
-			case ServerStatus.STOPPED:
-			default:
-				return 'bg-gray-400';
-		}
-	}
-
 	function getModLoaderDisplay(modLoader: ModLoader): string {
 		return ModLoader[modLoader].replace('_', ' ').toLowerCase();
 	}
 </script>
 
 <div class="h-full flex-1 space-y-8 bg-linear-to-br from-background to-muted/10 p-8 pt-6">
-	<div class="flex items-center justify-between border-b-2 border-border/50 pb-6">
+	<div class="flex flex-wrap items-center justify-between gap-4 border-b-2 border-border/50 pb-6">
 		<div class="flex items-center gap-4">
 			<div
 				class="flex h-16 w-16 animate-in items-center justify-center rounded-2xl bg-linear-to-br from-primary/20 to-primary/10 shadow-lg duration-500 fade-in-50"
@@ -346,9 +292,10 @@
 							>
 								{#if server.status === ServerStatus.STOPPED || server.status === ServerStatus.ERROR}
 									<button
-										title="Start"
+										title="Start {server.name}"
+										aria-label="Start {server.name}"
 										disabled={loading}
-										class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-green-500/10 hover:text-green-500 disabled:opacity-50"
+										class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-green-500/10 hover:text-green-500 disabled:opacity-50"
 										onclick={() => handleServerAction('start', server)}
 									>
 										<Play class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
@@ -356,9 +303,10 @@
 								{/if}
 								{#if server.status === ServerStatus.RUNNING || server.status === ServerStatus.UNHEALTHY || server.status === ServerStatus.STARTING}
 									<button
-										title="Stop"
+										title="Stop {server.name}"
+										aria-label="Stop {server.name}"
 										disabled={loading}
-										class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50"
+										class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50"
 										onclick={() => handleServerAction('stop', server)}
 									>
 										<Square class="h-3 w-3 sm:h-2.5 sm:w-2.5" />
@@ -366,26 +314,29 @@
 								{/if}
 								{#if server.status === ServerStatus.RUNNING || server.status === ServerStatus.UNHEALTHY}
 									<button
-										title="Restart"
+										title="Restart {server.name}"
+										aria-label="Restart {server.name}"
 										disabled={loading}
-										class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-yellow-500/10 hover:text-yellow-500 disabled:opacity-50"
+										class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-yellow-500/10 hover:text-yellow-500 disabled:opacity-50"
 										onclick={() => handleServerAction('restart', server)}
 									>
 										<RotateCw class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
 									</button>
 								{/if}
 								<button
-									title="Recreate"
+									title="Recreate {server.name}"
+									aria-label="Recreate {server.name}"
 									disabled={loading}
-									class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
+									class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
 									onclick={() => handleServerAction('recreate', server)}
 								>
 									<RefreshCcw class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
 								</button>
 								<button
-									title="Save as Template"
+									title="Save {server.name} as Template"
+									aria-label="Save {server.name} as Template"
 									disabled={loading}
-									class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+									class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
 									onclick={() => {
 										saveTemplateServer = server;
 										saveTemplateOpen = true;
@@ -394,9 +345,10 @@
 									<PackagePlus class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
 								</button>
 								<button
-									title="Delete"
+									title="Delete {server.name}"
+									aria-label="Delete {server.name}"
 									disabled={loading}
-									class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
+									class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
 									onclick={() => deleteServer(server)}
 								>
 									<Trash2 class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
@@ -406,9 +358,9 @@
 
 						<!-- Status badge row -->
 						<div class="mt-2 flex items-center gap-2">
-							<div class="h-2 w-2 rounded-full {getStatusDotColor(server.status)}"></div>
-							<Badge variant="outline" class="border text-xs {getStatusBadgeColor(server.status)}">
-								{getStatusDisplayName(server.status)}
+							<div class="h-2 w-2 rounded-full {serverStatusDotClass(server.status)}"></div>
+							<Badge variant="outline" class="text-xs {serverStatusBadgeClass(server.status)}">
+								{serverStatusLabel(server.status)}
 							</Badge>
 							<span class="text-xs text-muted-foreground">{server.mcVersion}</span>
 							{#if server.modLoader !== ModLoader.VANILLA && server.modLoader !== ModLoader.UNSPECIFIED}
