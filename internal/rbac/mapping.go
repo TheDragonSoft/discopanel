@@ -58,6 +58,16 @@ var ProcedurePermissions = map[string]ProcedurePermission{
 	"/discopanel.v1.ServerService/RecreateServer":       {Resource: ResourceServers, Action: ActionRestart, ObjectIDField: "id"},
 	"/discopanel.v1.ServerService/SendCommand":          {Resource: ResourceServers, Action: ActionCommand, ObjectIDField: "id"},
 
+	// ── TemplateService ────────────────────────────────────────────────
+	// Capturing a template only reads a server, so it maps to servers:read.
+	// Templates themselves are panel settings: update/delete require the
+	// settings resource. Deploying creates a new server.
+	"/discopanel.v1.TemplateService/ListServerTemplates":  {Resource: ResourceServers, Action: ActionRead},
+	"/discopanel.v1.TemplateService/CreateServerTemplate": {Resource: ResourceServers, Action: ActionRead, ObjectIDField: "server_id"},
+	"/discopanel.v1.TemplateService/UpdateServerTemplate": {Resource: ResourceSettings, Action: ActionUpdate, ObjectIDField: "id"},
+	"/discopanel.v1.TemplateService/DeleteServerTemplate": {Resource: ResourceSettings, Action: ActionDelete, ObjectIDField: "id"},
+	"/discopanel.v1.TemplateService/DeployServerTemplate": {Resource: ResourceServers, Action: ActionCreate},
+
 	// ── AuthService (admin) ───────────────────────────────────────────
 	"/discopanel.v1.AuthService/GetAuthConfig":      {Resource: ResourceSettings, Action: ActionRead},
 	"/discopanel.v1.AuthService/UpdateAuthSettings": {Resource: ResourceSettings, Action: ActionUpdate},

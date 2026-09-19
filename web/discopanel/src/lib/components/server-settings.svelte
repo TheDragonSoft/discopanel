@@ -65,6 +65,9 @@
 			detached: server.detached,
 			autoStart: server.autoStart,
 			wakeOnConnect: server.wakeOnConnect,
+			autoRestart: server.autoRestart ?? false,
+			autoRestartMaxRetries: server.autoRestartMaxRetries ?? 0,
+			autoRestartBackoffSecs: server.autoRestartBackoffSecs ?? 30,
 			tpsCommand: server.tpsCommand || '',
 			modpackId: '', // Not used in this context
 			modpackVersionId: '', // Not used in this context
@@ -85,6 +88,9 @@
 			formData.detached !== server.detached ||
 			formData.autoStart !== server.autoStart ||
 			formData.wakeOnConnect !== server.wakeOnConnect ||
+			formData.autoRestart !== (server.autoRestart ?? false) ||
+			formData.autoRestartMaxRetries !== (server.autoRestartMaxRetries ?? 0) ||
+			formData.autoRestartBackoffSecs !== (server.autoRestartBackoffSecs ?? 30) ||
 			formData.tpsCommand !== (server.tpsCommand || '') ||
 			safeToString(formData.additionalPorts) !== safeToString(server.additionalPorts || []) ||
 			safeToString($state.snapshot(formData.dockerOverrides)) !==
@@ -117,6 +123,9 @@
 				detached: server.detached,
 				autoStart: server.autoStart,
 				wakeOnConnect: server.wakeOnConnect,
+				autoRestart: server.autoRestart ?? false,
+				autoRestartMaxRetries: server.autoRestartMaxRetries ?? 0,
+				autoRestartBackoffSecs: server.autoRestartBackoffSecs ?? 30,
 				tpsCommand: server.tpsCommand || '',
 				modpackId: '', // Not used in this context
 				modpackVersionId: '', // Not used in this context
@@ -172,6 +181,32 @@
 		if (value <= 0) {
 			input.value = '1';
 			formData.maxPlayers = 1;
+		}
+	}
+
+	function handleAutoRestartMaxRetriesInput(e: Event) {
+		const input = e.currentTarget as HTMLInputElement;
+		const value = Math.floor(Number(input.value));
+
+		// Negative values are not allowed; 0 means unlimited
+		if (Number.isNaN(value) || value < 0) {
+			input.value = '0';
+			formData.autoRestartMaxRetries = 0;
+		} else {
+			formData.autoRestartMaxRetries = value;
+		}
+	}
+
+	function handleAutoRestartBackoffInput(e: Event) {
+		const input = e.currentTarget as HTMLInputElement;
+		const value = Math.floor(Number(input.value));
+
+		// Backoff must be at least 1 second
+		if (Number.isNaN(value) || value < 1) {
+			input.value = '1';
+			formData.autoRestartBackoffSecs = 1;
+		} else {
+			formData.autoRestartBackoffSecs = value;
 		}
 	}
 
@@ -437,6 +472,71 @@
 						formData.wakeOnConnect = checked;
 					}}
 				/>
+			</div>
+
+			<div class="rounded-lg bg-muted/50 p-4">
+				<div class="flex items-center justify-between">
+					<div class="space-y-0.5">
+						<Label for="auto_restart" class="cursor-pointer text-sm font-medium"
+							>Auto-Restart</Label
+						>
+						<p class="text-xs text-muted-foreground">
+							Automatically restart the server when it crashes or exits unexpectedly
+						</p>
+					</div>
+					<Switch
+						id="auto_restart"
+						checked={formData.autoRestart ?? false}
+						onCheckedChange={(checked) => {
+							formData.autoRestart = checked;
+							// Apply sensible defaults the first time auto-restart is enabled
+							if (checked) {
+								if (formData.autoRestartBackoffSecs === undefined) {
+									formData.autoRestartBackoffSecs = 30;
+								}
+							}
+						}}
+					/>
+				</div>
+
+				{#if formData.autoRestart}
+					<div class="mt-4 grid gap-4 rounded-lg bg-background/60 p-4 sm:grid-cols-2">
+						<div class="space-y-2">
+							<Label for="auto_restart_max_retries" class="text-sm font-medium"
+								>Max Restarts</Label
+							>
+							<Input
+								id="auto_restart_max_retries"
+								type="number"
+								min="0"
+								step="1"
+								bind:value={formData.autoRestartMaxRetries}
+								oninput={handleAutoRestartMaxRetriesInput}
+								class="h-10"
+							/>
+							<p class="text-xs text-muted-foreground">
+								Maximum restart attempts per crash episode (0 = unlimited)
+							</p>
+						</div>
+						<div class="space-y-2">
+							<Label for="auto_restart_backoff_secs" class="text-sm font-medium"
+								>Backoff (seconds)</Label
+							>
+							<Input
+								id="auto_restart_backoff_secs"
+								type="number"
+								min="1"
+								step="1"
+								bind:value={formData.autoRestartBackoffSecs}
+								oninput={handleAutoRestartBackoffInput}
+								class="h-10"
+							/>
+							<p class="text-xs text-muted-foreground">
+								Wait time before each restart attempt (default 30)
+							</p>
+						</div>
+					</div>
+				{/if}
 			</div>
 		</div>
 	</div>

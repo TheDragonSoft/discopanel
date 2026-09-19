@@ -89,6 +89,9 @@ message Server {
   optional bool wake_on_connect = 41; // Start the server automatically when a client connects through the proxy
   string public_address = 42; // Public address discovered from an attached playit.gg tunnel (empty if none)
   int32 public_port = 43; // Public port matching public_address
+  optional bool auto_restart = 44; // Restart automatically when the server process exits unexpectedly
+  optional int32 auto_restart_max_retries = 45; // Max consecutive auto-restarts before giving up (0 = unlimited)
+  optional int32 auto_restart_backoff_secs = 46; // Base backoff between auto-restarts, doubled each retry up to 10x
 
   // Additional configuration
   repeated AdditionalPort additional_ports = 27;

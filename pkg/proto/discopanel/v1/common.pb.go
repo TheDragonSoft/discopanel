@@ -318,17 +318,20 @@ type Server struct {
 	Detached        bool                   `protobuf:"varint,19,opt,name=detached,proto3" json:"detached,omitempty"`
 	TpsCommand      string                 `protobuf:"bytes,20,opt,name=tps_command,json=tpsCommand,proto3" json:"tps_command,omitempty"`
 	// Runtime stats
-	MemoryUsage   int64   `protobuf:"varint,21,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
-	CpuPercent    float64 `protobuf:"fixed64,22,opt,name=cpu_percent,json=cpuPercent,proto3" json:"cpu_percent,omitempty"`
-	DiskUsage     int64   `protobuf:"varint,23,opt,name=disk_usage,json=diskUsage,proto3" json:"disk_usage,omitempty"`
-	DiskTotal     int64   `protobuf:"varint,24,opt,name=disk_total,json=diskTotal,proto3" json:"disk_total,omitempty"`
-	PlayersOnline int32   `protobuf:"varint,25,opt,name=players_online,json=playersOnline,proto3" json:"players_online,omitempty"`
-	WorldSize     int64   `protobuf:"varint,39,opt,name=world_size,json=worldSize,proto3" json:"world_size,omitempty"`
-	Tps           float64 `protobuf:"fixed64,26,opt,name=tps,proto3" json:"tps,omitempty"`
-	DiskFree      int64   `protobuf:"varint,40,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"`                        // Available (free) disk space in bytes on the data drive
-	WakeOnConnect *bool   `protobuf:"varint,41,opt,name=wake_on_connect,json=wakeOnConnect,proto3,oneof" json:"wake_on_connect,omitempty"` // Start the server automatically when a client connects through the proxy
-	PublicAddress string  `protobuf:"bytes,42,opt,name=public_address,json=publicAddress,proto3" json:"public_address,omitempty"`          // Public address discovered from an attached playit.gg tunnel (empty if none)
-	PublicPort    int32   `protobuf:"varint,43,opt,name=public_port,json=publicPort,proto3" json:"public_port,omitempty"`                  // Public port matching public_address
+	MemoryUsage            int64   `protobuf:"varint,21,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
+	CpuPercent             float64 `protobuf:"fixed64,22,opt,name=cpu_percent,json=cpuPercent,proto3" json:"cpu_percent,omitempty"`
+	DiskUsage              int64   `protobuf:"varint,23,opt,name=disk_usage,json=diskUsage,proto3" json:"disk_usage,omitempty"`
+	DiskTotal              int64   `protobuf:"varint,24,opt,name=disk_total,json=diskTotal,proto3" json:"disk_total,omitempty"`
+	PlayersOnline          int32   `protobuf:"varint,25,opt,name=players_online,json=playersOnline,proto3" json:"players_online,omitempty"`
+	WorldSize              int64   `protobuf:"varint,39,opt,name=world_size,json=worldSize,proto3" json:"world_size,omitempty"`
+	Tps                    float64 `protobuf:"fixed64,26,opt,name=tps,proto3" json:"tps,omitempty"`
+	DiskFree               int64   `protobuf:"varint,40,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"`                                                     // Available (free) disk space in bytes on the data drive
+	WakeOnConnect          *bool   `protobuf:"varint,41,opt,name=wake_on_connect,json=wakeOnConnect,proto3,oneof" json:"wake_on_connect,omitempty"`                              // Start the server automatically when a client connects through the proxy
+	PublicAddress          string  `protobuf:"bytes,42,opt,name=public_address,json=publicAddress,proto3" json:"public_address,omitempty"`                                       // Public address discovered from an attached playit.gg tunnel (empty if none)
+	PublicPort             int32   `protobuf:"varint,43,opt,name=public_port,json=publicPort,proto3" json:"public_port,omitempty"`                                               // Public port matching public_address
+	AutoRestart            *bool   `protobuf:"varint,44,opt,name=auto_restart,json=autoRestart,proto3,oneof" json:"auto_restart,omitempty"`                                      // Restart automatically when the server process exits unexpectedly
+	AutoRestartMaxRetries  *int32  `protobuf:"varint,45,opt,name=auto_restart_max_retries,json=autoRestartMaxRetries,proto3,oneof" json:"auto_restart_max_retries,omitempty"`    // Max consecutive auto-restarts before giving up (0 = unlimited)
+	AutoRestartBackoffSecs *int32  `protobuf:"varint,46,opt,name=auto_restart_backoff_secs,json=autoRestartBackoffSecs,proto3,oneof" json:"auto_restart_backoff_secs,omitempty"` // Base backoff between auto-restarts, doubled each retry up to 10x
 	// Additional configuration
 	AdditionalPorts []*AdditionalPort      `protobuf:"bytes,27,rep,name=additional_ports,json=additionalPorts,proto3" json:"additional_ports,omitempty"`
 	DockerOverrides *DockerOverrides       `protobuf:"bytes,28,opt,name=docker_overrides,json=dockerOverrides,proto3" json:"docker_overrides,omitempty"`
@@ -590,6 +593,27 @@ func (x *Server) GetPublicAddress() string {
 func (x *Server) GetPublicPort() int32 {
 	if x != nil {
 		return x.PublicPort
+	}
+	return 0
+}
+
+func (x *Server) GetAutoRestart() bool {
+	if x != nil && x.AutoRestart != nil {
+		return *x.AutoRestart
+	}
+	return false
+}
+
+func (x *Server) GetAutoRestartMaxRetries() int32 {
+	if x != nil && x.AutoRestartMaxRetries != nil {
+		return *x.AutoRestartMaxRetries
+	}
+	return 0
+}
+
+func (x *Server) GetAutoRestartBackoffSecs() int32 {
+	if x != nil && x.AutoRestartBackoffSecs != nil {
+		return *x.AutoRestartBackoffSecs
 	}
 	return 0
 }
@@ -1388,7 +1412,7 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\n" +
 	"last_login\x18\t \x01(\v2\x1a.google.protobuf.TimestampH\x01R\tlastLogin\x88\x01\x01B\b\n" +
 	"\x06_emailB\r\n" +
-	"\v_last_login\"\xf4\f\n" +
+	"\v_last_login\"\xe6\x0e\n" +
 	"\x06Server\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -1432,7 +1456,10 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\x0fwake_on_connect\x18) \x01(\bH\x01R\rwakeOnConnect\x88\x01\x01\x12%\n" +
 	"\x0epublic_address\x18* \x01(\tR\rpublicAddress\x12\x1f\n" +
 	"\vpublic_port\x18+ \x01(\x05R\n" +
-	"publicPort\x12H\n" +
+	"publicPort\x12&\n" +
+	"\fauto_restart\x18, \x01(\bH\x02R\vautoRestart\x88\x01\x01\x12<\n" +
+	"\x18auto_restart_max_retries\x18- \x01(\x05H\x03R\x15autoRestartMaxRetries\x88\x01\x01\x12>\n" +
+	"\x19auto_restart_backoff_secs\x18. \x01(\x05H\x04R\x16autoRestartBackoffSecs\x88\x01\x01\x12H\n" +
 	"\x10additional_ports\x18\x1b \x03(\v2\x1d.discopanel.v1.AdditionalPortR\x0fadditionalPorts\x12I\n" +
 	"\x10docker_overrides\x18\x1c \x01(\v2\x1e.discopanel.v1.DockerOverridesR\x0fdockerOverrides\x129\n" +
 	"\n" +
@@ -1448,7 +1475,10 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\x0fmax_players_slp\x18% \x01(\x05R\rmaxPlayersSlp\x12\x18\n" +
 	"\afavicon\x18& \x01(\tR\afaviconB\x0f\n" +
 	"\r_last_startedB\x12\n" +
-	"\x10_wake_on_connect\"\x84\x01\n" +
+	"\x10_wake_on_connectB\x0f\n" +
+	"\r_auto_restartB\x1b\n" +
+	"\x19_auto_restart_max_retriesB\x1c\n" +
+	"\x1a_auto_restart_backoff_secs\"\x84\x01\n" +
 	"\x0eAdditionalPort\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12%\n" +
 	"\x0econtainer_port\x18\x02 \x01(\x05R\rcontainerPort\x12\x1b\n" +

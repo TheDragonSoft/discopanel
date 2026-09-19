@@ -30,7 +30,8 @@
 		ExternalLink,
 		Trash2,
 		Cpu,
-		Info
+		Info,
+		PackagePlus
 	} from '@lucide/svelte';
 	import {
 		DropdownMenu,
@@ -65,6 +66,7 @@
 	import MetricsHistory from '$lib/components/metrics-history.svelte';
 	import ServerModules from '$lib/components/server/ServerModules.svelte';
 	import MotdEditor from '$lib/components/motd-editor.svelte';
+	import SaveServerTemplateDialog from '$lib/components/save-server-template-dialog.svelte';
 
 	let server = $state<Server | null>(null);
 	let loading = $state(true);
@@ -74,6 +76,7 @@
 	let activeTab = $state('overview');
 	let routingInfo = $state<GetServerRoutingResponse | null>(null);
 	let onlinePlayers = $state<OnlinePlayer[]>([]);
+	let saveTemplateOpen = $state(false);
 
 	let interval: ReturnType<typeof setInterval> | undefined;
 
@@ -389,6 +392,10 @@
 						{/snippet}
 					</DropdownMenuTrigger>
 					<DropdownMenuContent align="end">
+						<DropdownMenuItem class="flew-row flex" onclick={() => (saveTemplateOpen = true)}>
+							<PackagePlus class="mr-2 h-4 w-4" />
+							Save as Template
+						</DropdownMenuItem>
 						<DropdownMenuItem class="flew-row flex" onclick={() => handleServerAction('recreate')}>
 							<RefreshCcw class="mr-2 h-4 w-4" />
 							Force Recreate
@@ -1198,6 +1205,8 @@
 {/if}
 
 <ScrollToTop />
+
+<SaveServerTemplateDialog {server} bind:open={saveTemplateOpen} />
 
 <style>
 	@keyframes shimmer {

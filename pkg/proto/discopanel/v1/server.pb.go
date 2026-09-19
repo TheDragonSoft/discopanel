@@ -846,26 +846,29 @@ func (x *CreateServerResponse) GetServer() *Server {
 
 // Server fields to update
 type UpdateServerRequest struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name             string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Description      string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Port             *int32                 `protobuf:"varint,4,opt,name=port,proto3,oneof" json:"port,omitempty"`
-	MaxPlayers       int32                  `protobuf:"varint,5,opt,name=max_players,json=maxPlayers,proto3" json:"max_players,omitempty"`
-	Memory           int32                  `protobuf:"varint,6,opt,name=memory,proto3" json:"memory,omitempty"`
-	ModLoader        string                 `protobuf:"bytes,7,opt,name=mod_loader,json=modLoader,proto3" json:"mod_loader,omitempty"`
-	McVersion        string                 `protobuf:"bytes,8,opt,name=mc_version,json=mcVersion,proto3" json:"mc_version,omitempty"`
-	DockerImage      string                 `protobuf:"bytes,9,opt,name=docker_image,json=dockerImage,proto3" json:"docker_image,omitempty"`
-	AutoStart        *bool                  `protobuf:"varint,10,opt,name=auto_start,json=autoStart,proto3,oneof" json:"auto_start,omitempty"`
-	Detached         *bool                  `protobuf:"varint,11,opt,name=detached,proto3,oneof" json:"detached,omitempty"`
-	TpsCommand       *string                `protobuf:"bytes,12,opt,name=tps_command,json=tpsCommand,proto3,oneof" json:"tps_command,omitempty"`
-	ModpackId        string                 `protobuf:"bytes,13,opt,name=modpack_id,json=modpackId,proto3" json:"modpack_id,omitempty"`
-	ModpackVersionId string                 `protobuf:"bytes,14,opt,name=modpack_version_id,json=modpackVersionId,proto3" json:"modpack_version_id,omitempty"`
-	AdditionalPorts  []*AdditionalPort      `protobuf:"bytes,15,rep,name=additional_ports,json=additionalPorts,proto3" json:"additional_ports,omitempty"`
-	DockerOverrides  *DockerOverrides       `protobuf:"bytes,16,opt,name=docker_overrides,json=dockerOverrides,proto3" json:"docker_overrides,omitempty"`
-	WakeOnConnect    *bool                  `protobuf:"varint,17,opt,name=wake_on_connect,json=wakeOnConnect,proto3,oneof" json:"wake_on_connect,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"open.v1"`
+	Id                     string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name                   string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description            string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Port                   *int32                 `protobuf:"varint,4,opt,name=port,proto3,oneof" json:"port,omitempty"`
+	MaxPlayers             int32                  `protobuf:"varint,5,opt,name=max_players,json=maxPlayers,proto3" json:"max_players,omitempty"`
+	Memory                 int32                  `protobuf:"varint,6,opt,name=memory,proto3" json:"memory,omitempty"`
+	ModLoader              string                 `protobuf:"bytes,7,opt,name=mod_loader,json=modLoader,proto3" json:"mod_loader,omitempty"`
+	McVersion              string                 `protobuf:"bytes,8,opt,name=mc_version,json=mcVersion,proto3" json:"mc_version,omitempty"`
+	DockerImage            string                 `protobuf:"bytes,9,opt,name=docker_image,json=dockerImage,proto3" json:"docker_image,omitempty"`
+	AutoStart              *bool                  `protobuf:"varint,10,opt,name=auto_start,json=autoStart,proto3,oneof" json:"auto_start,omitempty"`
+	Detached               *bool                  `protobuf:"varint,11,opt,name=detached,proto3,oneof" json:"detached,omitempty"`
+	TpsCommand             *string                `protobuf:"bytes,12,opt,name=tps_command,json=tpsCommand,proto3,oneof" json:"tps_command,omitempty"`
+	ModpackId              string                 `protobuf:"bytes,13,opt,name=modpack_id,json=modpackId,proto3" json:"modpack_id,omitempty"`
+	ModpackVersionId       string                 `protobuf:"bytes,14,opt,name=modpack_version_id,json=modpackVersionId,proto3" json:"modpack_version_id,omitempty"`
+	AdditionalPorts        []*AdditionalPort      `protobuf:"bytes,15,rep,name=additional_ports,json=additionalPorts,proto3" json:"additional_ports,omitempty"`
+	DockerOverrides        *DockerOverrides       `protobuf:"bytes,16,opt,name=docker_overrides,json=dockerOverrides,proto3" json:"docker_overrides,omitempty"`
+	WakeOnConnect          *bool                  `protobuf:"varint,17,opt,name=wake_on_connect,json=wakeOnConnect,proto3,oneof" json:"wake_on_connect,omitempty"`
+	AutoRestart            *bool                  `protobuf:"varint,18,opt,name=auto_restart,json=autoRestart,proto3,oneof" json:"auto_restart,omitempty"`
+	AutoRestartMaxRetries  *int32                 `protobuf:"varint,19,opt,name=auto_restart_max_retries,json=autoRestartMaxRetries,proto3,oneof" json:"auto_restart_max_retries,omitempty"`
+	AutoRestartBackoffSecs *int32                 `protobuf:"varint,20,opt,name=auto_restart_backoff_secs,json=autoRestartBackoffSecs,proto3,oneof" json:"auto_restart_backoff_secs,omitempty"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *UpdateServerRequest) Reset() {
@@ -1015,6 +1018,27 @@ func (x *UpdateServerRequest) GetWakeOnConnect() bool {
 		return *x.WakeOnConnect
 	}
 	return false
+}
+
+func (x *UpdateServerRequest) GetAutoRestart() bool {
+	if x != nil && x.AutoRestart != nil {
+		return *x.AutoRestart
+	}
+	return false
+}
+
+func (x *UpdateServerRequest) GetAutoRestartMaxRetries() int32 {
+	if x != nil && x.AutoRestartMaxRetries != nil {
+		return *x.AutoRestartMaxRetries
+	}
+	return 0
+}
+
+func (x *UpdateServerRequest) GetAutoRestartBackoffSecs() int32 {
+	if x != nil && x.AutoRestartBackoffSecs != nil {
+		return *x.AutoRestartBackoffSecs
+	}
+	return 0
 }
 
 // Updated server instance
@@ -1928,7 +1952,7 @@ const file_discopanel_v1_server_proto_rawDesc = "" +
 	"\x10additional_ports\x18\x11 \x03(\v2\x1d.discopanel.v1.AdditionalPortR\x0fadditionalPorts\x12I\n" +
 	"\x10docker_overrides\x18\x12 \x01(\v2\x1e.discopanel.v1.DockerOverridesR\x0fdockerOverrides\"E\n" +
 	"\x14CreateServerResponse\x12-\n" +
-	"\x06server\x18\x01 \x01(\v2\x15.discopanel.v1.ServerR\x06server\"\xd1\x05\n" +
+	"\x06server\x18\x01 \x01(\v2\x15.discopanel.v1.ServerR\x06server\"\xc3\a\n" +
 	"\x13UpdateServerRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -1953,12 +1977,18 @@ const file_discopanel_v1_server_proto_rawDesc = "" +
 	"\x12modpack_version_id\x18\x0e \x01(\tR\x10modpackVersionId\x12H\n" +
 	"\x10additional_ports\x18\x0f \x03(\v2\x1d.discopanel.v1.AdditionalPortR\x0fadditionalPorts\x12I\n" +
 	"\x10docker_overrides\x18\x10 \x01(\v2\x1e.discopanel.v1.DockerOverridesR\x0fdockerOverrides\x12+\n" +
-	"\x0fwake_on_connect\x18\x11 \x01(\bH\x04R\rwakeOnConnect\x88\x01\x01B\a\n" +
+	"\x0fwake_on_connect\x18\x11 \x01(\bH\x04R\rwakeOnConnect\x88\x01\x01\x12&\n" +
+	"\fauto_restart\x18\x12 \x01(\bH\x05R\vautoRestart\x88\x01\x01\x12<\n" +
+	"\x18auto_restart_max_retries\x18\x13 \x01(\x05H\x06R\x15autoRestartMaxRetries\x88\x01\x01\x12>\n" +
+	"\x19auto_restart_backoff_secs\x18\x14 \x01(\x05H\aR\x16autoRestartBackoffSecs\x88\x01\x01B\a\n" +
 	"\x05_portB\r\n" +
 	"\v_auto_startB\v\n" +
 	"\t_detachedB\x0e\n" +
 	"\f_tps_commandB\x12\n" +
-	"\x10_wake_on_connect\"E\n" +
+	"\x10_wake_on_connectB\x0f\n" +
+	"\r_auto_restartB\x1b\n" +
+	"\x19_auto_restart_max_retriesB\x1c\n" +
+	"\x1a_auto_restart_backoff_secs\"E\n" +
 	"\x14UpdateServerResponse\x12-\n" +
 	"\x06server\x18\x01 \x01(\v2\x15.discopanel.v1.ServerR\x06server\"\xee\x01\n" +
 	"\x13ImportServerRequest\x12\x12\n" +

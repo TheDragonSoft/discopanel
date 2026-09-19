@@ -23,6 +23,7 @@ import { ModpackService } from '$lib/proto/discopanel/v1/modpack_pb';
 import { ProxyService } from '$lib/proto/discopanel/v1/proxy_pb';
 import { ServerService } from '$lib/proto/discopanel/v1/server_pb';
 import { SupportService } from '$lib/proto/discopanel/v1/support_pb';
+import { TemplateService } from '$lib/proto/discopanel/v1/template_pb';
 import { TaskService } from '$lib/proto/discopanel/v1/task_pb';
 import { UploadService } from '$lib/proto/discopanel/v1/upload_pb';
 import { UserService } from '$lib/proto/discopanel/v1/user_pb';
@@ -105,6 +106,7 @@ export class RpcClient {
 	public readonly proxy: Client<typeof ProxyService>;
 	public readonly server: Client<typeof ServerService>;
 	public readonly support: Client<typeof SupportService>;
+	public readonly template: Client<typeof TemplateService>;
 	public readonly task: Client<typeof TaskService>;
 	public readonly upload: Client<typeof UploadService>;
 	public readonly user: Client<typeof UserService>;
@@ -125,6 +127,7 @@ export class RpcClient {
 		this.proxy = createClient(ProxyService, transport);
 		this.server = createClient(ServerService, transport);
 		this.support = createClient(SupportService, transport);
+		this.template = createClient(TemplateService, transport);
 		this.task = createClient(TaskService, transport);
 		this.upload = createClient(UploadService, transport);
 		this.user = createClient(UserService, transport);

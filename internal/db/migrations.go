@@ -37,6 +37,7 @@ func allModels() []any {
 		&PlayerSession{},
 		&WhitelistEntry{},
 		&AuditEntry{},
+		&ServerTemplate{},
 	}
 }
 

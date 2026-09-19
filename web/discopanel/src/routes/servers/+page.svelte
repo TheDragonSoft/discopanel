@@ -25,14 +25,23 @@
 		Users,
 		Zap,
 		MemoryStick,
-		Wifi
+		Wifi,
+		Blocks,
+		PackagePlus
 	} from '@lucide/svelte';
 	import { type Server, ServerStatus, ModLoader } from '$lib/proto/discopanel/v1/common_pb';
+	import ServerTemplatesDialog from '$lib/components/server-templates-dialog.svelte';
+	import SaveServerTemplateDialog from '$lib/components/save-server-template-dialog.svelte';
 
 	let servers = $derived($serversStore);
 	let filteredServers = $state<Server[]>([]);
 	let searchQuery = $state('');
 	let loading = $state(false);
+
+	// Templates
+	let templatesOpen = $state(false);
+	let saveTemplateOpen = $state(false);
+	let saveTemplateServer = $state<Server | null>(null);
 
 	$effect(() => {
 		filterServers();
@@ -211,6 +220,15 @@
 		</div>
 		<div class="flex animate-in items-center gap-2 duration-500 slide-in-from-right-5">
 			<Button
+				onclick={() => (templatesOpen = true)}
+				variant="outline"
+				size="default"
+				class="border-2 shadow-md transition-all hover:scale-[1.02] hover:shadow-lg"
+			>
+				<Blocks class="mr-2 h-5 w-5" />
+				Templates
+			</Button>
+			<Button
 				href="/servers/new"
 				size="default"
 				class="bg-linear-to-r from-primary to-primary/80 shadow-lg transition-all hover:scale-[1.02] hover:from-primary/90 hover:to-primary/70 hover:shadow-xl"
@@ -365,6 +383,17 @@
 									<RefreshCcw class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
 								</button>
 								<button
+									title="Save as Template"
+									disabled={loading}
+									class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+									onclick={() => {
+										saveTemplateServer = server;
+										saveTemplateOpen = true;
+									}}
+								>
+									<PackagePlus class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
+								</button>
+								<button
 									title="Delete"
 									disabled={loading}
 									class="flex h-8 w-8 sm:h-7 sm:w-7 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
@@ -462,3 +491,12 @@
 		</div>
 	{/if}
 </div>
+
+<ServerTemplatesDialog bind:open={templatesOpen} />
+<SaveServerTemplateDialog
+	server={saveTemplateServer}
+	bind:open={saveTemplateOpen}
+	onSaved={() => {
+		saveTemplateServer = null;
+	}}
+/>

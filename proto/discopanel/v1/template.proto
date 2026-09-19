@@ -1,0 +1,98 @@
+syntax = "proto3";
+
+package discopanel.v1;
+
+import "discopanel/v1/common.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1";
+
+// Reusable server templates: capture a server's configuration and mods,
+// then deploy new servers from it.
+service TemplateService {
+  // List all server templates
+  rpc ListServerTemplates(ListServerTemplatesRequest) returns (ListServerTemplatesResponse);
+  // Capture a template from an existing server (config + optional mods)
+  rpc CreateServerTemplate(CreateServerTemplateRequest) returns (CreateServerTemplateResponse);
+  // Update a template's metadata
+  rpc UpdateServerTemplate(UpdateServerTemplateRequest) returns (UpdateServerTemplateResponse);
+  // Delete a template (and its captured mods)
+  rpc DeleteServerTemplate(DeleteServerTemplateRequest) returns (DeleteServerTemplateResponse);
+  // Create a new server from a template
+  rpc DeployServerTemplate(DeployServerTemplateRequest) returns (DeployServerTemplateResponse);
+}
+
+// A saved server template
+message ServerTemplate {
+  string id = 1;
+  string name = 2;
+  string description = 3;
+  ModLoader mod_loader = 4;
+  string mc_version = 5;
+  int32 memory = 6; // MB
+  int32 max_players = 7;
+  string java_version = 8;
+  string docker_image = 9;
+  repeated AdditionalPort additional_ports = 10;
+  DockerOverrides docker_overrides = 11;
+  string config_json = 12;     // Serialized ServerConfig (JVM flags, env vars, etc.)
+  bool has_mods = 13;          // Mods directory captured and available for deploy
+  int64 mods_size_bytes = 14;
+  string source_server_name = 15; // Server the template was captured from (informational)
+  google.protobuf.Timestamp created_at = 16;
+  google.protobuf.Timestamp updated_at = 17;
+}
+
+// List templates request
+message ListServerTemplatesRequest {}
+
+// List templates response
+message ListServerTemplatesResponse {
+  repeated ServerTemplate templates = 1;
+}
+
+// Capture a template from an existing server
+message CreateServerTemplateRequest {
+  string server_id = 1;
+  string name = 2;
+  string description = 3;
+  bool include_mods = 4; // Copy the server's mods directory into the template
+}
+
+// Capture response
+message CreateServerTemplateResponse {
+  ServerTemplate template = 1;
+}
+
+// Update template metadata request
+message UpdateServerTemplateRequest {
+  string id = 1;
+  optional string name = 2;
+  optional string description = 3;
+}
+
+// Update template response
+message UpdateServerTemplateResponse {
+  ServerTemplate template = 1;
+}
+
+// Delete template request
+message DeleteServerTemplateRequest {
+  string id = 1;
+}
+
+// Delete template response
+message DeleteServerTemplateResponse {}
+
+// Deploy a new server from a template
+message DeployServerTemplateRequest {
+  string id = 1;
+  string name = 2;        // Name for the new server
+  string proxy_hostname = 3; // Optional hostname routing for the new server
+  bool auto_start = 4;    // Start the server after creation
+}
+
+// Deploy response
+message DeployServerTemplateResponse {
+  Server server = 1; // The newly created server
+}

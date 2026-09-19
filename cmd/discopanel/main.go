@@ -22,6 +22,7 @@ import (
 	"github.com/nickheyer/discopanel/internal/rpc"
 	"github.com/nickheyer/discopanel/internal/scheduler"
 	"github.com/nickheyer/discopanel/internal/tracker"
+	"github.com/nickheyer/discopanel/internal/watchdog"
 	"github.com/nickheyer/discopanel/pkg/logger"
 	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
 )
@@ -256,8 +257,15 @@ func main() {
 	}
 	defer metricsCollector.Stop()
 
+	// Start the crash watchdog: auto-restarts servers whose containers exit
+	// unexpectedly when auto_restart is enabled. Created before the RPC
+	// server so user-initiated stops can be marked as intentional.
+	crashWatchdog := watchdog.New(store, dockerClient, eventBus, log)
+	crashWatchdog.Start()
+	defer crashWatchdog.Stop()
+
 	// Initialize RPC server with full configuration
-	rpcServer := rpc.NewServer(store, dockerClient, sender, cfg, proxyManager, taskScheduler, metricsCollector, moduleManager, playerTracker, eventBus, log)
+	rpcServer := rpc.NewServer(store, dockerClient, sender, cfg, proxyManager, taskScheduler, metricsCollector, moduleManager, playerTracker, eventBus, crashWatchdog, log)
 
 	// Print recovery key
 	if key := rpcServer.RecoveryKey(); key != "" {

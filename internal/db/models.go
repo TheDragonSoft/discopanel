@@ -92,6 +92,9 @@ type Server struct {
 	Detached        bool                 `json:"detached" gorm:"default:false;column:detached"`                             // Detach server container from DiscoPanel lifecycle (default: false)
 	AutoStart       bool                 `json:"auto_start" gorm:"default:false;column:auto_start"`                         // Start server when DiscoPanel starts (default: false)
 	WakeOnConnect   bool                 `json:"wake_on_connect" gorm:"default:false;column:wake_on_connect"`               // Start the server when a client connects through the proxy (lazy servers)
+	AutoRestart            bool          `json:"auto_restart" gorm:"default:false;column:auto_restart"`                     // Restart automatically when the container exits unexpectedly (default: false)
+	AutoRestartMaxRetries  int           `json:"auto_restart_max_retries" gorm:"column:auto_restart_max_retries"`           // Max consecutive auto-restarts before giving up (0 = unlimited)
+	AutoRestartBackoffSecs int           `json:"auto_restart_backoff_secs" gorm:"default:30;column:auto_restart_backoff_secs"` // Base backoff between auto-restarts, doubled per consecutive crash (capped at 10x)
 	TPSCommand      string               `json:"tps_command" gorm:"column:tps_command"`                                     // The TPS command for this server (empty if not supported)
 	AdditionalPorts []*v1.AdditionalPort `json:"additional_ports" gorm:"column:additional_ports;serializer:json"`           // Additional port configurations
 	DockerOverrides *v1.DockerOverrides  `json:"docker_overrides" gorm:"column:docker_overrides;type:text;serializer:json"` // Docker container overrides
@@ -792,6 +795,32 @@ type AuditEntry struct {
 	Status    string    `json:"status"`       // "ok" or "error"
 	Detail    string    `json:"detail" gorm:"type:text"` // Error message when status is error, else empty
 	CreatedAt time.Time `json:"created_at" gorm:"index;autoCreateTime"`
+}
+
+// ServerTemplate is a reusable snapshot of a server's configuration (and
+// optionally its mods) that can be deployed as a new server.
+type ServerTemplate struct {
+	ID          string    `json:"id" gorm:"primaryKey"`
+	Name        string    `json:"name" gorm:"not null"`
+	Description string    `json:"description"`
+	ModLoader   string    `json:"mod_loader" gorm:"column:mod_loader"`
+	MCVersion   string    `json:"mc_version" gorm:"column:mc_version"`
+	Memory      int       `json:"memory" gorm:"default:4096"` // in MB
+	MaxPlayers  int       `json:"max_players" gorm:"default:20;column:max_players"`
+	JavaVersion string    `json:"java_version" gorm:"column:java_version"`
+	DockerImage string    `json:"docker_image" gorm:"column:docker_image"`
+	// AdditionalPorts mirrors how Server stores them (JSON serializer)
+	AdditionalPorts []*v1.AdditionalPort `json:"additional_ports" gorm:"column:additional_ports;serializer:json"`
+	// DockerOverrides mirrors how Server stores them (JSON serializer)
+	DockerOverrides *v1.DockerOverrides `json:"docker_overrides" gorm:"column:docker_overrides;type:text;serializer:json"`
+	// ConfigJSON is the source server's ServerConfig serialized as JSON
+	// (JVM flags, env vars, etc.).
+	ConfigJSON       string    `json:"config_json" gorm:"type:text;column:config_json"`
+	HasMods          bool      `json:"has_mods" gorm:"default:false;column:has_mods"`
+	ModsSizeBytes    int64     `json:"mods_size_bytes" gorm:"column:mods_size_bytes"`
+	SourceServerName string    `json:"source_server_name" gorm:"column:source_server_name"`
+	CreatedAt        time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt        time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 // AlertEventRecord is a persisted alert firing/resolution event.

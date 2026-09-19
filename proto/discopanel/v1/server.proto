@@ -153,6 +153,9 @@ message UpdateServerRequest {
   repeated AdditionalPort additional_ports = 15;
   DockerOverrides docker_overrides = 16;
   optional bool wake_on_connect = 17;
+  optional bool auto_restart = 18;
+  optional int32 auto_restart_max_retries = 19;
+  optional int32 auto_restart_backoff_secs = 20;
 }
 
 // Updated server instance

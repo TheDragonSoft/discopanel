@@ -27,6 +27,7 @@ import (
 	"github.com/nickheyer/discopanel/internal/module"
 	"github.com/nickheyer/discopanel/internal/proxy"
 	"github.com/nickheyer/discopanel/internal/rbac"
+	"github.com/nickheyer/discopanel/internal/watchdog"
 	"github.com/nickheyer/discopanel/pkg/files"
 	"github.com/nickheyer/discopanel/pkg/upload"
 	"github.com/nickheyer/discopanel/pkg/logger"
@@ -52,6 +53,7 @@ type ServerService struct {
 	bus              *events.Bus
 	enforcer         *rbac.Enforcer
 	uploadManager    *upload.Manager
+	watchdog         *watchdog.Watchdog
 }
 
 // NewServerService creates a new server service
@@ -72,7 +74,25 @@ func NewServerService(store *storage.Store, docker *docker.Client, sender *comma
 	}
 }
 
+// SetWatchdog wires the crash watchdog so user-initiated stops can be
+// distinguished from crashes.
+func (s *ServerService) SetWatchdog(w *watchdog.Watchdog) {
+	s.watchdog = w
+}
+
+// markIntentionalStop tells the watchdog that an upcoming container exit for
+// this server was requested by a user (or by a panel operation).
+func (s *ServerService) markIntentionalStop(serverID string) {
+	if s.watchdog != nil {
+		s.watchdog.MarkIntentionalStop(serverID)
+	}
+}
+
 // dbServerToProto converts a database server model to proto server
+func int32Ptr(v int32) *int32 {
+	return &v
+}
+
 func dbServerToProto(server *storage.Server) *v1.Server {
 	if server == nil {
 		return nil
@@ -98,6 +118,9 @@ func dbServerToProto(server *storage.Server) *v1.Server {
 		DockerImage:     server.DockerImage,
 		AutoStart:       server.AutoStart,
 		WakeOnConnect:   &server.WakeOnConnect,
+		AutoRestart:            &server.AutoRestart,
+		AutoRestartMaxRetries:  int32Ptr(int32(server.AutoRestartMaxRetries)),
+		AutoRestartBackoffSecs: int32Ptr(int32(server.AutoRestartBackoffSecs)),
 		Detached:        server.Detached,
 		TpsCommand:      server.TPSCommand,
 		MemoryUsage:     int64(server.MemoryUsage),
@@ -450,8 +473,24 @@ func (s *ServerService) applyPlayitAddresses(ctx context.Context, protoServers .
 
 // CreateServer creates a new server
 func (s *ServerService) CreateServer(ctx context.Context, req *connect.Request[v1.CreateServerRequest]) (*connect.Response[v1.CreateServerResponse], error) {
-	msg := req.Msg
+	server, err := s.createServerInternal(ctx, req.Msg, nil)
+	if err != nil {
+		return nil, err
+	}
 
+	// Return immediately with the server in "creating" state
+	return connect.NewResponse(&v1.CreateServerResponse{
+		Server: dbServerToProto(server),
+	}), nil
+}
+
+// createServerInternal is the shared server-creation path used by
+// CreateServer and template deployment (DeployServerTemplate), so port
+// allocation, proxy wiring, memory quota and container creation behave
+// identically. postCreate, when non-nil, runs synchronously after the server
+// row is persisted but BEFORE the container is created/started - the template
+// service uses it to copy captured mods and apply the captured config first.
+func (s *ServerService) createServerInternal(ctx context.Context, msg *v1.CreateServerRequest, postCreate func(server *storage.Server) error) (*storage.Server, error) {
 	// Convert mod loader from proto
 	modLoader := protoModLoaderToDB(msg.ModLoader)
 
@@ -684,6 +723,22 @@ func (s *ServerService) CreateServer(ctx context.Context, req *connect.Request[v
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to create server"))
 	}
 
+	// Run the post-create hook (template mods copy + captured config) while
+	// the container does not exist yet, so nothing can start without them.
+	if postCreate != nil {
+		if err := postCreate(server); err != nil {
+			// Roll back the half-created server so no orphan row/dir remains
+			s.log.Error("Post-create hook failed for server %s: %v", server.ID, err)
+			if delErr := s.store.DeleteServer(ctx, server.ID); delErr != nil {
+				s.log.Error("Failed to roll back server %s: %v", server.ID, delErr)
+			}
+			if rmErr := os.RemoveAll(server.DataPath); rmErr != nil {
+				s.log.Error("Failed to remove data directory for %s: %v", server.ID, rmErr)
+			}
+			return nil, connect.NewError(connect.CodeInternal, err)
+		}
+	}
+
 	// Get the server config
 	serverConfig, err := s.store.GetServerConfig(ctx, server.ID)
 	if err != nil {
@@ -828,10 +883,7 @@ func (s *ServerService) CreateServer(ctx context.Context, req *connect.Request[v
 		}
 	}()
 
-	// Return immediately with the server in "creating" state
-	return connect.NewResponse(&v1.CreateServerResponse{
-		Server: dbServerToProto(server),
-	}), nil
+	return server, nil
 }
 
 // UpdateServer updates a server
@@ -916,6 +968,15 @@ func (s *ServerService) UpdateServer(ctx context.Context, req *connect.Request[v
 	}
 	if msg.WakeOnConnect != nil {
 		server.WakeOnConnect = *msg.WakeOnConnect
+	}
+	if msg.AutoRestart != nil {
+		server.AutoRestart = *msg.AutoRestart
+	}
+	if msg.AutoRestartMaxRetries != nil {
+		server.AutoRestartMaxRetries = int(*msg.AutoRestartMaxRetries)
+	}
+	if msg.AutoRestartBackoffSecs != nil {
+		server.AutoRestartBackoffSecs = int(*msg.AutoRestartBackoffSecs)
 	}
 	if msg.Detached != nil {
 		server.Detached = *msg.Detached
@@ -1052,6 +1113,9 @@ func (s *ServerService) UpdateServer(ctx context.Context, req *connect.Request[v
 			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get server configuration"))
 		}
 
+		// The container stop inside recreation is intentional, not a crash
+		s.markIntentionalStop(server.ID)
+
 		// Recreate container
 		result, err := s.docker.RecreateContainer(ctx, server.ContainerID, server, serverConfig)
 		if err != nil {
@@ -1117,7 +1181,8 @@ func (s *ServerService) DeleteServer(ctx context.Context, req *connect.Request[v
 		}
 	}
 
-	// Stop and remove container
+	// Stop and remove container - intentional, not a crash
+	s.markIntentionalStop(server.ID)
 	if server.ContainerID != "" {
 		if _, err := s.docker.StopContainer(ctx, server.ContainerID); err != nil {
 			s.log.Error("Failed to stop container: %v", err)
@@ -1261,6 +1326,9 @@ func (s *ServerService) StopServer(ctx context.Context, req *connect.Request[v1.
 		}), nil
 	}
 
+	// Tell the watchdog this exit is user-initiated, not a crash
+	s.markIntentionalStop(server.ID)
+
 	// Stop container
 	found, err := s.docker.StopContainer(ctx, server.ContainerID)
 	if err != nil {
@@ -1367,7 +1435,8 @@ func (s *ServerService) RestartServer(ctx context.Context, req *connect.Request[
 		}), nil
 	}
 
-	// Restart container
+	// Restart container - the stop half is intentional, not a crash
+	s.markIntentionalStop(server.ID)
 	if err := s.docker.RestartContainer(ctx, server.ContainerID, 2*time.Second); err != nil {
 		s.log.Error("Failed to restart container: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to restart server"))
@@ -1420,6 +1489,9 @@ func (s *ServerService) RecreateServer(ctx context.Context, req *connect.Request
 		s.log.Error("Failed to get server config: %v", err)
 		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get server configuration"))
 	}
+
+	// The container stop inside recreation is intentional, not a crash
+	s.markIntentionalStop(server.ID)
 
 	// Recreate container
 	result, err := s.docker.RecreateContainer(ctx, server.ContainerID, server, serverConfig)
@@ -1641,11 +1713,25 @@ func (s *ServerService) ClearServerLogs(ctx context.Context, req *connect.Reques
 
 // GetNextAvailablePort gets the next available port
 func (s *ServerService) GetNextAvailablePort(ctx context.Context, req *connect.Request[v1.GetNextAvailablePortRequest]) (*connect.Response[v1.GetNextAvailablePortResponse], error) {
+	port, usedPorts, err := s.nextAvailablePort(ctx)
+	if err != nil {
+		return nil, connect.NewError(connect.CodeResourceExhausted, err)
+	}
+
+	return connect.NewResponse(&v1.GetNextAvailablePortResponse{
+		Port:      port,
+		UsedPorts: usedPorts,
+	}), nil
+}
+
+// nextAvailablePort finds the next free host port for a non-proxied server.
+// Shared by GetNextAvailablePort and template deployment.
+func (s *ServerService) nextAvailablePort(ctx context.Context) (int32, []*v1.UsedPort, error) {
 	// Get all servers
 	servers, err := s.store.ListServers(ctx)
 	if err != nil {
 		s.log.Error("Failed to list servers: %v", err)
-		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get available port"))
+		return 0, nil, fmt.Errorf("failed to get available port")
 	}
 
 	// Build a map of used ports (only for non-proxied servers)
@@ -1670,7 +1756,7 @@ func (s *ServerService) GetNextAvailablePort(ctx context.Context, req *connect.R
 		nextPort++
 		// Safety check to avoid infinite loop
 		if nextPort > 65535 {
-			return nil, connect.NewError(connect.CodeResourceExhausted, fmt.Errorf("no available ports"))
+			return 0, nil, fmt.Errorf("no available ports")
 		}
 	}
 
@@ -1683,8 +1769,5 @@ func (s *ServerService) GetNextAvailablePort(ctx context.Context, req *connect.R
 		})
 	}
 
-	return connect.NewResponse(&v1.GetNextAvailablePortResponse{
-		Port:      nextPort,
-		UsedPorts: usedPorts,
-	}), nil
+	return nextPort, usedPorts, nil
 }

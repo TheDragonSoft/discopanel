@@ -24,6 +24,7 @@ import (
 	"github.com/nickheyer/discopanel/internal/rpc/services"
 	"github.com/nickheyer/discopanel/internal/scheduler"
 	"github.com/nickheyer/discopanel/internal/tracker"
+	"github.com/nickheyer/discopanel/internal/watchdog"
 	"github.com/nickheyer/discopanel/internal/ws"
 	"github.com/nickheyer/discopanel/pkg/download"
 	"github.com/nickheyer/discopanel/pkg/logger"
@@ -57,6 +58,7 @@ type Server struct {
 	uploadManager    *upload.Manager
 	downloadManager  *download.Manager
 	wsHub            *ws.Hub
+	watchdog         *watchdog.Watchdog
 	auditCh          chan *storage.AuditEntry
 }
 
@@ -65,7 +67,7 @@ type Server struct {
 const auditChannelSize = 256
 
 // Creates new Connect RPC server
-func NewServer(store *storage.Store, docker *docker.Client, sender *command.Sender, cfg *config.Config, proxyManager *proxy.Manager, sched *scheduler.Scheduler, metricsCollector *metrics.Collector, moduleManager *module.Manager, playerTracker *tracker.Tracker, bus *events.Bus, log *logger.Logger) *Server {
+func NewServer(store *storage.Store, docker *docker.Client, sender *command.Sender, cfg *config.Config, proxyManager *proxy.Manager, sched *scheduler.Scheduler, metricsCollector *metrics.Collector, moduleManager *module.Manager, playerTracker *tracker.Tracker, bus *events.Bus, crashWatchdog *watchdog.Watchdog, log *logger.Logger) *Server {
 	// Initialize RBAC enforcer
 	enforcer, err := rbac.NewEnforcer(store.DB())
 	if err != nil {
@@ -124,6 +126,7 @@ func NewServer(store *storage.Store, docker *docker.Client, sender *command.Send
 		uploadManager:    uploadManager,
 		downloadManager:  downloadManager,
 		wsHub:            wsHub,
+		watchdog:         crashWatchdog,
 		auditCh:          make(chan *storage.AuditEntry, auditChannelSize),
 	}
 
@@ -175,6 +178,7 @@ func (s *Server) setupHandler() {
 		discopanelv1connect.ServerServiceName,
 		discopanelv1connect.SupportServiceName,
 		discopanelv1connect.TaskServiceName,
+		discopanelv1connect.TemplateServiceName,
 		discopanelv1connect.UploadServiceName,
 		discopanelv1connect.UserServiceName,
 		discopanelv1connect.MetricServiceName,
@@ -222,6 +226,8 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 	modpackService := services.NewModpackService(s.store, s.config, s.uploadManager, s.log)
 	proxyService := services.NewProxyService(s.store, s.docker, s.proxyManager, s.config, s.logStreamer, s.log)
 	serverService := services.NewServerService(s.store, s.docker, s.sender, s.config, s.proxyManager, s.logStreamer, s.metricsCollector, s.moduleManager, s.bus, s.enforcer, s.uploadManager, s.log)
+	serverService.SetWatchdog(s.watchdog)
+	templateService := services.NewTemplateService(s.store, s.config, serverService, s.log)
 	supportService := services.NewSupportService(s.store, s.docker, s.config, s.log)
 	taskService := services.NewTaskService(s.store, s.scheduler, s.config, s.docker, s.log)
 	userService := services.NewUserService(s.store, s.authManager, s.log)
@@ -257,6 +263,9 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 
 	serverPath, serverHandler := discopanelv1connect.NewServerServiceHandler(serverService, opts...)
 	mux.Handle(serverPath, serverHandler)
+
+	templatePath, templateHandler := discopanelv1connect.NewTemplateServiceHandler(templateService, opts...)
+	mux.Handle(templatePath, templateHandler)
 
 	supportPath, supportHandler := discopanelv1connect.NewSupportServiceHandler(supportService, opts...)
 	mux.Handle(supportPath, supportHandler)
