@@ -1,0 +1,151 @@
+syntax = "proto3";
+
+package discopanel.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1";
+
+// Server administration: whitelist management and MOTD editing.
+// Whitelist desired-state is stored in the panel DB and applied to game
+// servers via RCON.
+service AdminService {
+  // List whitelist entries stored in the panel
+  rpc ListWhitelistEntries(ListWhitelistEntriesRequest) returns (ListWhitelistEntriesResponse);
+  // Add a player to the panel-side whitelist
+  rpc AddWhitelistEntry(AddWhitelistEntryRequest) returns (AddWhitelistEntryResponse);
+  // Remove a player from the panel-side whitelist
+  rpc RemoveWhitelistEntry(RemoveWhitelistEntryRequest) returns (RemoveWhitelistEntryResponse);
+  // Converge selected servers to the panel-side whitelist via RCON
+  rpc ApplyWhitelist(ApplyWhitelistRequest) returns (ApplyWhitelistResponse);
+  // Read the current whitelist from a server via RCON and import it into the panel
+  rpc PullWhitelist(PullWhitelistRequest) returns (PullWhitelistResponse);
+  // Ban a player on the selected servers via RCON
+  rpc BanPlayer(BanPlayerRequest) returns (BanPlayerResponse);
+  // Unban a player on the selected servers via RCON
+  rpc UnbanPlayer(UnbanPlayerRequest) returns (UnbanPlayerResponse);
+  // Read the MOTD and icon from a server's server.properties / icon.png
+  rpc GetServerMotd(GetServerMotdRequest) returns (GetServerMotdResponse);
+  // Write the MOTD and/or icon to a server (server must be stopped to take effect on restart)
+  rpc UpdateServerMotd(UpdateServerMotdRequest) returns (UpdateServerMotdResponse);
+}
+
+// A whitelisted player (panel-side desired state)
+message WhitelistEntry {
+  string id = 1;
+  string name = 2;
+  string note = 3;
+  google.protobuf.Timestamp created_at = 4;
+}
+
+// Outcome of applying whitelist/ban commands to one server
+message ServerOpResult {
+  string server_id = 1;
+  string server_name = 2;
+  bool success = 3;
+  string message = 4;
+  repeated string added = 5;    // Names added on this server (whitelist apply)
+  repeated string removed = 6;  // Names removed on this server (whitelist apply)
+  repeated string current = 7;  // Final whitelist on this server (empty for ban ops)
+}
+
+// List whitelist entries request
+message ListWhitelistEntriesRequest {
+  string search = 1; // Optional name substring filter
+}
+
+// List whitelist entries response
+message ListWhitelistEntriesResponse {
+  repeated WhitelistEntry entries = 1;
+}
+
+// Add whitelist entry request
+message AddWhitelistEntryRequest {
+  string name = 1;
+  string note = 2;
+}
+
+// Add whitelist entry response
+message AddWhitelistEntryResponse {
+  WhitelistEntry entry = 1;
+}
+
+// Remove whitelist entry request
+message RemoveWhitelistEntryRequest {
+  string id = 1;
+}
+
+// Remove whitelist entry response
+message RemoveWhitelistEntryResponse {}
+
+// Apply whitelist request
+message ApplyWhitelistRequest {
+  repeated string server_ids = 1; // Empty = all servers
+}
+
+// Apply whitelist response
+message ApplyWhitelistResponse {
+  repeated ServerOpResult results = 1;
+}
+
+// Pull whitelist request
+message PullWhitelistRequest {
+  string server_id = 1;
+}
+
+// Pull whitelist response
+message PullWhitelistResponse {
+  repeated string imported = 2; // Names now in the panel whitelist
+}
+
+// Ban player request
+message BanPlayerRequest {
+  repeated string server_ids = 1; // Empty = all servers
+  string name = 2;
+  string reason = 3;
+}
+
+// Ban player response
+message BanPlayerResponse {
+  repeated ServerOpResult results = 1;
+}
+
+// Unban player request
+message UnbanPlayerRequest {
+  repeated string server_ids = 1; // Empty = all servers
+  string name = 2;
+}
+
+// Unban player response
+message UnbanPlayerResponse {
+  repeated ServerOpResult results = 1;
+}
+
+// Get MOTD request
+message GetServerMotdRequest {
+  string server_id = 1;
+}
+
+// Get MOTD response
+message GetServerMotdResponse {
+  string motd = 1;              // Raw motd value from server.properties (escaped \u00A7 etc.)
+  string icon = 2;              // Base64 PNG of icon.png, empty when absent
+  bool whitelist_enabled = 3;   // Current white-list setting in server.properties
+  bool online_mode = 4;         // Current online-mode setting in server.properties
+  int32 max_players = 5;        // Current max-players setting in server.properties
+}
+
+// Update MOTD request
+message UpdateServerMotdRequest {
+  string server_id = 1;
+  optional string motd = 2;             // Omit to leave unchanged
+  optional string icon = 3;             // Base64 PNG; empty string removes icon.png
+  optional bool whitelist_enabled = 4;  // Writes white-list=true/false and issues the RCON reload
+  optional bool online_mode = 5;        // Writes online-mode (requires restart)
+  optional int32 max_players = 6;       // Writes max-players (requires restart)
+}
+
+// Update MOTD response
+message UpdateServerMotdResponse {
+  string status = 1; // "updated"
+}

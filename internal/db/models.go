@@ -771,6 +771,29 @@ type PlayerSession struct {
 	BytesOut     int64      `json:"bytes_out" gorm:"column:bytes_out"`
 }
 
+// WhitelistEntry is a panel-side desired-state whitelist entry. The desired
+// names are pushed to servers via RCON with ApplyWhitelist.
+type WhitelistEntry struct {
+	ID        string    `json:"id" gorm:"primaryKey"`
+	Name      string    `json:"name" gorm:"not null;uniqueIndex"`
+	Note      string    `json:"note" gorm:"type:text"`
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+}
+
+// AuditEntry records one mutating RPC call for the audit log.
+type AuditEntry struct {
+	ID        string    `json:"id" gorm:"primaryKey"`
+	UserID    string    `json:"user_id" gorm:"column:user_id"`
+	Username  string    `json:"username" gorm:"index"`
+	Procedure string    `json:"procedure"`    // e.g. /discopanel.v1.ServerService/StartServer
+	Resource  string    `json:"resource"`     // RBAC resource, e.g. servers
+	Action    string    `json:"action"`       // RBAC action, e.g. start
+	ObjectID  string    `json:"object_id" gorm:"column:object_id"`
+	Status    string    `json:"status"`       // "ok" or "error"
+	Detail    string    `json:"detail" gorm:"type:text"` // Error message when status is error, else empty
+	CreatedAt time.Time `json:"created_at" gorm:"index;autoCreateTime"`
+}
+
 // AlertEventRecord is a persisted alert firing/resolution event.
 type AlertEventRecord struct {
 	ID        string    `json:"id" gorm:"primaryKey"`

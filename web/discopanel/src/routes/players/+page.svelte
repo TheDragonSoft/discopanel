@@ -28,6 +28,8 @@
 		TableHeader,
 		TableRow
 	} from '$lib/components/ui/table';
+	import { Tabs, TabsContent, TabsList, TabsTrigger } from '$lib/components/ui/tabs';
+	import WhitelistManager from '$lib/components/whitelist-manager.svelte';
 	import {
 		Users,
 		Search,
@@ -38,7 +40,8 @@
 		UserX,
 		ChevronLeft,
 		ChevronRight,
-		Activity
+		Activity,
+		ShieldCheck
 	} from '@lucide/svelte';
 	import { create } from '@bufbuild/protobuf';
 	import type {
@@ -79,6 +82,8 @@
 	let selectedSessions = $state<PlayerSession[]>([]);
 
 	let currentTime = $state(new Date());
+
+	let activeTab = $state('players');
 
 	async function loadPlayers(silent = false) {
 		if (silent) {
@@ -204,7 +209,20 @@
 		</Button>
 	</div>
 
-	<!-- Summary strip -->
+	<Tabs value={activeTab} onValueChange={(v) => (activeTab = v || activeTab)} class="space-y-6">
+		<TabsList class="flex w-fit gap-1">
+			<TabsTrigger value="players" class="flex items-center gap-2 px-4">
+				<Users class="h-4 w-4" />
+				Players
+			</TabsTrigger>
+			<TabsTrigger value="whitelist" class="flex items-center gap-2 px-4">
+				<ShieldCheck class="h-4 w-4" />
+				Whitelist &amp; Bans
+			</TabsTrigger>
+		</TabsList>
+
+		<TabsContent value="players" class="space-y-8">
+			<!-- Summary strip -->
 	<div class="grid gap-4 md:grid-cols-3">
 		<Card
 			class="group relative animate-in overflow-hidden border-border/50 transition-all duration-500 fade-in-50 slide-in-from-bottom-2 hover:border-primary/30 hover:shadow-lg"
@@ -444,6 +462,12 @@
 			{/if}
 		</CardContent>
 	</Card>
+		</TabsContent>
+
+		<TabsContent value="whitelist">
+			<WhitelistManager />
+		</TabsContent>
+	</Tabs>
 </div>
 
 <!-- Player detail dialog -->

@@ -16,7 +16,8 @@
 		ScrollText,
 		Users,
 		KeyRound,
-		Bell
+		Bell,
+		History
 	} from '@lucide/svelte';
 	import type { ConfigCategory } from '$lib/proto/discopanel/v1/config_pb';
 	import { rpcClient } from '$lib/api/rpc-client';
@@ -25,6 +26,7 @@
 	import SupportSettings from '$lib/components/support-settings.svelte';
 	import LogsSettings from '$lib/components/logs-settings.svelte';
 	import AlertSettings from '$lib/components/alert-settings.svelte';
+	import AuditSettings from '$lib/components/audit-settings.svelte';
 	import { canReadSettings, canReadUsers, canReadRoles, authEnabled } from '$lib/stores/auth';
 
 	let globalConfig = $state<ConfigCategory[]>([]);
@@ -128,6 +130,10 @@
 					<Bell class="h-4 w-4" />
 					Alerts
 				</TabsTrigger>
+				<TabsTrigger value="audit" class="flex items-center gap-2 px-4">
+					<History class="h-4 w-4" />
+					Audit Log
+				</TabsTrigger>
 				<TabsTrigger value="support" class="flex items-center gap-2 px-4">
 					<HelpCircle class="h-4 w-4" />
 					Support
@@ -183,6 +189,10 @@
 
 			<TabsContent value="alerts" class="space-y-4">
 				<AlertSettings />
+			</TabsContent>
+
+			<TabsContent value="audit" class="space-y-4">
+				<AuditSettings />
 			</TabsContent>
 
 			<TabsContent value="support" class="space-y-4">

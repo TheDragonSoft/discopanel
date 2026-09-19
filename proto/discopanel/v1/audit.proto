@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package discopanel.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1";
+
+// Audit trail of mutating panel operations
+service AuditService {
+  // List audit entries with filters
+  rpc ListAuditEntries(ListAuditEntriesRequest) returns (ListAuditEntriesResponse);
+  // Delete audit entries recorded before the given time (or all when omitted)
+  rpc ClearAuditEntries(ClearAuditEntriesRequest) returns (ClearAuditEntriesResponse);
+}
+
+// One recorded mutation
+message AuditEntry {
+  string id = 1;
+  string user_id = 2;
+  string username = 3;
+  string procedure = 4;    // e.g. /discopanel.v1.ServerService/StartServer
+  string resource = 5;     // RBAC resource, e.g. servers
+  string action = 6;       // RBAC action, e.g. start
+  string object_id = 7;    // RBAC object id extracted from the request ("*" when none)
+  string status = 8;       // "ok" or "error"
+  string detail = 9;       // Error message when status is error, else empty
+  google.protobuf.Timestamp created_at = 10;
+}
+
+// List audit entries request
+message ListAuditEntriesRequest {
+  string username = 1;  // Optional filter
+  string resource = 2;  // Optional filter
+  string action = 3;    // Optional filter
+  int32 limit = 4;      // 0 = default 100
+  int32 offset = 5;
+}
+
+// List audit entries response
+message ListAuditEntriesResponse {
+  repeated AuditEntry entries = 1;
+  int32 total = 2;
+}
+
+// Clear audit entries request
+message ClearAuditEntriesRequest {
+  optional google.protobuf.Timestamp before = 1; // Omit to clear everything
+}
+
+// Clear audit entries response
+message ClearAuditEntriesResponse {
+  int64 deleted = 1;
+}

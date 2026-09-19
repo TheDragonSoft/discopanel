@@ -64,6 +64,7 @@
 	import ServerTasks from '$lib/components/server-tasks.svelte';
 	import MetricsHistory from '$lib/components/metrics-history.svelte';
 	import ServerModules from '$lib/components/server/ServerModules.svelte';
+	import MotdEditor from '$lib/components/motd-editor.svelte';
 
 	let server = $state<Server | null>(null);
 	let loading = $state(true);
@@ -1080,7 +1081,7 @@
 		>
 			<div class="w-full min-w-0 max-w-full flex-shrink-0 overflow-x-auto pb-1 scrollbar-thin">
 				<TabsList
-					class="inline-flex h-11 w-max min-w-full items-center justify-start gap-1 rounded-xl bg-muted/60 p-1 backdrop-blur-sm 2xl:grid 2xl:h-12 2xl:grid-cols-9 2xl:w-full"
+					class="inline-flex h-11 w-max min-w-full items-center justify-start gap-1 rounded-xl bg-muted/60 p-1 backdrop-blur-sm 2xl:grid 2xl:h-12 2xl:grid-cols-10 2xl:w-full"
 				>
 					<TabsTrigger
 						value="overview"
@@ -1126,6 +1127,11 @@
 						value="routing"
 						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
 						>Routing & Exposure</TabsTrigger
+					>
+					<TabsTrigger
+						value="branding"
+						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
+						>Branding</TabsTrigger
 					>
 				</TabsList>
 			</div>
@@ -1175,6 +1181,12 @@
 
 				<TabsContent value="routing" class="h-full overflow-y-auto">
 					<ServerRouting {server} bind:router={routingInfo} active={activeTab === 'routing'} />
+				</TabsContent>
+
+				<TabsContent value="branding" class="h-full overflow-y-auto">
+					{#if server}
+						<MotdEditor {server} />
+					{/if}
 				</TabsContent>
 			</div>
 		</Tabs>

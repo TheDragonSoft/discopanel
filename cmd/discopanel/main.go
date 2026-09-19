@@ -70,6 +70,13 @@ func main() {
 
 	ctx := context.Background()
 
+	// Prune audit log entries past the retention window
+	if deleted, err := store.PruneAuditEntries(ctx, time.Now().UTC().AddDate(0, 0, -storage.AuditRetentionDays)); err != nil {
+		log.Error("Failed to prune audit entries: %v", err)
+	} else if deleted > 0 {
+		log.Info("Pruned %d audit entries older than %d days", deleted, storage.AuditRetentionDays)
+	}
+
 	// Initialize container runtime client (Docker or Podman) with configuration
 	dockerClient, err := docker.NewClient(cfg.Docker.Host, log, docker.ClientConfig{
 		Provider:    cfg.Docker.Provider,

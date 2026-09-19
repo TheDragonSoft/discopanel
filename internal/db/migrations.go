@@ -35,6 +35,8 @@ func allModels() []any {
 		&AlertEventRecord{},
 		&Player{},
 		&PlayerSession{},
+		&WhitelistEntry{},
+		&AuditEntry{},
 	}
 }
 

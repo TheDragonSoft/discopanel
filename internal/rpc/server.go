@@ -9,6 +9,7 @@ import (
 
 	"connectrpc.com/connect"
 	"connectrpc.com/grpcreflect"
+	"github.com/google/uuid"
 	"github.com/nickheyer/discopanel/internal/auth"
 	"github.com/nickheyer/discopanel/internal/command"
 	"github.com/nickheyer/discopanel/internal/config"
@@ -56,7 +57,12 @@ type Server struct {
 	uploadManager    *upload.Manager
 	downloadManager  *download.Manager
 	wsHub            *ws.Hub
+	auditCh          chan *storage.AuditEntry
 }
+
+// auditChannelSize bounds the buffered audit queue; entries are dropped (with
+// a log line) when full rather than blocking RPC calls.
+const auditChannelSize = 256
 
 // Creates new Connect RPC server
 func NewServer(store *storage.Store, docker *docker.Client, sender *command.Sender, cfg *config.Config, proxyManager *proxy.Manager, sched *scheduler.Scheduler, metricsCollector *metrics.Collector, moduleManager *module.Manager, playerTracker *tracker.Tracker, bus *events.Bus, log *logger.Logger) *Server {
@@ -118,7 +124,12 @@ func NewServer(store *storage.Store, docker *docker.Client, sender *command.Send
 		uploadManager:    uploadManager,
 		downloadManager:  downloadManager,
 		wsHub:            wsHub,
+		auditCh:          make(chan *storage.AuditEntry, auditChannelSize),
 	}
+
+	// Consume audit records produced by the logging interceptor off the RPC
+	// path so audit inserts never block request handling.
+	go s.auditWorker()
 
 	s.setupHandler()
 	return s
@@ -128,10 +139,15 @@ func NewServer(store *storage.Store, docker *docker.Client, sender *command.Send
 func (s *Server) setupHandler() {
 	mux := http.NewServeMux()
 
-	// Configure Connect options
+	// Configure Connect options. Interceptor order matters: interceptors
+	// listed first run OUTERMOST. authInterceptor must run before (outside)
+	// loggingInterceptor so the audit recording in the logging interceptor
+	// can read the authenticated user from the request context - the inner
+	// interceptor's context changes are visible to everything it wraps, but
+	// not to outer interceptors.
 	interceptors := []connect.Interceptor{
-		s.loggingInterceptor(),
 		s.authInterceptor(),
+		s.loggingInterceptor(),
 	}
 
 	opts := []connect.HandlerOption{
@@ -163,6 +179,8 @@ func (s *Server) setupHandler() {
 		discopanelv1connect.UserServiceName,
 		discopanelv1connect.MetricServiceName,
 		discopanelv1connect.PlayerServiceName,
+		discopanelv1connect.AdminServiceName,
+		discopanelv1connect.AuditServiceName,
 	)
 	mux.Handle(grpcreflect.NewHandlerV1(reflector))
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
@@ -212,6 +230,8 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 	uploadService := services.NewUploadService(s.uploadManager, s.config, s.log)
 		metricService := services.NewMetricService(s.store, s.metricsCollector, s.log)
 		playerService := services.NewPlayerService(s.store, s.playerTracker, s.log)
+		adminService := services.NewAdminService(s.store, s.sender, s.docker, s.log)
+		auditService := services.NewAuditService(s.store, s.log)
 
 	// Register service handlers
 	authPath, authHandler := discopanelv1connect.NewAuthServiceHandler(authService, opts...)
@@ -261,6 +281,12 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 
 	playerPath, playerHandler := discopanelv1connect.NewPlayerServiceHandler(playerService, opts...)
 	mux.Handle(playerPath, playerHandler)
+
+	adminPath, adminHandler := discopanelv1connect.NewAdminServiceHandler(adminService, opts...)
+	mux.Handle(adminPath, adminHandler)
+
+	auditPath, auditHandler := discopanelv1connect.NewAuditServiceHandler(auditService, opts...)
+	mux.Handle(auditPath, auditHandler)
 }
 
 // The HTTP handler for the server
@@ -268,7 +294,9 @@ func (s *Server) Handler() http.Handler {
 	return s.handler
 }
 
-// Creates a Connect interceptor for logging
+// Creates a Connect interceptor for logging. Because authInterceptor runs
+// outermost, the authenticated user is available in the context here. This is
+// also where audit records for mutating procedures are enqueued.
 func (s *Server) loggingInterceptor() connect.UnaryInterceptorFunc {
 	return func(next connect.UnaryFunc) connect.UnaryFunc {
 		return func(ctx context.Context, req connect.AnyRequest) (connect.AnyResponse, error) {
@@ -276,8 +304,58 @@ func (s *Server) loggingInterceptor() connect.UnaryInterceptorFunc {
 			if !s.isPollingProcedure(req.Spec().Procedure) {
 				s.log.Info("RPC %s %s", req.Peer().Addr, req.Spec().Procedure)
 			}
-			return next(ctx, req)
+			resp, err := next(ctx, req)
+			s.recordAudit(ctx, req, err)
+			return resp, err
 		}
+	}
+}
+
+// recordAudit enqueues an audit entry for mutating procedures. Reads, public
+// procedures and polling endpoints are not recorded; inserts happen on a
+// background goroutine so request handling is never blocked.
+func (s *Server) recordAudit(ctx context.Context, req connect.AnyRequest, err error) {
+	procedure := req.Spec().Procedure
+
+	// No permission mapping means public/authenticated-only procedures such
+	// as AuthService/Login - skip those, along with polling endpoints.
+	perm, ok := rbac.ProcedurePermissions[procedure]
+	if !ok || perm.Action == rbac.ActionRead || s.isPollingProcedure(procedure) {
+		return
+	}
+
+	entry := &storage.AuditEntry{
+		ID:        uuid.New().String(),
+		Procedure: procedure,
+		Resource:  perm.Resource,
+		Action:    perm.Action,
+		ObjectID:  extractObjectID(req, perm.ObjectIDField),
+		Status:    "ok",
+	}
+	if err != nil {
+		entry.Status = "error"
+		entry.Detail = err.Error()
+	}
+	if user := auth.GetUserFromContext(ctx); user != nil {
+		entry.UserID = user.ID
+		entry.Username = user.Username
+	}
+
+	select {
+	case s.auditCh <- entry:
+	default:
+		s.log.Warn("Audit queue full, dropping audit entry for %s", procedure)
+	}
+}
+
+// auditWorker drains the audit queue and persists entries.
+func (s *Server) auditWorker() {
+	for entry := range s.auditCh {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		if err := s.store.InsertAuditEntry(ctx, entry); err != nil {
+			s.log.Error("Failed to persist audit entry for %s: %v", entry.Procedure, err)
+		}
+		cancel()
 	}
 }
 

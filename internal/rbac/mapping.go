@@ -205,4 +205,22 @@ var ProcedurePermissions = map[string]ProcedurePermission{
 	"/discopanel.v1.PlayerService/GetPlayer":           {Resource: ResourcePlayers, Action: ActionRead},
 	"/discopanel.v1.PlayerService/ListPlayerSessions":  {Resource: ResourcePlayers, Action: ActionRead, ObjectIDField: "server_id"},
 	"/discopanel.v1.PlayerService/ListOnlinePlayers":   {Resource: ResourcePlayers, Action: ActionRead, ObjectIDField: "server_id"},
+
+	// ── AdminService ───────────────────────────────────────────────────
+	// Note: ApplyWhitelist, PullWhitelist, BanPlayer and UnbanPlayer target a
+	// repeated server_ids field the object extractor cannot read, so they are
+	// not object-scoped and may apply to every server.
+	"/discopanel.v1.AdminService/ListWhitelistEntries": {Resource: ResourcePlayers, Action: ActionRead},
+	"/discopanel.v1.AdminService/AddWhitelistEntry":    {Resource: ResourcePlayers, Action: ActionCreate},
+	"/discopanel.v1.AdminService/RemoveWhitelistEntry": {Resource: ResourcePlayers, Action: ActionDelete},
+	"/discopanel.v1.AdminService/ApplyWhitelist":       {Resource: ResourcePlayers, Action: ActionUpdate},
+	"/discopanel.v1.AdminService/PullWhitelist":        {Resource: ResourcePlayers, Action: ActionUpdate},
+	"/discopanel.v1.AdminService/BanPlayer":            {Resource: ResourcePlayers, Action: ActionUpdate},
+	"/discopanel.v1.AdminService/UnbanPlayer":          {Resource: ResourcePlayers, Action: ActionUpdate},
+	"/discopanel.v1.AdminService/GetServerMotd":        {Resource: ResourceServerConfig, Action: ActionRead, ObjectIDField: "server_id"},
+	"/discopanel.v1.AdminService/UpdateServerMotd":     {Resource: ResourceServerConfig, Action: ActionUpdate, ObjectIDField: "server_id"},
+
+	// ── AuditService ───────────────────────────────────────────────────
+	"/discopanel.v1.AuditService/ListAuditEntries":  {Resource: ResourceSettings, Action: ActionRead},
+	"/discopanel.v1.AuditService/ClearAuditEntries": {Resource: ResourceSettings, Action: ActionDelete},
 }

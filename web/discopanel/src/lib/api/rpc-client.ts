@@ -30,6 +30,8 @@ import { RoleService } from '$lib/proto/discopanel/v1/role_pb';
 import { ModuleService } from '$lib/proto/discopanel/v1/module_pb';
 import { MetricService } from '$lib/proto/discopanel/v1/metrics_pb';
 import { PlayerService } from '$lib/proto/discopanel/v1/player_pb';
+import { AdminService } from '$lib/proto/discopanel/v1/admin_pb';
+import { AuditService } from '$lib/proto/discopanel/v1/audit_pb';
 
 // Header to mark requests as silent / no loader
 const SILENT_HEADER = 'X-Silent-Request';
@@ -110,6 +112,8 @@ export class RpcClient {
 	public readonly module: Client<typeof ModuleService>;
 	public readonly metric: Client<typeof MetricService>;
 	public readonly player: Client<typeof PlayerService>;
+	public readonly admin: Client<typeof AdminService>;
+	public readonly audit: Client<typeof AuditService>;
 
 	constructor() {
 		this.auth = createClient(AuthService, transport);
@@ -128,6 +132,8 @@ export class RpcClient {
 		this.module = createClient(ModuleService, transport);
 		this.metric = createClient(MetricService, transport);
 		this.player = createClient(PlayerService, transport);
+		this.admin = createClient(AdminService, transport);
+		this.audit = createClient(AuditService, transport);
 	}
 }
 
