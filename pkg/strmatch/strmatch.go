@@ -174,20 +174,35 @@ func bestContainmentIndex(long, short string) int {
 
 // Rewards candidates whose whole words all appear as whole words in query
 func tokenScoreWithPrecomputed(queryTokens map[string]bool, c string) float64 {
-	candidateTokens := tokens(c)
-	if len(candidateTokens) == 0 {
-		return 0
-	}
 	matched := 0
-	for _, t := range candidateTokens {
-		if queryTokens[t] {
+	total := 0
+	start := -1
+	for i, r := range c {
+		isWord := unicode.IsLetter(r) || unicode.IsNumber(r)
+		if isWord {
+			if start == -1 {
+				start = i
+			}
+		} else {
+			if start != -1 {
+				total++
+				if queryTokens[c[start:i]] {
+					matched++
+				}
+				start = -1
+			}
+		}
+	}
+	if start != -1 {
+		total++
+		if queryTokens[c[start:]] {
 			matched++
 		}
 	}
-	if matched == 0 {
+	if total == 0 {
 		return 0
 	}
-	frac := float64(matched) / float64(len(candidateTokens))
+	frac := float64(matched) / float64(total)
 	return tokenBase + tokenSpan*frac
 }
 
@@ -240,23 +255,35 @@ func levenshtein(a, b string) int {
 		return len(ra)
 	}
 
-	prev := make([]int, len(rb)+1)
-	curr := make([]int, len(rb)+1)
-	for j := range prev {
-		prev[j] = j
+	if len(ra) < len(rb) {
+		ra, rb = rb, ra
 	}
+
+	var localRow [64]int
+	var row []int
+	if len(rb)+1 <= 64 {
+		row = localRow[:len(rb)+1]
+	} else {
+		row = make([]int, len(rb)+1)
+	}
+	for j := range row {
+		row[j] = j
+	}
+
 	for i := 1; i <= len(ra); i++ {
-		curr[0] = i
+		prevTopLeft := row[0]
+		row[0] = i
 		for j := 1; j <= len(rb); j++ {
 			cost := 1
 			if ra[i-1] == rb[j-1] {
 				cost = 0
 			}
-			curr[j] = min3(prev[j]+1, curr[j-1]+1, prev[j-1]+cost)
+			prevTop := row[j]
+			row[j] = min3(row[j]+1, row[j-1]+1, prevTopLeft+cost)
+			prevTopLeft = prevTop
 		}
-		prev, curr = curr, prev
 	}
-	return prev[len(rb)]
+	return row[len(rb)]
 }
 
 func min3(a, b, c int) int {
