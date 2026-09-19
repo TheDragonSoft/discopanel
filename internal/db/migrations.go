@@ -17,6 +17,7 @@ func allModels() []any {
 		&IndexedModpack{},
 		&IndexedModpackFile{},
 		&ModpackFavorite{},
+		&ModpackUpdateSetting{},
 		&ProxyConfig{},
 		&ProxyListener{},
 		&User{},

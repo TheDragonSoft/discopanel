@@ -60,6 +60,7 @@
 	import ServerConfiguration from '$lib/components/server-configuration.svelte';
 	import ServerSettings from '$lib/components/server-settings.svelte';
 	import ServerMods from '$lib/components/server-mods.svelte';
+	import ModpackUpdate from '$lib/components/modpack-update.svelte';
 	import ServerFiles from '$lib/components/files/server-files.svelte';
 	import ServerRouting from '$lib/components/server-routing.svelte';
 	import ServerTasks from '$lib/components/server-tasks.svelte';
@@ -1088,7 +1089,7 @@
 		>
 			<div class="w-full min-w-0 max-w-full flex-shrink-0 overflow-x-auto pb-1 scrollbar-thin">
 				<TabsList
-					class="inline-flex h-11 w-max min-w-full items-center justify-start gap-1 rounded-xl bg-muted/60 p-1 backdrop-blur-sm 2xl:grid 2xl:h-12 2xl:grid-cols-10 2xl:w-full"
+					class="inline-flex h-11 w-max min-w-full items-center justify-start gap-1 rounded-xl bg-muted/60 p-1 backdrop-blur-sm 2xl:grid 2xl:h-12 2xl:grid-cols-11 2xl:w-full"
 				>
 					<TabsTrigger
 						value="overview"
@@ -1114,6 +1115,11 @@
 						value="mods"
 						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
 						>Mods</TabsTrigger
+					>
+					<TabsTrigger
+						value="modpack"
+						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
+						>Modpack</TabsTrigger
 					>
 					<TabsTrigger
 						value="modules"
@@ -1172,6 +1178,23 @@
 
 				<TabsContent value="mods" class="h-full space-y-4">
 					<ServerMods {server} active={activeTab === 'mods'} />
+				</TabsContent>
+
+				<TabsContent value="modpack" class="h-full overflow-y-auto">
+					<Card class="border-border/50 shadow-sm">
+						<CardHeader class="pb-4">
+							<CardTitle class="text-xl">Modpack</CardTitle>
+							<CardDescription>
+								Check for modpack updates, apply them in place (world is preserved) and manage
+								automatic update checks
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							{#if server}
+								<ModpackUpdate {server} />
+							{/if}
+						</CardContent>
+					</Card>
 				</TabsContent>
 
 				<TabsContent value="modules" class="h-full">

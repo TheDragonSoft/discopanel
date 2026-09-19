@@ -375,7 +375,23 @@ type ModpackFavorite struct {
 	ID        string          `json:"id" gorm:"primaryKey"`
 	ModpackID string          `json:"modpack_id" gorm:"index;column:modpack_id"`
 	CreatedAt time.Time       `json:"created_at" gorm:"autoCreateTime"`
-	Modpack   *IndexedModpack `json:"modpack,omitempty" gorm:"foreignKey:ModpackID;constraint:OnDelete:CASCADE"`
+	Modpack   *IndexedModpack `json:"-" gorm:"foreignKey:ModpackID;constraint:OnDelete:CASCADE"`
+}
+
+// ModpackUpdateSetting holds the per-server scheduled modpack update
+// configuration plus the outcome of the last check/update. LastBackupFilename
+// records the pre-update archive created by the most recent modpack update so
+// RollbackModpackUpdate can restore it; no separate update-history table is
+// kept.
+type ModpackUpdateSetting struct {
+	ServerID           string     `json:"server_id" gorm:"primaryKey;column:server_id"`
+	Enabled            bool       `json:"enabled" gorm:"default:false"`
+	IntervalHours      int        `json:"interval_hours" gorm:"default:24;column:interval_hours"`
+	Mode               string     `json:"mode" gorm:"default:notify"` // "notify" or "apply"
+	LastCheck          *time.Time `json:"last_check" gorm:"column:last_check"`
+	LastResult         string     `json:"last_result" gorm:"type:text;column:last_result"`
+	LastBackupFilename string     `json:"last_backup_filename" gorm:"column:last_backup_filename"` // Pre-update backup for rollback
+	UpdatedAt          time.Time  `json:"updated_at" gorm:"autoUpdateTime"`
 }
 
 // ProxyConfig stores the global proxy configuration

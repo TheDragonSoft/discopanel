@@ -60,13 +60,10 @@ func (s *Scheduler) executeBackupTask(ctx context.Context, server *storage.Serve
 	prefix := files.SanitizePathName(backupName)
 	destPath := filepath.Join(destDir, fmt.Sprintf("%s_%s.zip", prefix, time.Now().UTC().Format("20060102-150405")))
 
-	resumeSaves := s.pauseWorldSaves(ctx, server)
-	defer resumeSaves()
-
 	start := time.Now()
-	count, err := files.CreateZipArchive(paths, server.DataPath, destPath, config.Compress)
+	count, err := s.archiveServerData(ctx, server, paths, destPath, config.Compress)
 	if err != nil {
-		return "", fmt.Errorf("failed to create backup archive: %w", err)
+		return "", err
 	}
 
 	var size int64
@@ -88,6 +85,55 @@ func (s *Scheduler) executeBackupTask(ctx context.Context, server *storage.Serve
 		output += fmt.Sprintf("; prune warning: %v", pruneErr)
 	}
 	return output, nil
+}
+
+// CreateServerBackup archives a server's data using the exact machinery of
+// the scheduled backup task (default world paths, save pausing, compression)
+// and returns the created archive's filename. It is the programmatic entry
+// point used by the modpack update pipeline to snapshot a server before an
+// in-place update.
+func (s *Scheduler) CreateServerBackup(ctx context.Context, server *storage.Server, backupName string) (string, error) {
+	if s.appConfig == nil || s.appConfig.Storage.BackupDir == "" {
+		return "", fmt.Errorf("backup directory is not configured")
+	}
+	if server == nil || server.DataPath == "" {
+		return "", fmt.Errorf("server has no data directory")
+	}
+
+	paths, _, err := resolveBackupPaths(server.DataPath, nil)
+	if err != nil {
+		return "", err
+	}
+
+	destDir := filepath.Join(s.appConfig.Storage.BackupDir, filepath.Base(server.DataPath))
+	if err := os.MkdirAll(destDir, 0755); err != nil {
+		return "", fmt.Errorf("failed to create backup directory: %w", err)
+	}
+
+	prefix := files.SanitizePathName(backupName)
+	if prefix == "" {
+		prefix = "backup"
+	}
+	destPath := filepath.Join(destDir, fmt.Sprintf("%s_%s.zip", prefix, time.Now().UTC().Format("20060102-150405")))
+
+	if _, err := s.archiveServerData(ctx, server, paths, destPath, true); err != nil {
+		return "", err
+	}
+	return filepath.Base(destPath), nil
+}
+
+// archiveServerData is the shared core of both backup paths: it pauses world
+// saves while the server is running, zips the resolved paths, and guarantees
+// saves are re-enabled afterwards. Returns the number of files archived.
+func (s *Scheduler) archiveServerData(ctx context.Context, server *storage.Server, paths []string, destPath string, compress bool) (int, error) {
+	resumeSaves := s.pauseWorldSaves(ctx, server)
+	defer resumeSaves()
+
+	count, err := files.CreateZipArchive(paths, server.DataPath, destPath, compress)
+	if err != nil {
+		return 0, fmt.Errorf("failed to create backup archive: %w", err)
+	}
+	return count, nil
 }
 
 // Validates the requested paths against the server data

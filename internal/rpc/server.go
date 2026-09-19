@@ -53,13 +53,14 @@ type Server struct {
 	scheduler        *scheduler.Scheduler
 	metricsCollector *metrics.Collector
 	moduleManager    *module.Manager
-	playerTracker    *tracker.Tracker
-	bus              *events.Bus
-	uploadManager    *upload.Manager
-	downloadManager  *download.Manager
-	wsHub            *ws.Hub
-	watchdog         *watchdog.Watchdog
-	auditCh          chan *storage.AuditEntry
+		playerTracker    *tracker.Tracker
+		bus              *events.Bus
+		uploadManager    *upload.Manager
+		downloadManager  *download.Manager
+		wsHub            *ws.Hub
+		watchdog         *watchdog.Watchdog
+		modpackUpdateSvc *services.ModpackUpdateService
+		auditCh          chan *storage.AuditEntry
 }
 
 // auditChannelSize bounds the buffered audit queue; entries are dropped (with
@@ -172,6 +173,7 @@ func (s *Server) setupHandler() {
 		discopanelv1connect.MinecraftServiceName,
 		discopanelv1connect.ModServiceName,
 		discopanelv1connect.ModpackServiceName,
+		discopanelv1connect.ModpackUpdateServiceName,
 		discopanelv1connect.ModuleServiceName,
 		discopanelv1connect.ProxyServiceName,
 		discopanelv1connect.RoleServiceName,
@@ -224,6 +226,8 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 	minecraftService := services.NewMinecraftService(s.store, s.docker, s.log)
 	modService := services.NewModService(s.store, s.docker, s.uploadManager, s.log)
 	modpackService := services.NewModpackService(s.store, s.config, s.uploadManager, s.log)
+	modpackUpdateService := services.NewModpackUpdateService(s.store, s.config, s.docker, s.scheduler, s.bus, s.log)
+	modpackUpdateService.SetWatchdog(s.watchdog)
 	proxyService := services.NewProxyService(s.store, s.docker, s.proxyManager, s.config, s.logStreamer, s.log)
 	serverService := services.NewServerService(s.store, s.docker, s.sender, s.config, s.proxyManager, s.logStreamer, s.metricsCollector, s.moduleManager, s.bus, s.enforcer, s.uploadManager, s.log)
 	serverService.SetWatchdog(s.watchdog)
@@ -257,6 +261,12 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 
 	modpackPath, modpackHandler := discopanelv1connect.NewModpackServiceHandler(modpackService, opts...)
 	mux.Handle(modpackPath, modpackHandler)
+
+	modpackUpdatePath, modpackUpdateHandler := discopanelv1connect.NewModpackUpdateServiceHandler(modpackUpdateService, opts...)
+	mux.Handle(modpackUpdatePath, modpackUpdateHandler)
+
+	// Keep a reference so main can drive the scheduled-check loop lifecycle
+	s.modpackUpdateSvc = modpackUpdateService
 
 	proxyPath, proxyHandler := discopanelv1connect.NewProxyServiceHandler(proxyService, opts...)
 	mux.Handle(proxyPath, proxyHandler)
@@ -545,6 +555,23 @@ func extractObjectID(req connect.AnyRequest, fieldName string) string {
 // RecoveryKey returns the current recovery key from the auth manager.
 func (s *Server) RecoveryKey() string {
 	return s.authManager.GetRecoveryKey()
+}
+
+// StartModpackUpdateScheduler launches the background loop that periodically
+// checks enabled servers for modpack updates and notifies/applies updates.
+func (s *Server) StartModpackUpdateScheduler() error {
+	if s.modpackUpdateSvc == nil {
+		return fmt.Errorf("modpack update service is not initialized")
+	}
+	return s.modpackUpdateSvc.Start()
+}
+
+// StopModpackUpdateScheduler gracefully stops the scheduled modpack update
+// checks loop.
+func (s *Server) StopModpackUpdateScheduler() {
+	if s.modpackUpdateSvc != nil {
+		s.modpackUpdateSvc.Stop()
+	}
 }
 
 // Starts log streaming for a container

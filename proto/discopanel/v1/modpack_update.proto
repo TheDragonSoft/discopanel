@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+package discopanel.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1";
+
+// In-place modpack updates that preserve the world, with backup + rollback
+// safety and optional scheduled checks.
+service ModpackUpdateService {
+  // Check whether a newer version of a server's modpack is available
+  rpc CheckModpackUpdate(CheckModpackUpdateRequest) returns (CheckModpackUpdateResponse);
+  // Update a server's modpack to a target version (world preserved, optional pre-update backup)
+  rpc UpdateServerModpack(UpdateServerModpackRequest) returns (UpdateServerModpackResponse);
+  // List versions available for a server's modpack
+  rpc ListModpackVersions(ListModpackVersionsRequest) returns (ListModpackVersionsResponse);
+  // Restore the pre-update backup created by the last update (server must be stopped)
+  rpc RollbackModpackUpdate(RollbackModpackUpdateRequest) returns (RollbackModpackUpdateResponse);
+  // Get the scheduled-update settings for a server
+  rpc GetModpackUpdateSettings(GetModpackUpdateSettingsRequest) returns (GetModpackUpdateSettingsResponse);
+  // Set the scheduled-update settings for a server
+  rpc SetModpackUpdateSettings(SetModpackUpdateSettingsRequest) returns (SetModpackUpdateSettingsResponse);
+}
+
+// Modest update mode for scheduled checks
+enum ModpackUpdateMode {
+  MODPACK_UPDATE_MODE_UNSPECIFIED = 0;
+  MODPACK_UPDATE_MODE_NOTIFY = 1; // Emit MODPACK_UPDATE_AVAILABLE event only
+  MODPACK_UPDATE_MODE_APPLY = 2;  // Back up, stop, update, restart automatically
+}
+
+// Update availability snapshot
+message ModpackUpdateCheck {
+  string server_id = 1;
+  string modpack_name = 2;
+  string current_version = 3;
+  string latest_version = 4;
+  string latest_version_id = 5;
+  bool update_available = 6;
+  string error = 7; // Lookup failure detail when the check could not complete
+}
+
+// Check update request
+message CheckModpackUpdateRequest {
+  string server_id = 1;
+}
+
+// Check update response
+message CheckModpackUpdateResponse {
+  ModpackUpdateCheck check = 1;
+}
+
+// Update request
+message UpdateServerModpackRequest {
+  string server_id = 1;
+  string target_version_id = 2; // Version to install (empty = latest)
+  bool create_backup = 3;       // Create a pre-update backup (recommended, default true)
+}
+
+// Update response — status reflects the synchronous update attempt
+message UpdateServerModpackResponse {
+  string status = 1;    // "updated" | "failed"
+  string message = 2;   // Detail, e.g. backup filename or failure reason
+  string backup_filename = 3; // Pre-update backup name (for rollback reference)
+}
+
+// List versions request
+message ListModpackVersionsRequest {
+  string server_id = 1;
+}
+
+// A selectable modpack version
+message ModpackVersionInfo {
+  string version_id = 1;
+  string version_name = 2;
+  google.protobuf.Timestamp released_at = 3;
+  bool is_current = 4;
+}
+
+// List versions response
+message ListModpackVersionsResponse {
+  repeated ModpackVersionInfo versions = 1;
+}
+
+// Rollback request
+message RollbackModpackUpdateRequest {
+  string server_id = 1;
+}
+
+// Rollback response
+message RollbackModpackUpdateResponse {
+  string status = 1;  // "restored" | "failed"
+  string message = 2;
+}
+
+// Get update settings request
+message GetModpackUpdateSettingsRequest {
+  string server_id = 1;
+}
+
+// Update settings
+message ModpackUpdateSettings {
+  string server_id = 1;
+  bool enabled = 2;
+  int32 interval_hours = 3;   // Check interval
+  ModpackUpdateMode mode = 4; // Notify only vs auto-apply
+  google.protobuf.Timestamp last_check = 5;
+  string last_result = 6;     // Human-readable outcome of the last check ("up to date", "updated to 1.2.3", error)
+}
+
+// Get settings response
+message GetModpackUpdateSettingsResponse {
+  ModpackUpdateSettings settings = 1;
+}
+
+// Set settings request
+message SetModpackUpdateSettingsRequest {
+  string server_id = 1;
+  bool enabled = 2;
+  int32 interval_hours = 3;
+  ModpackUpdateMode mode = 4;
+}
+
+// Set settings response
+message SetModpackUpdateSettingsResponse {
+  ModpackUpdateSettings settings = 1;
+}

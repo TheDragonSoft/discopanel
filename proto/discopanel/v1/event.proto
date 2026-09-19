@@ -23,4 +23,6 @@ enum TriggeredEventType {
   TRIGGERED_EVENT_TYPE_ALERT_TRIGGERED = 7;
   // A previously-triggered alert recovered (data: rule_id, rule_name, metric, value, threshold, message)
   TRIGGERED_EVENT_TYPE_ALERT_RESOLVED = 8;
+  // A modpack update is available for a server (data: server_id, modpack_name, current_version, latest_version)
+  TRIGGERED_EVENT_TYPE_MODPACK_UPDATE_AVAILABLE = 9;
 }

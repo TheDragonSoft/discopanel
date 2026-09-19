@@ -267,6 +267,14 @@ func main() {
 	// Initialize RPC server with full configuration
 	rpcServer := rpc.NewServer(store, dockerClient, sender, cfg, proxyManager, taskScheduler, metricsCollector, moduleManager, playerTracker, eventBus, crashWatchdog, log)
 
+	// Start the scheduled modpack update checker (runs the
+	// ModpackUpdateService check loop; updates mark their container stops as
+	// intentional with the watchdog).
+	if err := rpcServer.StartModpackUpdateScheduler(); err != nil {
+		log.Error("Failed to start modpack update checker: %v", err)
+	}
+	defer rpcServer.StopModpackUpdateScheduler()
+
 	// Print recovery key
 	if key := rpcServer.RecoveryKey(); key != "" {
 		fmt.Fprintf(os.Stderr, "\n═══════════════════════════════════════════════════════════════════════\n")

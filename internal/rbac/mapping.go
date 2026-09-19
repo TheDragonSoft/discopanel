@@ -121,6 +121,15 @@ var ProcedurePermissions = map[string]ProcedurePermission{
 	"/discopanel.v1.ModpackService/GetModpackVersions":    {Resource: ResourceModpacks, Action: ActionRead, ObjectIDField: "id"},
 	"/discopanel.v1.ModpackService/SyncModpackFiles":      {Resource: ResourceModpacks, Action: ActionUpdate, ObjectIDField: "id"},
 
+	// ── ModpackUpdateService ───────────────────────────────────────────
+	"/discopanel.v1.ModpackUpdateService/CheckModpackUpdate":    {Resource: ResourceModpacks, Action: ActionRead, ObjectIDField: "server_id"},
+	"/discopanel.v1.ModpackUpdateService/ListModpackVersions":   {Resource: ResourceModpacks, Action: ActionRead, ObjectIDField: "server_id"},
+	"/discopanel.v1.ModpackUpdateService/UpdateServerModpack":   {Resource: ResourceModpacks, Action: ActionUpdate, ObjectIDField: "server_id"},
+	"/discopanel.v1.ModpackUpdateService/RollbackModpackUpdate": {Resource: ResourceModpacks, Action: ActionUpdate, ObjectIDField: "server_id"},
+	// Settings read/update on the same resource, scoped to the server.
+	"/discopanel.v1.ModpackUpdateService/GetModpackUpdateSettings": {Resource: ResourceModpacks, Action: ActionRead, ObjectIDField: "server_id"},
+	"/discopanel.v1.ModpackUpdateService/SetModpackUpdateSettings": {Resource: ResourceModpacks, Action: ActionUpdate, ObjectIDField: "server_id"},
+
 	// ── ModuleService ──────────────────────────────────────────────────
 	"/discopanel.v1.ModuleService/ListModuleTemplates":        {Resource: ResourceModuleTemplates, Action: ActionRead},
 	"/discopanel.v1.ModuleService/GetModuleTemplate":          {Resource: ResourceModuleTemplates, Action: ActionRead, ObjectIDField: "id"},

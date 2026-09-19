@@ -42,6 +42,8 @@ const (
 	TriggeredEventType_TRIGGERED_EVENT_TYPE_ALERT_TRIGGERED TriggeredEventType = 7
 	// A previously-triggered alert recovered (data: rule_id, rule_name, metric, value, threshold, message)
 	TriggeredEventType_TRIGGERED_EVENT_TYPE_ALERT_RESOLVED TriggeredEventType = 8
+	// A modpack update is available for a server (data: server_id, modpack_name, current_version, latest_version)
+	TriggeredEventType_TRIGGERED_EVENT_TYPE_MODPACK_UPDATE_AVAILABLE TriggeredEventType = 9
 )
 
 // Enum value maps for TriggeredEventType.
@@ -56,17 +58,19 @@ var (
 		6: "TRIGGERED_EVENT_TYPE_SERVER_RESTART",
 		7: "TRIGGERED_EVENT_TYPE_ALERT_TRIGGERED",
 		8: "TRIGGERED_EVENT_TYPE_ALERT_RESOLVED",
+		9: "TRIGGERED_EVENT_TYPE_MODPACK_UPDATE_AVAILABLE",
 	}
 	TriggeredEventType_value = map[string]int32{
-		"TRIGGERED_EVENT_TYPE_UNSPECIFIED":     0,
-		"TRIGGERED_EVENT_TYPE_SERVER_START":    1,
-		"TRIGGERED_EVENT_TYPE_SERVER_STOP":     2,
-		"TRIGGERED_EVENT_TYPE_SERVER_HEALTHY":  3,
-		"TRIGGERED_EVENT_TYPE_PLAYER_JOIN":     4,
-		"TRIGGERED_EVENT_TYPE_PLAYER_LEAVE":    5,
-		"TRIGGERED_EVENT_TYPE_SERVER_RESTART":  6,
-		"TRIGGERED_EVENT_TYPE_ALERT_TRIGGERED": 7,
-		"TRIGGERED_EVENT_TYPE_ALERT_RESOLVED":  8,
+		"TRIGGERED_EVENT_TYPE_UNSPECIFIED":              0,
+		"TRIGGERED_EVENT_TYPE_SERVER_START":             1,
+		"TRIGGERED_EVENT_TYPE_SERVER_STOP":              2,
+		"TRIGGERED_EVENT_TYPE_SERVER_HEALTHY":           3,
+		"TRIGGERED_EVENT_TYPE_PLAYER_JOIN":              4,
+		"TRIGGERED_EVENT_TYPE_PLAYER_LEAVE":             5,
+		"TRIGGERED_EVENT_TYPE_SERVER_RESTART":           6,
+		"TRIGGERED_EVENT_TYPE_ALERT_TRIGGERED":          7,
+		"TRIGGERED_EVENT_TYPE_ALERT_RESOLVED":           8,
+		"TRIGGERED_EVENT_TYPE_MODPACK_UPDATE_AVAILABLE": 9,
 	}
 )
 
@@ -101,7 +105,7 @@ var File_discopanel_v1_event_proto protoreflect.FileDescriptor
 
 const file_discopanel_v1_event_proto_rawDesc = "" +
 	"\n" +
-	"\x19discopanel/v1/event.proto\x12\rdiscopanel.v1*\xf9\x02\n" +
+	"\x19discopanel/v1/event.proto\x12\rdiscopanel.v1*\xac\x03\n" +
 	"\x12TriggeredEventType\x12$\n" +
 	" TRIGGERED_EVENT_TYPE_UNSPECIFIED\x10\x00\x12%\n" +
 	"!TRIGGERED_EVENT_TYPE_SERVER_START\x10\x01\x12$\n" +
@@ -111,7 +115,8 @@ const file_discopanel_v1_event_proto_rawDesc = "" +
 	"!TRIGGERED_EVENT_TYPE_PLAYER_LEAVE\x10\x05\x12'\n" +
 	"#TRIGGERED_EVENT_TYPE_SERVER_RESTART\x10\x06\x12(\n" +
 	"$TRIGGERED_EVENT_TYPE_ALERT_TRIGGERED\x10\a\x12'\n" +
-	"#TRIGGERED_EVENT_TYPE_ALERT_RESOLVED\x10\bBFZDgithub.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1b\x06proto3"
+	"#TRIGGERED_EVENT_TYPE_ALERT_RESOLVED\x10\b\x121\n" +
+	"-TRIGGERED_EVENT_TYPE_MODPACK_UPDATE_AVAILABLE\x10\tBFZDgithub.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1b\x06proto3"
 
 var (
 	file_discopanel_v1_event_proto_rawDescOnce sync.Once
