@@ -199,4 +199,10 @@ var ProcedurePermissions = map[string]ProcedurePermission{
 	"/discopanel.v1.MetricService/DeleteAlertRule":   {Resource: ResourceSettings, Action: ActionDelete},
 	"/discopanel.v1.MetricService/TestAlertRule":     {Resource: ResourceSettings, Action: ActionUpdate},
 	"/discopanel.v1.MetricService/ListAlertEvents":   {Resource: ResourceSettings, Action: ActionRead},
+
+	// ── PlayerService ──────────────────────────────────────────────────
+	"/discopanel.v1.PlayerService/ListPlayers":         {Resource: ResourcePlayers, Action: ActionRead, ObjectIDField: "server_id"},
+	"/discopanel.v1.PlayerService/GetPlayer":           {Resource: ResourcePlayers, Action: ActionRead},
+	"/discopanel.v1.PlayerService/ListPlayerSessions":  {Resource: ResourcePlayers, Action: ActionRead, ObjectIDField: "server_id"},
+	"/discopanel.v1.PlayerService/ListOnlinePlayers":   {Resource: ResourcePlayers, Action: ActionRead, ObjectIDField: "server_id"},
 }

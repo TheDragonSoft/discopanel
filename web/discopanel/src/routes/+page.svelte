@@ -42,8 +42,12 @@
 		RefreshCw
 	} from '@lucide/svelte';
 	import { ServerStatus, type Server as ServerType } from '$lib/proto/discopanel/v1/common_pb';
-	import { rpcClient } from '$lib/api/rpc-client';
+	import { rpcClient, silentCallOptions } from '$lib/api/rpc-client';
 	import { serversStore, sortServersByActivity } from '$lib/stores/servers';
+	import { create } from '@bufbuild/protobuf';
+	import type { OnlinePlayer } from '$lib/proto/discopanel/v1/player_pb';
+	import { ListOnlinePlayersRequestSchema } from '$lib/proto/discopanel/v1/player_pb';
+	import { timestampToDate } from '$lib/utils';
 	import type { Timestamp } from '@bufbuild/protobuf/wkt';
 
 	// Dashboard data
@@ -51,6 +55,30 @@
 	let isLoading = $state(true);
 	let isRefreshing = $state(false);
 	let currentTime = $state(new Date());
+	let onlinePlayers = $state<OnlinePlayer[]>([]);
+
+	// Online players via tracking service
+	async function loadOnlinePlayers() {
+		try {
+			const response = await rpcClient.player.listOnlinePlayers(
+				create(ListOnlinePlayersRequestSchema, {}),
+				silentCallOptions
+			);
+			onlinePlayers = response.players;
+		} catch (error) {
+			console.error('Failed to load online players:', error);
+		}
+	}
+
+	// Format how long an online player has been connected
+	function joinedDuration(joinedAt?: Timestamp): string {
+		if (!joinedAt) return '—';
+		const secs = Math.max(0, Math.floor((Date.now() - timestampToDate(joinedAt).getTime()) / 1000));
+		const hours = Math.floor(secs / 3600);
+		const minutes = Math.floor((secs % 3600) / 60);
+		if (hours > 0) return `${hours}h ${minutes}m`;
+		return `${minutes}m`;
+	}
 	// Load dashboard data with full stats
 	async function loadDashboardData() {
 		try {
@@ -137,11 +165,18 @@
 			isLoading = false;
 		});
 
+		// Load online players and refresh every 30s
+		loadOnlinePlayers();
+		const onlineInterval = setInterval(loadOnlinePlayers, 30000);
+
 		// Update time for relative timestamps
 		const interval = setInterval(() => {
 			currentTime = new Date();
 		}, 1000);
-		return () => clearInterval(interval);
+		return () => {
+			clearInterval(onlineInterval);
+			clearInterval(interval);
+		};
 	});
 
 	const getStatusColor = (status: ServerStatus) => {
@@ -602,6 +637,70 @@
 		</div>
 
 		<div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+			<Card
+				class="group animate-in border-border/50 transition-all duration-500 fade-in-50 slide-in-from-bottom-5 hover:border-primary/30 hover:shadow-lg"
+				style="animation-delay: 300ms"
+			>
+				<CardHeader>
+					<div class="flex items-center justify-between">
+						<div class="flex items-center gap-3">
+							<div
+								class="flex h-10 w-10 items-center justify-center rounded-xl bg-linear-to-br from-green-500/20 to-green-600/10"
+							>
+								<Users class="h-5 w-5 text-green-500" />
+							</div>
+							<div>
+								<CardTitle class="text-base">Online Now</CardTitle>
+								<CardDescription class="text-xs">Tracked via proxy connections</CardDescription>
+							</div>
+						</div>
+						<Badge
+							variant="outline"
+							class="border-green-500/20 bg-green-500/10 text-green-600 dark:text-green-400"
+						>
+							{onlinePlayers.length}
+						</Badge>
+					</div>
+				</CardHeader>
+				<CardContent>
+					{#if onlinePlayers.length === 0}
+						<div class="py-6 text-center text-muted-foreground">
+							<Users class="mx-auto mb-2 h-8 w-8 opacity-40" />
+							<p class="text-sm">No players online</p>
+						</div>
+					{:else}
+						<div class="scrollbar-thin max-h-56 space-y-2 overflow-y-auto pr-1">
+							{#each onlinePlayers as op (op.playerId + op.serverId)}
+								<div
+									class="flex items-center justify-between gap-2 rounded-lg border bg-muted/30 px-3 py-2"
+								>
+									<div class="flex min-w-0 items-center gap-2">
+										<img
+											src="https://mc-heads.net/avatar/{op.name}/20"
+											alt={op.name}
+											class="h-5 w-5 rounded-sm"
+											onerror={(e) => {
+												const target = e.currentTarget as HTMLImageElement;
+												target.style.display = 'none';
+											}}
+										/>
+										<div class="min-w-0">
+											<p class="truncate text-sm font-medium">{op.name}</p>
+											<p class="truncate text-xs text-muted-foreground">
+												{op.serverName || op.serverId}
+											</p>
+										</div>
+									</div>
+									<span class="shrink-0 font-mono text-xs text-muted-foreground">
+										{joinedDuration(op.joinedAt)}
+									</span>
+								</div>
+							{/each}
+						</div>
+					{/if}
+				</CardContent>
+			</Card>
+
 			<Card
 				class="group animate-in border-border/50 transition-all duration-500 fade-in-50 slide-in-from-bottom-5 hover:border-primary/30 hover:shadow-lg"
 				style="animation-delay: 350ms"

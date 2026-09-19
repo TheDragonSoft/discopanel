@@ -22,6 +22,7 @@ import (
 	"github.com/nickheyer/discopanel/internal/rpc/handlers"
 	"github.com/nickheyer/discopanel/internal/rpc/services"
 	"github.com/nickheyer/discopanel/internal/scheduler"
+	"github.com/nickheyer/discopanel/internal/tracker"
 	"github.com/nickheyer/discopanel/internal/ws"
 	"github.com/nickheyer/discopanel/pkg/download"
 	"github.com/nickheyer/discopanel/pkg/logger"
@@ -50,6 +51,7 @@ type Server struct {
 	scheduler        *scheduler.Scheduler
 	metricsCollector *metrics.Collector
 	moduleManager    *module.Manager
+	playerTracker    *tracker.Tracker
 	bus              *events.Bus
 	uploadManager    *upload.Manager
 	downloadManager  *download.Manager
@@ -57,7 +59,7 @@ type Server struct {
 }
 
 // Creates new Connect RPC server
-func NewServer(store *storage.Store, docker *docker.Client, sender *command.Sender, cfg *config.Config, proxyManager *proxy.Manager, sched *scheduler.Scheduler, metricsCollector *metrics.Collector, moduleManager *module.Manager, bus *events.Bus, log *logger.Logger) *Server {
+func NewServer(store *storage.Store, docker *docker.Client, sender *command.Sender, cfg *config.Config, proxyManager *proxy.Manager, sched *scheduler.Scheduler, metricsCollector *metrics.Collector, moduleManager *module.Manager, playerTracker *tracker.Tracker, bus *events.Bus, log *logger.Logger) *Server {
 	// Initialize RBAC enforcer
 	enforcer, err := rbac.NewEnforcer(store.DB())
 	if err != nil {
@@ -111,6 +113,7 @@ func NewServer(store *storage.Store, docker *docker.Client, sender *command.Send
 		scheduler:        sched,
 		metricsCollector: metricsCollector,
 		moduleManager:    moduleManager,
+		playerTracker:    playerTracker,
 		bus:              bus,
 		uploadManager:    uploadManager,
 		downloadManager:  downloadManager,
@@ -159,6 +162,7 @@ func (s *Server) setupHandler() {
 		discopanelv1connect.UploadServiceName,
 		discopanelv1connect.UserServiceName,
 		discopanelv1connect.MetricServiceName,
+		discopanelv1connect.PlayerServiceName,
 	)
 	mux.Handle(grpcreflect.NewHandlerV1(reflector))
 	mux.Handle(grpcreflect.NewHandlerV1Alpha(reflector))
@@ -206,7 +210,8 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 	roleService := services.NewRoleService(s.store, s.enforcer, s.log)
 	moduleService := services.NewModuleService(s.store, s.docker, s.moduleManager, s.proxyManager, s.authManager, s.config, s.logStreamer, s.log)
 	uploadService := services.NewUploadService(s.uploadManager, s.config, s.log)
-	metricService := services.NewMetricService(s.store, s.metricsCollector, s.log)
+		metricService := services.NewMetricService(s.store, s.metricsCollector, s.log)
+		playerService := services.NewPlayerService(s.store, s.playerTracker, s.log)
 
 	// Register service handlers
 	authPath, authHandler := discopanelv1connect.NewAuthServiceHandler(authService, opts...)
@@ -253,6 +258,9 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 
 	metricPath, metricHandler := discopanelv1connect.NewMetricServiceHandler(metricService, opts...)
 	mux.Handle(metricPath, metricHandler)
+
+	playerPath, playerHandler := discopanelv1connect.NewPlayerServiceHandler(playerService, opts...)
+	mux.Handle(playerPath, playerHandler)
 }
 
 // The HTTP handler for the server
@@ -344,6 +352,7 @@ var pollingProcedures = []string{
 	"/discopanel.v1.UploadService/GetUploadStatus",
 	"/discopanel.v1.FileService/GetExtractionStatus",
 	"/discopanel.v1.MetricService/ListMetricHistory",
+	"/discopanel.v1.PlayerService/ListOnlinePlayers",
 }
 
 // Checks if a procedure is a polling endpoint or high-frequency endpoint

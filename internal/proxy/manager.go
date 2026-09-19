@@ -11,6 +11,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/nickheyer/discopanel/internal/config"
 	db "github.com/nickheyer/discopanel/internal/db"
+	"github.com/nickheyer/discopanel/internal/events"
+	"github.com/nickheyer/discopanel/internal/tracker"
 	"github.com/nickheyer/discopanel/pkg/logger"
 )
 
@@ -32,6 +34,11 @@ type Manager struct {
 
 	// wakeHandler starts a stopped server (set by the application wiring).
 	wakeHandler func(serverID string) error
+
+	// playerTracker and eventBus are wired into server-listener Minecraft
+	// proxies for player session tracking (optional; set via SetPlayerTracker).
+	playerTracker *tracker.Tracker
+	eventBus      *events.Bus
 }
 
 // NewManager creates a new proxy manager
@@ -80,6 +87,8 @@ func (m *Manager) Start() error {
 			TrustedProxies:       m.config.TrustedProxies,
 		})
 		proxy.wakeResolver = m.wakeResolve
+		proxy.playerTracker = m.playerTracker
+		proxy.eventBus = m.eventBus
 
 		m.proxies[listener.Port] = proxy
 		m.logger.Info("Created Minecraft proxy for listener %s on port %d", listener.Name, listener.Port)
@@ -351,6 +360,9 @@ func (m *Manager) AddListener(listener *db.ProxyListener) error {
 		IngressProxyProtocol: m.config.IngressProxyProtocol,
 		TrustedProxies:       m.config.TrustedProxies,
 	})
+	proxy.wakeResolver = m.wakeResolve
+	proxy.playerTracker = m.playerTracker
+	proxy.eventBus = m.eventBus
 
 	// Start the proxy
 	if err := proxy.Start(); err != nil {
@@ -457,14 +469,32 @@ func (m *Manager) SetWakeHandler(h func(serverID string) error) {
 	m.wakeHandler = h
 }
 
+// SetPlayerTracker wires the player tracker and event bus into server-listener
+// Minecraft proxies so player sessions are recorded and join/leave events are
+// emitted. Module port proxies are deliberately not wired: their routes carry
+// module IDs, not server IDs.
+func (m *Manager) SetPlayerTracker(t *tracker.Tracker, bus *events.Bus) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	m.playerTracker = t
+	m.eventBus = bus
+
+	for _, proxy := range m.proxies {
+		if mcProxy, ok := proxy.(*MinecraftProxy); ok {
+			mcProxy.playerTracker = t
+			mcProxy.eventBus = bus
+		}
+	}
+}
+
 // wakeResolve is called by Minecraft proxies when no active route matches a
 // hostname. For servers with wake-on-connect enabled it starts the server (or
-// waits for one that is already starting) and returns its fresh backend
+// waits for one that is already starting) and returns its ID and fresh backend
 // address once the container is reachable.
-func (m *Manager) wakeResolve(hostname string) (string, int, bool) {
+func (m *Manager) wakeResolve(hostname string) (string, string, int, bool) {
 	servers, err := m.store.ListServers(context.Background())
 	if err != nil {
-		return "", 0, false
+		return "", "", 0, false
 	}
 
 	var target *db.Server
@@ -475,19 +505,19 @@ func (m *Manager) wakeResolve(hostname string) (string, int, bool) {
 		}
 	}
 	if target == nil || target.ContainerID == "" {
-		return "", 0, false
+		return "", "", 0, false
 	}
 
 	// The container may already be up (route just stale) - check first.
 	if ip, err := GetContainerIP(target.ContainerID, m.networkName); err == nil && ip != "" {
-		return ip, 25565, true
+		return target.ID, ip, 25565, true
 	}
 
 	m.mu.Lock()
 	handler := m.wakeHandler
 	m.mu.Unlock()
 	if handler == nil {
-		return "", 0, false
+		return "", "", 0, false
 	}
 
 	m.logger.Info("Wake-on-connect: starting server %s for hostname %s", target.Name, hostname)
@@ -502,12 +532,12 @@ func (m *Manager) wakeResolve(hostname string) (string, int, bool) {
 		time.Sleep(wakePollInterval)
 		if ip, err := GetContainerIP(target.ContainerID, m.networkName); err == nil && ip != "" {
 			m.logger.Info("Wake-on-connect: server %s is up at %s after %s", target.Name, ip, time.Until(deadline).Round(time.Second))
-			return ip, 25565, true
+			return target.ID, ip, 25565, true
 		}
 	}
 
 	m.logger.Error("Wake-on-connect: server %s did not come up within %v", target.Name, wakeMaxWait)
-	return "", 0, false
+	return "", "", 0, false
 }
 
 // AddModuleRoute adds a proxy route for a module's ports

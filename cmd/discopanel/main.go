@@ -21,6 +21,7 @@ import (
 	"github.com/nickheyer/discopanel/internal/proxy"
 	"github.com/nickheyer/discopanel/internal/rpc"
 	"github.com/nickheyer/discopanel/internal/scheduler"
+	"github.com/nickheyer/discopanel/internal/tracker"
 	"github.com/nickheyer/discopanel/pkg/logger"
 	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
 )
@@ -173,6 +174,14 @@ func main() {
 	// Initialize the central event bus
 	eventBus := events.NewBus(log)
 
+	// Player tracking: records sessions for connections observed by the
+	// Minecraft proxy. Startup closes sessions left open by a previous run.
+	playerTracker := tracker.NewTracker(store, log)
+	if err := playerTracker.Start(); err != nil {
+		log.Error("Failed to recover stale player sessions: %v", err)
+	}
+	proxyManager.SetPlayerTracker(playerTracker, eventBus)
+
 	// Wake-on-connect: the proxy manager starts stopped servers when a client
 	// connects to their hostname while wake_on_connect is enabled.
 	proxyManager.SetWakeHandler(func(serverID string) error {
@@ -241,7 +250,7 @@ func main() {
 	defer metricsCollector.Stop()
 
 	// Initialize RPC server with full configuration
-	rpcServer := rpc.NewServer(store, dockerClient, sender, cfg, proxyManager, taskScheduler, metricsCollector, moduleManager, eventBus, log)
+	rpcServer := rpc.NewServer(store, dockerClient, sender, cfg, proxyManager, taskScheduler, metricsCollector, moduleManager, playerTracker, eventBus, log)
 
 	// Print recovery key
 	if key := rpcServer.RecoveryKey(); key != "" {

@@ -8,7 +8,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/nickheyer/discopanel/internal/events"
+	"github.com/nickheyer/discopanel/internal/tracker"
 	"github.com/nickheyer/discopanel/pkg/logger"
+	v1 "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1"
 )
 
 // MinecraftProxy handles Minecraft protocol proxying with handshake parsing for hostname-based routing
@@ -25,8 +28,13 @@ type MinecraftProxy struct {
 
 	// wakeResolver is consulted when no active route matches a hostname.
 	// Used for wake-on-connect: it may start the stopped server and block
-	// until it is ready, then return its fresh backend address.
-	wakeResolver func(hostname string) (backendHost string, backendPort int, ok bool)
+	// until it is ready, then return its server ID and fresh backend address.
+	wakeResolver func(hostname string) (serverID string, backendHost string, backendPort int, ok bool)
+
+	// playerTracker, when non-nil, records player sessions. It is only wired
+	// for server listeners (module port proxies leave it nil).
+	playerTracker *tracker.Tracker
+	eventBus      *events.Bus
 
 	ingressProxyProtocol bool
 	trustedProxies       []string
@@ -202,13 +210,15 @@ func (p *MinecraftProxy) handleConnection(clientConn net.Conn) {
 
 	var backendHost string
 	var backendPort int
+	var serverID string
 	if exists && route.Active {
+		serverID = route.ServerID
 		backendHost = route.BackendHost
 		backendPort = route.BackendPort
 	} else if p.wakeResolver != nil {
 		// No active route: give wake-on-connect a chance to start the server
 		// and wait until it comes up.
-		host, port, ok := p.wakeResolver(hostname)
+		id, host, port, ok := p.wakeResolver(hostname)
 		if !ok {
 			p.logger.Debug("No active route found for hostname: %s", hostname)
 			p.routesMutex.RLock()
@@ -219,7 +229,7 @@ func (p *MinecraftProxy) handleConnection(clientConn net.Conn) {
 			p.routesMutex.RUnlock()
 			return
 		}
-		backendHost, backendPort = host, port
+		serverID, backendHost, backendPort = id, host, port
 	} else {
 		p.logger.Debug("No active route found for hostname: %s", hostname)
 		p.routesMutex.RLock()
@@ -269,27 +279,96 @@ func (p *MinecraftProxy) handleConnection(clientConn net.Conn) {
 		return
 	}
 
+	// Player tracking: only connections that proceed to login (NextState 2)
+	// carry a Login Start packet; status pings (NextState 1) never create a
+	// session. When a tracker is wired, snoop the Login Start packet to get
+	// the username and forward its raw bytes to the backend unchanged.
+	var (
+		sessionID    string
+		username     string
+		loginRawSize int64
+	)
+	if handshake.NextState == 2 && p.playerTracker != nil && serverID != "" {
+		pkt, raw, err := ReadLoginStartPacket(clientConn)
+		switch {
+		case err == nil && pkt != nil:
+			loginRawSize = int64(len(raw))
+			if _, werr := backendConn.Write(raw); werr != nil {
+				p.logger.Error("Failed to write login start to backend: %v", werr)
+				return
+			}
+			username = pkt.Username
+			sid, terr := p.playerTracker.OnPlayerConnect(context.Background(), serverID, username, clientConn.RemoteAddr().String())
+			if terr != nil {
+				p.logger.Debug("Failed to track player %s: %v", username, terr)
+			} else {
+				sessionID = sid
+				p.emitPlayerEvent(v1.TriggeredEventType_TRIGGERED_EVENT_TYPE_PLAYER_JOIN, serverID, username)
+			}
+		case raw != nil:
+			// A complete but non-login-start packet: forward it and keep the
+			// connection untracked.
+			if _, werr := backendConn.Write(raw); werr != nil {
+				p.logger.Error("Failed to write packet to backend: %v", werr)
+				return
+			}
+		default:
+			// IO error: the client is gone or timed out mid-read.
+			p.logger.Debug("Failed to read login start from %s: %v", clientConn.RemoteAddr(), err)
+			return
+		}
+	}
+
 	// Clear timeouts for proxying
 	clientConn.SetReadDeadline(time.Time{})
 	backendConn.SetReadDeadline(time.Time{})
 
-	// Start bidirectional proxying
-	var wg sync.WaitGroup
+	// Start bidirectional proxying, counting bytes per direction. Each pipe
+	// goroutine writes its own counter; they are read after wg.Wait().
+	var (
+		wg       sync.WaitGroup
+		bytesIn  int64 // client -> server
+		bytesOut int64 // server -> client
+	)
 	wg.Add(2)
 
 	go func() {
 		defer wg.Done()
-		proxyCopy(backendConn, clientConn)
+		n, _ := proxyCopy(backendConn, clientConn)
+		bytesIn = n
 		backendConn.Close()
 	}()
 
 	go func() {
 		defer wg.Done()
-		proxyCopy(clientConn, backendConn)
+		n, _ := proxyCopy(clientConn, backendConn)
+		bytesOut = n
 		clientConn.Close()
 	}()
 
 	wg.Wait()
+
+	// Close the tracked session now that both directions are done. The
+	// handshake and snooped login-start bytes were consumed out-of-band, so
+	// the snooped login packet is added to the inbound total.
+	if sessionID != "" && p.playerTracker != nil {
+		p.playerTracker.OnBytes(sessionID, bytesIn+loginRawSize, bytesOut)
+		p.playerTracker.OnPlayerDisconnect(sessionID)
+		p.emitPlayerEvent(v1.TriggeredEventType_TRIGGERED_EVENT_TYPE_PLAYER_LEAVE, serverID, username)
+	}
+}
+
+// emitPlayerEvent publishes a player join/leave event on the event bus when
+// one is wired.
+func (p *MinecraftProxy) emitPlayerEvent(eventType v1.TriggeredEventType, serverID, username string) {
+	if p.eventBus == nil || username == "" {
+		return
+	}
+	p.eventBus.Emit(context.Background(), events.Event{
+		Type:     eventType,
+		ServerID: serverID,
+		Data:     map[string]any{"player": username},
+	})
 }
 
 // GetRoutes returns a copy of all current routes

@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 import type { DockerImage } from './proto/discopanel/v1/minecraft_pb';
+import type { Timestamp } from '@bufbuild/protobuf/wkt';
 
 export function cn(...inputs: ClassValue[]) {
 	return twMerge(clsx(inputs));
@@ -50,6 +51,38 @@ export function getDockerImageDisplayName(
 
 export function getStringForEnum(map: Record<string, unknown>, val: unknown) {
 	return Object.keys(map).find((key) => map[key] === val);
+}
+
+// Convert protobuf Timestamp (bigint seconds) to a JS Date
+export function timestampToDate(timestamp: Timestamp | undefined | null): Date {
+	if (!timestamp) return new Date(0);
+	return new Date(Number(timestamp.seconds) * 1000 + timestamp.nanos / 1_000_000);
+}
+
+// Human-readable duration, e.g. "3h 24m", "45m", "2d 5h"
+export function formatPlaytime(secs: number | bigint): string {
+	const total = Number(secs);
+	if (!total || total <= 0) return '—';
+	const days = Math.floor(total / 86400);
+	const hours = Math.floor((total % 86400) / 3600);
+	const minutes = Math.floor((total % 3600) / 60);
+	if (days > 0) return `${days}d ${hours}h`;
+	if (hours > 0) return `${hours}h ${minutes}m`;
+	if (minutes > 0) return `${minutes}m`;
+	return `${total}s`;
+}
+
+// Human-readable elapsed time since a date, e.g. "5m ago"
+export function formatTimeAgo(date: Date, now: Date = new Date()): string {
+	const diff = Math.max(0, Math.floor((now.getTime() - date.getTime()) / 1000));
+	if (date.getTime() === 0) return 'Never';
+	const days = Math.floor(diff / 86400);
+	const hours = Math.floor((diff % 86400) / 3600);
+	const minutes = Math.floor((diff % 3600) / 60);
+	if (days > 0) return `${days}d ago`;
+	if (hours > 0) return `${hours}h ago`;
+	if (minutes > 0) return `${minutes}m ago`;
+	return 'Just now';
 }
 
 // Convert proto enum value to the lowercase string name used by backend

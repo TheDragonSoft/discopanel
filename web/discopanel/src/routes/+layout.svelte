@@ -51,7 +51,8 @@
 		Sun,
 		Moon,
 		Puzzle,
-		Blocks
+		Blocks,
+		Users
 	} from '@lucide/svelte';
 	import { toggleMode, mode } from 'mode-watcher';
 	import { ServerStatus, type User } from '$lib/proto/discopanel/v1/common_pb';
@@ -211,6 +212,16 @@
 											<a href={resolvePath('/mods')} {...props}>
 												<Blocks class="h-4 w-4" />
 												<span class="group-data-[collapsible=icon]:hidden">Mods</span>
+											</a>
+										{/snippet}
+									</SidebarMenuButton>
+								</SidebarMenuItem>
+								<SidebarMenuItem>
+									<SidebarMenuButton isActive={page.url.pathname.startsWith('/players')}>
+										{#snippet child({ props })}
+											<a href={resolvePath('/players')} {...props}>
+												<Users class="h-4 w-4" />
+												<span class="group-data-[collapsible=icon]:hidden">Players</span>
 											</a>
 										{/snippet}
 									</SidebarMenuButton>

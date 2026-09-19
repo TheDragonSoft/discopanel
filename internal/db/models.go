@@ -748,6 +748,29 @@ type MetricSampleRecord struct {
 	DiskTotal     int64     `json:"disk_total" gorm:"column:disk_total"` // Bytes
 }
 
+// Player is a known Minecraft player, upserted the first time the proxy sees
+// them send a Login Start packet through a server route.
+type Player struct {
+	ID        string    `json:"id" gorm:"primaryKey"`
+	Name      string    `json:"name" gorm:"not null;uniqueIndex"`
+	FirstSeen time.Time `json:"first_seen" gorm:"autoCreateTime;column:first_seen"`
+	LastSeen  time.Time `json:"last_seen" gorm:"column:last_seen"`
+}
+
+// PlayerSession is one proxy-observed connection of a player to a server.
+// LeftAt stays NULL while the connection is alive (and after a crash, until
+// startup recovery closes stale sessions).
+type PlayerSession struct {
+	ID           string     `json:"id" gorm:"primaryKey"`
+	PlayerID     string     `json:"player_id" gorm:"not null;index;column:player_id"`
+	ServerID     string     `json:"server_id" gorm:"not null;index;column:server_id"`
+	JoinedAt     time.Time  `json:"joined_at" gorm:"not null;index;autoCreateTime;column:joined_at"`
+	LeftAt       *time.Time `json:"left_at" gorm:"column:left_at"`
+	DurationSecs int64      `json:"duration_secs" gorm:"column:duration_secs"`
+	BytesIn      int64      `json:"bytes_in" gorm:"column:bytes_in"`
+	BytesOut     int64      `json:"bytes_out" gorm:"column:bytes_out"`
+}
+
 // AlertEventRecord is a persisted alert firing/resolution event.
 type AlertEventRecord struct {
 	ID        string    `json:"id" gorm:"primaryKey"`

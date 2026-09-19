@@ -33,6 +33,8 @@ func allModels() []any {
 		&AlertRule{},
 		&MetricSampleRecord{},
 		&AlertEventRecord{},
+		&Player{},
+		&PlayerSession{},
 	}
 }
 

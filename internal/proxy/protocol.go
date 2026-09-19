@@ -145,6 +145,67 @@ func ReadHandshakePacket(r io.Reader) (*HandshakePacket, error) {
 	return packet, nil
 }
 
+// LoginStartPacket represents the client's Login Start packet (state 2,
+// packet 0x00). Only the username is parsed; later protocol versions append
+// optional fields (signature data, UUID) that the proxy does not need.
+type LoginStartPacket struct {
+	Username string
+}
+
+// ReadLoginStartPacket reads the client's Login Start packet from r and
+// returns the parsed packet together with the exact raw bytes consumed, so
+// the caller can forward them to the backend unchanged. Parse errors (wrong
+// packet ID, malformed fields) still return the fully consumed raw bytes;
+// io errors mean the connection died mid-read and the raw bytes are unusable.
+func ReadLoginStartPacket(r io.Reader) (*LoginStartPacket, []byte, error) {
+	var raw bytes.Buffer
+	tee := io.TeeReader(r, &raw)
+
+	// Read packet length
+	length, err := ReadVarInt(tee)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to read packet length: %w", err)
+	}
+	if length < 1 || length > 1024 {
+		return nil, nil, fmt.Errorf("invalid login packet length: %d", length)
+	}
+
+	// Read packet data
+	data := make([]byte, length)
+	if _, err := io.ReadFull(tee, data); err != nil {
+		return nil, nil, fmt.Errorf("failed to read packet data (got %d/%d bytes): %w", len(data), length, err)
+	}
+
+	buf := bytes.NewReader(data)
+
+	// Read packet ID (should be 0x00 for login start)
+	packetID, err := ReadVarInt(buf)
+	if err != nil {
+		return nil, raw.Bytes(), fmt.Errorf("failed to read packet ID: %w", err)
+	}
+	if packetID != 0x00 {
+		return nil, raw.Bytes(), fmt.Errorf("expected login start packet (0x00), got %d", packetID)
+	}
+
+	packet := &LoginStartPacket{}
+
+	// Read the username string
+	nameLen, err := ReadVarInt(buf)
+	if err != nil {
+		return nil, raw.Bytes(), fmt.Errorf("failed to read username length: %w", err)
+	}
+	if nameLen < 1 || nameLen > 64 {
+		return nil, raw.Bytes(), fmt.Errorf("invalid username length: %d", nameLen)
+	}
+	nameBytes := make([]byte, nameLen)
+	if _, err := io.ReadFull(buf, nameBytes); err != nil {
+		return nil, raw.Bytes(), fmt.Errorf("failed to read username: %w", err)
+	}
+	packet.Username = string(nameBytes)
+
+	return packet, raw.Bytes(), nil
+}
+
 // WriteHandshakePacket writes a handshake packet to the connection
 func WriteHandshakePacket(w io.Writer, packet *HandshakePacket) error {
 	var buf bytes.Buffer

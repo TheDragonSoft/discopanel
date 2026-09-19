@@ -53,6 +53,8 @@
 	} from '$lib/proto/discopanel/v1/server_pb';
 	import { formatBytes } from '$lib/utils';
 	import { copyToClipboard as copyText } from '$lib/utils/clipboard';
+	import type { OnlinePlayer } from '$lib/proto/discopanel/v1/player_pb';
+	import { ListOnlinePlayersRequestSchema } from '$lib/proto/discopanel/v1/player_pb';
 	import ServerConsole from '$lib/components/server-console.svelte';
 	import ServerConfiguration from '$lib/components/server-configuration.svelte';
 	import ServerSettings from '$lib/components/server-settings.svelte';
@@ -70,6 +72,7 @@
 	let prevServerId = $state<string | undefined>(undefined);
 	let activeTab = $state('overview');
 	let routingInfo = $state<GetServerRoutingResponse | null>(null);
+	let onlinePlayers = $state<OnlinePlayer[]>([]);
 
 	let interval: ReturnType<typeof setInterval> | undefined;
 
@@ -107,6 +110,20 @@
 	async function loadServer(skipLoading = false) {
 		if (!serverId) return;
 		const requestedId = serverId;
+		// Tracked online players (silent, refreshed with the same polling cadence)
+		rpcClient.player
+			.listOnlinePlayers(
+				create(ListOnlinePlayersRequestSchema, { serverId: requestedId }),
+				silentCallOptions
+			)
+			.then((response) => {
+				if (serverId === requestedId) {
+					onlinePlayers = response.players;
+				}
+			})
+			.catch((err) => {
+				console.debug('Failed to load online players:', err);
+			});
 		try {
 			const request = create(GetServerRequestSchema, { id: requestedId });
 			const callOptions = skipLoading ? silentCallOptions : undefined;
@@ -809,7 +826,27 @@
 									></div>
 								</div>
 							</div>
-							{#if server.playerSample && server.playerSample.length > 0}
+							{#if onlinePlayers.length > 0}
+								<div class="flex flex-wrap gap-1.5">
+									{#each onlinePlayers as op (op.playerId + op.serverId)}
+										<div
+											class="flex items-center gap-1 rounded border px-1.5 py-0.5 transition-colors duration-500"
+											style="background: rgb({colors.bg} / 0.1); border-color: rgb({colors.bg} / 0.2);"
+										>
+											<img
+												src="https://mc-heads.net/avatar/{op.name}/16"
+												alt={op.name}
+												class="h-4 w-4 rounded-sm"
+												onerror={(e) => {
+													const target = e.currentTarget as HTMLImageElement;
+													target.style.display = 'none';
+												}}
+											/>
+											<span class="text-[10px] font-medium text-foreground/80">{op.name}</span>
+										</div>
+									{/each}
+								</div>
+							{:else if server.playerSample && server.playerSample.length > 0}
 								<div class="flex flex-wrap gap-1.5">
 									{#each server.playerSample as playerName (playerName)}
 										<div

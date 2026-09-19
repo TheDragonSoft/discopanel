@@ -1,0 +1,110 @@
+syntax = "proto3";
+
+package discopanel.v1;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1";
+
+// Player tracking service (populated from proxy connection observation)
+service PlayerService {
+  // List known players with aggregated stats
+  rpc ListPlayers(ListPlayersRequest) returns (ListPlayersResponse);
+  // Get a single player and their recent sessions
+  rpc GetPlayer(GetPlayerRequest) returns (GetPlayerResponse);
+  // List player sessions with optional filters
+  rpc ListPlayerSessions(ListPlayerSessionsRequest) returns (ListPlayerSessionsResponse);
+  // List players currently connected through the proxy
+  rpc ListOnlinePlayers(ListOnlinePlayersRequest) returns (ListOnlinePlayersResponse);
+}
+
+// A known player
+message Player {
+  string id = 1;
+  string name = 2;
+  google.protobuf.Timestamp first_seen = 3;
+  google.protobuf.Timestamp last_seen = 4;
+  int64 total_playtime_secs = 5; // Sum of completed session durations
+  int32 sessions_count = 6;
+  bool online = 7;               // Currently connected through the proxy
+  repeated PlayerServerStats server_stats = 8; // Per-server playtime
+}
+
+// Per-server aggregate for a player
+message PlayerServerStats {
+  string server_id = 1;
+  string server_name = 2;
+  int64 playtime_secs = 3;
+  int32 sessions_count = 4;
+  google.protobuf.Timestamp last_seen = 5;
+}
+
+// One play session on a server
+message PlayerSession {
+  string id = 1;
+  string player_id = 2;
+  string player_name = 3;
+  string server_id = 4;
+  string server_name = 5;
+  google.protobuf.Timestamp joined_at = 6;
+  optional google.protobuf.Timestamp left_at = 7; // Null while still connected
+  int64 duration_secs = 8;
+  int64 bytes_in = 9;  // Bytes transferred player -> server
+  int64 bytes_out = 10; // Bytes transferred server -> player
+}
+
+// A player currently connected
+message OnlinePlayer {
+  string player_id = 1;
+  string name = 2;
+  string server_id = 3;
+  string server_name = 4;
+  google.protobuf.Timestamp joined_at = 5;
+}
+
+// List players request
+message ListPlayersRequest {
+  string server_id = 1; // Filter to players who have played on this server
+  string search = 2;    // Name substring search
+  int32 limit = 3;      // 0 = default 100
+  int32 offset = 4;
+}
+
+// List players response
+message ListPlayersResponse {
+  repeated Player players = 1;
+  int32 total = 2; // Total matching before limit/offset
+}
+
+// Get player request
+message GetPlayerRequest {
+  string id = 1;
+}
+
+// Get player response
+message GetPlayerResponse {
+  Player player = 1;
+  repeated PlayerSession sessions = 2; // 20 most recent
+}
+
+// List sessions request
+message ListPlayerSessionsRequest {
+  string player_id = 1; // Optional filter
+  string server_id = 2; // Optional filter
+  int32 limit = 3;      // 0 = default 100
+}
+
+// List sessions response
+message ListPlayerSessionsResponse {
+  repeated PlayerSession sessions = 1;
+}
+
+// List online players request
+message ListOnlinePlayersRequest {
+  string server_id = 1; // Optional filter
+}
+
+// Online players response
+message ListOnlinePlayersResponse {
+  repeated OnlinePlayer players = 1;
+}
