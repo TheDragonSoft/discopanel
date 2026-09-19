@@ -22,7 +22,6 @@ import (
 	"github.com/nickheyer/discopanel/internal/rpc/handlers"
 	"github.com/nickheyer/discopanel/internal/rpc/services"
 	"github.com/nickheyer/discopanel/internal/scheduler"
-	"github.com/nickheyer/discopanel/internal/tunnel"
 	"github.com/nickheyer/discopanel/internal/ws"
 	"github.com/nickheyer/discopanel/pkg/download"
 	"github.com/nickheyer/discopanel/pkg/logger"
@@ -51,7 +50,6 @@ type Server struct {
 	scheduler        *scheduler.Scheduler
 	metricsCollector *metrics.Collector
 	moduleManager    *module.Manager
-	tunnelManager    *tunnel.Manager
 	bus              *events.Bus
 	uploadManager    *upload.Manager
 	downloadManager  *download.Manager
@@ -59,7 +57,7 @@ type Server struct {
 }
 
 // Creates new Connect RPC server
-func NewServer(store *storage.Store, docker *docker.Client, sender *command.Sender, cfg *config.Config, proxyManager *proxy.Manager, sched *scheduler.Scheduler, metricsCollector *metrics.Collector, moduleManager *module.Manager, tunnelManager *tunnel.Manager, bus *events.Bus, log *logger.Logger) *Server {
+func NewServer(store *storage.Store, docker *docker.Client, sender *command.Sender, cfg *config.Config, proxyManager *proxy.Manager, sched *scheduler.Scheduler, metricsCollector *metrics.Collector, moduleManager *module.Manager, bus *events.Bus, log *logger.Logger) *Server {
 	// Initialize RBAC enforcer
 	enforcer, err := rbac.NewEnforcer(store.DB())
 	if err != nil {
@@ -113,7 +111,6 @@ func NewServer(store *storage.Store, docker *docker.Client, sender *command.Send
 		scheduler:        sched,
 		metricsCollector: metricsCollector,
 		moduleManager:    moduleManager,
-		tunnelManager:    tunnelManager,
 		bus:              bus,
 		uploadManager:    uploadManager,
 		downloadManager:  downloadManager,
@@ -159,7 +156,6 @@ func (s *Server) setupHandler() {
 		discopanelv1connect.ServerServiceName,
 		discopanelv1connect.SupportServiceName,
 		discopanelv1connect.TaskServiceName,
-		discopanelv1connect.TunnelServiceName,
 		discopanelv1connect.UploadServiceName,
 		discopanelv1connect.UserServiceName,
 	)
@@ -208,7 +204,6 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 	userService := services.NewUserService(s.store, s.authManager, s.log)
 	roleService := services.NewRoleService(s.store, s.enforcer, s.log)
 	moduleService := services.NewModuleService(s.store, s.docker, s.moduleManager, s.proxyManager, s.authManager, s.config, s.logStreamer, s.log)
-	tunnelService := services.NewTunnelService(s.store, s.tunnelManager, s.log)
 	uploadService := services.NewUploadService(s.uploadManager, s.config, s.log)
 
 	// Register service handlers
@@ -250,9 +245,6 @@ func (s *Server) registerServices(mux *http.ServeMux, opts []connect.HandlerOpti
 
 	modulePath, moduleHandler := discopanelv1connect.NewModuleServiceHandler(moduleService, opts...)
 	mux.Handle(modulePath, moduleHandler)
-
-	tunnelPath, tunnelHandler := discopanelv1connect.NewTunnelServiceHandler(tunnelService, opts...)
-	mux.Handle(tunnelPath, tunnelHandler)
 
 	uploadPath, uploadHandler := discopanelv1connect.NewUploadServiceHandler(uploadService, opts...)
 	mux.Handle(uploadPath, uploadHandler)

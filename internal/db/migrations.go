@@ -30,7 +30,6 @@ func allModels() []any {
 		&ModuleTemplate{},
 		&Module{},
 		&SystemSetting{},
-		&Tunnel{},
 	}
 }
 

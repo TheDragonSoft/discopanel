@@ -22,16 +22,21 @@ type TCPProxy struct {
 	runningMutex sync.RWMutex
 	ctx          context.Context
 	cancel       context.CancelFunc
+
+	ingressProxyProtocol bool
+	trustedProxies       []string
 }
 
 // NewTCPProxy creates a new raw TCP proxy instance
 func NewTCPProxy(cfg *Config) *TCPProxy {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &TCPProxy{
-		logger:     cfg.Logger,
-		listenAddr: cfg.ListenAddr,
-		ctx:        ctx,
-		cancel:     cancel,
+		logger:               cfg.Logger,
+		listenAddr:           cfg.ListenAddr,
+		ctx:                  ctx,
+		cancel:               cancel,
+		ingressProxyProtocol: cfg.IngressProxyProtocol,
+		trustedProxies:       cfg.TrustedProxies,
 	}
 }
 
@@ -96,6 +101,14 @@ func (p *TCPProxy) Start() error {
 	listener, err := net.Listen("tcp", p.listenAddr)
 	if err != nil {
 		return fmt.Errorf("failed to listen on %s: %w", p.listenAddr, err)
+	}
+
+	listener, err = wrapIngress(listener, &Config{
+		IngressProxyProtocol: p.ingressProxyProtocol,
+		TrustedProxies:       p.trustedProxies,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to enable PROXY protocol on %s: %w", p.listenAddr, err)
 	}
 
 	p.listener = listener

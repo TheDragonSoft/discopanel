@@ -74,8 +74,10 @@ func (m *Manager) Start() error {
 
 		listenAddr := fmt.Sprintf(":%d", listener.Port)
 		proxy := NewMinecraftProxy(&Config{
-			ListenAddr: listenAddr,
-			Logger:     m.logger,
+			ListenAddr:           listenAddr,
+			Logger:               m.logger,
+			IngressProxyProtocol: m.config.IngressProxyProtocol,
+			TrustedProxies:       m.config.TrustedProxies,
 		})
 		proxy.wakeResolver = m.wakeResolve
 
@@ -344,8 +346,10 @@ func (m *Manager) AddListener(listener *db.ProxyListener) error {
 	// Create new proxy instance
 	listenAddr := fmt.Sprintf(":%d", listener.Port)
 	proxy := NewMinecraftProxy(&Config{
-		ListenAddr: listenAddr,
-		Logger:     m.logger,
+		ListenAddr:           listenAddr,
+		Logger:               m.logger,
+		IngressProxyProtocol: m.config.IngressProxyProtocol,
+		TrustedProxies:       m.config.TrustedProxies,
 	})
 
 	// Start the proxy
@@ -558,8 +562,10 @@ func (m *Manager) addPortRouteUnlocked(routeID, hostname, containerIP string, ho
 	if !exists {
 		listenAddr := fmt.Sprintf(":%d", hostPort)
 		cfg := &Config{
-			ListenAddr: listenAddr,
-			Logger:     m.logger,
+			ListenAddr:           listenAddr,
+			Logger:               m.logger,
+			IngressProxyProtocol: m.config.IngressProxyProtocol,
+			TrustedProxies:       m.config.TrustedProxies,
 		}
 
 		// Create appropriate proxy type based on protocol

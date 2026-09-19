@@ -27,17 +27,22 @@ type MinecraftProxy struct {
 	// Used for wake-on-connect: it may start the stopped server and block
 	// until it is ready, then return its fresh backend address.
 	wakeResolver func(hostname string) (backendHost string, backendPort int, ok bool)
+
+	ingressProxyProtocol bool
+	trustedProxies       []string
 }
 
 // NewMinecraftProxy creates a new Minecraft proxy instance
 func NewMinecraftProxy(cfg *Config) *MinecraftProxy {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &MinecraftProxy{
-		routes:     make(map[string]*Route),
-		logger:     cfg.Logger,
-		listenAddr: cfg.ListenAddr,
-		ctx:        ctx,
-		cancel:     cancel,
+		routes:               make(map[string]*Route),
+		logger:               cfg.Logger,
+		listenAddr:           cfg.ListenAddr,
+		ctx:                  ctx,
+		cancel:               cancel,
+		ingressProxyProtocol: cfg.IngressProxyProtocol,
+		trustedProxies:       cfg.TrustedProxies,
 	}
 }
 
@@ -107,6 +112,14 @@ func (p *MinecraftProxy) Start() error {
 	listener, err := net.Listen("tcp", p.listenAddr)
 	if err != nil {
 		return fmt.Errorf("failed to listen on %s: %w", p.listenAddr, err)
+	}
+
+	listener, err = wrapIngress(listener, &Config{
+		IngressProxyProtocol: p.ingressProxyProtocol,
+		TrustedProxies:       p.trustedProxies,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to enable PROXY protocol on %s: %w", p.listenAddr, err)
 	}
 
 	p.listener = listener

@@ -190,6 +190,35 @@ func InitBuiltinTemplates(store *storage.Store) error {
 			Documentation:   "Displays a real-time status dashboard for the attached Minecraft server. Fetches status via the DiscoPanel API including player count, TPS, CPU/memory usage, and server configuration. Automatically refreshes every 10 seconds.",
 			DefaultMemory:   512,
 		},
+		{
+			ID:             "builtin-playit",
+			Name:           "Playit.gg",
+			Description:    "Publish this server through a free playit.gg tunnel. Players join via your tunnel's public address, no port forwarding or public IP needed.",
+			Type:           storage.ModuleTemplateTypeBuiltin,
+			DockerImage:    "ghcr.io/discohaus/discomodule-playit:latest",
+			Category:       "proxy",
+			SupportsProxy:  false,
+			RequiresServer: true,
+			Icon:           "globe",
+			Ports: []*v1.ModulePort{
+				{Name: "Status", ContainerPort: 8201, HostPort: 0, Protocol: "http", ProxyEnabled: false},
+			},
+			DefaultAccessUrls: []string{"https://playit.gg/account/tunnels"},
+			DefaultEnv: `{
+				"SECRET_KEY": "",
+				"TARGET_HOSTNAME": "{{server.proxy_hostname}}",
+				"PROXY_PORT": "{{server.proxy_port}}",
+				"PROXY_PORT_DEFAULT": "{{config.proxy.listen_port}}",
+				"LISTEN_PORT": "25565",
+				"UDP_FORWARD": "true",
+				"VOICE_PORT": "24454"
+			}`,
+			DefaultVolumes:  `[{"source": "{{server.data_path}}/modules/playit", "target": "/data", "read_only": false, "create_dir": true}]`,
+			HealthCheckPath: "/health",
+			HealthCheckPort: 8201,
+			Documentation:   "Runs the official playit.gg agent next to a gateway that rewrites incoming Minecraft handshakes onto this server's proxy hostname and relays them into the DiscoPanel proxy, keeping wake-on-connect working. Generate an agent secret key on playit.gg (under Agents) and set it as the SECRET_KEY environment variable. DiscoPanel handles the rest automatically: a matching Minecraft Java tunnel for LISTEN_PORT is created on your account if it doesn't exist yet (disable via module.playit_auto_create), and the assigned public address is captured and shown as the server's connection address on the dashboard. The provisioned secret persists in the module data volume. UDP tunnels for voice mods forward straight to the server container when UDP_FORWARD is on.",
+			DefaultMemory:   256,
+		},
 	}
 
 	// Upsert each template

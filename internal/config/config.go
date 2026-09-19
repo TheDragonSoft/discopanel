@@ -66,6 +66,9 @@ type ServerConfig struct {
 }
 
 type DockerConfig struct {
+	// Container runtime provider: "docker" or "podman". Podman is reached
+	// through its Docker-compatible API socket.
+	Provider     string            `mapstructure:"provider" json:"provider"`
 	SyncInterval int               `mapstructure:"sync_interval" json:"sync_interval"`
 	Host         string            `mapstructure:"host" json:"host"`
 	Version      string            `mapstructure:"version" json:"version"`
@@ -92,6 +95,10 @@ type ProxyConfig struct {
 	BaseURL      string `mapstructure:"base_url" json:"base_url"`
 	ListenPort   int    `mapstructure:"listen_port" json:"listen_port"`   // Primary listen port
 	ListenPorts  []int  `mapstructure:"listen_ports" json:"listen_ports"` // Multiple listen ports
+	// Parse PROXY protocol v1/v2 on proxy listener ingress, so an external
+	// edge (VPS tunnel, Pangolin, HAProxy) can pass through real client IPs
+	IngressProxyProtocol bool     `mapstructure:"ingress_proxy_protocol" json:"ingress_proxy_protocol"`
+	TrustedProxies       []string `mapstructure:"trusted_proxies" json:"trusted_proxies"` // Optional CIDR whitelist allowed to send PROXY protocol headers
 	PortRangeMin int    `mapstructure:"port_range_min" json:"port_range_min"`
 	PortRangeMax int    `mapstructure:"port_range_max" json:"port_range_max"`
 }
@@ -100,6 +107,13 @@ type ModuleConfig struct {
 	Enabled      bool `mapstructure:"enabled" json:"enabled"`
 	PortRangeMin int  `mapstructure:"port_range_min" json:"port_range_min"`
 	PortRangeMax int  `mapstructure:"port_range_max" json:"port_range_max"`
+
+	// Playit.gg integration: the module watcher polls the playit API for
+	// running playit modules, captures each tunnel's assigned public address,
+	// and (optionally) auto-creates missing tunnels on the linked account.
+	PlayitAPIURL      string `mapstructure:"playit_api_url" json:"playit_api_url"`
+	PlayitPollSeconds int    `mapstructure:"playit_poll_seconds" json:"playit_poll_seconds"`
+	PlayitAutoCreate  bool   `mapstructure:"playit_auto_create" json:"playit_auto_create"`
 }
 
 type DatabaseConfig struct {
@@ -202,6 +216,7 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("database.auto_migrate", true)
 
 	// Docker defaults
+	v.SetDefault("docker.provider", "docker")
 	v.SetDefault("docker.sync_interval", 5)
 	v.SetDefault("docker.host", "unix:///var/run/docker.sock")
 	v.SetDefault("docker.version", "")
@@ -227,11 +242,16 @@ func setDefaults(v *viper.Viper) {
 	v.SetDefault("proxy.listen_ports", []int{25565})
 	v.SetDefault("proxy.port_range_min", 25565)
 	v.SetDefault("proxy.port_range_max", 25665)
+	v.SetDefault("proxy.ingress_proxy_protocol", false)
+	v.SetDefault("proxy.trusted_proxies", []string{})
 
 	// Module defaults
 	v.SetDefault("module.enabled", true)
 	v.SetDefault("module.port_range_min", 8100)
 	v.SetDefault("module.port_range_max", 8199)
+	v.SetDefault("module.playit_api_url", "https://api.playit.gg")
+	v.SetDefault("module.playit_poll_seconds", 15)
+	v.SetDefault("module.playit_auto_create", true)
 
 	v.SetDefault("minecraft.reset_global", false)
 
@@ -315,6 +335,15 @@ func validateConfig(cfg *Config) error {
 				cfg.Proxy.ListenPorts = append([]int{cfg.Proxy.ListenPort}, cfg.Proxy.ListenPorts...)
 			}
 		}
+	}
+
+	// Validate container runtime provider
+	provider := strings.ToLower(strings.TrimSpace(cfg.Docker.Provider))
+	if provider == "" {
+		provider = "docker"
+	}
+	if provider != "docker" && provider != "podman" {
+		return fmt.Errorf("docker.provider must be either 'docker' or 'podman', got: %s", cfg.Docker.Provider)
 	}
 
 	// Validate custom Docker labels do not use reserved namespace 'discopanel.'

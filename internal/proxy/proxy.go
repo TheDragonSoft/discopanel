@@ -2,6 +2,7 @@ package proxy
 
 import (
 	"io"
+	"net"
 	"sync"
 
 	"github.com/nickheyer/discopanel/pkg/logger"
@@ -31,6 +32,29 @@ type Route struct {
 type Config struct {
 	ListenAddr string // Address to listen on (e.g., ":25565" or ":8080")
 	Logger     *logger.Logger
+
+	// IngressProxyProtocol parses PROXY protocol v1/v2 headers on accepted
+	// connections so an external edge (VPS tunnel, Pangolin, HAProxy) can
+	// pass through the real client address.
+	IngressProxyProtocol bool
+	// TrustedProxies restricts which upstream CIDRs may send PROXY protocol
+	// headers (empty = accept headers from any upstream).
+	TrustedProxies []string
+}
+
+// wrapIngress applies PROXY protocol parsing to a freshly bound listener when
+// configured. On wrap failure the original listener is closed and returned
+// with the error so callers can treat it as a start failure.
+func wrapIngress(listener net.Listener, cfg *Config) (net.Listener, error) {
+	if cfg == nil || !cfg.IngressProxyProtocol {
+		return listener, nil
+	}
+	wrapped, err := WrapIngressListener(listener, cfg.TrustedProxies)
+	if err != nil {
+		listener.Close()
+		return nil, err
+	}
+	return wrapped, nil
 }
 
 var proxyBufPool = sync.Pool{

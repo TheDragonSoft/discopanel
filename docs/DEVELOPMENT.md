@@ -70,7 +70,6 @@ internal/rpc         ConnectRPC server, auth interceptor, RBAC, HTTP handlers
 internal/rpc/services  one file per service (server.go, task.go, backups.go, ...)
 internal/scheduler   cron/interval/event task scheduler + backup executor
 internal/module      module system (builtin templates in builtin_templates.go)
-internal/tunnel      Playit.gg tunnel integration
 internal/rbac        Casbin enforcer + procedure permission mapping
 pkg/files            safe filesystem helpers (zip extract, disk space, dir size)
 pkg/upload           chunked upload sessions (used by modpack import, server import)

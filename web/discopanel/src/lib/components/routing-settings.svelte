@@ -30,16 +30,8 @@
 		Network,
 		Info,
 		Edit,
-		Star,
-		Radio,
-		ExternalLink,
-		ShieldCheck,
-		Key,
-		Copy,
-		RotateCw,
-		Check
+		Star
 	} from '@lucide/svelte';
-	import * as Dialog from '$lib/components/ui/dialog';
 	import { copyToClipboard as copyText } from '$lib/utils/clipboard';
 
 	let loading = $state(true);
@@ -58,100 +50,16 @@
 	let portError = $state('');
 	let activeRoutes = $state<ProxyRoute[]>([]);
 
-	// Playit.gg Account Linking state
-	let playitLinked = $state(false);
-	let playitNotice = $state('');
-	let playitLoading = $state(false);
-	let linkSession = $state<{ sessionId: string; claimUrl: string; claimCode: string } | null>(null);
-	let linkingModalOpen = $state(false);
-	let manualSecretModalOpen = $state(false);
-	let manualSecret = $state('');
-	let linkChecking = $state(false);
-	let linkCheckInterval: ReturnType<typeof setInterval> | null = null;
-
 	onMount(() => {
 		loadAll();
-		return () => {
-			if (linkCheckInterval) clearInterval(linkCheckInterval);
-		};
 	});
 
 	async function loadAll() {
 		loading = true;
 		try {
-			await Promise.all([loadProxyConfig(), loadListeners(), loadActiveRoutes(), loadPlayitConfig()]);
+			await Promise.all([loadProxyConfig(), loadListeners(), loadActiveRoutes()]);
 		} finally {
 			loading = false;
-		}
-	}
-
-	async function loadPlayitConfig() {
-		try {
-			playitLoading = true;
-			const res = await rpcClient.tunnel.getPlayitAccountConfig({});
-			playitLinked = res.isLinked;
-			playitNotice = res.notice;
-		} catch {
-			// fallback
-		} finally {
-			playitLoading = false;
-		}
-	}
-
-	function startPlayitLinking() {
-		manualSecretModalOpen = true;
-	}
-
-	function startLinkStatusPolling(sessionId: string) {
-		if (linkCheckInterval) clearInterval(linkCheckInterval);
-		linkCheckInterval = setInterval(async () => {
-			if (!linkingModalOpen) {
-				if (linkCheckInterval) clearInterval(linkCheckInterval);
-				return;
-			}
-			linkChecking = true;
-			try {
-				const res = await rpcClient.tunnel.checkAccountLinkStatus({ sessionId });
-				if (res.isLinked) {
-					if (linkCheckInterval) clearInterval(linkCheckInterval);
-					linkingModalOpen = false;
-					toast.success('Playit.gg account successfully linked fleet-wide!');
-					await loadPlayitConfig();
-				}
-			} catch {
-				// keep polling until user closes
-			} finally {
-				linkChecking = false;
-			}
-		}, 3000);
-	}
-
-	async function unlinkPlayit() {
-		if (!confirm('Are you sure you want to unlink your Playit.gg account? Tunnels will revert to guest claim mode.')) return;
-		try {
-			await rpcClient.tunnel.unlinkPlayitAccount({});
-			toast.success('Playit.gg account unlinked');
-			await loadPlayitConfig();
-		} catch (e: unknown) {
-			const msg = e instanceof Error ? e.message : 'Failed to unlink account';
-			toast.error(msg);
-		}
-	}
-
-	async function saveManualSecret() {
-		if (!manualSecret.trim()) {
-			toast.error('Secret key cannot be empty');
-			return;
-		}
-		try {
-			await rpcClient.tunnel.setPlayitAccountSecret({ secretKey: manualSecret.trim() });
-			toast.success('Playit account secret saved');
-			manualSecretModalOpen = false;
-			manualSecret = '';
-			await loadPlayitConfig();
-		} catch (e: unknown) {
-			const msg = e instanceof Error ? e.message : 'Failed to save secret key';
-			toast.error(msg);
 		}
 	}
 
@@ -355,87 +263,6 @@
 </script>
 
 <div class="space-y-6">
-	<!-- Playit.gg Account Linking Card -->
-	<Card class="border-border/70 bg-gradient-to-br from-card via-card/95 to-background shadow-md">
-		<CardHeader>
-			<div class="flex items-center justify-between">
-				<div class="flex items-center gap-3">
-					<Radio class="h-5 w-5 text-emerald-500" />
-					<div>
-						<CardTitle>Playit.gg WAN Account Linking</CardTitle>
-						<CardDescription>
-							Auto-link all server exposure tunnels to your personal Playit.gg account
-						</CardDescription>
-					</div>
-				</div>
-				{#if playitLinked}
-					<Badge variant="default" class="gap-1.5 border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-						<ShieldCheck class="h-3.5 w-3.5" />
-						Account Linked (Fleet Active)
-					</Badge>
-				{:else}
-					<Badge variant="outline" class="gap-1 text-xs text-muted-foreground">
-						Not Linked (Guest Mode)
-					</Badge>
-				{/if}
-			</div>
-		</CardHeader>
-		<CardContent class="space-y-4">
-			{#if playitLinked}
-				<div class="rounded-lg border border-emerald-500/20 bg-emerald-500/5 p-4">
-					<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-						<div class="space-y-1">
-							<p class="text-sm font-semibold text-foreground">Playit.gg Fleet Auto-Link Active</p>
-							<p class="text-xs text-muted-foreground">
-								All tunnels created across your servers will automatically inherit your account credentials without manual guest claiming.
-							</p>
-						</div>
-						<div class="flex items-center gap-2">
-							<Button variant="outline" size="sm" class="gap-1.5 text-xs text-destructive hover:bg-destructive/10" onclick={unlinkPlayit}>
-								<Trash2 class="h-3.5 w-3.5" />
-								Unlink Account
-							</Button>
-						</div>
-					</div>
-				</div>
-			{:else}
-				<div class="rounded-lg border border-border/70 bg-muted/30 p-4">
-					<div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-						<div class="space-y-1">
-							<p class="text-sm font-semibold text-foreground">1-Click Auto-Link Playit.gg Account</p>
-							<p class="text-xs text-muted-foreground">
-								Click the button below to authorize DiscoPanel. We will automatically retrieve and store your secret key to link all future server tunnels.
-							</p>
-						</div>
-						<div class="flex items-center gap-2">
-							<Button
-								class="gap-1.5 bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
-								disabled={playitLoading}
-								onclick={startPlayitLinking}
-							>
-								{#if playitLoading}
-									<Loader2 class="h-4 w-4 animate-spin" />
-								{:else}
-									<ExternalLink class="h-4 w-4" />
-								{/if}
-								Link Account on Playit.gg
-							</Button>
-							<Button
-								variant="outline"
-								size="sm"
-								class="text-xs"
-								onclick={() => (manualSecretModalOpen = true)}
-							>
-								<Key class="mr-1 h-3.5 w-3.5" />
-								Manual Key
-							</Button>
-						</div>
-					</div>
-				</div>
-			{/if}
-		</CardContent>
-	</Card>
-
 	<!-- Global Proxy Configuration -->
 	<Card>
 		<CardHeader>
@@ -741,63 +568,3 @@
 		{/if}
 	{/if}
 </div>
-
-<!-- Playit Account Linking Modal -->
-<Dialog.Root bind:open={manualSecretModalOpen}>
-	<Dialog.Content class="max-w-md">
-		<Dialog.Header>
-			<Dialog.Title class="flex items-center gap-2">
-				<Radio class="h-5 w-5 text-emerald-500" />
-				Link Playit.gg Account
-			</Dialog.Title>
-			<Dialog.Description>
-				Follow the steps below to link DiscoPanel to your Playit.gg account.
-			</Dialog.Description>
-		</Dialog.Header>
-
-		<div class="space-y-4 py-2">
-			<div class="space-y-2">
-				<Label class="text-xs font-semibold uppercase text-muted-foreground">Step 1: Get Your Secret Key</Label>
-				<div class="rounded-lg border border-border/80 bg-muted/40 p-3">
-					<p class="mb-3 text-xs text-muted-foreground">
-						Open your Playit.gg dashboard, create or select an agent, and copy its <strong>Secret Key</strong>.
-					</p>
-					<Button
-						variant="outline"
-						class="w-full gap-1.5"
-						onclick={() => window.open('https://playit.gg/manage/agents', '_blank')}
-					>
-						<ExternalLink class="h-4 w-4" />
-						Open Playit.gg Agents Dashboard
-					</Button>
-				</div>
-			</div>
-
-			<div class="space-y-2">
-				<Label for="manual-secret" class="text-xs font-semibold uppercase text-muted-foreground">Step 2: Paste Secret Key</Label>
-				<Input
-					id="manual-secret"
-					type="password"
-					placeholder="Paste Playit Secret Key here..."
-					bind:value={manualSecret}
-				/>
-				<p class="text-xs text-muted-foreground">
-					This key is securely stored in DiscoPanel settings and used to auto-link all server tunnels.
-				</p>
-			</div>
-		</div>
-
-		<Dialog.Footer class="gap-2">
-			<Button variant="outline" onclick={() => (manualSecretModalOpen = false)}>
-				Cancel
-			</Button>
-			<Button
-				class="bg-emerald-600 text-white hover:bg-emerald-700 dark:bg-emerald-500 dark:text-black dark:hover:bg-emerald-400"
-				onclick={saveManualSecret}
-				disabled={!manualSecret}
-			>
-				Save & Link Account
-			</Button>
-		</Dialog.Footer>
-	</Dialog.Content>
-</Dialog.Root>

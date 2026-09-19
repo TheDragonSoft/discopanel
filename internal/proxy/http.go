@@ -24,14 +24,19 @@ type HTTPProxy struct {
 	listenAddr   string
 	running      bool
 	runningMutex sync.RWMutex
+
+	ingressProxyProtocol bool
+	trustedProxies       []string
 }
 
 // NewHTTPProxy creates a new HTTP reverse proxy instance
 func NewHTTPProxy(cfg *Config) *HTTPProxy {
 	p := &HTTPProxy{
-		routes:     make(map[string]*Route),
-		logger:     cfg.Logger,
-		listenAddr: cfg.ListenAddr,
+		routes:               make(map[string]*Route),
+		logger:               cfg.Logger,
+		listenAddr:           cfg.ListenAddr,
+		ingressProxyProtocol: cfg.IngressProxyProtocol,
+		trustedProxies:       cfg.TrustedProxies,
 	}
 
 	p.server = &http.Server{
@@ -213,6 +218,14 @@ func (p *HTTPProxy) Start() error {
 	listener, err := net.Listen("tcp", p.listenAddr)
 	if err != nil {
 		return fmt.Errorf("failed to listen on %s: %w", p.listenAddr, err)
+	}
+
+	listener, err = wrapIngress(listener, &Config{
+		IngressProxyProtocol: p.ingressProxyProtocol,
+		TrustedProxies:       p.trustedProxies,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to enable PROXY protocol on %s: %w", p.listenAddr, err)
 	}
 
 	p.running = true

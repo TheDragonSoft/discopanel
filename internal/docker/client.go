@@ -178,6 +178,9 @@ func GetRequiredJavaVersion(mcVersion string, modLoader models.ModLoader) string
 }
 
 type ClientConfig struct {
+	// Container runtime provider: "docker" (default) or "podman". Podman is
+	// reached through its Docker-compatible API socket.
+	Provider    string
 	APIVersion  string
 	NetworkName string
 	RegistryURL string
@@ -196,8 +199,14 @@ type ContainerLogStreamer interface {
 type Client struct {
 	docker      *client.Client
 	config      ClientConfig
+	provider    string
 	logStreamer ContainerLogStreamer
 	log         *logger.Logger
+}
+
+// Provider returns the container runtime in use ("docker" or "podman")
+func (c *Client) Provider() string {
+	return c.provider
 }
 
 // Auto manage streams at the client level when set
@@ -205,36 +214,75 @@ func (c *Client) SetLogStreamer(ls ContainerLogStreamer) {
 	c.logStreamer = ls
 }
 
+// Resolves the API endpoint for the given provider. Podman exposes the same
+// API as Docker on its own socket (rootless: $XDG_RUNTIME_DIR/podman/podman.sock,
+// rootful: /run/podman/podman.sock); an explicit host always wins.
+func resolveHost(provider, host string) string {
+	if host != "" && host != "unix:///var/run/docker.sock" {
+		return host
+	}
+	if provider == "podman" {
+		socketDir := os.Getenv("XDG_RUNTIME_DIR")
+		if socketDir == "" {
+			socketDir = "/run"
+		}
+		return "unix://" + socketDir + "/podman/podman.sock"
+	}
+	return host
+}
+
 func NewClient(host string, log *logger.Logger, config ...ClientConfig) (*Client, error) {
+	cfg := ClientConfig{}
+	if len(config) > 0 {
+		cfg = config[0]
+	}
+
+	provider := strings.ToLower(strings.TrimSpace(cfg.Provider))
+	if provider == "" {
+		provider = "docker"
+	}
+	if provider != "docker" && provider != "podman" {
+		return nil, fmt.Errorf("unknown container provider '%s', must be 'docker' or 'podman'", provider)
+	}
+
 	opts := []client.Opt{
 		client.FromEnv,
 		client.WithAPIVersionNegotiation(),
 	}
 
 	// Apply API version if provided
-	if len(config) > 0 && config[0].APIVersion != "" {
-		opts = append(opts, client.WithVersion(config[0].APIVersion))
+	if cfg.APIVersion != "" {
+		opts = append(opts, client.WithVersion(cfg.APIVersion))
 	}
 
-	if host != "" && host != "unix:///var/run/docker.sock" {
-		opts = append(opts, client.WithHost(host))
+	resolvedHost := resolveHost(provider, host)
+	if resolvedHost != "" && resolvedHost != "unix:///var/run/docker.sock" {
+		opts = append(opts, client.WithHost(resolvedHost))
 	}
 
 	docker, err := client.NewClientWithOpts(opts...)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create docker client: %w", err)
+		return nil, fmt.Errorf("failed to create %s client: %w", provider, err)
 	}
 
-	c := &Client{docker: docker, log: log}
-	if len(config) > 0 {
-		c.config = config[0]
-	} else {
-		// Set defaults
-		c.config = ClientConfig{
-			NetworkName: "discopanel-network",
+	// Podman's socket is not running by default (podman system service), so
+	// fail fast with an actionable error instead of a confusing failure later
+	if provider == "podman" {
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if _, err := docker.ServerVersion(ctx); err != nil {
+			docker.Close()
+			return nil, fmt.Errorf("cannot reach Podman at %s (is the podman socket running? start it with 'podman system service' or 'podman machine start'): %w", resolvedHost, err)
 		}
 	}
 
+	c := &Client{docker: docker, log: log, provider: provider}
+	if cfg.NetworkName == "" {
+		cfg.NetworkName = "discopanel-network"
+	}
+	c.config = cfg
+
+	log.Info("Container runtime: %s (host: %s)", provider, resolvedHost)
 	return c, nil
 }
 

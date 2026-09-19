@@ -26,8 +26,13 @@ database:
   max_idle_conns: 5
   conn_max_lifetime: 300
 
-# Docker configuration
+# Container runtime configuration
 docker:
+  # Container runtime provider: "docker" (default) or "podman".
+  # Podman is reached through its Docker-compatible API socket, so all
+  # container features work the same. Use "host" below to point at a
+  # non-default socket (e.g. a rootful Podman socket or a remote machine).
+  provider: "docker"
   host: "unix:///var/run/docker.sock"
   version: ""
   network_name: "discopanel-network"
@@ -93,6 +98,12 @@ module:
   enabled: true
   port_range_min: 8100
   port_range_max: 8199
+  # Playit.gg integration: a background watcher polls the playit API for running
+  # playit modules, captures each tunnel's assigned public address (shown on the
+  # server dashboard), and auto-creates missing tunnels on the linked account.
+  playit_api_url: "https://api.playit.gg"
+  playit_poll_seconds: 15
+  playit_auto_create: true
 
 # Proxy configuration - ENABLE THIS FOR MINECRAFT ROUTING
 proxy:
@@ -102,6 +113,16 @@ proxy:
   listen_ports: [25565] # Multiple ports to listen on (listen_port will be added if not present)
   port_range_min: 25565
   port_range_max: 25665
+  # Parse PROXY protocol v1/v2 on proxy listeners so an external edge in front
+  # of DiscoPanel (VPS tunnel, Pangolin, HAProxy, nginx stream...) can pass
+  # through the real client IP. Enable only when such an edge is present;
+  # direct clients without a PROXY header will be rejected.
+  ingress_proxy_protocol: false
+  # Optional CIDR whitelist restricting which upstreams may send PROXY
+  # headers. Leave empty to accept headers from any upstream.
+  # trusted_proxies:
+  #   - "10.0.0.0/8"
+  #   - "172.16.0.0/12"
 
 # Example usage:
 # With proxy enabled and base_url set to "mc.example.com":
