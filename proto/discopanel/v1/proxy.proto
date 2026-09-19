@@ -57,12 +57,14 @@ message GetProxyStatusResponse {
   int32 listen_port = 5; // Primary port
   bool running = 6;
   int32 active_routes = 7;
+  optional string fallback_server_id = 8; // Lobby for offline hostname routes (empty = disabled)
 }
 
 // Proxy settings to update
 message UpdateProxyConfigRequest {
   bool enabled = 1;
   string base_url = 2;
+  optional string fallback_server_id = 3; // Lobby for offline hostname routes (empty = disabled)
 }
 
 // Updated proxy state
@@ -74,6 +76,7 @@ message UpdateProxyConfigResponse {
   int32 listen_port = 5;
   bool running = 6;
   int32 active_routes = 7;
+  optional string fallback_server_id = 8;
 }
 
 // Empty listeners request

@@ -219,16 +219,17 @@ func (*GetProxyStatusRequest) Descriptor() ([]byte, []int) {
 
 // Proxy system state
 type GetProxyStatusResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	BaseUrl       string                 `protobuf:"bytes,2,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
-	ListenPorts   []int32                `protobuf:"varint,3,rep,packed,name=listen_ports,json=listenPorts,proto3" json:"listen_ports,omitempty"`
-	Listeners     []*ProxyListener       `protobuf:"bytes,4,rep,name=listeners,proto3" json:"listeners,omitempty"`
-	ListenPort    int32                  `protobuf:"varint,5,opt,name=listen_port,json=listenPort,proto3" json:"listen_port,omitempty"` // Primary port
-	Running       bool                   `protobuf:"varint,6,opt,name=running,proto3" json:"running,omitempty"`
-	ActiveRoutes  int32                  `protobuf:"varint,7,opt,name=active_routes,json=activeRoutes,proto3" json:"active_routes,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Enabled          bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	BaseUrl          string                 `protobuf:"bytes,2,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
+	ListenPorts      []int32                `protobuf:"varint,3,rep,packed,name=listen_ports,json=listenPorts,proto3" json:"listen_ports,omitempty"`
+	Listeners        []*ProxyListener       `protobuf:"bytes,4,rep,name=listeners,proto3" json:"listeners,omitempty"`
+	ListenPort       int32                  `protobuf:"varint,5,opt,name=listen_port,json=listenPort,proto3" json:"listen_port,omitempty"` // Primary port
+	Running          bool                   `protobuf:"varint,6,opt,name=running,proto3" json:"running,omitempty"`
+	ActiveRoutes     int32                  `protobuf:"varint,7,opt,name=active_routes,json=activeRoutes,proto3" json:"active_routes,omitempty"`
+	FallbackServerId *string                `protobuf:"bytes,8,opt,name=fallback_server_id,json=fallbackServerId,proto3,oneof" json:"fallback_server_id,omitempty"` // Lobby for offline hostname routes (empty = disabled)
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *GetProxyStatusResponse) Reset() {
@@ -310,13 +311,21 @@ func (x *GetProxyStatusResponse) GetActiveRoutes() int32 {
 	return 0
 }
 
+func (x *GetProxyStatusResponse) GetFallbackServerId() string {
+	if x != nil && x.FallbackServerId != nil {
+		return *x.FallbackServerId
+	}
+	return ""
+}
+
 // Proxy settings to update
 type UpdateProxyConfigRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	BaseUrl       string                 `protobuf:"bytes,2,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Enabled          bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	BaseUrl          string                 `protobuf:"bytes,2,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
+	FallbackServerId *string                `protobuf:"bytes,3,opt,name=fallback_server_id,json=fallbackServerId,proto3,oneof" json:"fallback_server_id,omitempty"` // Lobby for offline hostname routes (empty = disabled)
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *UpdateProxyConfigRequest) Reset() {
@@ -363,18 +372,26 @@ func (x *UpdateProxyConfigRequest) GetBaseUrl() string {
 	return ""
 }
 
+func (x *UpdateProxyConfigRequest) GetFallbackServerId() string {
+	if x != nil && x.FallbackServerId != nil {
+		return *x.FallbackServerId
+	}
+	return ""
+}
+
 // Updated proxy state
 type UpdateProxyConfigResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Enabled       bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	BaseUrl       string                 `protobuf:"bytes,2,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
-	ListenPorts   []int32                `protobuf:"varint,3,rep,packed,name=listen_ports,json=listenPorts,proto3" json:"listen_ports,omitempty"`
-	Listeners     []*ProxyListener       `protobuf:"bytes,4,rep,name=listeners,proto3" json:"listeners,omitempty"`
-	ListenPort    int32                  `protobuf:"varint,5,opt,name=listen_port,json=listenPort,proto3" json:"listen_port,omitempty"`
-	Running       bool                   `protobuf:"varint,6,opt,name=running,proto3" json:"running,omitempty"`
-	ActiveRoutes  int32                  `protobuf:"varint,7,opt,name=active_routes,json=activeRoutes,proto3" json:"active_routes,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Enabled          bool                   `protobuf:"varint,1,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	BaseUrl          string                 `protobuf:"bytes,2,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
+	ListenPorts      []int32                `protobuf:"varint,3,rep,packed,name=listen_ports,json=listenPorts,proto3" json:"listen_ports,omitempty"`
+	Listeners        []*ProxyListener       `protobuf:"bytes,4,rep,name=listeners,proto3" json:"listeners,omitempty"`
+	ListenPort       int32                  `protobuf:"varint,5,opt,name=listen_port,json=listenPort,proto3" json:"listen_port,omitempty"`
+	Running          bool                   `protobuf:"varint,6,opt,name=running,proto3" json:"running,omitempty"`
+	ActiveRoutes     int32                  `protobuf:"varint,7,opt,name=active_routes,json=activeRoutes,proto3" json:"active_routes,omitempty"`
+	FallbackServerId *string                `protobuf:"bytes,8,opt,name=fallback_server_id,json=fallbackServerId,proto3,oneof" json:"fallback_server_id,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *UpdateProxyConfigResponse) Reset() {
@@ -454,6 +471,13 @@ func (x *UpdateProxyConfigResponse) GetActiveRoutes() int32 {
 		return x.ActiveRoutes
 	}
 	return 0
+}
+
+func (x *UpdateProxyConfigResponse) GetFallbackServerId() string {
+	if x != nil && x.FallbackServerId != nil {
+		return *x.FallbackServerId
+	}
+	return ""
 }
 
 // Empty listeners request
@@ -1261,7 +1285,7 @@ const file_discopanel_v1_proxy_proto_rawDesc = "" +
 	"\x15GetProxyRoutesRequest\"K\n" +
 	"\x16GetProxyRoutesResponse\x121\n" +
 	"\x06routes\x18\x01 \x03(\v2\x19.discopanel.v1.ProxyRouteR\x06routes\"\x17\n" +
-	"\x15GetProxyStatusRequest\"\x8c\x02\n" +
+	"\x15GetProxyStatusRequest\"\xd6\x02\n" +
 	"\x16GetProxyStatusResponse\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x19\n" +
 	"\bbase_url\x18\x02 \x01(\tR\abaseUrl\x12!\n" +
@@ -1270,10 +1294,14 @@ const file_discopanel_v1_proxy_proto_rawDesc = "" +
 	"\vlisten_port\x18\x05 \x01(\x05R\n" +
 	"listenPort\x12\x18\n" +
 	"\arunning\x18\x06 \x01(\bR\arunning\x12#\n" +
-	"\ractive_routes\x18\a \x01(\x05R\factiveRoutes\"O\n" +
+	"\ractive_routes\x18\a \x01(\x05R\factiveRoutes\x121\n" +
+	"\x12fallback_server_id\x18\b \x01(\tH\x00R\x10fallbackServerId\x88\x01\x01B\x15\n" +
+	"\x13_fallback_server_id\"\x99\x01\n" +
 	"\x18UpdateProxyConfigRequest\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x19\n" +
-	"\bbase_url\x18\x02 \x01(\tR\abaseUrl\"\x8f\x02\n" +
+	"\bbase_url\x18\x02 \x01(\tR\abaseUrl\x121\n" +
+	"\x12fallback_server_id\x18\x03 \x01(\tH\x00R\x10fallbackServerId\x88\x01\x01B\x15\n" +
+	"\x13_fallback_server_id\"\xd9\x02\n" +
 	"\x19UpdateProxyConfigResponse\x12\x18\n" +
 	"\aenabled\x18\x01 \x01(\bR\aenabled\x12\x19\n" +
 	"\bbase_url\x18\x02 \x01(\tR\abaseUrl\x12!\n" +
@@ -1282,7 +1310,9 @@ const file_discopanel_v1_proxy_proto_rawDesc = "" +
 	"\vlisten_port\x18\x05 \x01(\x05R\n" +
 	"listenPort\x12\x18\n" +
 	"\arunning\x18\x06 \x01(\bR\arunning\x12#\n" +
-	"\ractive_routes\x18\a \x01(\x05R\factiveRoutes\"\x1a\n" +
+	"\ractive_routes\x18\a \x01(\x05R\factiveRoutes\x121\n" +
+	"\x12fallback_server_id\x18\b \x01(\tH\x00R\x10fallbackServerId\x88\x01\x01B\x15\n" +
+	"\x13_fallback_server_id\"\x1a\n" +
 	"\x18GetProxyListenersRequest\"u\n" +
 	"\x16ProxyListenerWithCount\x128\n" +
 	"\blistener\x18\x01 \x01(\v2\x1c.discopanel.v1.ProxyListenerR\blistener\x12!\n" +
@@ -1423,6 +1453,9 @@ func file_discopanel_v1_proxy_proto_init() {
 		return
 	}
 	file_discopanel_v1_common_proto_init()
+	file_discopanel_v1_proxy_proto_msgTypes[4].OneofWrappers = []any{}
+	file_discopanel_v1_proxy_proto_msgTypes[5].OneofWrappers = []any{}
+	file_discopanel_v1_proxy_proto_msgTypes[6].OneofWrappers = []any{}
 	file_discopanel_v1_proxy_proto_msgTypes[18].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

@@ -246,3 +246,35 @@ func WriteHandshakePacket(w io.Writer, packet *HandshakePacket) error {
 	_, err := w.Write(data)
 	return err
 }
+
+// WriteLoginDisconnectPacket writes a login-state disconnect packet (0x00)
+// carrying reason as a JSON chat component, using the varint helpers above.
+// It is a best-effort courtesy sent to clients the proxy rejects in the login
+// stage before a backend is involved (e.g. connection limit reached); the
+// connection is expected to be closed right after. Connections still in the
+// status stage cannot be disconnected this way and are simply closed.
+func WriteLoginDisconnectPacket(w io.Writer, reason string) error {
+	var payload bytes.Buffer
+
+	// Packet ID 0x00 (Disconnect) in the login state
+	if err := WriteVarInt(&payload, 0x00); err != nil {
+		return err
+	}
+
+	// Reason as a JSON text component string
+	reasonJSON := fmt.Sprintf(`{"text":%q}`, reason)
+	if err := WriteVarInt(&payload, VarInt(len(reasonJSON))); err != nil {
+		return err
+	}
+	if _, err := payload.WriteString(reasonJSON); err != nil {
+		return err
+	}
+
+	// Frame with the packet length
+	data := payload.Bytes()
+	if err := WriteVarInt(w, VarInt(len(data))); err != nil {
+		return err
+	}
+	_, err := w.Write(data)
+	return err
+}

@@ -92,6 +92,7 @@ message Server {
   optional bool auto_restart = 44; // Restart automatically when the server process exits unexpectedly
   optional int32 auto_restart_max_retries = 45; // Max consecutive auto-restarts before giving up (0 = unlimited)
   optional int32 auto_restart_backoff_secs = 46; // Base backoff between auto-restarts, doubled each retry up to 10x
+  optional int32 connection_limit = 47; // Max simultaneous player connections through the proxy (0 = unlimited)
 
   // Additional configuration
   repeated AdditionalPort additional_ports = 27;
@@ -172,6 +173,7 @@ message ProxyConfig {
   string base_url = 3;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
+  optional string fallback_server_id = 6; // Lobby: hostname routes pointing at an offline server are forwarded here
 }
 
 // Permission entry for RBAC

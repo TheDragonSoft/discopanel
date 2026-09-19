@@ -68,6 +68,7 @@
 			autoRestart: server.autoRestart ?? false,
 			autoRestartMaxRetries: server.autoRestartMaxRetries ?? 0,
 			autoRestartBackoffSecs: server.autoRestartBackoffSecs ?? 30,
+			connectionLimit: server.connectionLimit ?? 0,
 			tpsCommand: server.tpsCommand || '',
 			modpackId: '', // Not used in this context
 			modpackVersionId: '', // Not used in this context
@@ -91,6 +92,7 @@
 			formData.autoRestart !== (server.autoRestart ?? false) ||
 			formData.autoRestartMaxRetries !== (server.autoRestartMaxRetries ?? 0) ||
 			formData.autoRestartBackoffSecs !== (server.autoRestartBackoffSecs ?? 30) ||
+			formData.connectionLimit !== (server.connectionLimit ?? 0) ||
 			formData.tpsCommand !== (server.tpsCommand || '') ||
 			safeToString(formData.additionalPorts) !== safeToString(server.additionalPorts || []) ||
 			safeToString($state.snapshot(formData.dockerOverrides)) !==
@@ -126,6 +128,7 @@
 				autoRestart: server.autoRestart ?? false,
 				autoRestartMaxRetries: server.autoRestartMaxRetries ?? 0,
 				autoRestartBackoffSecs: server.autoRestartBackoffSecs ?? 30,
+				connectionLimit: server.connectionLimit ?? 0,
 				tpsCommand: server.tpsCommand || '',
 				modpackId: '', // Not used in this context
 				modpackVersionId: '', // Not used in this context
@@ -207,6 +210,19 @@
 			formData.autoRestartBackoffSecs = 1;
 		} else {
 			formData.autoRestartBackoffSecs = value;
+		}
+	}
+
+	function handleConnectionLimitInput(e: Event) {
+		const input = e.currentTarget as HTMLInputElement;
+		const value = Math.floor(Number(input.value));
+
+		// Negative values are not allowed; 0 means unlimited
+		if (Number.isNaN(value) || value < 0) {
+			input.value = '0';
+			formData.connectionLimit = 0;
+		} else {
+			formData.connectionLimit = value;
 		}
 	}
 
@@ -472,6 +488,24 @@
 						formData.wakeOnConnect = checked;
 					}}
 				/>
+			</div>
+
+			<div class="rounded-lg bg-muted/50 p-4">
+				<div class="space-y-2">
+					<Label for="connection_limit" class="text-sm font-medium">Connection Limit</Label>
+					<Input
+						id="connection_limit"
+						type="number"
+						min="0"
+						step="1"
+						bind:value={formData.connectionLimit}
+						oninput={handleConnectionLimitInput}
+						class="h-10 w-40"
+					/>
+					<p class="text-xs text-muted-foreground">
+						Maximum simultaneous connections allowed through the proxy (0 = unlimited)
+					</p>
+				</div>
 			</div>
 
 			<div class="rounded-lg bg-muted/50 p-4">

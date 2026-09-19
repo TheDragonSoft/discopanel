@@ -386,8 +386,7 @@ func (s *MetricService) TestAlertRule(ctx context.Context, req *connect.Request[
 }
 
 // ListAlertEvents lists recent alert firing/resolution events
-func (s *MetricService) ListAlertEvents(ctx context.Context, req *connect.Request[v1.ListAlertEventsRequest]) (*connect.Response[v1.ListAlertEventsResponse], error) {
-	limit := int(req.Msg.Limit)
+func (s *MetricService) ListAlertEvents(ctx context.Context, req *connect.Request[v1.ListAlertEventsRequest]) (*connect.Response[v1.ListAlertEventsResponse], error) {	limit := int(req.Msg.Limit)
 	if limit <= 0 {
 		limit = 50 // Default limit
 	}
@@ -405,5 +404,34 @@ func (s *MetricService) ListAlertEvents(ctx context.Context, req *connect.Reques
 
 	return connect.NewResponse(&v1.ListAlertEventsResponse{
 		Events: protoEvents,
+	}), nil
+}
+
+// GetTrafficSummary aggregates proxy traffic per server from recorded sessions
+func (s *MetricService) GetTrafficSummary(ctx context.Context, req *connect.Request[v1.GetTrafficSummaryRequest]) (*connect.Response[v1.GetTrafficSummaryResponse], error) {
+	msg := req.Msg
+
+	if msg.ServerId == "" {
+		return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("server_id is required"))
+	}
+	rangeSecs := int(msg.RangeSecs)
+	if rangeSecs <= 0 {
+		rangeSecs = 86400 // default 24h
+	}
+	since := time.Now().UTC().Add(-time.Duration(rangeSecs) * time.Second)
+
+	totals, err := s.store.GetTrafficSummary(ctx, msg.ServerId, since)
+	if err != nil {
+		s.log.Error("Failed to get traffic summary: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to get traffic summary"))
+	}
+
+	return connect.NewResponse(&v1.GetTrafficSummaryResponse{
+		Summary: &v1.TrafficSummary{
+			ServerId: msg.ServerId,
+			BytesIn:  totals.BytesIn,
+			BytesOut: totals.BytesOut,
+			Sessions: int32(totals.Sessions),
+		},
 	}), nil
 }

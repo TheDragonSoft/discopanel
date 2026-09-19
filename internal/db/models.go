@@ -95,6 +95,7 @@ type Server struct {
 	AutoRestart            bool          `json:"auto_restart" gorm:"default:false;column:auto_restart"`                     // Restart automatically when the container exits unexpectedly (default: false)
 	AutoRestartMaxRetries  int           `json:"auto_restart_max_retries" gorm:"column:auto_restart_max_retries"`           // Max consecutive auto-restarts before giving up (0 = unlimited)
 	AutoRestartBackoffSecs int           `json:"auto_restart_backoff_secs" gorm:"default:30;column:auto_restart_backoff_secs"` // Base backoff between auto-restarts, doubled per consecutive crash (capped at 10x)
+	ConnectionLimit        int           `json:"connection_limit" gorm:"default:0;column:connection_limit"`                 // Max simultaneous proxied connections for this server (0 = unlimited)
 	TPSCommand      string               `json:"tps_command" gorm:"column:tps_command"`                                     // The TPS command for this server (empty if not supported)
 	AdditionalPorts []*v1.AdditionalPort `json:"additional_ports" gorm:"column:additional_ports;serializer:json"`           // Additional port configurations
 	DockerOverrides *v1.DockerOverrides  `json:"docker_overrides" gorm:"column:docker_overrides;type:text;serializer:json"` // Docker container overrides
@@ -399,6 +400,9 @@ type ProxyConfig struct {
 	ID        string    `json:"id" gorm:"primaryKey"`
 	Enabled   bool      `json:"enabled" gorm:"not null;default:false"`
 	BaseURL   string    `json:"base_url" gorm:"column:base_url"`
+	// FallbackServerID is the lobby server connections are forwarded to when
+	// a hostname route points at an offline server (empty = disabled).
+	FallbackServerID string    `json:"fallback_server_id" gorm:"column:fallback_server_id"`
 	UpdatedAt time.Time `json:"updated_at" gorm:"autoUpdateTime"`
 }
 

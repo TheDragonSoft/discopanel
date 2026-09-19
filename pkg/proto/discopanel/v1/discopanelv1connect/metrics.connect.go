@@ -57,6 +57,9 @@ const (
 	// MetricServiceListAlertEventsProcedure is the fully-qualified name of the MetricService's
 	// ListAlertEvents RPC.
 	MetricServiceListAlertEventsProcedure = "/discopanel.v1.MetricService/ListAlertEvents"
+	// MetricServiceGetTrafficSummaryProcedure is the fully-qualified name of the MetricService's
+	// GetTrafficSummary RPC.
+	MetricServiceGetTrafficSummaryProcedure = "/discopanel.v1.MetricService/GetTrafficSummary"
 )
 
 // MetricServiceClient is a client for the discopanel.v1.MetricService service.
@@ -77,6 +80,8 @@ type MetricServiceClient interface {
 	TestAlertRule(context.Context, *connect.Request[v1.TestAlertRuleRequest]) (*connect.Response[v1.TestAlertRuleResponse], error)
 	// List recent alert firing/resolution events
 	ListAlertEvents(context.Context, *connect.Request[v1.ListAlertEventsRequest]) (*connect.Response[v1.ListAlertEventsResponse], error)
+	// Aggregated proxy traffic per server from recorded player sessions
+	GetTrafficSummary(context.Context, *connect.Request[v1.GetTrafficSummaryRequest]) (*connect.Response[v1.GetTrafficSummaryResponse], error)
 }
 
 // NewMetricServiceClient constructs a client for the discopanel.v1.MetricService service. By
@@ -138,6 +143,12 @@ func NewMetricServiceClient(httpClient connect.HTTPClient, baseURL string, opts 
 			connect.WithSchema(metricServiceMethods.ByName("ListAlertEvents")),
 			connect.WithClientOptions(opts...),
 		),
+		getTrafficSummary: connect.NewClient[v1.GetTrafficSummaryRequest, v1.GetTrafficSummaryResponse](
+			httpClient,
+			baseURL+MetricServiceGetTrafficSummaryProcedure,
+			connect.WithSchema(metricServiceMethods.ByName("GetTrafficSummary")),
+			connect.WithClientOptions(opts...),
+		),
 	}
 }
 
@@ -151,6 +162,7 @@ type metricServiceClient struct {
 	deleteAlertRule   *connect.Client[v1.DeleteAlertRuleRequest, v1.DeleteAlertRuleResponse]
 	testAlertRule     *connect.Client[v1.TestAlertRuleRequest, v1.TestAlertRuleResponse]
 	listAlertEvents   *connect.Client[v1.ListAlertEventsRequest, v1.ListAlertEventsResponse]
+	getTrafficSummary *connect.Client[v1.GetTrafficSummaryRequest, v1.GetTrafficSummaryResponse]
 }
 
 // ListMetricHistory calls discopanel.v1.MetricService.ListMetricHistory.
@@ -193,6 +205,11 @@ func (c *metricServiceClient) ListAlertEvents(ctx context.Context, req *connect.
 	return c.listAlertEvents.CallUnary(ctx, req)
 }
 
+// GetTrafficSummary calls discopanel.v1.MetricService.GetTrafficSummary.
+func (c *metricServiceClient) GetTrafficSummary(ctx context.Context, req *connect.Request[v1.GetTrafficSummaryRequest]) (*connect.Response[v1.GetTrafficSummaryResponse], error) {
+	return c.getTrafficSummary.CallUnary(ctx, req)
+}
+
 // MetricServiceHandler is an implementation of the discopanel.v1.MetricService service.
 type MetricServiceHandler interface {
 	// List recorded metric samples for a server
@@ -211,6 +228,8 @@ type MetricServiceHandler interface {
 	TestAlertRule(context.Context, *connect.Request[v1.TestAlertRuleRequest]) (*connect.Response[v1.TestAlertRuleResponse], error)
 	// List recent alert firing/resolution events
 	ListAlertEvents(context.Context, *connect.Request[v1.ListAlertEventsRequest]) (*connect.Response[v1.ListAlertEventsResponse], error)
+	// Aggregated proxy traffic per server from recorded player sessions
+	GetTrafficSummary(context.Context, *connect.Request[v1.GetTrafficSummaryRequest]) (*connect.Response[v1.GetTrafficSummaryResponse], error)
 }
 
 // NewMetricServiceHandler builds an HTTP handler from the service implementation. It returns the
@@ -268,6 +287,12 @@ func NewMetricServiceHandler(svc MetricServiceHandler, opts ...connect.HandlerOp
 		connect.WithSchema(metricServiceMethods.ByName("ListAlertEvents")),
 		connect.WithHandlerOptions(opts...),
 	)
+	metricServiceGetTrafficSummaryHandler := connect.NewUnaryHandler(
+		MetricServiceGetTrafficSummaryProcedure,
+		svc.GetTrafficSummary,
+		connect.WithSchema(metricServiceMethods.ByName("GetTrafficSummary")),
+		connect.WithHandlerOptions(opts...),
+	)
 	return "/discopanel.v1.MetricService/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case MetricServiceListMetricHistoryProcedure:
@@ -286,6 +311,8 @@ func NewMetricServiceHandler(svc MetricServiceHandler, opts ...connect.HandlerOp
 			metricServiceTestAlertRuleHandler.ServeHTTP(w, r)
 		case MetricServiceListAlertEventsProcedure:
 			metricServiceListAlertEventsHandler.ServeHTTP(w, r)
+		case MetricServiceGetTrafficSummaryProcedure:
+			metricServiceGetTrafficSummaryHandler.ServeHTTP(w, r)
 		default:
 			http.NotFound(w, r)
 		}
@@ -325,4 +352,8 @@ func (UnimplementedMetricServiceHandler) TestAlertRule(context.Context, *connect
 
 func (UnimplementedMetricServiceHandler) ListAlertEvents(context.Context, *connect.Request[v1.ListAlertEventsRequest]) (*connect.Response[v1.ListAlertEventsResponse], error) {
 	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("discopanel.v1.MetricService.ListAlertEvents is not implemented"))
+}
+
+func (UnimplementedMetricServiceHandler) GetTrafficSummary(context.Context, *connect.Request[v1.GetTrafficSummaryRequest]) (*connect.Response[v1.GetTrafficSummaryResponse], error) {
+	return nil, connect.NewError(connect.CodeUnimplemented, errors.New("discopanel.v1.MetricService.GetTrafficSummary is not implemented"))
 }

@@ -332,6 +332,7 @@ type Server struct {
 	AutoRestart            *bool   `protobuf:"varint,44,opt,name=auto_restart,json=autoRestart,proto3,oneof" json:"auto_restart,omitempty"`                                      // Restart automatically when the server process exits unexpectedly
 	AutoRestartMaxRetries  *int32  `protobuf:"varint,45,opt,name=auto_restart_max_retries,json=autoRestartMaxRetries,proto3,oneof" json:"auto_restart_max_retries,omitempty"`    // Max consecutive auto-restarts before giving up (0 = unlimited)
 	AutoRestartBackoffSecs *int32  `protobuf:"varint,46,opt,name=auto_restart_backoff_secs,json=autoRestartBackoffSecs,proto3,oneof" json:"auto_restart_backoff_secs,omitempty"` // Base backoff between auto-restarts, doubled each retry up to 10x
+	ConnectionLimit        *int32  `protobuf:"varint,47,opt,name=connection_limit,json=connectionLimit,proto3,oneof" json:"connection_limit,omitempty"`                          // Max simultaneous player connections through the proxy (0 = unlimited)
 	// Additional configuration
 	AdditionalPorts []*AdditionalPort      `protobuf:"bytes,27,rep,name=additional_ports,json=additionalPorts,proto3" json:"additional_ports,omitempty"`
 	DockerOverrides *DockerOverrides       `protobuf:"bytes,28,opt,name=docker_overrides,json=dockerOverrides,proto3" json:"docker_overrides,omitempty"`
@@ -614,6 +615,13 @@ func (x *Server) GetAutoRestartMaxRetries() int32 {
 func (x *Server) GetAutoRestartBackoffSecs() int32 {
 	if x != nil && x.AutoRestartBackoffSecs != nil {
 		return *x.AutoRestartBackoffSecs
+	}
+	return 0
+}
+
+func (x *Server) GetConnectionLimit() int32 {
+	if x != nil && x.ConnectionLimit != nil {
+		return *x.ConnectionLimit
 	}
 	return 0
 }
@@ -1156,14 +1164,15 @@ func (x *ProxyListener) GetUpdatedAt() *timestamppb.Timestamp {
 
 // Global proxy settings
 type ProxyConfig struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Enabled       bool                   `protobuf:"varint,2,opt,name=enabled,proto3" json:"enabled,omitempty"`
-	BaseUrl       string                 `protobuf:"bytes,3,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Enabled          bool                   `protobuf:"varint,2,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	BaseUrl          string                 `protobuf:"bytes,3,opt,name=base_url,json=baseUrl,proto3" json:"base_url,omitempty"`
+	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt        *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	FallbackServerId *string                `protobuf:"bytes,6,opt,name=fallback_server_id,json=fallbackServerId,proto3,oneof" json:"fallback_server_id,omitempty"` // Lobby: hostname routes pointing at an offline server are forwarded here
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *ProxyConfig) Reset() {
@@ -1229,6 +1238,13 @@ func (x *ProxyConfig) GetUpdatedAt() *timestamppb.Timestamp {
 		return x.UpdatedAt
 	}
 	return nil
+}
+
+func (x *ProxyConfig) GetFallbackServerId() string {
+	if x != nil && x.FallbackServerId != nil {
+		return *x.FallbackServerId
+	}
+	return ""
 }
 
 // Permission entry for RBAC
@@ -1412,7 +1428,7 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\n" +
 	"last_login\x18\t \x01(\v2\x1a.google.protobuf.TimestampH\x01R\tlastLogin\x88\x01\x01B\b\n" +
 	"\x06_emailB\r\n" +
-	"\v_last_login\"\xe6\x0e\n" +
+	"\v_last_login\"\xab\x0f\n" +
 	"\x06Server\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -1459,7 +1475,8 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"publicPort\x12&\n" +
 	"\fauto_restart\x18, \x01(\bH\x02R\vautoRestart\x88\x01\x01\x12<\n" +
 	"\x18auto_restart_max_retries\x18- \x01(\x05H\x03R\x15autoRestartMaxRetries\x88\x01\x01\x12>\n" +
-	"\x19auto_restart_backoff_secs\x18. \x01(\x05H\x04R\x16autoRestartBackoffSecs\x88\x01\x01\x12H\n" +
+	"\x19auto_restart_backoff_secs\x18. \x01(\x05H\x04R\x16autoRestartBackoffSecs\x88\x01\x01\x12.\n" +
+	"\x10connection_limit\x18/ \x01(\x05H\x05R\x0fconnectionLimit\x88\x01\x01\x12H\n" +
 	"\x10additional_ports\x18\x1b \x03(\v2\x1d.discopanel.v1.AdditionalPortR\x0fadditionalPorts\x12I\n" +
 	"\x10docker_overrides\x18\x1c \x01(\v2\x1e.discopanel.v1.DockerOverridesR\x0fdockerOverrides\x129\n" +
 	"\n" +
@@ -1478,7 +1495,8 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\x10_wake_on_connectB\x0f\n" +
 	"\r_auto_restartB\x1b\n" +
 	"\x19_auto_restart_max_retriesB\x1c\n" +
-	"\x1a_auto_restart_backoff_secs\"\x84\x01\n" +
+	"\x1a_auto_restart_backoff_secsB\x13\n" +
+	"\x11_connection_limit\"\x84\x01\n" +
 	"\x0eAdditionalPort\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12%\n" +
 	"\x0econtainer_port\x18\x02 \x01(\x05R\rcontainerPort\x12\x1b\n" +
@@ -1537,7 +1555,7 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xc8\x01\n" +
+	"updated_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\x92\x02\n" +
 	"\vProxyConfig\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x18\n" +
 	"\aenabled\x18\x02 \x01(\bR\aenabled\x12\x19\n" +
@@ -1545,7 +1563,9 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"]\n" +
+	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x121\n" +
+	"\x12fallback_server_id\x18\x06 \x01(\tH\x00R\x10fallbackServerId\x88\x01\x01B\x15\n" +
+	"\x13_fallback_server_id\"]\n" +
 	"\n" +
 	"Permission\x12\x1a\n" +
 	"\bresource\x18\x01 \x01(\tR\bresource\x12\x16\n" +
@@ -1659,6 +1679,7 @@ func file_discopanel_v1_common_proto_init() {
 	}
 	file_discopanel_v1_common_proto_msgTypes[0].OneofWrappers = []any{}
 	file_discopanel_v1_common_proto_msgTypes[1].OneofWrappers = []any{}
+	file_discopanel_v1_common_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{

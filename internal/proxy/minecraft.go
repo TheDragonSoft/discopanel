@@ -31,6 +31,22 @@ type MinecraftProxy struct {
 	// until it is ready, then return its server ID and fresh backend address.
 	wakeResolver func(hostname string) (serverID string, backendHost string, backendPort int, ok bool)
 
+	// fallbackResolver is consulted when the route target is unknown/offline
+	// and wake-on-connect does not apply (disabled or failed), and when the
+	// backend dial of a routed target fails. It returns the fallback (lobby)
+	// server to forward the connection to instead. Only wired for server
+	// listeners; module port proxies never fall back.
+	fallbackResolver func(hostname string, originalServerID string) (serverID string, backendHost string, backendPort int, ok bool)
+
+	// limiter counts active connections per server on this listener and
+	// enforces per-server connection limits. Nil for module port proxies,
+	// which are exempt from server connection limits.
+	limiter *connLimiter
+
+	// limitResolver returns the configured connection limit for a server
+	// (0 = unlimited).
+	limitResolver func(serverID string) int
+
 	// playerTracker, when non-nil, records player sessions. It is only wired
 	// for server listeners (module port proxies leave it nil).
 	playerTracker *tracker.Tracker
@@ -208,29 +224,50 @@ func (p *MinecraftProxy) handleConnection(clientConn net.Conn) {
 	route, exists := p.routes[hostname]
 	p.routesMutex.RUnlock()
 
-	var backendHost string
-	var backendPort int
-	var serverID string
+	var (
+		backendHost string
+		backendPort int
+		serverID    string
+	)
+	routed := false
 	if exists && route.Active {
 		serverID = route.ServerID
 		backendHost = route.BackendHost
 		backendPort = route.BackendPort
-	} else if p.wakeResolver != nil {
+		routed = true
+	}
+
+	if !routed && p.wakeResolver != nil {
 		// No active route: give wake-on-connect a chance to start the server
-		// and wait until it comes up.
-		id, host, port, ok := p.wakeResolver(hostname)
-		if !ok {
-			p.logger.Debug("No active route found for hostname: %s", hostname)
-			p.routesMutex.RLock()
-			p.logger.Debug("Available routes:")
-			for r := range p.routes {
-				p.logger.Debug("%s", r)
-			}
-			p.routesMutex.RUnlock()
-			return
+		// and wait until it comes up. If waking succeeds the connection
+		// continues to the target server; fallback routing (below) only
+		// applies when waking is disabled for the hostname or failed.
+		if id, host, port, ok := p.wakeResolver(hostname); ok {
+			serverID, backendHost, backendPort = id, host, port
+			routed = true
 		}
-		serverID, backendHost, backendPort = id, host, port
-	} else {
+	}
+
+	if !routed && p.fallbackResolver != nil {
+		// The target is unknown or offline and waking either does not apply or
+		// failed: forward to the configured fallback (lobby) server, if any.
+		// This works for Minecraft even though the client's handshake still
+		// names the original hostname X: vanilla servers (and most server
+		// implementations) do not reject connections for unknown hostnames and
+		// simply serve their default world. The address field is rewritten to
+		// "localhost" below anyway, and FML/Forge data in the address is
+		// preserved.
+		originalID := ""
+		if exists {
+			originalID = route.ServerID
+		}
+		if id, host, port, ok := p.fallbackResolver(hostname, originalID); ok {
+			serverID, backendHost, backendPort = id, host, port
+			routed = true
+		}
+	}
+
+	if !routed {
 		p.logger.Debug("No active route found for hostname: %s", hostname)
 		p.routesMutex.RLock()
 		p.logger.Debug("Available routes:")
@@ -244,11 +281,46 @@ func (p *MinecraftProxy) handleConnection(clientConn net.Conn) {
 	// Connect to backend
 	backendAddr := net.JoinHostPort(backendHost, fmt.Sprintf("%d", backendPort))
 	backendConn, err := net.DialTimeout("tcp", backendAddr, 5*time.Second)
+	if err != nil && p.fallbackResolver != nil {
+		// The route may point at a container that just went away (routes are
+		// only reconciled periodically). If a fallback is configured and we
+		// were not already routed to it, forward there instead.
+		if id, host, port, ok := p.fallbackResolver(hostname, serverID); ok {
+			serverID, backendHost, backendPort = id, host, port
+			backendAddr = net.JoinHostPort(backendHost, fmt.Sprintf("%d", backendPort))
+			backendConn, err = net.DialTimeout("tcp", backendAddr, 5*time.Second)
+		}
+	}
 	if err != nil {
 		p.logger.Error("Failed to connect to backend %s: %v", backendAddr, err)
 		return
 	}
 	defer backendConn.Close()
+
+	// Per-server connection limit enforcement. The limit counts raw TCP
+	// connections routed to a backend (including status pings), not tracked
+	// player sessions; fallback-routed connections count against the fallback
+	// server since that is the actual target. Limits only apply on server
+	// listeners (p.limiter non-nil), not module port proxies.
+	if p.limiter != nil && serverID != "" {
+		limit := 0
+		if p.limitResolver != nil {
+			limit = p.limitResolver(serverID)
+		}
+		if !p.limiter.acquire(serverID, limit) {
+			p.logger.Error("connection limit reached for %s (%d)", serverID, p.limiter.count(serverID))
+			if handshake.NextState == 2 {
+				// Login stage: send a proper disconnect so the client shows a
+				// readable message instead of a bare connection close.
+				clientConn.SetWriteDeadline(time.Now().Add(5 * time.Second))
+				if werr := WriteLoginDisconnectPacket(clientConn, "Connection limit reached for this server. Try again later."); werr != nil {
+					p.logger.Debug("Failed to send limit disconnect to %s: %v", clientConn.RemoteAddr(), werr)
+				}
+			}
+			return
+		}
+		defer p.limiter.release(serverID)
+	}
 
 	// Modify handshake packet to use backend's expected hostname
 	// For Forge servers, we need to preserve any FML data in the address field

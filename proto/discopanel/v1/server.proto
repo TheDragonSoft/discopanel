@@ -156,6 +156,7 @@ message UpdateServerRequest {
   optional bool auto_restart = 18;
   optional int32 auto_restart_max_retries = 19;
   optional int32 auto_restart_backoff_secs = 20;
+  optional int32 connection_limit = 21;
 }
 
 // Updated server instance

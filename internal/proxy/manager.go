@@ -35,6 +35,11 @@ type Manager struct {
 	// wakeHandler starts a stopped server (set by the application wiring).
 	wakeHandler func(serverID string) error
 
+	// limiter counts active proxied connections per server on server
+	// listeners and enforces per-server connection limits. Shared across all
+	// listener proxies; module port proxies do not participate.
+	limiter *connLimiter
+
 	// playerTracker and eventBus are wired into server-listener Minecraft
 	// proxies for player session tracking (optional; set via SetPlayerTracker).
 	playerTracker *tracker.Tracker
@@ -49,6 +54,7 @@ func NewManager(store *db.Store, cfg *config.Config, logger *logger.Logger) *Man
 		config:      &cfg.Proxy,
 		logger:      logger,
 		networkName: cfg.Docker.NetworkName,
+		limiter:     newConnLimiter(),
 	}
 }
 
@@ -87,6 +93,9 @@ func (m *Manager) Start() error {
 			TrustedProxies:       m.config.TrustedProxies,
 		})
 		proxy.wakeResolver = m.wakeResolve
+		proxy.fallbackResolver = m.fallbackResolve
+		proxy.limiter = m.limiter
+		proxy.limitResolver = m.serverConnectionLimit
 		proxy.playerTracker = m.playerTracker
 		proxy.eventBus = m.eventBus
 
@@ -361,6 +370,9 @@ func (m *Manager) AddListener(listener *db.ProxyListener) error {
 		TrustedProxies:       m.config.TrustedProxies,
 	})
 	proxy.wakeResolver = m.wakeResolve
+	proxy.fallbackResolver = m.fallbackResolve
+	proxy.limiter = m.limiter
+	proxy.limitResolver = m.serverConnectionLimit
 	proxy.playerTracker = m.playerTracker
 	proxy.eventBus = m.eventBus
 

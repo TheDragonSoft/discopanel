@@ -867,6 +867,7 @@ type UpdateServerRequest struct {
 	AutoRestart            *bool                  `protobuf:"varint,18,opt,name=auto_restart,json=autoRestart,proto3,oneof" json:"auto_restart,omitempty"`
 	AutoRestartMaxRetries  *int32                 `protobuf:"varint,19,opt,name=auto_restart_max_retries,json=autoRestartMaxRetries,proto3,oneof" json:"auto_restart_max_retries,omitempty"`
 	AutoRestartBackoffSecs *int32                 `protobuf:"varint,20,opt,name=auto_restart_backoff_secs,json=autoRestartBackoffSecs,proto3,oneof" json:"auto_restart_backoff_secs,omitempty"`
+	ConnectionLimit        *int32                 `protobuf:"varint,21,opt,name=connection_limit,json=connectionLimit,proto3,oneof" json:"connection_limit,omitempty"`
 	unknownFields          protoimpl.UnknownFields
 	sizeCache              protoimpl.SizeCache
 }
@@ -1037,6 +1038,13 @@ func (x *UpdateServerRequest) GetAutoRestartMaxRetries() int32 {
 func (x *UpdateServerRequest) GetAutoRestartBackoffSecs() int32 {
 	if x != nil && x.AutoRestartBackoffSecs != nil {
 		return *x.AutoRestartBackoffSecs
+	}
+	return 0
+}
+
+func (x *UpdateServerRequest) GetConnectionLimit() int32 {
+	if x != nil && x.ConnectionLimit != nil {
+		return *x.ConnectionLimit
 	}
 	return 0
 }
@@ -1952,7 +1960,7 @@ const file_discopanel_v1_server_proto_rawDesc = "" +
 	"\x10additional_ports\x18\x11 \x03(\v2\x1d.discopanel.v1.AdditionalPortR\x0fadditionalPorts\x12I\n" +
 	"\x10docker_overrides\x18\x12 \x01(\v2\x1e.discopanel.v1.DockerOverridesR\x0fdockerOverrides\"E\n" +
 	"\x14CreateServerResponse\x12-\n" +
-	"\x06server\x18\x01 \x01(\v2\x15.discopanel.v1.ServerR\x06server\"\xc3\a\n" +
+	"\x06server\x18\x01 \x01(\v2\x15.discopanel.v1.ServerR\x06server\"\x88\b\n" +
 	"\x13UpdateServerRequest\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -1980,7 +1988,8 @@ const file_discopanel_v1_server_proto_rawDesc = "" +
 	"\x0fwake_on_connect\x18\x11 \x01(\bH\x04R\rwakeOnConnect\x88\x01\x01\x12&\n" +
 	"\fauto_restart\x18\x12 \x01(\bH\x05R\vautoRestart\x88\x01\x01\x12<\n" +
 	"\x18auto_restart_max_retries\x18\x13 \x01(\x05H\x06R\x15autoRestartMaxRetries\x88\x01\x01\x12>\n" +
-	"\x19auto_restart_backoff_secs\x18\x14 \x01(\x05H\aR\x16autoRestartBackoffSecs\x88\x01\x01B\a\n" +
+	"\x19auto_restart_backoff_secs\x18\x14 \x01(\x05H\aR\x16autoRestartBackoffSecs\x88\x01\x01\x12.\n" +
+	"\x10connection_limit\x18\x15 \x01(\x05H\bR\x0fconnectionLimit\x88\x01\x01B\a\n" +
 	"\x05_portB\r\n" +
 	"\v_auto_startB\v\n" +
 	"\t_detachedB\x0e\n" +
@@ -1988,7 +1997,8 @@ const file_discopanel_v1_server_proto_rawDesc = "" +
 	"\x10_wake_on_connectB\x0f\n" +
 	"\r_auto_restartB\x1b\n" +
 	"\x19_auto_restart_max_retriesB\x1c\n" +
-	"\x1a_auto_restart_backoff_secs\"E\n" +
+	"\x1a_auto_restart_backoff_secsB\x13\n" +
+	"\x11_connection_limit\"E\n" +
 	"\x14UpdateServerResponse\x12-\n" +
 	"\x06server\x18\x01 \x01(\v2\x15.discopanel.v1.ServerR\x06server\"\xee\x01\n" +
 	"\x13ImportServerRequest\x12\x12\n" +

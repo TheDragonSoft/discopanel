@@ -24,6 +24,8 @@ service MetricService {
   rpc TestAlertRule(TestAlertRuleRequest) returns (TestAlertRuleResponse);
   // List recent alert firing/resolution events
   rpc ListAlertEvents(ListAlertEventsRequest) returns (ListAlertEventsResponse);
+  // Aggregated proxy traffic per server from recorded player sessions
+  rpc GetTrafficSummary(GetTrafficSummaryRequest) returns (GetTrafficSummaryResponse);
 }
 
 // Metric an alert rule can watch
@@ -192,4 +194,24 @@ message ListAlertEventsRequest {
 // List of alert events
 message ListAlertEventsResponse {
   repeated AlertEvent events = 1;
+}
+
+// Aggregated traffic for one server
+message TrafficSummary {
+  string server_id = 1;
+  int64 bytes_in = 2;   // Player -> server bytes in the period
+  int64 bytes_out = 3;  // Server -> player bytes in the period
+  int32 sessions = 4;   // Sessions in the period
+  int64 peak_concurrent = 5; // Best-effort peak simultaneous players (0 when unknown)
+}
+
+// Get traffic summary request
+message GetTrafficSummaryRequest {
+  string server_id = 1;
+  int32 range_secs = 2; // Look-back window (0 = 24h)
+}
+
+// Get traffic summary response
+message GetTrafficSummaryResponse {
+  TrafficSummary summary = 1;
 }

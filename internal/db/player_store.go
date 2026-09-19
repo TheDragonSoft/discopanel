@@ -261,3 +261,21 @@ func (s *Store) CloseStalePlayerSessions(ctx context.Context, closedAt time.Time
 	}
 	return closed, nil
 }
+
+// TrafficTotals holds aggregated proxy traffic for one server and window.
+type TrafficTotals struct {
+	BytesIn  int64
+	BytesOut int64
+	Sessions int64
+}
+
+// GetTrafficSummary aggregates recorded player-session traffic for a server
+// since the given time.
+func (s *Store) GetTrafficSummary(ctx context.Context, serverID string, since time.Time) (*TrafficTotals, error) {
+	var totals TrafficTotals
+	err := s.db.WithContext(ctx).Model(&PlayerSession{}).
+		Select("COALESCE(SUM(bytes_in), 0) AS bytes_in, COALESCE(SUM(bytes_out), 0) AS bytes_out, COUNT(*) AS sessions").
+		Where("server_id = ? AND joined_at >= ?", serverID, since).
+		Scan(&totals).Error
+	return &totals, err
+}

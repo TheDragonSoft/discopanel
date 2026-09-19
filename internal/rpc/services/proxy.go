@@ -118,13 +118,14 @@ func (s *ProxyService) GetProxyStatus(ctx context.Context, req *connect.Request[
 	}
 
 	return connect.NewResponse(&v1.GetProxyStatusResponse{
-		Enabled:      proxyConfig.Enabled,
-		BaseUrl:      proxyConfig.BaseURL,
-		ListenPorts:  listenPorts,
-		Listeners:    protoListeners,
-		ListenPort:   primaryPort,
-		Running:      running,
-		ActiveRoutes: activeRoutes,
+		Enabled:          proxyConfig.Enabled,
+		BaseUrl:          proxyConfig.BaseURL,
+		ListenPorts:      listenPorts,
+		Listeners:        protoListeners,
+		ListenPort:       primaryPort,
+		Running:          running,
+		ActiveRoutes:     activeRoutes,
+		FallbackServerId: &proxyConfig.FallbackServerID,
 	}), nil
 }
 
@@ -132,11 +133,27 @@ func (s *ProxyService) GetProxyStatus(ctx context.Context, req *connect.Request[
 func (s *ProxyService) UpdateProxyConfig(ctx context.Context, req *connect.Request[v1.UpdateProxyConfigRequest]) (*connect.Response[v1.UpdateProxyConfigResponse], error) {
 	msg := req.Msg
 
+	// The fallback (lobby) server setting: accept it from the request when
+	// provided, otherwise preserve the stored value. A stale reference to a
+	// deleted server is cleared instead of silently kept.
+	fallbackServerID := ""
+	if msg.FallbackServerId != nil {
+		fallbackServerID = *msg.FallbackServerId
+	} else if existing, _, err := s.store.GetProxyConfig(ctx); err == nil && existing != nil {
+		fallbackServerID = existing.FallbackServerID
+	}
+	if fallbackServerID != "" {
+		if _, err := s.store.GetServer(ctx, fallbackServerID); err != nil {
+			return nil, connect.NewError(connect.CodeInvalidArgument, fmt.Errorf("fallback server %s does not exist", fallbackServerID))
+		}
+	}
+
 	// Save to database
 	proxyConfig := &storage.ProxyConfig{
-		ID:      "default",
-		Enabled: msg.Enabled,
-		BaseURL: msg.BaseUrl,
+		ID:               "default",
+		Enabled:          msg.Enabled,
+		BaseURL:          msg.BaseUrl,
+		FallbackServerID: fallbackServerID,
 	}
 
 	if err := s.store.SaveProxyConfig(ctx, proxyConfig); err != nil {
@@ -171,13 +188,14 @@ func (s *ProxyService) UpdateProxyConfig(ctx context.Context, req *connect.Reque
 	}
 
 	return connect.NewResponse(&v1.UpdateProxyConfigResponse{
-		Enabled:      statusResp.Msg.Enabled,
-		BaseUrl:      statusResp.Msg.BaseUrl,
-		ListenPorts:  statusResp.Msg.ListenPorts,
-		Listeners:    statusResp.Msg.Listeners,
-		ListenPort:   statusResp.Msg.ListenPort,
-		Running:      statusResp.Msg.Running,
-		ActiveRoutes: statusResp.Msg.ActiveRoutes,
+		Enabled:          statusResp.Msg.Enabled,
+		BaseUrl:          statusResp.Msg.BaseUrl,
+		ListenPorts:      statusResp.Msg.ListenPorts,
+		Listeners:        statusResp.Msg.Listeners,
+		ListenPort:       statusResp.Msg.ListenPort,
+		Running:          statusResp.Msg.Running,
+		ActiveRoutes:     statusResp.Msg.ActiveRoutes,
+		FallbackServerId: &fallbackServerID,
 	}), nil
 }
 

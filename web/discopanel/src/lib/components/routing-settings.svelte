@@ -13,6 +13,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Label } from '$lib/components/ui/label';
 	import { Button } from '$lib/components/ui/button';
+	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
 	import { Switch } from '$lib/components/ui/switch';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Alert, AlertDescription } from '$lib/components/ui/alert';
@@ -33,6 +34,7 @@
 		Star
 	} from '@lucide/svelte';
 	import { copyToClipboard as copyText } from '$lib/utils/clipboard';
+	import { serversStore } from '$lib/stores/servers';
 
 	let loading = $state(true);
 	let saving = $state(false);
@@ -49,9 +51,13 @@
 	});
 	let portError = $state('');
 	let activeRoutes = $state<ProxyRoute[]>([]);
+	// Lobby server for offline hostname routes ('' = disabled)
+	let fallbackServerId = $state('');
 
 	onMount(() => {
 		loadAll();
+		// Populate the fallback server select (silent refresh of the server list)
+		serversStore.fetchServers(true).catch((e) => console.error('Failed to fetch servers:', e));
 	});
 
 	async function loadAll() {
@@ -132,11 +138,14 @@
 	async function saveProxyConfig() {
 		saving = true;
 		try {
-			await rpcClient.proxy.updateProxyConfig({
+			const response = await rpcClient.proxy.updateProxyConfig({
 				enabled: proxyEnabled,
-				baseUrl: baseURL
+				baseUrl: baseURL,
+				fallbackServerId
 			});
 
+			// Keep the select in sync with the saved value
+			fallbackServerId = response.fallbackServerId ?? '';
 			toast.success('Proxy configuration saved');
 			await loadAll();
 		} catch (_e) {
@@ -294,6 +303,32 @@
 				<p class="text-xs text-muted-foreground">
 					Optional base domain that will be appended to server hostnames (e.g., "survival" becomes
 					"survival.minecraft.example.com")
+				</p>
+			</div>
+
+			<div class="space-y-2">
+				<Label for="fallback-server">Fallback Server (Lobby)</Label>
+				<Select
+					type="single"
+					value={fallbackServerId}
+					onValueChange={(value: string) => (fallbackServerId = value ?? '')}
+					disabled={saving || !proxyEnabled}
+				>
+					<SelectTrigger id="fallback-server" class="w-full sm:w-72">
+						<span>
+							{$serversStore.find((s) => s.id === fallbackServerId)?.name || 'Disabled'}
+						</span>
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="">Disabled</SelectItem>
+						{#each $serversStore as server (server.id)}
+							<SelectItem value={server.id}>{server.name}</SelectItem>
+						{/each}
+					</SelectContent>
+				</Select>
+				<p class="text-xs text-muted-foreground">
+					When a hostname route points at an offline server, players are forwarded to this server
+					instead.
 				</p>
 			</div>
 

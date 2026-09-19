@@ -1436,6 +1436,181 @@ func (x *ListAlertEventsResponse) GetEvents() []*AlertEvent {
 	return nil
 }
 
+// Aggregated traffic for one server
+type TrafficSummary struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	ServerId       string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	BytesIn        int64                  `protobuf:"varint,2,opt,name=bytes_in,json=bytesIn,proto3" json:"bytes_in,omitempty"`                      // Player -> server bytes in the period
+	BytesOut       int64                  `protobuf:"varint,3,opt,name=bytes_out,json=bytesOut,proto3" json:"bytes_out,omitempty"`                   // Server -> player bytes in the period
+	Sessions       int32                  `protobuf:"varint,4,opt,name=sessions,proto3" json:"sessions,omitempty"`                                   // Sessions in the period
+	PeakConcurrent int64                  `protobuf:"varint,5,opt,name=peak_concurrent,json=peakConcurrent,proto3" json:"peak_concurrent,omitempty"` // Best-effort peak simultaneous players (0 when unknown)
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *TrafficSummary) Reset() {
+	*x = TrafficSummary{}
+	mi := &file_discopanel_v1_metrics_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TrafficSummary) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TrafficSummary) ProtoMessage() {}
+
+func (x *TrafficSummary) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_metrics_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TrafficSummary.ProtoReflect.Descriptor instead.
+func (*TrafficSummary) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_metrics_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *TrafficSummary) GetServerId() string {
+	if x != nil {
+		return x.ServerId
+	}
+	return ""
+}
+
+func (x *TrafficSummary) GetBytesIn() int64 {
+	if x != nil {
+		return x.BytesIn
+	}
+	return 0
+}
+
+func (x *TrafficSummary) GetBytesOut() int64 {
+	if x != nil {
+		return x.BytesOut
+	}
+	return 0
+}
+
+func (x *TrafficSummary) GetSessions() int32 {
+	if x != nil {
+		return x.Sessions
+	}
+	return 0
+}
+
+func (x *TrafficSummary) GetPeakConcurrent() int64 {
+	if x != nil {
+		return x.PeakConcurrent
+	}
+	return 0
+}
+
+// Get traffic summary request
+type GetTrafficSummaryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ServerId      string                 `protobuf:"bytes,1,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
+	RangeSecs     int32                  `protobuf:"varint,2,opt,name=range_secs,json=rangeSecs,proto3" json:"range_secs,omitempty"` // Look-back window (0 = 24h)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTrafficSummaryRequest) Reset() {
+	*x = GetTrafficSummaryRequest{}
+	mi := &file_discopanel_v1_metrics_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTrafficSummaryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTrafficSummaryRequest) ProtoMessage() {}
+
+func (x *GetTrafficSummaryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_metrics_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTrafficSummaryRequest.ProtoReflect.Descriptor instead.
+func (*GetTrafficSummaryRequest) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_metrics_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetTrafficSummaryRequest) GetServerId() string {
+	if x != nil {
+		return x.ServerId
+	}
+	return ""
+}
+
+func (x *GetTrafficSummaryRequest) GetRangeSecs() int32 {
+	if x != nil {
+		return x.RangeSecs
+	}
+	return 0
+}
+
+// Get traffic summary response
+type GetTrafficSummaryResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Summary       *TrafficSummary        `protobuf:"bytes,1,opt,name=summary,proto3" json:"summary,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetTrafficSummaryResponse) Reset() {
+	*x = GetTrafficSummaryResponse{}
+	mi := &file_discopanel_v1_metrics_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetTrafficSummaryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetTrafficSummaryResponse) ProtoMessage() {}
+
+func (x *GetTrafficSummaryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_discopanel_v1_metrics_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetTrafficSummaryResponse.ProtoReflect.Descriptor instead.
+func (*GetTrafficSummaryResponse) Descriptor() ([]byte, []int) {
+	return file_discopanel_v1_metrics_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *GetTrafficSummaryResponse) GetSummary() *TrafficSummary {
+	if x != nil {
+		return x.Summary
+	}
+	return nil
+}
+
 var File_discopanel_v1_metrics_proto protoreflect.FileDescriptor
 
 const file_discopanel_v1_metrics_proto_rawDesc = "" +
@@ -1560,7 +1735,19 @@ const file_discopanel_v1_metrics_proto_rawDesc = "" +
 	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\"L\n" +
 	"\x17ListAlertEventsResponse\x121\n" +
-	"\x06events\x18\x01 \x03(\v2\x19.discopanel.v1.AlertEventR\x06events*\xc0\x01\n" +
+	"\x06events\x18\x01 \x03(\v2\x19.discopanel.v1.AlertEventR\x06events\"\xaa\x01\n" +
+	"\x0eTrafficSummary\x12\x1b\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x19\n" +
+	"\bbytes_in\x18\x02 \x01(\x03R\abytesIn\x12\x1b\n" +
+	"\tbytes_out\x18\x03 \x01(\x03R\bbytesOut\x12\x1a\n" +
+	"\bsessions\x18\x04 \x01(\x05R\bsessions\x12'\n" +
+	"\x0fpeak_concurrent\x18\x05 \x01(\x03R\x0epeakConcurrent\"V\n" +
+	"\x18GetTrafficSummaryRequest\x12\x1b\n" +
+	"\tserver_id\x18\x01 \x01(\tR\bserverId\x12\x1d\n" +
+	"\n" +
+	"range_secs\x18\x02 \x01(\x05R\trangeSecs\"T\n" +
+	"\x19GetTrafficSummaryResponse\x127\n" +
+	"\asummary\x18\x01 \x01(\v2\x1d.discopanel.v1.TrafficSummaryR\asummary*\xc0\x01\n" +
 	"\vAlertMetric\x12\x1c\n" +
 	"\x18ALERT_METRIC_UNSPECIFIED\x10\x00\x12\x1c\n" +
 	"\x18ALERT_METRIC_CPU_PERCENT\x10\x01\x12\x1f\n" +
@@ -1576,7 +1763,7 @@ const file_discopanel_v1_metrics_proto_rawDesc = "" +
 	"AlertState\x12\x1b\n" +
 	"\x17ALERT_STATE_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12ALERT_STATE_FIRING\x10\x01\x12\x18\n" +
-	"\x14ALERT_STATE_RESOLVED\x10\x022\x93\x06\n" +
+	"\x14ALERT_STATE_RESOLVED\x10\x022\xfb\x06\n" +
 	"\rMetricService\x12f\n" +
 	"\x11ListMetricHistory\x12'.discopanel.v1.ListMetricHistoryRequest\x1a(.discopanel.v1.ListMetricHistoryResponse\x12]\n" +
 	"\x0eListAlertRules\x12$.discopanel.v1.ListAlertRulesRequest\x1a%.discopanel.v1.ListAlertRulesResponse\x12W\n" +
@@ -1585,7 +1772,8 @@ const file_discopanel_v1_metrics_proto_rawDesc = "" +
 	"\x0fUpdateAlertRule\x12%.discopanel.v1.UpdateAlertRuleRequest\x1a&.discopanel.v1.UpdateAlertRuleResponse\x12`\n" +
 	"\x0fDeleteAlertRule\x12%.discopanel.v1.DeleteAlertRuleRequest\x1a&.discopanel.v1.DeleteAlertRuleResponse\x12Z\n" +
 	"\rTestAlertRule\x12#.discopanel.v1.TestAlertRuleRequest\x1a$.discopanel.v1.TestAlertRuleResponse\x12`\n" +
-	"\x0fListAlertEvents\x12%.discopanel.v1.ListAlertEventsRequest\x1a&.discopanel.v1.ListAlertEventsResponseBFZDgithub.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1b\x06proto3"
+	"\x0fListAlertEvents\x12%.discopanel.v1.ListAlertEventsRequest\x1a&.discopanel.v1.ListAlertEventsResponse\x12f\n" +
+	"\x11GetTrafficSummary\x12'.discopanel.v1.GetTrafficSummaryRequest\x1a(.discopanel.v1.GetTrafficSummaryResponseBFZDgithub.com/nickheyer/discopanel/pkg/proto/discopanel/v1;discopanelv1b\x06proto3"
 
 var (
 	file_discopanel_v1_metrics_proto_rawDescOnce sync.Once
@@ -1600,7 +1788,7 @@ func file_discopanel_v1_metrics_proto_rawDescGZIP() []byte {
 }
 
 var file_discopanel_v1_metrics_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_discopanel_v1_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_discopanel_v1_metrics_proto_msgTypes = make([]protoimpl.MessageInfo, 22)
 var file_discopanel_v1_metrics_proto_goTypes = []any{
 	(AlertMetric)(0),                  // 0: discopanel.v1.AlertMetric
 	(AlertComparator)(0),              // 1: discopanel.v1.AlertComparator
@@ -1624,16 +1812,19 @@ var file_discopanel_v1_metrics_proto_goTypes = []any{
 	(*TestAlertRuleResponse)(nil),     // 19: discopanel.v1.TestAlertRuleResponse
 	(*ListAlertEventsRequest)(nil),    // 20: discopanel.v1.ListAlertEventsRequest
 	(*ListAlertEventsResponse)(nil),   // 21: discopanel.v1.ListAlertEventsResponse
-	(*timestamppb.Timestamp)(nil),     // 22: google.protobuf.Timestamp
+	(*TrafficSummary)(nil),            // 22: discopanel.v1.TrafficSummary
+	(*GetTrafficSummaryRequest)(nil),  // 23: discopanel.v1.GetTrafficSummaryRequest
+	(*GetTrafficSummaryResponse)(nil), // 24: discopanel.v1.GetTrafficSummaryResponse
+	(*timestamppb.Timestamp)(nil),     // 25: google.protobuf.Timestamp
 }
 var file_discopanel_v1_metrics_proto_depIdxs = []int32{
 	0,  // 0: discopanel.v1.AlertRule.metric:type_name -> discopanel.v1.AlertMetric
 	1,  // 1: discopanel.v1.AlertRule.comparator:type_name -> discopanel.v1.AlertComparator
-	22, // 2: discopanel.v1.AlertRule.created_at:type_name -> google.protobuf.Timestamp
-	22, // 3: discopanel.v1.AlertRule.updated_at:type_name -> google.protobuf.Timestamp
+	25, // 2: discopanel.v1.AlertRule.created_at:type_name -> google.protobuf.Timestamp
+	25, // 3: discopanel.v1.AlertRule.updated_at:type_name -> google.protobuf.Timestamp
 	2,  // 4: discopanel.v1.AlertEvent.state:type_name -> discopanel.v1.AlertState
-	22, // 5: discopanel.v1.AlertEvent.created_at:type_name -> google.protobuf.Timestamp
-	22, // 6: discopanel.v1.MetricSample.timestamp:type_name -> google.protobuf.Timestamp
+	25, // 5: discopanel.v1.AlertEvent.created_at:type_name -> google.protobuf.Timestamp
+	25, // 6: discopanel.v1.MetricSample.timestamp:type_name -> google.protobuf.Timestamp
 	5,  // 7: discopanel.v1.ListMetricHistoryResponse.samples:type_name -> discopanel.v1.MetricSample
 	3,  // 8: discopanel.v1.ListAlertRulesResponse.rules:type_name -> discopanel.v1.AlertRule
 	3,  // 9: discopanel.v1.GetAlertRuleResponse.rule:type_name -> discopanel.v1.AlertRule
@@ -1646,27 +1837,30 @@ var file_discopanel_v1_metrics_proto_depIdxs = []int32{
 	0,  // 16: discopanel.v1.TestAlertRuleRequest.metric:type_name -> discopanel.v1.AlertMetric
 	1,  // 17: discopanel.v1.TestAlertRuleRequest.comparator:type_name -> discopanel.v1.AlertComparator
 	4,  // 18: discopanel.v1.ListAlertEventsResponse.events:type_name -> discopanel.v1.AlertEvent
-	6,  // 19: discopanel.v1.MetricService.ListMetricHistory:input_type -> discopanel.v1.ListMetricHistoryRequest
-	8,  // 20: discopanel.v1.MetricService.ListAlertRules:input_type -> discopanel.v1.ListAlertRulesRequest
-	10, // 21: discopanel.v1.MetricService.GetAlertRule:input_type -> discopanel.v1.GetAlertRuleRequest
-	12, // 22: discopanel.v1.MetricService.CreateAlertRule:input_type -> discopanel.v1.CreateAlertRuleRequest
-	14, // 23: discopanel.v1.MetricService.UpdateAlertRule:input_type -> discopanel.v1.UpdateAlertRuleRequest
-	16, // 24: discopanel.v1.MetricService.DeleteAlertRule:input_type -> discopanel.v1.DeleteAlertRuleRequest
-	18, // 25: discopanel.v1.MetricService.TestAlertRule:input_type -> discopanel.v1.TestAlertRuleRequest
-	20, // 26: discopanel.v1.MetricService.ListAlertEvents:input_type -> discopanel.v1.ListAlertEventsRequest
-	7,  // 27: discopanel.v1.MetricService.ListMetricHistory:output_type -> discopanel.v1.ListMetricHistoryResponse
-	9,  // 28: discopanel.v1.MetricService.ListAlertRules:output_type -> discopanel.v1.ListAlertRulesResponse
-	11, // 29: discopanel.v1.MetricService.GetAlertRule:output_type -> discopanel.v1.GetAlertRuleResponse
-	13, // 30: discopanel.v1.MetricService.CreateAlertRule:output_type -> discopanel.v1.CreateAlertRuleResponse
-	15, // 31: discopanel.v1.MetricService.UpdateAlertRule:output_type -> discopanel.v1.UpdateAlertRuleResponse
-	17, // 32: discopanel.v1.MetricService.DeleteAlertRule:output_type -> discopanel.v1.DeleteAlertRuleResponse
-	19, // 33: discopanel.v1.MetricService.TestAlertRule:output_type -> discopanel.v1.TestAlertRuleResponse
-	21, // 34: discopanel.v1.MetricService.ListAlertEvents:output_type -> discopanel.v1.ListAlertEventsResponse
-	27, // [27:35] is the sub-list for method output_type
-	19, // [19:27] is the sub-list for method input_type
-	19, // [19:19] is the sub-list for extension type_name
-	19, // [19:19] is the sub-list for extension extendee
-	0,  // [0:19] is the sub-list for field type_name
+	22, // 19: discopanel.v1.GetTrafficSummaryResponse.summary:type_name -> discopanel.v1.TrafficSummary
+	6,  // 20: discopanel.v1.MetricService.ListMetricHistory:input_type -> discopanel.v1.ListMetricHistoryRequest
+	8,  // 21: discopanel.v1.MetricService.ListAlertRules:input_type -> discopanel.v1.ListAlertRulesRequest
+	10, // 22: discopanel.v1.MetricService.GetAlertRule:input_type -> discopanel.v1.GetAlertRuleRequest
+	12, // 23: discopanel.v1.MetricService.CreateAlertRule:input_type -> discopanel.v1.CreateAlertRuleRequest
+	14, // 24: discopanel.v1.MetricService.UpdateAlertRule:input_type -> discopanel.v1.UpdateAlertRuleRequest
+	16, // 25: discopanel.v1.MetricService.DeleteAlertRule:input_type -> discopanel.v1.DeleteAlertRuleRequest
+	18, // 26: discopanel.v1.MetricService.TestAlertRule:input_type -> discopanel.v1.TestAlertRuleRequest
+	20, // 27: discopanel.v1.MetricService.ListAlertEvents:input_type -> discopanel.v1.ListAlertEventsRequest
+	23, // 28: discopanel.v1.MetricService.GetTrafficSummary:input_type -> discopanel.v1.GetTrafficSummaryRequest
+	7,  // 29: discopanel.v1.MetricService.ListMetricHistory:output_type -> discopanel.v1.ListMetricHistoryResponse
+	9,  // 30: discopanel.v1.MetricService.ListAlertRules:output_type -> discopanel.v1.ListAlertRulesResponse
+	11, // 31: discopanel.v1.MetricService.GetAlertRule:output_type -> discopanel.v1.GetAlertRuleResponse
+	13, // 32: discopanel.v1.MetricService.CreateAlertRule:output_type -> discopanel.v1.CreateAlertRuleResponse
+	15, // 33: discopanel.v1.MetricService.UpdateAlertRule:output_type -> discopanel.v1.UpdateAlertRuleResponse
+	17, // 34: discopanel.v1.MetricService.DeleteAlertRule:output_type -> discopanel.v1.DeleteAlertRuleResponse
+	19, // 35: discopanel.v1.MetricService.TestAlertRule:output_type -> discopanel.v1.TestAlertRuleResponse
+	21, // 36: discopanel.v1.MetricService.ListAlertEvents:output_type -> discopanel.v1.ListAlertEventsResponse
+	24, // 37: discopanel.v1.MetricService.GetTrafficSummary:output_type -> discopanel.v1.GetTrafficSummaryResponse
+	29, // [29:38] is the sub-list for method output_type
+	20, // [20:29] is the sub-list for method input_type
+	20, // [20:20] is the sub-list for extension type_name
+	20, // [20:20] is the sub-list for extension extendee
+	0,  // [0:20] is the sub-list for field type_name
 }
 
 func init() { file_discopanel_v1_metrics_proto_init() }
@@ -1681,7 +1875,7 @@ func file_discopanel_v1_metrics_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_discopanel_v1_metrics_proto_rawDesc), len(file_discopanel_v1_metrics_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   19,
+			NumMessages:   22,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

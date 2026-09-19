@@ -5,14 +5,17 @@
 	import {
 		ListMetricHistoryRequestSchema,
 		ListAlertEventsRequestSchema,
+		GetTrafficSummaryRequestSchema,
 		AlertState,
-		type MetricSample
+		type MetricSample,
+		type TrafficSummary
 	} from '$lib/proto/discopanel/v1/metrics_pb';
 	import type { Server } from '$lib/proto/discopanel/v1/common_pb';
 	import { Skeleton } from '$lib/components/ui/skeleton';
 	import { Badge } from '$lib/components/ui/badge';
 	import * as Select from '$lib/components/ui/select';
 	import { Button } from '$lib/components/ui/button';
+	import { formatBytes } from '$lib/utils';
 	import {
 		Cpu,
 		MemoryStick,
@@ -21,7 +24,9 @@
 		RefreshCw,
 		BellRing,
 		LineChart,
-		Clock
+		Clock,
+		ArrowDownToLine,
+		ArrowUpFromLine
 	} from '@lucide/svelte';
 
 	let { server, active }: { server: Server; active?: boolean } = $props();
@@ -35,6 +40,7 @@
 
 	let rangeSecs = $state(3600);
 	let samples = $state<MetricSample[]>([]);
+	let traffic = $state<TrafficSummary | null>(null);
 	let loading = $state(true);
 	let refreshing = $state(false);
 	let firingAlerts = $state(0);
@@ -68,15 +74,16 @@
 		};
 	});
 
-	$effect(() => {
-		// Track tab visibility reactively (prop)
-		activeRef = active;
-		if (server.id !== prevServerId) {
-			prevServerId = server.id;
-			initialized = false;
-			samples = [];
-			loading = true;
-		}
+		$effect(() => {
+			// Track tab visibility reactively (prop)
+			activeRef = active;
+			if (server.id !== prevServerId) {
+				prevServerId = server.id;
+				initialized = false;
+				samples = [];
+				traffic = null;
+				loading = true;
+			}
 		const rs = rangeSecs;
 		if (active && !initialized) {
 			initialized = true;
@@ -101,17 +108,28 @@
 				rangeSecs: rangeSecs,
 				maxPoints: 200
 			});
-			const [historyRes, eventsRes] = await Promise.all([
+			const [historyRes, eventsRes, trafficRes] = await Promise.all([
 				rpcClient.metric.listMetricHistory(historyRequest, silentCallOptions),
 				rpcClient.metric
 					.listAlertEvents(
 						create(ListAlertEventsRequestSchema, { serverId: server.id, limit: 50 }),
 						silentCallOptions
 					)
+					.catch(() => null),
+				// Traffic summary follows the selected range (reuses rangeSecs)
+				rpcClient.metric
+					.getTrafficSummary(
+						create(GetTrafficSummaryRequestSchema, {
+							serverId: server.id,
+							rangeSecs: rangeSecs
+						}),
+						silentCallOptions
+					)
 					.catch(() => null)
 			]);
 			samples = historyRes.samples;
 			firingAlerts = (eventsRes?.events ?? []).filter((e) => e.state === AlertState.FIRING).length;
+			traffic = trafficRes?.summary ?? null;
 		} catch {
 			// Silent for background refreshes; first load errors surface as empty state
 		} finally {
@@ -274,6 +292,8 @@
 		if (!first || !lastSample) return '';
 		return `${fmtTime(Number(first.seconds) * 1000)} – ${fmtTime(Number(lastSample.seconds) * 1000)}`;
 	});
+
+	const rangeLabel = $derived(RANGES.find((r) => r.secs === rangeSecs)?.label ?? '');
 </script>
 
 <div class="space-y-4">
@@ -327,6 +347,35 @@
 			</Button>
 		</div>
 	</div>
+
+	<!-- Traffic summary strip -->
+	{#if traffic}
+		<div
+			class="flex flex-wrap items-center gap-x-6 gap-y-2 rounded-lg border border-border/50 bg-muted/10 px-4 py-2.5"
+		>
+			<div class="flex items-center gap-2">
+				<LineChart class="h-4 w-4 text-primary" />
+				<span class="text-xs font-semibold tracking-wider text-muted-foreground uppercase">
+					Traffic ({rangeLabel})
+				</span>
+			</div>
+			<div class="flex items-center gap-2" title="Bytes received from players">
+				<ArrowDownToLine class="h-4 w-4 text-blue-500" />
+				<span class="text-xs text-muted-foreground">In</span>
+				<span class="font-mono text-sm font-semibold">{formatBytes(Number(traffic.bytesIn))}</span>
+			</div>
+			<div class="flex items-center gap-2" title="Bytes sent to players">
+				<ArrowUpFromLine class="h-4 w-4 text-green-500" />
+				<span class="text-xs text-muted-foreground">Out</span>
+				<span class="font-mono text-sm font-semibold">{formatBytes(Number(traffic.bytesOut))}</span>
+			</div>
+			<div class="flex items-center gap-2" title="Player sessions in this period">
+				<Users class="h-4 w-4 text-purple-500" />
+				<span class="text-xs text-muted-foreground">Sessions</span>
+				<span class="font-mono text-sm font-semibold">{traffic.sessions}</span>
+			</div>
+		</div>
+	{/if}
 
 	<!-- Loading skeleton -->
 	{#if loading}

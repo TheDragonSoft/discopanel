@@ -121,6 +121,7 @@ func dbServerToProto(server *storage.Server) *v1.Server {
 		AutoRestart:            &server.AutoRestart,
 		AutoRestartMaxRetries:  int32Ptr(int32(server.AutoRestartMaxRetries)),
 		AutoRestartBackoffSecs: int32Ptr(int32(server.AutoRestartBackoffSecs)),
+		ConnectionLimit:        int32Ptr(int32(server.ConnectionLimit)),
 		Detached:        server.Detached,
 		TpsCommand:      server.TPSCommand,
 		MemoryUsage:     int64(server.MemoryUsage),
@@ -977,6 +978,14 @@ func (s *ServerService) UpdateServer(ctx context.Context, req *connect.Request[v
 	}
 	if msg.AutoRestartBackoffSecs != nil {
 		server.AutoRestartBackoffSecs = int(*msg.AutoRestartBackoffSecs)
+	}
+	if msg.ConnectionLimit != nil {
+		// 0 = unlimited; negative values are normalized to unlimited
+		if *msg.ConnectionLimit < 0 {
+			server.ConnectionLimit = 0
+		} else {
+			server.ConnectionLimit = int(*msg.ConnectionLimit)
+		}
 	}
 	if msg.Detached != nil {
 		server.Detached = *msg.Detached
