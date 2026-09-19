@@ -44,6 +44,7 @@ type Context struct {
 	ServerConfig *models.ServerConfig
 	Module       *models.Module
 	Modules      map[string]*models.Module // Sibling modules by name (for inter-module references)
+	Deps         map[string]*models.Module // Capability name -> sibling module providing it (for {{deps.*}} references)
 	Host         *Host
 	Config       *config.Config
 }
@@ -346,6 +347,10 @@ func Substitute(input string, ctx *Context) string {
 		result = substituteModuleReferences(result, ctx.Modules)
 	}
 
+	// Always run dep substitution so unresolvable {{deps.*}} aliases are
+	// stripped (map lookups simply fail) instead of leaking raw placeholders.
+	result = substituteDepsReferences(result, ctx.Deps)
+
 	return result
 }
 
@@ -519,4 +524,81 @@ func getModuleFieldValue(module *models.Module, field string) string {
 	}
 
 	return ""
+}
+
+// substituteDepsReferences handles {{deps.<capability>.<field>}} patterns where
+// the capability is the Provides value of another enabled module on the same
+// server. Supported fields:
+//   - id:           the providing module's ID
+//   - name:         the providing module's name
+//   - container:    the providing module's Docker container name
+//   - host:         same as container (container name = DNS name on the shared Docker network)
+//   - port_<NAME>:  the container port named NAME (e.g. {{deps.mariadb.port_DB}})
+//
+// Any other field falls back to reflection over the Module struct. When the
+// capability has no provider (or the field resolves to nothing), the alias is
+// stripped, matching how unresolved {{modules.*}} references are handled.
+func substituteDepsReferences(input string, deps map[string]*models.Module) string {
+	result := input
+
+	for strings.Contains(result, "{{deps.") {
+		start := strings.Index(result, "{{deps.")
+		if start == -1 {
+			break
+		}
+		end := strings.Index(result[start:], "}}")
+		if end == -1 {
+			break
+		}
+		end += start + 2
+
+		// Extract the full alias: {{deps.mariadb.port_DB}}
+		aliasText := result[start:end]
+		// Extract the path: deps.mariadb.port_DB
+		path := aliasText[2 : len(aliasText)-2]
+		parts := strings.SplitN(path, ".", 3)
+
+		if len(parts) == 3 {
+			capability := parts[1]
+			fieldName := parts[2]
+
+			if module, ok := deps[capability]; ok && module != nil {
+				value := getDepFieldValue(module, fieldName)
+				result = strings.Replace(result, aliasText, value, 1)
+				continue
+			}
+		}
+
+		// If we couldn't resolve, strip the alias to avoid infinite loop
+		result = result[:start] + result[end:]
+	}
+
+	return result
+}
+
+// getDepFieldValue resolves a dependency field for {{deps.*}} aliases
+func getDepFieldValue(module *models.Module, field string) string {
+	switch field {
+	case "id":
+		return module.ID
+	case "name":
+		return module.Name
+	case "container", "host":
+		// The container name doubles as the DNS name on the shared Docker network
+		return fmt.Sprintf("discopanel-module-%s", module.ID)
+	}
+
+	// port_<NAME>: container port of the providing module's port named NAME
+	if strings.HasPrefix(field, "port_") {
+		portName := strings.TrimPrefix(field, "port_")
+		for _, port := range module.Ports {
+			if port != nil && port.Name == portName && port.ContainerPort > 0 {
+				return strconv.Itoa(int(port.ContainerPort))
+			}
+		}
+		return ""
+	}
+
+	// Fall back to the inter-module field resolver (reflection + computed fields)
+	return getModuleFieldValue(module, field)
 }

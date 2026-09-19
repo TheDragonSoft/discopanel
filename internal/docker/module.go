@@ -25,8 +25,9 @@ type ModuleVolumeMount struct {
 	CreateDir bool   `json:"create_dir,omitempty"` // Pre-create source dirs
 }
 
-// Create container for a module w/ optional map of sibling modules by name for inter-module references
-func (c *Client) CreateModuleContainer(ctx context.Context, module *models.Module, template *models.ModuleTemplate, server *models.Server, serverConfig *models.ServerConfig, cfg *config.Config, siblingModules ...map[string]*models.Module) (string, error) {
+// Create container for a module w/ optional maps of sibling modules by name for
+// inter-module references and by capability for {{deps.*}} dependency references
+func (c *Client) CreateModuleContainer(ctx context.Context, module *models.Module, template *models.ModuleTemplate, server *models.Server, serverConfig *models.ServerConfig, cfg *config.Config, siblingModules map[string]*models.Module, depsByCapability map[string]*models.Module) (string, error) {
 	// Determine the Docker image to use
 	imageName := template.DockerImage
 	if imageName == "" {
@@ -46,8 +47,12 @@ func (c *Client) CreateModuleContainer(ctx context.Context, module *models.Modul
 		Config:       cfg,
 	}
 	// Add sibling modules for inter-module references
-	if len(siblingModules) > 0 && siblingModules[0] != nil {
-		aliasCtx.Modules = siblingModules[0]
+	if siblingModules != nil {
+		aliasCtx.Modules = siblingModules
+	}
+	// Add capability providers for {{deps.*}} dependency references
+	if depsByCapability != nil {
+		aliasCtx.Deps = depsByCapability
 	}
 
 	// Build environment variables

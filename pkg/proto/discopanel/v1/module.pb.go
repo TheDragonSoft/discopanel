@@ -610,8 +610,14 @@ type ModuleTemplate struct {
 	DefaultInitCommandDelay int32 `protobuf:"varint,28,opt,name=default_init_command_delay,json=defaultInitCommandDelay,proto3" json:"default_init_command_delay,omitempty"`
 	// Whether to restart the container after init command completes
 	DefaultRestartAfterInit bool `protobuf:"varint,29,opt,name=default_restart_after_init,json=defaultRestartAfterInit,proto3" json:"default_restart_after_init,omitempty"`
-	unknownFields           protoimpl.UnknownFields
-	sizeCache               protoimpl.SizeCache
+	// Capability this template provides (e.g. "mariadb", "redis"). Other modules
+	// on the same server can reference it via dependency aliases. Empty = none.
+	Provides *string `protobuf:"bytes,30,opt,name=provides,proto3,oneof" json:"provides,omitempty"`
+	// Capability this template requires from a co-located module (e.g. "mariadb").
+	// Creating an instance fails if no module on the target server provides it. Empty = none.
+	Requires      *string `protobuf:"bytes,31,opt,name=requires,proto3,oneof" json:"requires,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ModuleTemplate) Reset() {
@@ -845,6 +851,20 @@ func (x *ModuleTemplate) GetDefaultRestartAfterInit() bool {
 		return x.DefaultRestartAfterInit
 	}
 	return false
+}
+
+func (x *ModuleTemplate) GetProvides() string {
+	if x != nil && x.Provides != nil {
+		return *x.Provides
+	}
+	return ""
+}
+
+func (x *ModuleTemplate) GetRequires() string {
+	if x != nil && x.Requires != nil {
+		return *x.Requires
+	}
+	return ""
 }
 
 // Module represents a running module instance attached to a server.
@@ -3830,8 +3850,7 @@ const file_discopanel_v1_module_proto_rawDesc = "" +
 	"\x06action\x18\x02 \x01(\x0e2 .discopanel.v1.ModuleEventActionR\x06action\x12\x18\n" +
 	"\acommand\x18\x03 \x01(\tR\acommand\x12#\n" +
 	"\rdelay_seconds\x18\x04 \x01(\x05R\fdelaySeconds\x12\x1c\n" +
-	"\tcondition\x18\x05 \x01(\tR\tcondition\"\xac\n" +
-	"\n" +
+	"\tcondition\x18\x05 \x01(\tR\tcondition\"\x88\v\n" +
 	"\x0eModuleTemplate\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -3868,10 +3887,14 @@ const file_discopanel_v1_module_proto_rawDesc = "" +
 	"defaultGid\x120\n" +
 	"\x14default_init_command\x18\x1b \x01(\tR\x12defaultInitCommand\x12;\n" +
 	"\x1adefault_init_command_delay\x18\x1c \x01(\x05R\x17defaultInitCommandDelay\x12;\n" +
-	"\x1adefault_restart_after_init\x18\x1d \x01(\bR\x17defaultRestartAfterInit\x1a;\n" +
+	"\x1adefault_restart_after_init\x18\x1d \x01(\bR\x17defaultRestartAfterInit\x12\x1f\n" +
+	"\bprovides\x18\x1e \x01(\tH\x00R\bprovides\x88\x01\x01\x12\x1f\n" +
+	"\brequires\x18\x1f \x01(\tH\x01R\brequires\x88\x01\x01\x1a;\n" +
 	"\rMetadataEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
-	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x89\r\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01B\v\n" +
+	"\t_providesB\v\n" +
+	"\t_requires\"\x89\r\n" +
 	"\x06Module\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1b\n" +
@@ -4413,6 +4436,7 @@ func file_discopanel_v1_module_proto_init() {
 	}
 	file_discopanel_v1_event_proto_init()
 	file_discopanel_v1_server_proto_init()
+	file_discopanel_v1_module_proto_msgTypes[3].OneofWrappers = []any{}
 	file_discopanel_v1_module_proto_msgTypes[4].OneofWrappers = []any{}
 	file_discopanel_v1_module_proto_msgTypes[5].OneofWrappers = []any{}
 	file_discopanel_v1_module_proto_msgTypes[11].OneofWrappers = []any{}

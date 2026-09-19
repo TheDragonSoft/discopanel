@@ -662,6 +662,14 @@ type ModuleTemplate struct {
 	DefaultInitCommand      string `json:"default_init_command" gorm:"column:default_init_command;default:''"`
 	DefaultInitCommandDelay int    `json:"default_init_command_delay" gorm:"column:default_init_command_delay;default:0"`
 	DefaultRestartAfterInit bool   `json:"default_restart_after_init" gorm:"column:default_restart_after_init;default:false"`
+
+	// Capability this template provides (e.g. "mariadb", "redis"). Other modules
+	// on the same server can reference it via {{deps.<capability>.*}} aliases. Empty = none.
+	Provides string `json:"provides" gorm:"column:provides;default:''"`
+
+	// Capability this template requires from a co-located module (e.g. "mariadb").
+	// Creating an instance fails if no module on the target server provides it. Empty = none.
+	Requires string `json:"requires" gorm:"column:requires;default:''"`
 }
 
 // Module represents a running instance of a module template attached to a server

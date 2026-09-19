@@ -128,7 +128,7 @@ func dbModuleTemplateToProto(t *storage.ModuleTemplate) *v1.ModuleTemplate {
 	if t == nil {
 		return nil
 	}
-	return &v1.ModuleTemplate{
+	protoTemplate := &v1.ModuleTemplate{
 		Id:                      t.ID,
 		Name:                    t.Name,
 		Description:             t.Description,
@@ -158,6 +158,18 @@ func dbModuleTemplateToProto(t *storage.ModuleTemplate) *v1.ModuleTemplate {
 		DefaultInitCommandDelay: int32(t.DefaultInitCommandDelay),
 		DefaultRestartAfterInit: t.DefaultRestartAfterInit,
 	}
+
+	// Optional capability fields (empty = none)
+	if t.Provides != "" {
+		provides := t.Provides
+		protoTemplate.Provides = &provides
+	}
+	if t.Requires != "" {
+		requires := t.Requires
+		protoTemplate.Requires = &requires
+	}
+
+	return protoTemplate
 }
 
 func dbModuleToProto(m *storage.Module, serverName, templateName, serverProxyHostname, createdByUsername string) *v1.Module {
@@ -564,6 +576,19 @@ func (s *ModuleService) CreateModule(ctx context.Context, req *connect.Request[v
 		return nil, connect.NewError(connect.CodeNotFound, errors.New("template not found"))
 	}
 
+	// Capability requirement check: the target server must already have a module
+	// created from a template that provides the required capability.
+	var provider *storage.Module
+	if template.Requires != "" {
+		provider, err = module.FindCapabilityProvider(ctx, s.store, msg.ServerId, template.Requires, "")
+		if err != nil {
+			return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to check capability requirements: %w", err))
+		}
+		if provider == nil {
+			return nil, connect.NewError(connect.CodeFailedPrecondition, fmt.Errorf("this module requires a module providing %q on the same server", template.Requires))
+		}
+	}
+
 	// Use ports from request, or fall back to template defaults
 	ports := msg.Ports
 	if len(ports) == 0 {
@@ -648,6 +673,24 @@ func (s *ModuleService) CreateModule(ctx context.Context, req *connect.Request[v
 				module.TokenID = token.ID
 				module.TokenPlaintext = plaintext
 			}
+		}
+	}
+
+	// Suggested start ordering: automatically depend on the capability provider
+	// (waiting for its health check) so e.g. the database container starts first.
+	if provider != nil {
+		hasProviderDep := false
+		for _, dep := range module.Dependencies {
+			if dep != nil && dep.ModuleId == provider.ID {
+				hasProviderDep = true
+				break
+			}
+		}
+		if !hasProviderDep {
+			module.Dependencies = append(module.Dependencies, &v1.ModuleDependency{
+				ModuleId:       provider.ID,
+				WaitForHealthy: true,
+			})
 		}
 	}
 
@@ -1074,6 +1117,10 @@ func (s *ModuleService) GetResolvedAliases(ctx context.Context, req *connect.Req
 				for _, sib := range siblings {
 					aliasCtx.Modules[sib.Name] = sib
 				}
+			}
+			// Capability providers for {{deps.*}} aliases
+			if deps, err := module.CapabilityProviders(ctx, s.store, mod.ServerID, mod.ID); err == nil {
+				aliasCtx.Deps = deps
 			}
 		}
 	}

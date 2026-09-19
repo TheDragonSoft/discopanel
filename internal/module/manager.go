@@ -150,8 +150,15 @@ func (m *Manager) CreateAndStartModule(ctx context.Context, moduleID string, sta
 		}
 	}
 
+	// Build capability -> provider map for {{deps.<capability>.*}} alias resolution
+	depsByCapability, err := CapabilityProviders(ctx, m.store, module.ServerID, module.ID)
+	if err != nil {
+		m.logger.Warn("Failed to build capability map for module %s: %v", module.Name, err)
+		depsByCapability = nil
+	}
+
 	// Create the container
-	containerID, err := m.docker.CreateModuleContainer(ctx, module, template, server, serverConfig, m.config, siblingModules)
+	containerID, err := m.docker.CreateModuleContainer(ctx, module, template, server, serverConfig, m.config, siblingModules, depsByCapability)
 	if err != nil {
 		module.Status = storage.ModuleStatusError
 		m.store.UpdateModule(ctx, module)

@@ -202,6 +202,12 @@ message ModuleTemplate {
   int32 default_init_command_delay = 28;
   // Whether to restart the container after init command completes
   bool default_restart_after_init = 29;
+  // Capability this template provides (e.g. "mariadb", "redis"). Other modules
+  // on the same server can reference it via dependency aliases. Empty = none.
+  optional string provides = 30;
+  // Capability this template requires from a co-located module (e.g. "mariadb").
+  // Creating an instance fails if no module on the target server provides it. Empty = none.
+  optional string requires = 31;
 }
 
 // Module represents a running module instance attached to a server.
