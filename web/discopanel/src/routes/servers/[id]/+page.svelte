@@ -60,6 +60,7 @@
 	import ServerFiles from '$lib/components/files/server-files.svelte';
 	import ServerRouting from '$lib/components/server-routing.svelte';
 	import ServerTasks from '$lib/components/server-tasks.svelte';
+	import MetricsHistory from '$lib/components/metrics-history.svelte';
 	import ServerModules from '$lib/components/server/ServerModules.svelte';
 
 	let server = $state<Server | null>(null);
@@ -1042,12 +1043,17 @@
 		>
 			<div class="w-full min-w-0 max-w-full flex-shrink-0 overflow-x-auto pb-1 scrollbar-thin">
 				<TabsList
-					class="inline-flex h-11 w-max min-w-full items-center justify-start gap-1 rounded-xl bg-muted/60 p-1 backdrop-blur-sm 2xl:grid 2xl:h-12 2xl:grid-cols-8 2xl:w-full"
+					class="inline-flex h-11 w-max min-w-full items-center justify-start gap-1 rounded-xl bg-muted/60 p-1 backdrop-blur-sm 2xl:grid 2xl:h-12 2xl:grid-cols-9 2xl:w-full"
 				>
 					<TabsTrigger
 						value="overview"
 						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
 						>Overview</TabsTrigger
+					>
+					<TabsTrigger
+						value="metrics"
+						class="px-3 py-1.5 text-xs font-medium whitespace-nowrap data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm sm:px-4 sm:text-sm"
+						>Metrics</TabsTrigger
 					>
 					<TabsTrigger
 						value="console"
@@ -1104,6 +1110,10 @@
 
 				<TabsContent value="console" class="h-full">
 					<ServerConsole {server} active={activeTab === 'console'} />
+				</TabsContent>
+
+				<TabsContent value="metrics" class="h-full overflow-y-auto">
+					<MetricsHistory {server} active={activeTab === 'metrics'} />
 				</TabsContent>
 
 				<TabsContent value="configuration" class="h-full overflow-y-auto">

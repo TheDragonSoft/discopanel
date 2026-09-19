@@ -5,6 +5,7 @@
 backups/
 sandbox/
 build/
+.zcode/
 # Compiled server binary only - anchored so this can't ignore directories
 # named discopanel (e.g. pkg/proto/discopanel, web/discopanel)
 /discopanel

@@ -189,4 +189,14 @@ var ProcedurePermissions = map[string]ProcedurePermission{
 	"/discopanel.v1.UploadService/InitUpload":      {Resource: ResourceUploads, Action: ActionCreate},
 	"/discopanel.v1.UploadService/UploadChunk":     {Resource: ResourceUploads, Action: ActionCreate},
 	"/discopanel.v1.UploadService/CancelUpload":    {Resource: ResourceUploads, Action: ActionDelete},
+
+	// ── MetricService ──────────────────────────────────────────────────
+	"/discopanel.v1.MetricService/ListMetricHistory": {Resource: ResourceServers, Action: ActionRead, ObjectIDField: "server_id"},
+	"/discopanel.v1.MetricService/ListAlertRules":    {Resource: ResourceSettings, Action: ActionRead},
+	"/discopanel.v1.MetricService/GetAlertRule":      {Resource: ResourceSettings, Action: ActionRead},
+	"/discopanel.v1.MetricService/CreateAlertRule":   {Resource: ResourceSettings, Action: ActionUpdate},
+	"/discopanel.v1.MetricService/UpdateAlertRule":   {Resource: ResourceSettings, Action: ActionUpdate},
+	"/discopanel.v1.MetricService/DeleteAlertRule":   {Resource: ResourceSettings, Action: ActionDelete},
+	"/discopanel.v1.MetricService/TestAlertRule":     {Resource: ResourceSettings, Action: ActionUpdate},
+	"/discopanel.v1.MetricService/ListAlertEvents":   {Resource: ResourceSettings, Action: ActionRead},
 }

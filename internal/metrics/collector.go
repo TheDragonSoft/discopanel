@@ -45,23 +45,29 @@ type ServerMetrics struct {
 
 // Configuration for metrics collector
 type CollectorConfig struct {
-	StatsInterval time.Duration // default 5s
-	RCONInterval  time.Duration // default 10s
-	DiskInterval  time.Duration // default 60s
-	SLPInterval   time.Duration // default 15s
-	SLPTimeout    time.Duration // default 5s
-	SLPEnabled    bool          // default true
+	StatsInterval  time.Duration // default 5s
+	RCONInterval   time.Duration // default 10s
+	DiskInterval   time.Duration // default 60s
+	SLPInterval    time.Duration // default 15s
+	SLPTimeout     time.Duration // default 5s
+	SLPEnabled     bool          // default true
+	SampleInterval time.Duration // default 30s - how often in-memory metrics are persisted as history samples
+	Retention      time.Duration // default 7d - how long persisted metric samples are kept
+	AlertInterval  time.Duration // default 15s - how often alert rules are evaluated
 }
 
 // Get default collector configuration
 func DefaultConfig() CollectorConfig {
 	return CollectorConfig{
-		StatsInterval: 5 * time.Second,
-		RCONInterval:  10 * time.Second,
-		DiskInterval:  60 * time.Second,
-		SLPInterval:   15 * time.Second,
-		SLPTimeout:    5 * time.Second,
-		SLPEnabled:    true,
+		StatsInterval:  5 * time.Second,
+		RCONInterval:   10 * time.Second,
+		DiskInterval:   60 * time.Second,
+		SLPInterval:    15 * time.Second,
+		SLPTimeout:     5 * time.Second,
+		SLPEnabled:     true,
+		SampleInterval: 30 * time.Second,
+		Retention:      7 * 24 * time.Hour,
+		AlertInterval:  15 * time.Second,
 	}
 }
 
@@ -87,6 +93,10 @@ type Collector struct {
 	lifecycle   map[string]lifecycleState
 	lifecycleMu sync.Mutex
 
+	// Per (rule, server) alert evaluation state
+	alertStates map[string]*alertState
+	alertMu     sync.Mutex
+
 	running  bool
 	stopChan chan struct{}
 	wg       sync.WaitGroup
@@ -100,6 +110,31 @@ func NewCollector(store *storage.Store, docker *docker.Client, sender *command.S
 	if len(collectorCfg) > 0 {
 		cc = collectorCfg[0]
 	}
+	// Fill in defaults for any zeroed custom fields
+	if cc.StatsInterval <= 0 {
+		cc.StatsInterval = 5 * time.Second
+	}
+	if cc.RCONInterval <= 0 {
+		cc.RCONInterval = 10 * time.Second
+	}
+	if cc.DiskInterval <= 0 {
+		cc.DiskInterval = 60 * time.Second
+	}
+	if cc.SLPInterval <= 0 {
+		cc.SLPInterval = 15 * time.Second
+	}
+	if cc.SLPTimeout <= 0 {
+		cc.SLPTimeout = 5 * time.Second
+	}
+	if cc.SampleInterval <= 0 {
+		cc.SampleInterval = 30 * time.Second
+	}
+	if cc.Retention <= 0 {
+		cc.Retention = 7 * 24 * time.Hour
+	}
+	if cc.AlertInterval <= 0 {
+		cc.AlertInterval = 15 * time.Second
+	}
 
 	return &Collector{
 		store:           store,
@@ -110,6 +145,7 @@ func NewCollector(store *storage.Store, docker *docker.Client, sender *command.S
 		log:             log,
 		metrics:         make(map[string]*ServerMetrics),
 		lifecycle:       make(map[string]lifecycleState),
+		alertStates:     make(map[string]*alertState),
 		collectorConfig: cc,
 	}
 }
@@ -128,7 +164,7 @@ func (c *Collector) Start() error {
 	c.log.Info("Starting metrics collector")
 
 	// Start collection goroutines
-	loopCount := 4 // stats, rcon, disk, lifecycle-events
+	loopCount := 6 // stats, rcon, disk, lifecycle-events, history-sampling, alert-eval
 	if c.collectorConfig.SLPEnabled {
 		loopCount += 1
 	}
@@ -137,6 +173,8 @@ func (c *Collector) Start() error {
 	go c.collectRCONDataLoop()
 	go c.collectDiskUsageLoop()
 	go c.collectLifecycleEventsLoop()
+	go c.recordHistoryLoop()
+	go c.evaluateAlertsLoop()
 	if c.collectorConfig.SLPEnabled {
 		go c.collectSLPDataLoop()
 	}
@@ -174,6 +212,18 @@ func (c *Collector) GetAllMetrics() map[string]*ServerMetrics {
 	result := make(map[string]*ServerMetrics, len(c.metrics))
 	maps.Copy(result, c.metrics)
 	return result
+}
+
+// GetMetricSnapshot returns a copy of the current metrics for a server
+func (c *Collector) GetMetricSnapshot(serverID string) (ServerMetrics, bool) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	m, ok := c.metrics[serverID]
+	if !ok || m == nil {
+		return ServerMetrics{}, false
+	}
+	return *m, true
 }
 
 // Collects Docker container stats periodically

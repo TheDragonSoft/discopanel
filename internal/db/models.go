@@ -716,3 +716,48 @@ type Module struct {
 	CPUPercent  float64 `json:"cpu_percent" gorm:"-"`
 }
 
+// AlertRule defines a metric alert condition. An empty ServerID means the
+// rule applies to all servers.
+type AlertRule struct {
+	ID           string    `json:"id" gorm:"primaryKey"`
+	Name         string    `json:"name" gorm:"not null"`
+	Description  string    `json:"description"`
+	ServerID     string    `json:"server_id" gorm:"index;column:server_id"` // Empty = applies to all servers
+	Metric       string    `json:"metric" gorm:"not null;column:metric"`    // e.g. "cpu_percent", "memory_percent", "tps", "players_online", "disk_percent"
+	Comparator   string    `json:"comparator" gorm:"not null;column:comparator"`
+	Threshold    float64   `json:"threshold"`
+	DurationSecs int       `json:"duration_secs" gorm:"default:0;column:duration_secs"`   // Continuous breach time before firing (0 = fire immediately)
+	CooldownSecs int       `json:"cooldown_secs" gorm:"default:300;column:cooldown_secs"` // Minimum time between repeat firings
+	Enabled      bool      `json:"enabled" gorm:"default:true"`
+	CreatedAt    time.Time `json:"created_at" gorm:"autoCreateTime"`
+	UpdatedAt    time.Time `json:"updated_at" gorm:"autoUpdateTime"`
+}
+
+// MetricSampleRecord is a periodic snapshot of a server's metrics persisted
+// for history charts. Named to avoid colliding with the proto MetricSample.
+type MetricSampleRecord struct {
+	ID            int64     `json:"id" gorm:"primaryKey"`
+	ServerID      string    `json:"server_id" gorm:"index;column:server_id"`
+	Timestamp     time.Time `json:"timestamp" gorm:"index;column:timestamp"`
+	CPUPercent    float64   `json:"cpu_percent" gorm:"column:cpu_percent"`
+	MemoryUsage   float64   `json:"memory_usage" gorm:"column:memory_usage"`    // MB used
+	MemoryTotal   float64   `json:"memory_total" gorm:"column:memory_total"`    // MB allocated to the server
+	TPS           float64   `json:"tps" gorm:"column:tps"`
+	PlayersOnline int       `json:"players_online" gorm:"column:players_online"`
+	DiskUsage     int64     `json:"disk_usage" gorm:"column:disk_usage"` // Bytes (total server data)
+	DiskTotal     int64     `json:"disk_total" gorm:"column:disk_total"` // Bytes
+}
+
+// AlertEventRecord is a persisted alert firing/resolution event.
+type AlertEventRecord struct {
+	ID        string    `json:"id" gorm:"primaryKey"`
+	RuleID    string    `json:"rule_id" gorm:"index;column:rule_id"`
+	RuleName  string    `json:"rule_name" gorm:"column:rule_name"`
+	ServerID  string    `json:"server_id" gorm:"index;column:server_id"`
+	State     string    `json:"state" gorm:"column:state"` // "firing" or "resolved"
+	Value     float64   `json:"value"`                     // Observed metric value at fire/resolve time
+	Threshold float64   `json:"threshold"`
+	Message   string    `json:"message" gorm:"type:text"` // Human-readable summary
+	CreatedAt time.Time `json:"created_at" gorm:"autoCreateTime"`
+}
+

@@ -30,6 +30,9 @@ func allModels() []any {
 		&ModuleTemplate{},
 		&Module{},
 		&SystemSetting{},
+		&AlertRule{},
+		&MetricSampleRecord{},
+		&AlertEventRecord{},
 	}
 }
 
