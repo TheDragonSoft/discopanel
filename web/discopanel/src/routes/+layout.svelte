@@ -38,6 +38,7 @@
 	import { Toaster } from '$lib/components/ui/sonner';
 	import GlobalLoading from '$lib/components/global-loading.svelte';
 	import MobileNavCloser from '$lib/components/mobile-nav-closer.svelte';
+	import GlobalSearch from '$lib/components/global-search.svelte';
 
 	import {
 		Server,
@@ -52,7 +53,8 @@
 		Moon,
 		Puzzle,
 		Blocks,
-		Users
+		Users,
+		Search
 	} from '@lucide/svelte';
 	import { toggleMode, mode } from 'mode-watcher';
 	import { ServerStatus, type User } from '$lib/proto/discopanel/v1/common_pb';
@@ -65,6 +67,7 @@
 	let showSettingsNav = $derived($canAccessSettings);
 	let loading = $state(true);
 	let isAuthEnabled = $derived($authEnabled);
+	let globalSearch = $state<{ openSearch(): void } | undefined>();
 
 	function getUserInitials(user: User) {
 		if (!user) return '';
@@ -374,6 +377,16 @@
 							variant="ghost"
 							size="icon"
 							class="h-7 w-7 group-data-[collapsible=icon]:hidden"
+							aria-label="Search"
+							title="Search (Ctrl+K)"
+							onclick={() => globalSearch?.openSearch()}
+						>
+							<Search class="h-4 w-4 text-muted-foreground" />
+						</Button>
+						<Button
+							variant="ghost"
+							size="icon"
+							class="h-7 w-7 group-data-[collapsible=icon]:hidden"
 							aria-label="Toggle theme"
 							onclick={toggleMode}
 						>
@@ -388,7 +401,9 @@
 				</SidebarFooter>
 			</Sidebar>
 
-			<MobileNavCloser />
+				<MobileNavCloser />
+
+				<GlobalSearch bind:this={globalSearch} />
 
 			<SidebarInset class="flex min-h-[100dvh] flex-col overflow-y-auto overflow-x-hidden min-w-0 max-w-full">
 				<!-- Mobile Header Bar (< md) -->
@@ -401,6 +416,16 @@
 						</a>
 					</div>
 					<div class="flex items-center gap-1.5">
+						<Button
+							variant="ghost"
+							size="icon"
+							class="h-8 w-8"
+							onclick={() => globalSearch?.openSearch()}
+							aria-label="Search"
+							title="Search"
+						>
+							<Search class="h-4 w-4 text-muted-foreground" />
+						</Button>
 						<Button
 							variant="ghost"
 							size="icon"

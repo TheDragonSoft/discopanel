@@ -25,12 +25,15 @@ export default defineConfig({
 					],
 				},
 				{ label: 'Configuration', slug: 'configuration' },
-				{
-					label: 'Guides',
-					items: [
-						{ label: 'Server Backups', slug: 'guides/backups' },
-						{
-							label: 'OIDC',
+					{
+						label: 'Guides',
+						items: [
+							{ label: 'Server Backups', slug: 'guides/backups' },
+							{ label: 'Metrics & Alerts', slug: 'guides/metrics-and-alerts' },
+							{ label: 'Players, Whitelist & Bans', slug: 'guides/players-and-whitelist' },
+							{ label: 'Modules', slug: 'guides/modules' },
+							{
+								label: 'OIDC',
 							items: [
 								{ label: 'Keycloak', slug: 'guides/oidc/keycloak' },
 								{ label: 'Authelia', slug: 'guides/oidc/authelia' },

@@ -53,7 +53,54 @@ Or set the `DISCOPANEL_SERVER_PORT` environment variable to whatever port you wa
 <details>
   <summary>How do I set up the proxy for my servers?</summary>
 
-*TODO*
+Enable the proxy in **Settings → Routing & Exposure**, add a listener port, and give each server a hostname under your base URL. Clients then connect to the shared listener and DiscoPanel routes them to the right server by hostname.
+
+Two extra knobs worth knowing:
+
+- **Fallback Server (Lobby)** — pick a server in Settings → Routing & Exposure. When someone connects to a hostname whose server is offline, they're routed to the fallback (a lobby, typically) instead of getting disconnected.
+- **Connection Limit** — per server, on the server's Config tab. Caps how many proxied connections that server will accept (`0` = unlimited). Useful for keeping a lobby from soaking up every slot.
+
+See the [Players, Whitelist & Bans guide](/guides/players-and-whitelist/) for how the proxy tracks players and traffic.
+
+</details>
+
+<details>
+  <summary>Can DiscoPanel restart a server after it crashes?</summary>
+
+Yes — every server has an **Auto-Restart** option on its Config tab. When the container exits unexpectedly (crashes, OOM, whatever), DiscoPanel restarts it automatically with exponential backoff:
+
+- **Auto-Restart** — the on/off switch. User-initiated stops are never restarted.
+- **Max Retries** — consecutive crash restarts before DiscoPanel gives up (`0` = keep trying).
+- **Backoff (seconds)** — the base delay between restarts. It doubles with each consecutive crash (30s, 60s, 120s, …) and resets once the server stays up for a few minutes, so a genuinely broken server doesn't get hammered in a loop.
+
+Pair it with [alert rules](/guides/metrics-and-alerts/) if you want to know when it happens.
+
+</details>
+
+<details>
+  <summary>How do I reuse one server's setup for another server?</summary>
+
+Save it as a template. On a server's Overview tab, open the menu and pick **Save as Template** — optionally including the server's mods directory. The **Templates** manager on the Servers page lists your saved templates, and deploying one creates a new server with the same configuration (and mods) ready to go.
+
+</details>
+
+<details>
+  <summary>How do I update a modpack in place?</summary>
+
+Open the server's **Modpack** tab. The world is preserved on every update:
+
+1. **Check for updates** — shows the installed version and the latest available.
+2. **List versions** — pick a specific version, or leave it on latest.
+3. **Update Modpack** — with **Create pre-update backup** enabled (recommended), DiscoPanel backs up first, then updates. If anything goes wrong, hit **Rollback** to restore that pre-update backup (server must be stopped).
+
+You can also automate it: **Enable Automatic Updates** on the same tab, set the **Check Interval (hours)** and an **Update Mode** — **Notify** just raises a *modpack update available* event (hook it to a webhook task to get pinged), while **Apply** backs up, stops the server, updates, and restarts on its own.
+
+</details>
+
+<details>
+  <summary>Is there a quick way to jump between pages?</summary>
+
+Press <kbd>Ctrl</kbd>+<kbd>K</kbd> (or <kbd>Cmd</kbd>+<kbd>K</kbd>) anywhere in the panel for the global search. There's also a **Quick Edit Config** option in the menu on a server's Overview tab for making small config-file edits without hunting through the Files tab.
 
 </details>
 

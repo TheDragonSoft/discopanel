@@ -1,0 +1,94 @@
+---
+title: Modules
+description: Attach Docker sidecars to your servers — monitoring, databases, Discord integrations — with built-in templates and a capability system.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+Modules are Docker containers attached to a server — sidecars like maps, databases, and Discord bots that share the server's lifecycle and Docker network. Manage them from the **Modules** page in the sidebar (all instances across servers) or from a server's **Modules** tab. Each template is a blueprint: pick one, adjust the environment variables and volumes, and DiscoPanel creates, starts, and health-checks the container for you.
+
+## Built-in templates
+
+DiscoPanel ships with a set of ready-to-use templates:
+
+| Template | What it does |
+|---|---|
+| **Geyser** | Lets Bedrock Edition players join your Java server (pairs with the Floodgate plugin). |
+| **MC Backup** | RCON-coordinated world backups with configurable retention. |
+| **RCON Web Admin** | Browser-based RCON console for server commands. |
+| **Prometheus Exporter** | Exposes server metrics in Prometheus format. |
+| **BlueMap** | Interactive 3D web map of your worlds. |
+| **Status Panel** | Live status dashboard (players, TPS, CPU/memory) powered by the DiscoPanel API. |
+| **Grafana** | Dashboards for the metrics your servers and modules produce. |
+| **Uptime Kuma** | Self-hosted uptime monitoring and status pages. |
+| **ntfy** | Push notifications to your phone via HTTP topics. |
+| **MariaDB** | SQL database for plugins that need persistent storage. Provides the `mariadb` capability. |
+| **Redis** | In-memory cache and pub/sub for plugins. Provides the `redis` capability. |
+| **PostgreSQL** | Alternative SQL database for plugins. Provides the `postgres` capability. |
+| **Discord Chat Relay** | Bridges Minecraft chat, joins, and leaves to a Discord channel (see below). |
+| **Discord Whitelist Bot** | Lets Discord users manage the whitelist with slash commands (see below). |
+| **Playit.gg** | Publishes your server through a free tunnel — no port forwarding needed. |
+
+You can also create **custom templates** from the Modules page's template management, so a stack you've tuned once (env, volumes, ports, health checks) can be reused anywhere.
+
+<Aside type="tip">
+Monitoring modules compose well: point Grafana at the **Prometheus Exporter** for deep metrics, keep the panel's own alerting on [Metrics & Alerts](/guides/metrics-and-alerts/) for threshold alerts, and use **ntfy** as the webhook target to get alerts on your phone.
+</Aside>
+
+## Lifecycle options
+
+Every instance has the usual knobs: memory and CPU limits, ports, environment and volume overrides, and health check settings. The lifecycle options decide when it runs:
+
+- **Auto start** — start the module when the parent server starts.
+- **Follow server lifecycle** — stop the module when the server stops.
+- **Detached** — run independently of the server entirely (good for shared databases).
+
+Modules also support **event hooks**: on server events (start, stop, healthy, player join, alert fired, …) run an action — start/stop/restart the module, exec a command inside it, or send an RCON command to the server — optionally gated by a condition like `{{server.players_online}} == 0`.
+
+## Capabilities: Provides & Requires
+
+Some modules exist to be used by other modules. A template can declare:
+
+- **Provides** — a capability it offers, e.g. MariaDB provides `mariadb`, Redis provides `redis`, PostgreSQL provides `postgres`.
+- **Requires** — a capability it needs on the same server. Creating an instance of a requiring module fails if no other module on that server provides the capability.
+
+Requiring modules reference their provider through **dependency aliases** in their configuration:
+
+```
+{{deps.mariadb.host}}      # hostname of the module providing mariadb
+{{deps.mariadb.port_DB}}   # its exposed DB port
+{{deps.redis.host}}
+{{deps.postgres.host}}
+```
+
+Aliases are resolved at container start, so a plugin pointed at `{{deps.postgres.host}}:5432` automatically targets whichever PostgreSQL module is attached to the same server. If several modules provide the same capability, the oldest one wins.
+
+<Aside type="caution">
+Database templates ship with blank passwords on purpose — set `MARIADB_ROOT_PASSWORD`/`MARIADB_PASSWORD` or `POSTGRES_PASSWORD` before starting, or the container will fail to initialize.
+</Aside>
+
+## Discord Chat Relay
+
+The **Discord Chat Relay** module posts Minecraft chat, joins, and leaves to a Discord channel, and can relay Discord messages back into the game.
+
+1. In Discord, open your channel's **Settings → Integrations → Webhooks**, create a webhook, and copy its URL.
+2. Create the module and paste the URL into `DISCORD_WEBHOOK_URL`, then start it. Chat and join/leave lines from the server log are posted to the channel.
+
+For a **two-way relay** (Discord messages appear in-game via `say`):
+
+1. Create an application at [discord.com/developers](https://discord.com/developers), add a bot, and enable the **Message Content** intent.
+2. Invite the bot to your server with the `bot` scope.
+3. Set `DISCORD_BOT_TOKEN` to the bot token and `DISCORD_CHANNEL_ID` to the channel to listen in (enable developer mode, right-click the channel → **Copy Channel ID**).
+
+RCON settings are pulled from the server automatically. Webhook posts are rate limited to 5 messages per second; excess messages are dropped.
+
+## Discord Whitelist Bot
+
+The **Discord Whitelist Bot** adds `/whitelist <name>` and `/unwhitelist <name>` slash commands that manage the DiscoPanel whitelist from Discord.
+
+1. Create an application at [discord.com/developers](https://discord.com/developers), add a bot — **no privileged intents needed**, slash commands only.
+2. Invite it with the `bot` and `applications.commands` scopes (use the OAuth2 URL generator) and paste the bot token into `DISCORD_BOT_TOKEN`.
+3. Set `DISCORD_GUILD_ID` to your Discord server's ID (developer mode → right-click the server → **Copy Server ID**). The commands register there on startup.
+4. Create a panel API token under **Settings → API Tokens** with **players create/update/delete** permissions and paste it into `DISCOPANEL_API_TOKEN`.
+
+Two optional settings: `SERVER_IDS` (comma-separated) restricts which servers the whitelist changes are applied to — empty means all — and `ALLOWED_ROLE_ID` restricts the commands to members holding a specific Discord role. Replies are ephemeral, so only the person running the command sees the result.

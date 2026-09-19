@@ -1,0 +1,69 @@
+---
+title: Metrics & Alerts
+description: Per-server metric graphs, traffic summaries, and alert rules delivered through webhook tasks.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+DiscoPanel continuously records metrics for every server — CPU, memory, TPS, player count, and disk usage — graphs them on the server's **Metrics** tab, and can fire alerts when a metric crosses a threshold. Alerts are delivered through the same event system as everything else: event-triggered **Webhook** tasks.
+
+## Metric history
+
+Open a server and go to the **Metrics** tab. DiscoPanel keeps a rolling history of per-server samples and renders them as graphs:
+
+| Metric | What it shows |
+|---|---|
+| **CPU %** | Container CPU usage |
+| **Memory** | Usage vs. the allocation you gave the server |
+| **TPS** | Server ticks per second (20 = optimal) |
+| **Players** | Online player count |
+| **Disk** | Server data directory usage vs. total space |
+
+Pick a time range to look further back than the default hour. Samples are downsampled automatically so long ranges still load fast.
+
+The Metrics tab also includes a **traffic summary** — bytes in and out, session count, and peak concurrent players over the selected window (default 24 hours). Traffic is measured by the player tracker, which observes sessions passing through the [proxy](/guides/players-and-whitelist/#how-tracking-works), so servers joined directly (not through the proxy) won't appear.
+
+## Alert rules
+
+Alert rules live in **Settings → Alerts**. A rule watches one metric on one server — or leave the server unset to watch every server — and fires when the condition holds.
+
+| Option | What it does |
+|---|---|
+| **Metric** | CPU %, memory %, TPS, players online, or disk %. |
+| **Comparator** | Fires when the metric is **above** or **below** the threshold. |
+| **Threshold** | The value to compare against. |
+| **Duration** | The condition must hold continuously for this many seconds before the alert fires. `0` = immediately. |
+| **Cooldown** | Minimum seconds between repeat firings of the same rule. `0` = a default of 5 minutes. |
+
+Duration keeps one-off spikes from waking you up — a rule like "CPU above 90% for 5 minutes" stays quiet through a chunk pregen. Cooldown stops an already-firing rule from spamming you every evaluation interval.
+
+Use **Test** to evaluate a rule against the server's *current* metrics without saving anything — handy for picking thresholds.
+
+Recent firings and resolutions are listed in the same tab, with the observed value, the threshold, and a human-readable summary for each event.
+
+<Aside type="note">
+Memory and disk percentages are relative to what DiscoPanel knows: memory compares container usage against the server's allocated memory, and disk compares the server's data directory against the total size of its storage.
+</Aside>
+
+## Delivering alerts via webhooks
+
+Alerts don't send notifications on their own — they raise events, and any **Webhook** task set to trigger on events can react. To get pinged when an alert fires:
+
+1. Create a **Webhook** task on a server (or anywhere you keep utility tasks).
+2. Set its schedule to **Event** and select the event triggers you want, including **Alert triggered** and **Alert resolved**.
+3. Point the URL at Discord, Slack, ntfy, Uptime Kuma, or anything that accepts an HTTP POST.
+
+The event payload includes the rule ID and name, the metric, the observed value, the threshold, and a message — so a Discord message like "Server smp: TPS below 15 for 60s (value 11.2)" arrives with everything you need.
+
+The full set of events you can trigger on:
+
+| Event | Fires when |
+|---|---|
+| Server start / stop / restart / healthy | Container lifecycle and health checks |
+| Player join / leave | A player connects or disconnects through the proxy |
+| Alert triggered / resolved | An alert rule fires or recovers |
+| Modpack update available | A scheduled modpack check finds a newer version |
+
+<Aside type="tip">
+Pair **Alert triggered** with a module event hook or a Discord relay to build a poor-man's PagerDuty: ntfy for phone push notifications, Grafana for dashboards, and Uptime Kuma for externally-facing status pages — all available as built-in modules. See the [Modules guide](/guides/modules/).
+</Aside>

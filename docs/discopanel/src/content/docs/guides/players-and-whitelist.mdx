@@ -1,0 +1,62 @@
+---
+title: Players, Whitelist & Bans
+description: Player tracking and sessions, the panel-side whitelist with RCON syncing, cross-server bans, and the Branding tab.
+---
+
+import { Aside } from '@astrojs/starlight/components';
+
+DiscoPanel tracks every player who connects through its proxy, keeps their play history, and manages whitelists and bans from the panel — including syncing them to servers over RCON.
+
+## How tracking works
+
+The built-in proxy inspects Minecraft connections as they pass through and observes each client's **Login Start** packet — the moment the player's username becomes known. From there DiscoPanel records a session: who joined, which server they were routed to, when they joined and left, and how much data was transferred in each direction. Sessions survive panel restarts; anything left open by a crash is closed up on the next start.
+
+<Aside type="note">
+Only traffic routed through the DiscoPanel proxy is tracked. Players who connect to a server's port directly bypass the proxy and won't appear in the Players page, session history, or traffic summaries.
+</Aside>
+
+Tracking is per server, so on a network with a lobby and several backends you get per-server playtime breakdowns for each player, not just a total.
+
+## The Players page
+
+The **Players** page in the sidebar has three parts:
+
+- **Online Now** — players currently connected through the proxy, with the server they're on and when they joined. The dashboard home shows the same card, so you can see who's on at a glance.
+- **Player list** — every player DiscoPanel has seen, with first/last seen, session count, and total playtime. Search by name and filter by server from the dropdown.
+- **Player detail** — click a player for their per-server stats (playtime, sessions, last seen) and their most recent sessions, including duration and bytes in/out.
+
+Join and leave moments raise **Player join** and **Player leave** events, which you can trigger on with event-based [webhook tasks](/guides/metrics-and-alerts/#delivering-alerts-via-webhooks) or module hooks — announce joins in Discord, or start a stats module when the first player connects.
+
+## Panel-side whitelist
+
+The **Whitelist & Bans** section of the Players page holds the panel-side whitelist: your desired list of who may play. Entries are stored in DiscoPanel's database with an optional note (useful for tracking who someone is or when they were added).
+
+The whitelist in the panel is the source of truth; servers are converged to it over RCON:
+
+- **Apply to servers** — select one or more running servers and DiscoPanel diffs each server's current in-game whitelist against the panel list, then adds and removes only the difference. Per-server results show exactly what was added and removed.
+- **Pull from server** — read a server's current whitelist via RCON and import it into the panel. Handy when you've been running `whitelist add` in-game and want the panel to catch up.
+
+<Aside type="caution">
+Applying and pulling require the server to be running, since both go through RCON. Make sure RCON is enabled on the servers you want to manage this way.
+</Aside>
+
+You can also toggle the whitelist on or off while a server is running — see the [Branding tab](#the-branding-tab) below.
+
+## Bans across servers
+
+From the same section, **ban** or **unban** a player on any selection of servers with one action. DiscoPanel runs the ban or pardon commands via RCON and reports the result per server, so a cheater caught on one backend can be removed from the whole network in a couple of clicks.
+
+Bans are applied directly to the selected servers — they don't live in the panel-side whitelist, so they don't touch your allow-list.
+
+## The Branding tab
+
+Each server has a **Branding** tab that edits how the server presents itself, in one place:
+
+- **MOTD** — the message of the day shown in the server list.
+- **Server icon** — the `server-icon.png` players see in their client (64 KB PNG max).
+- **Max players** and **online mode** — written to `server.properties`.
+- **Whitelist toggle** — flips `white-list` in `server.properties` **live**: when the server is running, DiscoPanel writes the setting and issues the RCON reload, so you can open or close the server without a restart.
+
+<Aside type="note">
+The whitelist toggle and MOTD apply immediately on a running server. Changing **online mode** or **max players** rewrites `server.properties` but needs a restart to take effect.
+</Aside>

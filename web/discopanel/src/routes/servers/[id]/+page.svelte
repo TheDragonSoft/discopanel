@@ -62,6 +62,8 @@
 	import ServerMods from '$lib/components/server-mods.svelte';
 	import ModpackUpdate from '$lib/components/modpack-update.svelte';
 	import ServerFiles from '$lib/components/files/server-files.svelte';
+import QuickConfigEditor from '$lib/components/files/quick-config-editor.svelte';
+import { FileCog } from '@lucide/svelte';
 	import ServerRouting from '$lib/components/server-routing.svelte';
 	import ServerTasks from '$lib/components/server-tasks.svelte';
 	import MetricsHistory from '$lib/components/metrics-history.svelte';
@@ -78,6 +80,7 @@
 	let routingInfo = $state<GetServerRoutingResponse | null>(null);
 	let onlinePlayers = $state<OnlinePlayer[]>([]);
 	let saveTemplateOpen = $state(false);
+	let quickConfigOpen = $state(false);
 
 	let interval: ReturnType<typeof setInterval> | undefined;
 
@@ -392,8 +395,12 @@
 							</Button>
 						{/snippet}
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuItem class="flew-row flex" onclick={() => (saveTemplateOpen = true)}>
+						<DropdownMenuContent align="end">
+							<DropdownMenuItem class="flew-row flex" onclick={() => (quickConfigOpen = true)}>
+								<FileCog class="mr-2 h-4 w-4" />
+								Quick Edit Config
+							</DropdownMenuItem>
+							<DropdownMenuItem class="flew-row flex" onclick={() => (saveTemplateOpen = true)}>
 							<PackagePlus class="mr-2 h-4 w-4" />
 							Save as Template
 						</DropdownMenuItem>
@@ -1230,6 +1237,14 @@
 <ScrollToTop />
 
 <SaveServerTemplateDialog {server} bind:open={saveTemplateOpen} />
+
+{#if server}
+	<QuickConfigEditor
+		serverId={server.id}
+		serverRunning={server.status === ServerStatus.RUNNING}
+		bind:open={quickConfigOpen}
+	/>
+{/if}
 
 <style>
 	@keyframes shimmer {
