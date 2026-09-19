@@ -26,6 +26,7 @@ type Manager struct {
 	logStreamer  *logger.LogStreamer
 	mu           sync.Mutex
 	running      bool
+	cancel       context.CancelFunc
 }
 
 // NewManager creates a new module manager
@@ -64,6 +65,11 @@ func (m *Manager) Start() error {
 		m.logger.Error("Failed to initialize built-in module templates: %v", err)
 	}
 
+	// Launch background watcher that tracks playit tunnel public addresses
+	watcherCtx, cancel := context.WithCancel(context.Background())
+	m.cancel = cancel
+	go m.startPlayitWatcher(watcherCtx)
+
 	m.running = true
 	m.logger.Info("Module manager started")
 	return nil
@@ -76,6 +82,10 @@ func (m *Manager) Stop() error {
 
 	if !m.running {
 		return nil
+	}
+
+	if m.cancel != nil {
+		m.cancel()
 	}
 
 	ctx := context.Background()

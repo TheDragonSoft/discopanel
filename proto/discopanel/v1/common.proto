@@ -87,6 +87,8 @@ message Server {
   double tps = 26;
   int64 disk_free = 40; // Available (free) disk space in bytes on the data drive
   optional bool wake_on_connect = 41; // Start the server automatically when a client connects through the proxy
+  string public_address = 42; // Public address discovered from an attached playit.gg tunnel (empty if none)
+  int32 public_port = 43; // Public port matching public_address
 
   // Additional configuration
   repeated AdditionalPort additional_ports = 27;

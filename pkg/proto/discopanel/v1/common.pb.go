@@ -327,6 +327,8 @@ type Server struct {
 	Tps           float64 `protobuf:"fixed64,26,opt,name=tps,proto3" json:"tps,omitempty"`
 	DiskFree      int64   `protobuf:"varint,40,opt,name=disk_free,json=diskFree,proto3" json:"disk_free,omitempty"`                        // Available (free) disk space in bytes on the data drive
 	WakeOnConnect *bool   `protobuf:"varint,41,opt,name=wake_on_connect,json=wakeOnConnect,proto3,oneof" json:"wake_on_connect,omitempty"` // Start the server automatically when a client connects through the proxy
+	PublicAddress string  `protobuf:"bytes,42,opt,name=public_address,json=publicAddress,proto3" json:"public_address,omitempty"`          // Public address discovered from an attached playit.gg tunnel (empty if none)
+	PublicPort    int32   `protobuf:"varint,43,opt,name=public_port,json=publicPort,proto3" json:"public_port,omitempty"`                  // Public port matching public_address
 	// Additional configuration
 	AdditionalPorts []*AdditionalPort      `protobuf:"bytes,27,rep,name=additional_ports,json=additionalPorts,proto3" json:"additional_ports,omitempty"`
 	DockerOverrides *DockerOverrides       `protobuf:"bytes,28,opt,name=docker_overrides,json=dockerOverrides,proto3" json:"docker_overrides,omitempty"`
@@ -576,6 +578,20 @@ func (x *Server) GetWakeOnConnect() bool {
 		return *x.WakeOnConnect
 	}
 	return false
+}
+
+func (x *Server) GetPublicAddress() string {
+	if x != nil {
+		return x.PublicAddress
+	}
+	return ""
+}
+
+func (x *Server) GetPublicPort() int32 {
+	if x != nil {
+		return x.PublicPort
+	}
+	return 0
 }
 
 func (x *Server) GetAdditionalPorts() []*AdditionalPort {
@@ -1372,7 +1388,7 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"\n" +
 	"last_login\x18\t \x01(\v2\x1a.google.protobuf.TimestampH\x01R\tlastLogin\x88\x01\x01B\b\n" +
 	"\x06_emailB\r\n" +
-	"\v_last_login\"\xac\f\n" +
+	"\v_last_login\"\xf4\f\n" +
 	"\x06Server\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
@@ -1413,7 +1429,10 @@ const file_discopanel_v1_common_proto_rawDesc = "" +
 	"world_size\x18' \x01(\x03R\tworldSize\x12\x10\n" +
 	"\x03tps\x18\x1a \x01(\x01R\x03tps\x12\x1b\n" +
 	"\tdisk_free\x18( \x01(\x03R\bdiskFree\x12+\n" +
-	"\x0fwake_on_connect\x18) \x01(\bH\x01R\rwakeOnConnect\x88\x01\x01\x12H\n" +
+	"\x0fwake_on_connect\x18) \x01(\bH\x01R\rwakeOnConnect\x88\x01\x01\x12%\n" +
+	"\x0epublic_address\x18* \x01(\tR\rpublicAddress\x12\x1f\n" +
+	"\vpublic_port\x18+ \x01(\x05R\n" +
+	"publicPort\x12H\n" +
 	"\x10additional_ports\x18\x1b \x03(\v2\x1d.discopanel.v1.AdditionalPortR\x0fadditionalPorts\x12I\n" +
 	"\x10docker_overrides\x18\x1c \x01(\v2\x1e.discopanel.v1.DockerOverridesR\x0fdockerOverrides\x129\n" +
 	"\n" +

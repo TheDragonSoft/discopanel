@@ -359,6 +359,7 @@ func (s *ServerService) ListServers(ctx context.Context, req *connect.Request[v1
 	for i, server := range servers {
 		protoServers[i] = dbServerToProto(server)
 	}
+	s.applyPlayitAddresses(ctx, protoServers...)
 
 	return connect.NewResponse(&v1.ListServersResponse{
 		Servers: protoServers,
@@ -412,9 +413,39 @@ func (s *ServerService) GetServer(ctx context.Context, req *connect.Request[v1.G
 		}
 	}
 
+	protoServer := dbServerToProto(server)
+	s.applyPlayitAddresses(ctx, protoServer)
+
 	return connect.NewResponse(&v1.GetServerResponse{
-		Server: dbServerToProto(server),
+		Server: protoServer,
 	}), nil
+}
+
+// applyPlayitAddresses copies the public addresses discovered by the playit
+// module watcher (stored in module metadata) onto the server proto responses.
+func (s *ServerService) applyPlayitAddresses(ctx context.Context, protoServers ...*v1.Server) {
+	modules, err := s.store.ListModules(ctx)
+	if err != nil {
+		return
+	}
+
+	for _, mod := range modules {
+		if mod.TemplateID != module.PlayitTemplateID {
+			continue
+		}
+		address := mod.Metadata[module.MetaPublicAddress]
+		if address == "" {
+			continue
+		}
+		for _, ps := range protoServers {
+			if ps != nil && ps.Id == mod.ServerID {
+				ps.PublicAddress = address
+				if port, err := strconv.Atoi(mod.Metadata[module.MetaPublicPort]); err == nil {
+					ps.PublicPort = int32(port)
+				}
+			}
+		}
+	}
 }
 
 // CreateServer creates a new server
