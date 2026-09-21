@@ -52,7 +52,14 @@
 			>
 				<Download class="h-3.5 w-3.5" />
 			</Button>
-			<Button size="icon" variant="ghost" class="h-7 w-7" onclick={onMove} aria-label="Move selected" title="Move selected">
+			<Button
+				size="icon"
+				variant="ghost"
+				class="h-7 w-7"
+				onclick={onMove}
+				aria-label="Move selected"
+				title="Move selected"
+			>
 				<FolderInput class="h-3.5 w-3.5" />
 			</Button>
 			<Button

@@ -282,14 +282,14 @@
 	<DialogContent
 		showCloseButton={false}
 		class={isFullscreen
-			? 'flex h-[100dvh] w-full max-w-full rounded-none border-0 p-3 sm:p-6 sm:rounded-lg sm:border sm:h-[95vh] sm:w-[95vw]! sm:max-w-[95vw]! flex-col'
-			: 'flex h-[100dvh] w-full max-w-full rounded-none border-0 p-3 sm:p-6 sm:rounded-lg sm:border sm:h-[85vh] sm:w-[90vw]! sm:max-w-[90vw]! flex-col'}
+			? 'flex h-[100dvh] w-full max-w-full flex-col rounded-none border-0 p-3 sm:h-[95vh] sm:w-[95vw]! sm:max-w-[95vw]! sm:rounded-lg sm:border sm:p-6'
+			: 'flex h-[100dvh] w-full max-w-full flex-col rounded-none border-0 p-3 sm:h-[85vh] sm:w-[90vw]! sm:max-w-[90vw]! sm:rounded-lg sm:border sm:p-6'}
 	>
-		<div class="absolute top-3 right-3 sm:top-4 sm:right-4 flex gap-1 z-20">
+		<div class="absolute top-3 right-3 z-20 flex gap-1 sm:top-4 sm:right-4">
 			<button
 				onclick={toggleFullscreen}
 				title={isFullscreen ? 'Exit fullscreen' : 'Enter fullscreen'}
-				class="inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+				class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 sm:h-9 sm:w-9"
 			>
 				{#if isFullscreen}
 					<Minimize2 class="h-4 w-4" />
@@ -298,7 +298,7 @@
 				{/if}
 			</button>
 			<DialogPrimitive.Close
-				class="inline-flex h-8 w-8 sm:h-9 sm:w-9 items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
+				class="inline-flex h-8 w-8 items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50 sm:h-9 sm:w-9"
 			>
 				<X class="h-4 w-4" />
 				<span class="sr-only">Close</span>
@@ -322,7 +322,9 @@
 			</DialogDescription>
 		</DialogHeader>
 
-		<div class="relative min-h-0 flex-1 overflow-hidden rounded-md border bg-background my-2 sm:my-0">
+		<div
+			class="relative my-2 min-h-0 flex-1 overflow-hidden rounded-md border bg-background sm:my-0"
+		>
 			{#if loading}
 				<div class="absolute inset-0 z-10 flex items-center justify-center bg-background/80">
 					<Loader2 class="h-8 w-8 animate-spin" />
@@ -332,8 +334,10 @@
 		</div>
 
 		<DialogFooter class="shrink-0">
-			<div class="flex flex-col sm:flex-row w-full sm:items-center justify-between gap-2">
-				<div class="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+			<div class="flex w-full flex-col justify-between gap-2 sm:flex-row sm:items-center">
+				<div
+					class="flex flex-wrap items-center gap-2 text-xs text-muted-foreground sm:gap-4 sm:text-sm"
+				>
 					<span class="font-mono">
 						{#if file}
 							{getFileLanguage(file.name).toUpperCase()}
@@ -345,13 +349,13 @@
 						{content.split('\n').length} lines
 					</span>
 					{#if isDirty}
-						<span class="text-orange-500 font-medium">● Modified</span>
+						<span class="font-medium text-orange-500">● Modified</span>
 					{:else}
-						<span class="text-green-500 font-medium">● Saved</span>
+						<span class="font-medium text-green-500">● Saved</span>
 					{/if}
 				</div>
 				<div class="flex items-center justify-end gap-2">
-					<span class="hidden sm:inline text-xs text-muted-foreground"> Ctrl+S to save </span>
+					<span class="hidden text-xs text-muted-foreground sm:inline"> Ctrl+S to save </span>
 					<Button variant="outline" size="sm" onclick={handleClose} class="h-8">
 						<X class="mr-1.5 h-3.5 w-3.5" />
 						Close

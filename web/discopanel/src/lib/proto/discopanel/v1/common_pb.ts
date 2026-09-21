@@ -2,784 +2,793 @@
 // @generated from file discopanel/v1/common.proto (package discopanel.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenEnum, GenFile, GenMessage } from '@bufbuild/protobuf/codegenv2';
+import { enumDesc, fileDesc, messageDesc } from '@bufbuild/protobuf/codegenv2';
+import type { Timestamp } from '@bufbuild/protobuf/wkt';
+import { file_google_protobuf_timestamp } from '@bufbuild/protobuf/wkt';
+import type { Message } from '@bufbuild/protobuf';
 
 /**
  * Describes the file discopanel/v1/common.proto.
  */
-export const file_discopanel_v1_common: GenFile = /*@__PURE__*/
-  fileDesc("ChpkaXNjb3BhbmVsL3YxL2NvbW1vbi5wcm90bxINZGlzY29wYW5lbC52MSKfAgoEVXNlchIKCgJpZBgBIAEoCRIQCgh1c2VybmFtZRgCIAEoCRISCgVlbWFpbBgDIAEoCUgAiAEBEhUKDWF1dGhfcHJvdmlkZXIYBCABKAkSEQoJaXNfYWN0aXZlGAUgASgIEg0KBXJvbGVzGAYgAygJEi4KCmNyZWF0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjMKCmxhc3RfbG9naW4YCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSAGIAQFCCAoGX2VtYWlsQg0KC19sYXN0X2xvZ2luIuMKCgZTZXJ2ZXISCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIsCgptb2RfbG9hZGVyGAQgASgOMhguZGlzY29wYW5lbC52MS5Nb2RMb2FkZXISEgoKbWNfdmVyc2lvbhgFIAEoCRIrCgZzdGF0dXMYBiABKA4yGy5kaXNjb3BhbmVsLnYxLlNlcnZlclN0YXR1cxIMCgRwb3J0GAcgASgFEhYKDnByb3h5X2hvc3RuYW1lGAggASgJEhkKEXByb3h5X2xpc3RlbmVyX2lkGAkgASgJEhIKCnByb3h5X3BvcnQYCiABKAUSEwoLbWF4X3BsYXllcnMYCyABKAUSDgoGbWVtb3J5GAwgASgFEhEKCWRhdGFfcGF0aBgNIAEoCRIUCgxjb250YWluZXJfaWQYDiABKAkSNQoMbGFzdF9zdGFydGVkGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBEhQKDGphdmFfdmVyc2lvbhgQIAEoBRIUCgxkb2NrZXJfaW1hZ2UYESABKAkSEgoKYXV0b19zdGFydBgSIAEoCBIQCghkZXRhY2hlZBgTIAEoCBITCgt0cHNfY29tbWFuZBgUIAEoCRIUCgxtZW1vcnlfdXNhZ2UYFSABKAMSEwoLY3B1X3BlcmNlbnQYFiABKAESEgoKZGlza191c2FnZRgXIAEoAxISCgpkaXNrX3RvdGFsGBggASgDEhYKDnBsYXllcnNfb25saW5lGBkgASgFEhIKCndvcmxkX3NpemUYJyABKAMSCwoDdHBzGBogASgBEhEKCWRpc2tfZnJlZRgoIAEoAxIcCg93YWtlX29uX2Nvbm5lY3QYKSABKAhIAYgBARIWCg5wdWJsaWNfYWRkcmVzcxgqIAEoCRITCgtwdWJsaWNfcG9ydBgrIAEoBRIZCgxhdXRvX3Jlc3RhcnQYLCABKAhIAogBARIlChhhdXRvX3Jlc3RhcnRfbWF4X3JldHJpZXMYLSABKAVIA4gBARImChlhdXRvX3Jlc3RhcnRfYmFja29mZl9zZWNzGC4gASgFSASIAQESHQoQY29ubmVjdGlvbl9saW1pdBgvIAEoBUgFiAEBEjcKEGFkZGl0aW9uYWxfcG9ydHMYGyADKAsyHS5kaXNjb3BhbmVsLnYxLkFkZGl0aW9uYWxQb3J0EjgKEGRvY2tlcl9vdmVycmlkZXMYHCABKAsyHi5kaXNjb3BhbmVsLnYxLkRvY2tlck92ZXJyaWRlcxIuCgpjcmVhdGVkX2F0GB0gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgp1cGRhdGVkX2F0GB4gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIVCg1zbHBfYXZhaWxhYmxlGB8gASgIEhYKDnNscF9sYXRlbmN5X21zGCAgASgDEgwKBG1vdGQYISABKAkSFgoOc2VydmVyX3ZlcnNpb24YIiABKAkSGAoQcHJvdG9jb2xfdmVyc2lvbhgjIAEoBRIVCg1wbGF5ZXJfc2FtcGxlGCQgAygJEhcKD21heF9wbGF5ZXJzX3NscBglIAEoBRIPCgdmYXZpY29uGCYgASgJQg8KDV9sYXN0X3N0YXJ0ZWRCEgoQX3dha2Vfb25fY29ubmVjdEIPCg1fYXV0b19yZXN0YXJ0QhsKGV9hdXRvX3Jlc3RhcnRfbWF4X3JldHJpZXNCHAoaX2F1dG9fcmVzdGFydF9iYWNrb2ZmX3NlY3NCEwoRX2Nvbm5lY3Rpb25fbGltaXQiWwoOQWRkaXRpb25hbFBvcnQSDAoEbmFtZRgBIAEoCRIWCg5jb250YWluZXJfcG9ydBgCIAEoBRIRCglob3N0X3BvcnQYAyABKAUSEAoIcHJvdG9jb2wYBCABKAkiYgoLVm9sdW1lTW91bnQSDgoGc291cmNlGAEgASgJEg4KBnRhcmdldBgCIAEoCRIRCglyZWFkX29ubHkYAyABKAgSDAoEdHlwZRgEIAEoCRISCgpjcmVhdGVfZGlyGAUgASgIIvYECg9Eb2NrZXJPdmVycmlkZXMSRAoLZW52aXJvbm1lbnQYASADKAsyLy5kaXNjb3BhbmVsLnYxLkRvY2tlck92ZXJyaWRlcy5FbnZpcm9ubWVudEVudHJ5EisKB3ZvbHVtZXMYAiADKAsyGi5kaXNjb3BhbmVsLnYxLlZvbHVtZU1vdW50EhQKDG5ldHdvcmtfbW9kZRgDIAEoCRIWCg5yZXN0YXJ0X3BvbGljeRgEIAEoCRIRCgljcHVfbGltaXQYBSABKAESFAoMbWVtb3J5X2xpbWl0GAYgASgDEjoKBmxhYmVscxgHIAMoCzIqLmRpc2NvcGFuZWwudjEuRG9ja2VyT3ZlcnJpZGVzLkxhYmVsc0VudHJ5Eg8KB2NhcF9hZGQYCCADKAkSEAoIY2FwX2Ryb3AYCSADKAkSDwoHZGV2aWNlcxgKIAMoCRITCgtleHRyYV9ob3N0cxgLIAMoCRISCgpwcml2aWxlZ2VkGAwgASgIEhEKCXJlYWRfb25seRgNIAEoCBIUCgxzZWN1cml0eV9vcHQYDiADKAkSEAoIc2htX3NpemUYDyABKAMSDAoEdXNlchgQIAEoCRITCgt3b3JraW5nX2RpchgRIAEoCRISCgplbnRyeXBvaW50GBIgAygJEg8KB2NvbW1hbmQYEyADKAkSCwoDZG5zGBQgAygJEg0KBWltYWdlGBUgASgJGjIKEEVudmlyb25tZW50RW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARotCgtMYWJlbHNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBItEBCg1Qcm94eUxpc3RlbmVyEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSDAoEcG9ydBgEIAEoBRIPCgdlbmFibGVkGAUgASgIEhIKCmlzX2RlZmF1bHQYBiABKAgSLgoKY3JlYXRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKdXBkYXRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi1AEKC1Byb3h5Q29uZmlnEgoKAmlkGAEgASgJEg8KB2VuYWJsZWQYAiABKAgSEAoIYmFzZV91cmwYAyABKAkSLgoKY3JlYXRlZF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKdXBkYXRlZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASHwoSZmFsbGJhY2tfc2VydmVyX2lkGAYgASgJSACIAQFCFQoTX2ZhbGxiYWNrX3NlcnZlcl9pZCJBCgpQZXJtaXNzaW9uEhAKCHJlc291cmNlGAEgASgJEg4KBmFjdGlvbhgCIAEoCRIRCglvYmplY3RfaWQYAyABKAki7AEKBFJvbGUSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIRCglpc19zeXN0ZW0YBCABKAgSEgoKaXNfZGVmYXVsdBgFIAEoCBIuCgtwZXJtaXNzaW9ucxgGIAMoCzIZLmRpc2NvcGFuZWwudjEuUGVybWlzc2lvbhIuCgpjcmVhdGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgp1cGRhdGVkX2F0GAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCqLAgoMU2VydmVyU3RhdHVzEh0KGVNFUlZFUl9TVEFUVVNfVU5TUEVDSUZJRUQQABIaChZTRVJWRVJfU1RBVFVTX0NSRUFUSU5HEAESGgoWU0VSVkVSX1NUQVRVU19TVEFSVElORxACEhkKFVNFUlZFUl9TVEFUVVNfUlVOTklORxADEhoKFlNFUlZFUl9TVEFUVVNfU1RPUFBJTkcQBBIZChVTRVJWRVJfU1RBVFVTX1NUT1BQRUQQBRIcChhTRVJWRVJfU1RBVFVTX1JFU1RBUlRJTkcQBhIXChNTRVJWRVJfU1RBVFVTX0VSUk9SEAcSGwoXU0VSVkVSX1NUQVRVU19VTkhFQUxUSFkQCCrLAwoJTW9kTG9hZGVyEhoKFk1PRF9MT0FERVJfVU5TUEVDSUZJRUQQABIWChJNT0RfTE9BREVSX1ZBTklMTEEQARIUChBNT0RfTE9BREVSX0ZPUkdFEAISFQoRTU9EX0xPQURFUl9GQUJSSUMQAxIUChBNT0RfTE9BREVSX1FVSUxUEAQSFAoQTU9EX0xPQURFUl9QQVBFUhAFEhUKEU1PRF9MT0FERVJfU1BJR09UEAYSFQoRTU9EX0xPQURFUl9CVUtLSVQQBxIVChFNT0RfTE9BREVSX1BVUlBVUhAIEh0KGU1PRF9MT0FERVJfU1BPTkdFX1ZBTklMTEEQCRIbChdNT0RfTE9BREVSX1NQT05HRV9GT1JHRRAKEhUKEU1PRF9MT0FERVJfTU9ISVNUEAsSGAoUTU9EX0xPQURFUl9DQVRTRVJWRVIQDBIXChNNT0RfTE9BREVSX0FSQ0xJR0hUEA0SHgoaTU9EX0xPQURFUl9BVVRPX0NVUlNFRk9SR0UQDhIXChNNT0RfTE9BREVSX01PRFJJTlRIEA8SFwoTTU9EX0xPQURFUl9ORU9GT1JHRRAQEhQKEE1PRF9MT0FERVJfRk9MSUEQEUJGWkRnaXRodWIuY29tL25pY2toZXllci9kaXNjb3BhbmVsL3BrZy9wcm90by9kaXNjb3BhbmVsL3YxO2Rpc2NvcGFuZWx2MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+export const file_discopanel_v1_common: GenFile =
+	/*@__PURE__*/
+	fileDesc(
+		'ChpkaXNjb3BhbmVsL3YxL2NvbW1vbi5wcm90bxINZGlzY29wYW5lbC52MSKfAgoEVXNlchIKCgJpZBgBIAEoCRIQCgh1c2VybmFtZRgCIAEoCRISCgVlbWFpbBgDIAEoCUgAiAEBEhUKDWF1dGhfcHJvdmlkZXIYBCABKAkSEQoJaXNfYWN0aXZlGAUgASgIEg0KBXJvbGVzGAYgAygJEi4KCmNyZWF0ZWRfYXQYByABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYCCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEjMKCmxhc3RfbG9naW4YCSABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSAGIAQFCCAoGX2VtYWlsQg0KC19sYXN0X2xvZ2luIuMKCgZTZXJ2ZXISCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIsCgptb2RfbG9hZGVyGAQgASgOMhguZGlzY29wYW5lbC52MS5Nb2RMb2FkZXISEgoKbWNfdmVyc2lvbhgFIAEoCRIrCgZzdGF0dXMYBiABKA4yGy5kaXNjb3BhbmVsLnYxLlNlcnZlclN0YXR1cxIMCgRwb3J0GAcgASgFEhYKDnByb3h5X2hvc3RuYW1lGAggASgJEhkKEXByb3h5X2xpc3RlbmVyX2lkGAkgASgJEhIKCnByb3h5X3BvcnQYCiABKAUSEwoLbWF4X3BsYXllcnMYCyABKAUSDgoGbWVtb3J5GAwgASgFEhEKCWRhdGFfcGF0aBgNIAEoCRIUCgxjb250YWluZXJfaWQYDiABKAkSNQoMbGFzdF9zdGFydGVkGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcEgAiAEBEhQKDGphdmFfdmVyc2lvbhgQIAEoBRIUCgxkb2NrZXJfaW1hZ2UYESABKAkSEgoKYXV0b19zdGFydBgSIAEoCBIQCghkZXRhY2hlZBgTIAEoCBITCgt0cHNfY29tbWFuZBgUIAEoCRIUCgxtZW1vcnlfdXNhZ2UYFSABKAMSEwoLY3B1X3BlcmNlbnQYFiABKAESEgoKZGlza191c2FnZRgXIAEoAxISCgpkaXNrX3RvdGFsGBggASgDEhYKDnBsYXllcnNfb25saW5lGBkgASgFEhIKCndvcmxkX3NpemUYJyABKAMSCwoDdHBzGBogASgBEhEKCWRpc2tfZnJlZRgoIAEoAxIcCg93YWtlX29uX2Nvbm5lY3QYKSABKAhIAYgBARIWCg5wdWJsaWNfYWRkcmVzcxgqIAEoCRITCgtwdWJsaWNfcG9ydBgrIAEoBRIZCgxhdXRvX3Jlc3RhcnQYLCABKAhIAogBARIlChhhdXRvX3Jlc3RhcnRfbWF4X3JldHJpZXMYLSABKAVIA4gBARImChlhdXRvX3Jlc3RhcnRfYmFja29mZl9zZWNzGC4gASgFSASIAQESHQoQY29ubmVjdGlvbl9saW1pdBgvIAEoBUgFiAEBEjcKEGFkZGl0aW9uYWxfcG9ydHMYGyADKAsyHS5kaXNjb3BhbmVsLnYxLkFkZGl0aW9uYWxQb3J0EjgKEGRvY2tlcl9vdmVycmlkZXMYHCABKAsyHi5kaXNjb3BhbmVsLnYxLkRvY2tlck92ZXJyaWRlcxIuCgpjcmVhdGVkX2F0GB0gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgp1cGRhdGVkX2F0GB4gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIVCg1zbHBfYXZhaWxhYmxlGB8gASgIEhYKDnNscF9sYXRlbmN5X21zGCAgASgDEgwKBG1vdGQYISABKAkSFgoOc2VydmVyX3ZlcnNpb24YIiABKAkSGAoQcHJvdG9jb2xfdmVyc2lvbhgjIAEoBRIVCg1wbGF5ZXJfc2FtcGxlGCQgAygJEhcKD21heF9wbGF5ZXJzX3NscBglIAEoBRIPCgdmYXZpY29uGCYgASgJQg8KDV9sYXN0X3N0YXJ0ZWRCEgoQX3dha2Vfb25fY29ubmVjdEIPCg1fYXV0b19yZXN0YXJ0QhsKGV9hdXRvX3Jlc3RhcnRfbWF4X3JldHJpZXNCHAoaX2F1dG9fcmVzdGFydF9iYWNrb2ZmX3NlY3NCEwoRX2Nvbm5lY3Rpb25fbGltaXQiWwoOQWRkaXRpb25hbFBvcnQSDAoEbmFtZRgBIAEoCRIWCg5jb250YWluZXJfcG9ydBgCIAEoBRIRCglob3N0X3BvcnQYAyABKAUSEAoIcHJvdG9jb2wYBCABKAkiYgoLVm9sdW1lTW91bnQSDgoGc291cmNlGAEgASgJEg4KBnRhcmdldBgCIAEoCRIRCglyZWFkX29ubHkYAyABKAgSDAoEdHlwZRgEIAEoCRISCgpjcmVhdGVfZGlyGAUgASgIIvYECg9Eb2NrZXJPdmVycmlkZXMSRAoLZW52aXJvbm1lbnQYASADKAsyLy5kaXNjb3BhbmVsLnYxLkRvY2tlck92ZXJyaWRlcy5FbnZpcm9ubWVudEVudHJ5EisKB3ZvbHVtZXMYAiADKAsyGi5kaXNjb3BhbmVsLnYxLlZvbHVtZU1vdW50EhQKDG5ldHdvcmtfbW9kZRgDIAEoCRIWCg5yZXN0YXJ0X3BvbGljeRgEIAEoCRIRCgljcHVfbGltaXQYBSABKAESFAoMbWVtb3J5X2xpbWl0GAYgASgDEjoKBmxhYmVscxgHIAMoCzIqLmRpc2NvcGFuZWwudjEuRG9ja2VyT3ZlcnJpZGVzLkxhYmVsc0VudHJ5Eg8KB2NhcF9hZGQYCCADKAkSEAoIY2FwX2Ryb3AYCSADKAkSDwoHZGV2aWNlcxgKIAMoCRITCgtleHRyYV9ob3N0cxgLIAMoCRISCgpwcml2aWxlZ2VkGAwgASgIEhEKCXJlYWRfb25seRgNIAEoCBIUCgxzZWN1cml0eV9vcHQYDiADKAkSEAoIc2htX3NpemUYDyABKAMSDAoEdXNlchgQIAEoCRITCgt3b3JraW5nX2RpchgRIAEoCRISCgplbnRyeXBvaW50GBIgAygJEg8KB2NvbW1hbmQYEyADKAkSCwoDZG5zGBQgAygJEg0KBWltYWdlGBUgASgJGjIKEEVudmlyb25tZW50RW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ARotCgtMYWJlbHNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBItEBCg1Qcm94eUxpc3RlbmVyEgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSEwoLZGVzY3JpcHRpb24YAyABKAkSDAoEcG9ydBgEIAEoBRIPCgdlbmFibGVkGAUgASgIEhIKCmlzX2RlZmF1bHQYBiABKAgSLgoKY3JlYXRlZF9hdBgHIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKdXBkYXRlZF9hdBgIIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXAi1AEKC1Byb3h5Q29uZmlnEgoKAmlkGAEgASgJEg8KB2VuYWJsZWQYAiABKAgSEAoIYmFzZV91cmwYAyABKAkSLgoKY3JlYXRlZF9hdBgEIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKdXBkYXRlZF9hdBgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASHwoSZmFsbGJhY2tfc2VydmVyX2lkGAYgASgJSACIAQFCFQoTX2ZhbGxiYWNrX3NlcnZlcl9pZCJBCgpQZXJtaXNzaW9uEhAKCHJlc291cmNlGAEgASgJEg4KBmFjdGlvbhgCIAEoCRIRCglvYmplY3RfaWQYAyABKAki7AEKBFJvbGUSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIRCglpc19zeXN0ZW0YBCABKAgSEgoKaXNfZGVmYXVsdBgFIAEoCBIuCgtwZXJtaXNzaW9ucxgGIAMoCzIZLmRpc2NvcGFuZWwudjEuUGVybWlzc2lvbhIuCgpjcmVhdGVkX2F0GAcgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIuCgp1cGRhdGVkX2F0GAggASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCqLAgoMU2VydmVyU3RhdHVzEh0KGVNFUlZFUl9TVEFUVVNfVU5TUEVDSUZJRUQQABIaChZTRVJWRVJfU1RBVFVTX0NSRUFUSU5HEAESGgoWU0VSVkVSX1NUQVRVU19TVEFSVElORxACEhkKFVNFUlZFUl9TVEFUVVNfUlVOTklORxADEhoKFlNFUlZFUl9TVEFUVVNfU1RPUFBJTkcQBBIZChVTRVJWRVJfU1RBVFVTX1NUT1BQRUQQBRIcChhTRVJWRVJfU1RBVFVTX1JFU1RBUlRJTkcQBhIXChNTRVJWRVJfU1RBVFVTX0VSUk9SEAcSGwoXU0VSVkVSX1NUQVRVU19VTkhFQUxUSFkQCCrLAwoJTW9kTG9hZGVyEhoKFk1PRF9MT0FERVJfVU5TUEVDSUZJRUQQABIWChJNT0RfTE9BREVSX1ZBTklMTEEQARIUChBNT0RfTE9BREVSX0ZPUkdFEAISFQoRTU9EX0xPQURFUl9GQUJSSUMQAxIUChBNT0RfTE9BREVSX1FVSUxUEAQSFAoQTU9EX0xPQURFUl9QQVBFUhAFEhUKEU1PRF9MT0FERVJfU1BJR09UEAYSFQoRTU9EX0xPQURFUl9CVUtLSVQQBxIVChFNT0RfTE9BREVSX1BVUlBVUhAIEh0KGU1PRF9MT0FERVJfU1BPTkdFX1ZBTklMTEEQCRIbChdNT0RfTE9BREVSX1NQT05HRV9GT1JHRRAKEhUKEU1PRF9MT0FERVJfTU9ISVNUEAsSGAoUTU9EX0xPQURFUl9DQVRTRVJWRVIQDBIXChNNT0RfTE9BREVSX0FSQ0xJR0hUEA0SHgoaTU9EX0xPQURFUl9BVVRPX0NVUlNFRk9SR0UQDhIXChNNT0RfTE9BREVSX01PRFJJTlRIEA8SFwoTTU9EX0xPQURFUl9ORU9GT1JHRRAQEhQKEE1PRF9MT0FERVJfRk9MSUEQEUJGWkRnaXRodWIuY29tL25pY2toZXllci9kaXNjb3BhbmVsL3BrZy9wcm90by9kaXNjb3BhbmVsL3YxO2Rpc2NvcGFuZWx2MWIGcHJvdG8z',
+		[file_google_protobuf_timestamp]
+	);
 
 /**
  * System user account
  *
  * @generated from message discopanel.v1.User
  */
-export type User = Message<"discopanel.v1.User"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type User = Message<'discopanel.v1.User'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string username = 2;
-   */
-  username: string;
+	/**
+	 * @generated from field: string username = 2;
+	 */
+	username: string;
 
-  /**
-   * @generated from field: optional string email = 3;
-   */
-  email?: string | undefined;
+	/**
+	 * @generated from field: optional string email = 3;
+	 */
+	email?: string | undefined;
 
-  /**
-   * @generated from field: string auth_provider = 4;
-   */
-  authProvider: string;
+	/**
+	 * @generated from field: string auth_provider = 4;
+	 */
+	authProvider: string;
 
-  /**
-   * @generated from field: bool is_active = 5;
-   */
-  isActive: boolean;
+	/**
+	 * @generated from field: bool is_active = 5;
+	 */
+	isActive: boolean;
 
-  /**
-   * @generated from field: repeated string roles = 6;
-   */
-  roles: string[];
+	/**
+	 * @generated from field: repeated string roles = 6;
+	 */
+	roles: string[];
 
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 7;
-   */
-  createdAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp created_at = 7;
+	 */
+	createdAt?: Timestamp | undefined;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 8;
-   */
-  updatedAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp updated_at = 8;
+	 */
+	updatedAt?: Timestamp | undefined;
 
-  /**
-   * @generated from field: optional google.protobuf.Timestamp last_login = 9;
-   */
-  lastLogin?: Timestamp | undefined;
+	/**
+	 * @generated from field: optional google.protobuf.Timestamp last_login = 9;
+	 */
+	lastLogin?: Timestamp | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.User.
  * Use `create(UserSchema)` to create a new message.
  */
-export const UserSchema: GenMessage<User> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_common, 0);
+export const UserSchema: GenMessage<User> = /*@__PURE__*/ messageDesc(file_discopanel_v1_common, 0);
 
 /**
  * Minecraft server instance
  *
  * @generated from message discopanel.v1.Server
  */
-export type Server = Message<"discopanel.v1.Server"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type Server = Message<'discopanel.v1.Server'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+	/**
+	 * @generated from field: string name = 2;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string description = 3;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 3;
+	 */
+	description: string;
 
-  /**
-   * @generated from field: discopanel.v1.ModLoader mod_loader = 4;
-   */
-  modLoader: ModLoader;
+	/**
+	 * @generated from field: discopanel.v1.ModLoader mod_loader = 4;
+	 */
+	modLoader: ModLoader;
 
-  /**
-   * @generated from field: string mc_version = 5;
-   */
-  mcVersion: string;
+	/**
+	 * @generated from field: string mc_version = 5;
+	 */
+	mcVersion: string;
 
-  /**
-   * @generated from field: discopanel.v1.ServerStatus status = 6;
-   */
-  status: ServerStatus;
+	/**
+	 * @generated from field: discopanel.v1.ServerStatus status = 6;
+	 */
+	status: ServerStatus;
 
-  /**
-   * @generated from field: int32 port = 7;
-   */
-  port: number;
+	/**
+	 * @generated from field: int32 port = 7;
+	 */
+	port: number;
 
-  /**
-   * @generated from field: string proxy_hostname = 8;
-   */
-  proxyHostname: string;
+	/**
+	 * @generated from field: string proxy_hostname = 8;
+	 */
+	proxyHostname: string;
 
-  /**
-   * @generated from field: string proxy_listener_id = 9;
-   */
-  proxyListenerId: string;
+	/**
+	 * @generated from field: string proxy_listener_id = 9;
+	 */
+	proxyListenerId: string;
 
-  /**
-   * @generated from field: int32 proxy_port = 10;
-   */
-  proxyPort: number;
+	/**
+	 * @generated from field: int32 proxy_port = 10;
+	 */
+	proxyPort: number;
 
-  /**
-   * @generated from field: int32 max_players = 11;
-   */
-  maxPlayers: number;
+	/**
+	 * @generated from field: int32 max_players = 11;
+	 */
+	maxPlayers: number;
 
-  /**
-   * @generated from field: int32 memory = 12;
-   */
-  memory: number;
+	/**
+	 * @generated from field: int32 memory = 12;
+	 */
+	memory: number;
 
-  /**
-   * @generated from field: string data_path = 13;
-   */
-  dataPath: string;
+	/**
+	 * @generated from field: string data_path = 13;
+	 */
+	dataPath: string;
 
-  /**
-   * @generated from field: string container_id = 14;
-   */
-  containerId: string;
+	/**
+	 * @generated from field: string container_id = 14;
+	 */
+	containerId: string;
 
-  /**
-   * @generated from field: optional google.protobuf.Timestamp last_started = 15;
-   */
-  lastStarted?: Timestamp | undefined;
+	/**
+	 * @generated from field: optional google.protobuf.Timestamp last_started = 15;
+	 */
+	lastStarted?: Timestamp | undefined;
 
-  /**
-   * @generated from field: int32 java_version = 16;
-   */
-  javaVersion: number;
+	/**
+	 * @generated from field: int32 java_version = 16;
+	 */
+	javaVersion: number;
 
-  /**
-   * @generated from field: string docker_image = 17;
-   */
-  dockerImage: string;
+	/**
+	 * @generated from field: string docker_image = 17;
+	 */
+	dockerImage: string;
 
-  /**
-   * @generated from field: bool auto_start = 18;
-   */
-  autoStart: boolean;
+	/**
+	 * @generated from field: bool auto_start = 18;
+	 */
+	autoStart: boolean;
 
-  /**
-   * @generated from field: bool detached = 19;
-   */
-  detached: boolean;
+	/**
+	 * @generated from field: bool detached = 19;
+	 */
+	detached: boolean;
 
-  /**
-   * @generated from field: string tps_command = 20;
-   */
-  tpsCommand: string;
+	/**
+	 * @generated from field: string tps_command = 20;
+	 */
+	tpsCommand: string;
 
-  /**
-   * Runtime stats
-   *
-   * @generated from field: int64 memory_usage = 21;
-   */
-  memoryUsage: bigint;
+	/**
+	 * Runtime stats
+	 *
+	 * @generated from field: int64 memory_usage = 21;
+	 */
+	memoryUsage: bigint;
 
-  /**
-   * @generated from field: double cpu_percent = 22;
-   */
-  cpuPercent: number;
+	/**
+	 * @generated from field: double cpu_percent = 22;
+	 */
+	cpuPercent: number;
 
-  /**
-   * @generated from field: int64 disk_usage = 23;
-   */
-  diskUsage: bigint;
+	/**
+	 * @generated from field: int64 disk_usage = 23;
+	 */
+	diskUsage: bigint;
 
-  /**
-   * @generated from field: int64 disk_total = 24;
-   */
-  diskTotal: bigint;
+	/**
+	 * @generated from field: int64 disk_total = 24;
+	 */
+	diskTotal: bigint;
 
-  /**
-   * @generated from field: int32 players_online = 25;
-   */
-  playersOnline: number;
+	/**
+	 * @generated from field: int32 players_online = 25;
+	 */
+	playersOnline: number;
 
-  /**
-   * @generated from field: int64 world_size = 39;
-   */
-  worldSize: bigint;
+	/**
+	 * @generated from field: int64 world_size = 39;
+	 */
+	worldSize: bigint;
 
-  /**
-   * @generated from field: double tps = 26;
-   */
-  tps: number;
+	/**
+	 * @generated from field: double tps = 26;
+	 */
+	tps: number;
 
-  /**
-   * Available (free) disk space in bytes on the data drive
-   *
-   * @generated from field: int64 disk_free = 40;
-   */
-  diskFree: bigint;
+	/**
+	 * Available (free) disk space in bytes on the data drive
+	 *
+	 * @generated from field: int64 disk_free = 40;
+	 */
+	diskFree: bigint;
 
-  /**
-   * Start the server automatically when a client connects through the proxy
-   *
-   * @generated from field: optional bool wake_on_connect = 41;
-   */
-  wakeOnConnect?: boolean | undefined;
+	/**
+	 * Start the server automatically when a client connects through the proxy
+	 *
+	 * @generated from field: optional bool wake_on_connect = 41;
+	 */
+	wakeOnConnect?: boolean | undefined;
 
-  /**
-   * Public address discovered from an attached playit.gg tunnel (empty if none)
-   *
-   * @generated from field: string public_address = 42;
-   */
-  publicAddress: string;
+	/**
+	 * Public address discovered from an attached playit.gg tunnel (empty if none)
+	 *
+	 * @generated from field: string public_address = 42;
+	 */
+	publicAddress: string;
 
-  /**
-   * Public port matching public_address
-   *
-   * @generated from field: int32 public_port = 43;
-   */
-  publicPort: number;
+	/**
+	 * Public port matching public_address
+	 *
+	 * @generated from field: int32 public_port = 43;
+	 */
+	publicPort: number;
 
-  /**
-   * Restart automatically when the server process exits unexpectedly
-   *
-   * @generated from field: optional bool auto_restart = 44;
-   */
-  autoRestart?: boolean | undefined;
+	/**
+	 * Restart automatically when the server process exits unexpectedly
+	 *
+	 * @generated from field: optional bool auto_restart = 44;
+	 */
+	autoRestart?: boolean | undefined;
 
-  /**
-   * Max consecutive auto-restarts before giving up (0 = unlimited)
-   *
-   * @generated from field: optional int32 auto_restart_max_retries = 45;
-   */
-  autoRestartMaxRetries?: number | undefined;
+	/**
+	 * Max consecutive auto-restarts before giving up (0 = unlimited)
+	 *
+	 * @generated from field: optional int32 auto_restart_max_retries = 45;
+	 */
+	autoRestartMaxRetries?: number | undefined;
 
-  /**
-   * Base backoff between auto-restarts, doubled each retry up to 10x
-   *
-   * @generated from field: optional int32 auto_restart_backoff_secs = 46;
-   */
-  autoRestartBackoffSecs?: number | undefined;
+	/**
+	 * Base backoff between auto-restarts, doubled each retry up to 10x
+	 *
+	 * @generated from field: optional int32 auto_restart_backoff_secs = 46;
+	 */
+	autoRestartBackoffSecs?: number | undefined;
 
-  /**
-   * Max simultaneous player connections through the proxy (0 = unlimited)
-   *
-   * @generated from field: optional int32 connection_limit = 47;
-   */
-  connectionLimit?: number | undefined;
+	/**
+	 * Max simultaneous player connections through the proxy (0 = unlimited)
+	 *
+	 * @generated from field: optional int32 connection_limit = 47;
+	 */
+	connectionLimit?: number | undefined;
 
-  /**
-   * Additional configuration
-   *
-   * @generated from field: repeated discopanel.v1.AdditionalPort additional_ports = 27;
-   */
-  additionalPorts: AdditionalPort[];
+	/**
+	 * Additional configuration
+	 *
+	 * @generated from field: repeated discopanel.v1.AdditionalPort additional_ports = 27;
+	 */
+	additionalPorts: AdditionalPort[];
 
-  /**
-   * @generated from field: discopanel.v1.DockerOverrides docker_overrides = 28;
-   */
-  dockerOverrides?: DockerOverrides | undefined;
+	/**
+	 * @generated from field: discopanel.v1.DockerOverrides docker_overrides = 28;
+	 */
+	dockerOverrides?: DockerOverrides | undefined;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 29;
-   */
-  createdAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp created_at = 29;
+	 */
+	createdAt?: Timestamp | undefined;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 30;
-   */
-  updatedAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp updated_at = 30;
+	 */
+	updatedAt?: Timestamp | undefined;
 
-  /**
-   * SLP
-   *
-   * @generated from field: bool slp_available = 31;
-   */
-  slpAvailable: boolean;
+	/**
+	 * SLP
+	 *
+	 * @generated from field: bool slp_available = 31;
+	 */
+	slpAvailable: boolean;
 
-  /**
-   * @generated from field: int64 slp_latency_ms = 32;
-   */
-  slpLatencyMs: bigint;
+	/**
+	 * @generated from field: int64 slp_latency_ms = 32;
+	 */
+	slpLatencyMs: bigint;
 
-  /**
-   * @generated from field: string motd = 33;
-   */
-  motd: string;
+	/**
+	 * @generated from field: string motd = 33;
+	 */
+	motd: string;
 
-  /**
-   * @generated from field: string server_version = 34;
-   */
-  serverVersion: string;
+	/**
+	 * @generated from field: string server_version = 34;
+	 */
+	serverVersion: string;
 
-  /**
-   * @generated from field: int32 protocol_version = 35;
-   */
-  protocolVersion: number;
+	/**
+	 * @generated from field: int32 protocol_version = 35;
+	 */
+	protocolVersion: number;
 
-  /**
-   * @generated from field: repeated string player_sample = 36;
-   */
-  playerSample: string[];
+	/**
+	 * @generated from field: repeated string player_sample = 36;
+	 */
+	playerSample: string[];
 
-  /**
-   * @generated from field: int32 max_players_slp = 37;
-   */
-  maxPlayersSlp: number;
+	/**
+	 * @generated from field: int32 max_players_slp = 37;
+	 */
+	maxPlayersSlp: number;
 
-  /**
-   * Base64 PNG
-   *
-   * @generated from field: string favicon = 38;
-   */
-  favicon: string;
+	/**
+	 * Base64 PNG
+	 *
+	 * @generated from field: string favicon = 38;
+	 */
+	favicon: string;
 };
 
 /**
  * Describes the message discopanel.v1.Server.
  * Use `create(ServerSchema)` to create a new message.
  */
-export const ServerSchema: GenMessage<Server> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_common, 1);
+export const ServerSchema: GenMessage<Server> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_common, 1);
 
 /**
  * Extra port mapping for container
  *
  * @generated from message discopanel.v1.AdditionalPort
  */
-export type AdditionalPort = Message<"discopanel.v1.AdditionalPort"> & {
-  /**
-   * User-friendly name for the port (e.g., "BlueMap Web")
-   *
-   * @generated from field: string name = 1;
-   */
-  name: string;
+export type AdditionalPort = Message<'discopanel.v1.AdditionalPort'> & {
+	/**
+	 * User-friendly name for the port (e.g., "BlueMap Web")
+	 *
+	 * @generated from field: string name = 1;
+	 */
+	name: string;
 
-  /**
-   * Port inside the container
-   *
-   * @generated from field: int32 container_port = 2;
-   */
-  containerPort: number;
+	/**
+	 * Port inside the container
+	 *
+	 * @generated from field: int32 container_port = 2;
+	 */
+	containerPort: number;
 
-  /**
-   * Port on the host machine
-   *
-   * @generated from field: int32 host_port = 3;
-   */
-  hostPort: number;
+	/**
+	 * Port on the host machine
+	 *
+	 * @generated from field: int32 host_port = 3;
+	 */
+	hostPort: number;
 
-  /**
-   * Protocol: "tcp" or "udp" (defaults to "tcp" if empty)
-   *
-   * @generated from field: string protocol = 4;
-   */
-  protocol: string;
+	/**
+	 * Protocol: "tcp" or "udp" (defaults to "tcp" if empty)
+	 *
+	 * @generated from field: string protocol = 4;
+	 */
+	protocol: string;
 };
 
 /**
  * Describes the message discopanel.v1.AdditionalPort.
  * Use `create(AdditionalPortSchema)` to create a new message.
  */
-export const AdditionalPortSchema: GenMessage<AdditionalPort> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_common, 2);
+export const AdditionalPortSchema: GenMessage<AdditionalPort> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_common, 2);
 
 /**
  * Volume mount configuration for container
  *
  * @generated from message discopanel.v1.VolumeMount
  */
-export type VolumeMount = Message<"discopanel.v1.VolumeMount"> & {
-  /**
-   * Host path or volume name
-   *
-   * @generated from field: string source = 1;
-   */
-  source: string;
+export type VolumeMount = Message<'discopanel.v1.VolumeMount'> & {
+	/**
+	 * Host path or volume name
+	 *
+	 * @generated from field: string source = 1;
+	 */
+	source: string;
 
-  /**
-   * Container path
-   *
-   * @generated from field: string target = 2;
-   */
-  target: string;
+	/**
+	 * Container path
+	 *
+	 * @generated from field: string target = 2;
+	 */
+	target: string;
 
-  /**
-   * Mount as read-only
-   *
-   * @generated from field: bool read_only = 3;
-   */
-  readOnly: boolean;
+	/**
+	 * Mount as read-only
+	 *
+	 * @generated from field: bool read_only = 3;
+	 */
+	readOnly: boolean;
 
-  /**
-   * Mount type: "bind" or "volume" (defaults to "bind")
-   *
-   * @generated from field: string type = 4;
-   */
-  type: string;
+	/**
+	 * Mount type: "bind" or "volume" (defaults to "bind")
+	 *
+	 * @generated from field: string type = 4;
+	 */
+	type: string;
 
-  /**
-   * Pre-create source dir
-   *
-   * @generated from field: bool create_dir = 5;
-   */
-  createDir: boolean;
+	/**
+	 * Pre-create source dir
+	 *
+	 * @generated from field: bool create_dir = 5;
+	 */
+	createDir: boolean;
 };
 
 /**
  * Describes the message discopanel.v1.VolumeMount.
  * Use `create(VolumeMountSchema)` to create a new message.
  */
-export const VolumeMountSchema: GenMessage<VolumeMount> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_common, 3);
+export const VolumeMountSchema: GenMessage<VolumeMount> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_common, 3);
 
 /**
  * Container runtime customization
  *
  * @generated from message discopanel.v1.DockerOverrides
  */
-export type DockerOverrides = Message<"discopanel.v1.DockerOverrides"> & {
-  /**
-   * Additional environment variables
-   *
-   * @generated from field: map<string, string> environment = 1;
-   */
-  environment: { [key: string]: string };
+export type DockerOverrides = Message<'discopanel.v1.DockerOverrides'> & {
+	/**
+	 * Additional environment variables
+	 *
+	 * @generated from field: map<string, string> environment = 1;
+	 */
+	environment: { [key: string]: string };
 
-  /**
-   * Additional volume mounts
-   *
-   * @generated from field: repeated discopanel.v1.VolumeMount volumes = 2;
-   */
-  volumes: VolumeMount[];
+	/**
+	 * Additional volume mounts
+	 *
+	 * @generated from field: repeated discopanel.v1.VolumeMount volumes = 2;
+	 */
+	volumes: VolumeMount[];
 
-  /**
-   * Override network mode
-   *
-   * @generated from field: string network_mode = 3;
-   */
-  networkMode: string;
+	/**
+	 * Override network mode
+	 *
+	 * @generated from field: string network_mode = 3;
+	 */
+	networkMode: string;
 
-  /**
-   * Override restart policy
-   *
-   * @generated from field: string restart_policy = 4;
-   */
-  restartPolicy: string;
+	/**
+	 * Override restart policy
+	 *
+	 * @generated from field: string restart_policy = 4;
+	 */
+	restartPolicy: string;
 
-  /**
-   * CPU limit (e.g., 1.5 for 1.5 cores)
-   *
-   * @generated from field: double cpu_limit = 5;
-   */
-  cpuLimit: number;
+	/**
+	 * CPU limit (e.g., 1.5 for 1.5 cores)
+	 *
+	 * @generated from field: double cpu_limit = 5;
+	 */
+	cpuLimit: number;
 
-  /**
-   * Override memory limit in MB
-   *
-   * @generated from field: int64 memory_limit = 6;
-   */
-  memoryLimit: bigint;
+	/**
+	 * Override memory limit in MB
+	 *
+	 * @generated from field: int64 memory_limit = 6;
+	 */
+	memoryLimit: bigint;
 
-  /**
-   * Additional labels
-   *
-   * @generated from field: map<string, string> labels = 7;
-   */
-  labels: { [key: string]: string };
+	/**
+	 * Additional labels
+	 *
+	 * @generated from field: map<string, string> labels = 7;
+	 */
+	labels: { [key: string]: string };
 
-  /**
-   * Linux capabilities to add
-   *
-   * @generated from field: repeated string cap_add = 8;
-   */
-  capAdd: string[];
+	/**
+	 * Linux capabilities to add
+	 *
+	 * @generated from field: repeated string cap_add = 8;
+	 */
+	capAdd: string[];
 
-  /**
-   * Linux capabilities to drop
-   *
-   * @generated from field: repeated string cap_drop = 9;
-   */
-  capDrop: string[];
+	/**
+	 * Linux capabilities to drop
+	 *
+	 * @generated from field: repeated string cap_drop = 9;
+	 */
+	capDrop: string[];
 
-  /**
-   * Device mappings (e.g., "/dev/ttyUSB0:/dev/ttyUSB0")
-   *
-   * @generated from field: repeated string devices = 10;
-   */
-  devices: string[];
+	/**
+	 * Device mappings (e.g., "/dev/ttyUSB0:/dev/ttyUSB0")
+	 *
+	 * @generated from field: repeated string devices = 10;
+	 */
+	devices: string[];
 
-  /**
-   * Extra entries for /etc/hosts
-   *
-   * @generated from field: repeated string extra_hosts = 11;
-   */
-  extraHosts: string[];
+	/**
+	 * Extra entries for /etc/hosts
+	 *
+	 * @generated from field: repeated string extra_hosts = 11;
+	 */
+	extraHosts: string[];
 
-  /**
-   * Run container in privileged mode
-   *
-   * @generated from field: bool privileged = 12;
-   */
-  privileged: boolean;
+	/**
+	 * Run container in privileged mode
+	 *
+	 * @generated from field: bool privileged = 12;
+	 */
+	privileged: boolean;
 
-  /**
-   * Mount root filesystem as read-only
-   *
-   * @generated from field: bool read_only = 13;
-   */
-  readOnly: boolean;
+	/**
+	 * Mount root filesystem as read-only
+	 *
+	 * @generated from field: bool read_only = 13;
+	 */
+	readOnly: boolean;
 
-  /**
-   * Security options
-   *
-   * @generated from field: repeated string security_opt = 14;
-   */
-  securityOpt: string[];
+	/**
+	 * Security options
+	 *
+	 * @generated from field: repeated string security_opt = 14;
+	 */
+	securityOpt: string[];
 
-  /**
-   * Size of /dev/shm in bytes
-   *
-   * @generated from field: int64 shm_size = 15;
-   */
-  shmSize: bigint;
+	/**
+	 * Size of /dev/shm in bytes
+	 *
+	 * @generated from field: int64 shm_size = 15;
+	 */
+	shmSize: bigint;
 
-  /**
-   * User to run commands as
-   *
-   * @generated from field: string user = 16;
-   */
-  user: string;
+	/**
+	 * User to run commands as
+	 *
+	 * @generated from field: string user = 16;
+	 */
+	user: string;
 
-  /**
-   * Working directory inside container
-   *
-   * @generated from field: string working_dir = 17;
-   */
-  workingDir: string;
+	/**
+	 * Working directory inside container
+	 *
+	 * @generated from field: string working_dir = 17;
+	 */
+	workingDir: string;
 
-  /**
-   * Override default entrypoint
-   *
-   * @generated from field: repeated string entrypoint = 18;
-   */
-  entrypoint: string[];
+	/**
+	 * Override default entrypoint
+	 *
+	 * @generated from field: repeated string entrypoint = 18;
+	 */
+	entrypoint: string[];
 
-  /**
-   * Override default command
-   *
-   * @generated from field: repeated string command = 19;
-   */
-  command: string[];
+	/**
+	 * Override default command
+	 *
+	 * @generated from field: repeated string command = 19;
+	 */
+	command: string[];
 
-  /**
-   * Custom DNS servers
-   *
-   * @generated from field: repeated string dns = 20;
-   */
-  dns: string[];
+	/**
+	 * Custom DNS servers
+	 *
+	 * @generated from field: repeated string dns = 20;
+	 */
+	dns: string[];
 
-  /**
-   * Override the container image entirely (full image:tag, e.g. third-party images for legacy Minecraft editions)
-   *
-   * @generated from field: string image = 21;
-   */
-  image: string;
+	/**
+	 * Override the container image entirely (full image:tag, e.g. third-party images for legacy Minecraft editions)
+	 *
+	 * @generated from field: string image = 21;
+	 */
+	image: string;
 };
 
 /**
  * Describes the message discopanel.v1.DockerOverrides.
  * Use `create(DockerOverridesSchema)` to create a new message.
  */
-export const DockerOverridesSchema: GenMessage<DockerOverrides> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_common, 4);
+export const DockerOverridesSchema: GenMessage<DockerOverrides> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_common, 4);
 
 /**
  * TCP proxy listener endpoint
  *
  * @generated from message discopanel.v1.ProxyListener
  */
-export type ProxyListener = Message<"discopanel.v1.ProxyListener"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type ProxyListener = Message<'discopanel.v1.ProxyListener'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+	/**
+	 * @generated from field: string name = 2;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string description = 3;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 3;
+	 */
+	description: string;
 
-  /**
-   * @generated from field: int32 port = 4;
-   */
-  port: number;
+	/**
+	 * @generated from field: int32 port = 4;
+	 */
+	port: number;
 
-  /**
-   * @generated from field: bool enabled = 5;
-   */
-  enabled: boolean;
+	/**
+	 * @generated from field: bool enabled = 5;
+	 */
+	enabled: boolean;
 
-  /**
-   * @generated from field: bool is_default = 6;
-   */
-  isDefault: boolean;
+	/**
+	 * @generated from field: bool is_default = 6;
+	 */
+	isDefault: boolean;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 7;
-   */
-  createdAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp created_at = 7;
+	 */
+	createdAt?: Timestamp | undefined;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 8;
-   */
-  updatedAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp updated_at = 8;
+	 */
+	updatedAt?: Timestamp | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.ProxyListener.
  * Use `create(ProxyListenerSchema)` to create a new message.
  */
-export const ProxyListenerSchema: GenMessage<ProxyListener> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_common, 5);
+export const ProxyListenerSchema: GenMessage<ProxyListener> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_common, 5);
 
 /**
  * Global proxy settings
  *
  * @generated from message discopanel.v1.ProxyConfig
  */
-export type ProxyConfig = Message<"discopanel.v1.ProxyConfig"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type ProxyConfig = Message<'discopanel.v1.ProxyConfig'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: bool enabled = 2;
-   */
-  enabled: boolean;
+	/**
+	 * @generated from field: bool enabled = 2;
+	 */
+	enabled: boolean;
 
-  /**
-   * @generated from field: string base_url = 3;
-   */
-  baseUrl: string;
+	/**
+	 * @generated from field: string base_url = 3;
+	 */
+	baseUrl: string;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 4;
-   */
-  createdAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp created_at = 4;
+	 */
+	createdAt?: Timestamp | undefined;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 5;
-   */
-  updatedAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp updated_at = 5;
+	 */
+	updatedAt?: Timestamp | undefined;
 
-  /**
-   * Lobby: hostname routes pointing at an offline server are forwarded here
-   *
-   * @generated from field: optional string fallback_server_id = 6;
-   */
-  fallbackServerId?: string | undefined;
+	/**
+	 * Lobby: hostname routes pointing at an offline server are forwarded here
+	 *
+	 * @generated from field: optional string fallback_server_id = 6;
+	 */
+	fallbackServerId?: string | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.ProxyConfig.
  * Use `create(ProxyConfigSchema)` to create a new message.
  */
-export const ProxyConfigSchema: GenMessage<ProxyConfig> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_common, 6);
+export const ProxyConfigSchema: GenMessage<ProxyConfig> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_common, 6);
 
 /**
  * Permission entry for RBAC
  *
  * @generated from message discopanel.v1.Permission
  */
-export type Permission = Message<"discopanel.v1.Permission"> & {
-  /**
-   * @generated from field: string resource = 1;
-   */
-  resource: string;
+export type Permission = Message<'discopanel.v1.Permission'> & {
+	/**
+	 * @generated from field: string resource = 1;
+	 */
+	resource: string;
 
-  /**
-   * @generated from field: string action = 2;
-   */
-  action: string;
+	/**
+	 * @generated from field: string action = 2;
+	 */
+	action: string;
 
-  /**
-   * @generated from field: string object_id = 3;
-   */
-  objectId: string;
+	/**
+	 * @generated from field: string object_id = 3;
+	 */
+	objectId: string;
 };
 
 /**
  * Describes the message discopanel.v1.Permission.
  * Use `create(PermissionSchema)` to create a new message.
  */
-export const PermissionSchema: GenMessage<Permission> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_common, 7);
+export const PermissionSchema: GenMessage<Permission> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_common, 7);
 
 /**
  * Role definition
  *
  * @generated from message discopanel.v1.Role
  */
-export type Role = Message<"discopanel.v1.Role"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type Role = Message<'discopanel.v1.Role'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+	/**
+	 * @generated from field: string name = 2;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string description = 3;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 3;
+	 */
+	description: string;
 
-  /**
-   * @generated from field: bool is_system = 4;
-   */
-  isSystem: boolean;
+	/**
+	 * @generated from field: bool is_system = 4;
+	 */
+	isSystem: boolean;
 
-  /**
-   * @generated from field: bool is_default = 5;
-   */
-  isDefault: boolean;
+	/**
+	 * @generated from field: bool is_default = 5;
+	 */
+	isDefault: boolean;
 
-  /**
-   * @generated from field: repeated discopanel.v1.Permission permissions = 6;
-   */
-  permissions: Permission[];
+	/**
+	 * @generated from field: repeated discopanel.v1.Permission permissions = 6;
+	 */
+	permissions: Permission[];
 
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 7;
-   */
-  createdAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp created_at = 7;
+	 */
+	createdAt?: Timestamp | undefined;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 8;
-   */
-  updatedAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp updated_at = 8;
+	 */
+	updatedAt?: Timestamp | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.Role.
  * Use `create(RoleSchema)` to create a new message.
  */
-export const RoleSchema: GenMessage<Role> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_common, 8);
+export const RoleSchema: GenMessage<Role> = /*@__PURE__*/ messageDesc(file_discopanel_v1_common, 8);
 
 /**
  * Container runtime state
@@ -787,57 +796,58 @@ export const RoleSchema: GenMessage<Role> = /*@__PURE__*/
  * @generated from enum discopanel.v1.ServerStatus
  */
 export enum ServerStatus {
-  /**
-   * @generated from enum value: SERVER_STATUS_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
+	/**
+	 * @generated from enum value: SERVER_STATUS_UNSPECIFIED = 0;
+	 */
+	UNSPECIFIED = 0,
 
-  /**
-   * @generated from enum value: SERVER_STATUS_CREATING = 1;
-   */
-  CREATING = 1,
+	/**
+	 * @generated from enum value: SERVER_STATUS_CREATING = 1;
+	 */
+	CREATING = 1,
 
-  /**
-   * @generated from enum value: SERVER_STATUS_STARTING = 2;
-   */
-  STARTING = 2,
+	/**
+	 * @generated from enum value: SERVER_STATUS_STARTING = 2;
+	 */
+	STARTING = 2,
 
-  /**
-   * @generated from enum value: SERVER_STATUS_RUNNING = 3;
-   */
-  RUNNING = 3,
+	/**
+	 * @generated from enum value: SERVER_STATUS_RUNNING = 3;
+	 */
+	RUNNING = 3,
 
-  /**
-   * @generated from enum value: SERVER_STATUS_STOPPING = 4;
-   */
-  STOPPING = 4,
+	/**
+	 * @generated from enum value: SERVER_STATUS_STOPPING = 4;
+	 */
+	STOPPING = 4,
 
-  /**
-   * @generated from enum value: SERVER_STATUS_STOPPED = 5;
-   */
-  STOPPED = 5,
+	/**
+	 * @generated from enum value: SERVER_STATUS_STOPPED = 5;
+	 */
+	STOPPED = 5,
 
-  /**
-   * @generated from enum value: SERVER_STATUS_RESTARTING = 6;
-   */
-  RESTARTING = 6,
+	/**
+	 * @generated from enum value: SERVER_STATUS_RESTARTING = 6;
+	 */
+	RESTARTING = 6,
 
-  /**
-   * @generated from enum value: SERVER_STATUS_ERROR = 7;
-   */
-  ERROR = 7,
+	/**
+	 * @generated from enum value: SERVER_STATUS_ERROR = 7;
+	 */
+	ERROR = 7,
 
-  /**
-   * @generated from enum value: SERVER_STATUS_UNHEALTHY = 8;
-   */
-  UNHEALTHY = 8,
+	/**
+	 * @generated from enum value: SERVER_STATUS_UNHEALTHY = 8;
+	 */
+	UNHEALTHY = 8
 }
 
 /**
  * Describes the enum discopanel.v1.ServerStatus.
  */
-export const ServerStatusSchema: GenEnum<ServerStatus> = /*@__PURE__*/
-  enumDesc(file_discopanel_v1_common, 0);
+export const ServerStatusSchema: GenEnum<ServerStatus> =
+	/*@__PURE__*/
+	enumDesc(file_discopanel_v1_common, 0);
 
 /**
  * Minecraft server software type
@@ -845,100 +855,100 @@ export const ServerStatusSchema: GenEnum<ServerStatus> = /*@__PURE__*/
  * @generated from enum discopanel.v1.ModLoader
  */
 export enum ModLoader {
-  /**
-   * @generated from enum value: MOD_LOADER_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
+	/**
+	 * @generated from enum value: MOD_LOADER_UNSPECIFIED = 0;
+	 */
+	UNSPECIFIED = 0,
 
-  /**
-   * @generated from enum value: MOD_LOADER_VANILLA = 1;
-   */
-  VANILLA = 1,
+	/**
+	 * @generated from enum value: MOD_LOADER_VANILLA = 1;
+	 */
+	VANILLA = 1,
 
-  /**
-   * @generated from enum value: MOD_LOADER_FORGE = 2;
-   */
-  FORGE = 2,
+	/**
+	 * @generated from enum value: MOD_LOADER_FORGE = 2;
+	 */
+	FORGE = 2,
 
-  /**
-   * @generated from enum value: MOD_LOADER_FABRIC = 3;
-   */
-  FABRIC = 3,
+	/**
+	 * @generated from enum value: MOD_LOADER_FABRIC = 3;
+	 */
+	FABRIC = 3,
 
-  /**
-   * @generated from enum value: MOD_LOADER_QUILT = 4;
-   */
-  QUILT = 4,
+	/**
+	 * @generated from enum value: MOD_LOADER_QUILT = 4;
+	 */
+	QUILT = 4,
 
-  /**
-   * @generated from enum value: MOD_LOADER_PAPER = 5;
-   */
-  PAPER = 5,
+	/**
+	 * @generated from enum value: MOD_LOADER_PAPER = 5;
+	 */
+	PAPER = 5,
 
-  /**
-   * @generated from enum value: MOD_LOADER_SPIGOT = 6;
-   */
-  SPIGOT = 6,
+	/**
+	 * @generated from enum value: MOD_LOADER_SPIGOT = 6;
+	 */
+	SPIGOT = 6,
 
-  /**
-   * @generated from enum value: MOD_LOADER_BUKKIT = 7;
-   */
-  BUKKIT = 7,
+	/**
+	 * @generated from enum value: MOD_LOADER_BUKKIT = 7;
+	 */
+	BUKKIT = 7,
 
-  /**
-   * @generated from enum value: MOD_LOADER_PURPUR = 8;
-   */
-  PURPUR = 8,
+	/**
+	 * @generated from enum value: MOD_LOADER_PURPUR = 8;
+	 */
+	PURPUR = 8,
 
-  /**
-   * @generated from enum value: MOD_LOADER_SPONGE_VANILLA = 9;
-   */
-  SPONGE_VANILLA = 9,
+	/**
+	 * @generated from enum value: MOD_LOADER_SPONGE_VANILLA = 9;
+	 */
+	SPONGE_VANILLA = 9,
 
-  /**
-   * @generated from enum value: MOD_LOADER_SPONGE_FORGE = 10;
-   */
-  SPONGE_FORGE = 10,
+	/**
+	 * @generated from enum value: MOD_LOADER_SPONGE_FORGE = 10;
+	 */
+	SPONGE_FORGE = 10,
 
-  /**
-   * @generated from enum value: MOD_LOADER_MOHIST = 11;
-   */
-  MOHIST = 11,
+	/**
+	 * @generated from enum value: MOD_LOADER_MOHIST = 11;
+	 */
+	MOHIST = 11,
 
-  /**
-   * @generated from enum value: MOD_LOADER_CATSERVER = 12;
-   */
-  CATSERVER = 12,
+	/**
+	 * @generated from enum value: MOD_LOADER_CATSERVER = 12;
+	 */
+	CATSERVER = 12,
 
-  /**
-   * @generated from enum value: MOD_LOADER_ARCLIGHT = 13;
-   */
-  ARCLIGHT = 13,
+	/**
+	 * @generated from enum value: MOD_LOADER_ARCLIGHT = 13;
+	 */
+	ARCLIGHT = 13,
 
-  /**
-   * @generated from enum value: MOD_LOADER_AUTO_CURSEFORGE = 14;
-   */
-  AUTO_CURSEFORGE = 14,
+	/**
+	 * @generated from enum value: MOD_LOADER_AUTO_CURSEFORGE = 14;
+	 */
+	AUTO_CURSEFORGE = 14,
 
-  /**
-   * @generated from enum value: MOD_LOADER_MODRINTH = 15;
-   */
-  MODRINTH = 15,
+	/**
+	 * @generated from enum value: MOD_LOADER_MODRINTH = 15;
+	 */
+	MODRINTH = 15,
 
-  /**
-   * @generated from enum value: MOD_LOADER_NEOFORGE = 16;
-   */
-  NEOFORGE = 16,
+	/**
+	 * @generated from enum value: MOD_LOADER_NEOFORGE = 16;
+	 */
+	NEOFORGE = 16,
 
-  /**
-   * @generated from enum value: MOD_LOADER_FOLIA = 17;
-   */
-  FOLIA = 17,
+	/**
+	 * @generated from enum value: MOD_LOADER_FOLIA = 17;
+	 */
+	FOLIA = 17
 }
 
 /**
  * Describes the enum discopanel.v1.ModLoader.
  */
-export const ModLoaderSchema: GenEnum<ModLoader> = /*@__PURE__*/
-  enumDesc(file_discopanel_v1_common, 1);
-
+export const ModLoaderSchema: GenEnum<ModLoader> =
+	/*@__PURE__*/
+	enumDesc(file_discopanel_v1_common, 1);

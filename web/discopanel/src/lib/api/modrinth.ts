@@ -349,8 +349,12 @@ export async function resolveDependenciesForVersion(
 
 	// 2. Batch fetch projects and pinned versions
 	const [projects, pinnedVersions] = await Promise.all([
-		projectIdsToFetch.size > 0 ? getModrinthProjects(Array.from(projectIdsToFetch)).catch(() => []) : [],
-		versionIdsToFetch.size > 0 ? getModrinthVersionsByIds(Array.from(versionIdsToFetch)).catch(() => []) : []
+		projectIdsToFetch.size > 0
+			? getModrinthProjects(Array.from(projectIdsToFetch)).catch(() => [])
+			: [],
+		versionIdsToFetch.size > 0
+			? getModrinthVersionsByIds(Array.from(versionIdsToFetch)).catch(() => [])
+			: []
 	]);
 
 	const projectMap = new Map<string, ModrinthProjectDetails>();
@@ -395,20 +399,26 @@ export async function resolveDependenciesForVersion(
 
 					// 1. Compatible release
 					const compatibleRelease = projectVersions.find((pv) => {
-						const lMatch = !normalizedLoader || pv.loaders.some((l) => l.toLowerCase() === normalizedLoader);
+						const lMatch =
+							!normalizedLoader || pv.loaders.some((l) => l.toLowerCase() === normalizedLoader);
 						const vMatch = !normalizedMc || pv.game_versions.includes(normalizedMc);
 						return lMatch && vMatch && pv.version_type === 'release';
 					});
 
 					// 2. Any compatible
 					const anyCompatible = projectVersions.find((pv) => {
-						const lMatch = !normalizedLoader || pv.loaders.some((l) => l.toLowerCase() === normalizedLoader);
+						const lMatch =
+							!normalizedLoader || pv.loaders.some((l) => l.toLowerCase() === normalizedLoader);
 						const vMatch = !normalizedMc || pv.game_versions.includes(normalizedMc);
 						return lMatch && vMatch;
 					});
 
 					// 3. Fallback to newest release or first
-					depVersion = compatibleRelease || anyCompatible || projectVersions.find((pv) => pv.version_type === 'release') || projectVersions[0];
+					depVersion =
+						compatibleRelease ||
+						anyCompatible ||
+						projectVersions.find((pv) => pv.version_type === 'release') ||
+						projectVersions[0];
 				}
 			} catch (e) {
 				console.debug(`Could not fetch versions for dependency ${dep.project_id}:`, e);
@@ -416,7 +426,8 @@ export async function resolveDependenciesForVersion(
 		}
 
 		const primaryFile = depVersion?.files?.find((f) => f.primary) || depVersion?.files?.[0];
-		const title = proj?.title || dep.file_name || depVersion?.name || dep.project_id || 'Unknown Dependency';
+		const title =
+			proj?.title || dep.file_name || depVersion?.name || dep.project_id || 'Unknown Dependency';
 		const slug = proj?.slug || dep.project_id || '';
 		const icon = proj?.icon_url || null;
 

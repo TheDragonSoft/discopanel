@@ -202,9 +202,7 @@
 	}
 
 	let displayVersions = $derived(
-		showAllVersions
-			? versions
-			: versions.filter((v) => isVersionCompatible(v, selectedServer))
+		showAllVersions ? versions : versions.filter((v) => isVersionCompatible(v, selectedServer))
 	);
 
 	let filteredDisplayVersions = $derived(
@@ -291,8 +289,7 @@
 			return;
 		}
 
-		const primaryFile =
-			selectedVersion.files.find((f) => f.primary) || selectedVersion.files[0];
+		const primaryFile = selectedVersion.files.find((f) => f.primary) || selectedVersion.files[0];
 		if (!primaryFile || !primaryFile.url) {
 			toast.error('No downloadable file found for this version');
 			return;
@@ -461,30 +458,34 @@
 	>
 		<!-- Header -->
 		<div class="flex items-start justify-between border-b bg-muted/40 p-6">
-			<div class="flex items-start gap-4 min-w-0 flex-1">
+			<div class="flex min-w-0 flex-1 items-start gap-4">
 				{#if project?.icon_url}
 					<img
 						src={project.icon_url}
 						alt={project.title}
-						class="h-16 w-16 rounded-xl object-cover shadow-md shrink-0"
+						class="h-16 w-16 shrink-0 rounded-xl object-cover shadow-md"
 					/>
 				{:else}
 					<div
-						class="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-md shrink-0"
+						class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-md"
 					>
 						<Package class="h-8 w-8" />
 					</div>
 				{/if}
 				<div class="min-w-0 flex-1">
-					<div class="flex items-center gap-2 flex-wrap">
-						<h2 class="truncate text-xl font-bold tracking-tight">{project?.title || 'Use in Server'}</h2>
-						<Badge variant="secondary" class="text-xs uppercase font-semibold">
+					<div class="flex flex-wrap items-center gap-2">
+						<h2 class="truncate text-xl font-bold tracking-tight">
+							{project?.title || 'Use in Server'}
+						</h2>
+						<Badge variant="secondary" class="text-xs font-semibold uppercase">
 							{project?.project_type === 'resourcepack' ? 'Resource Pack' : 'Mod'}
 						</Badge>
 						<Badge variant="outline" class="text-xs">Modrinth</Badge>
 					</div>
-					<p class="text-sm text-muted-foreground mt-1">by <span class="font-medium text-foreground">{project?.author}</span></p>
-					<p class="text-xs text-muted-foreground mt-1 line-clamp-1">{project?.description}</p>
+					<p class="mt-1 text-sm text-muted-foreground">
+						by <span class="font-medium text-foreground">{project?.author}</span>
+					</p>
+					<p class="mt-1 line-clamp-1 text-xs text-muted-foreground">{project?.description}</p>
 				</div>
 			</div>
 			<Button
@@ -498,58 +499,75 @@
 		</div>
 
 		<!-- Body Content -->
-		<div class="flex-1 overflow-y-auto p-6 space-y-5">
+		<div class="flex-1 space-y-5 overflow-y-auto p-6">
 			{#if installStep === 'completed'}
 				<!-- Success Screen -->
-				<div class="flex flex-col items-center justify-center py-6 text-center space-y-4">
-					<div class="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500 ring-8 ring-green-500/5">
+				<div class="flex flex-col items-center justify-center space-y-4 py-6 text-center">
+					<div
+						class="flex h-16 w-16 items-center justify-center rounded-full bg-green-500/10 text-green-500 ring-8 ring-green-500/5"
+					>
 						<CheckCircle2 class="h-10 w-10" />
 					</div>
 					<div class="space-y-1">
 						<h3 class="text-2xl font-bold tracking-tight">Successfully Installed!</h3>
-						<p class="text-sm text-muted-foreground max-w-md">
-							Files have been added to <span class="font-semibold text-foreground">{selectedServer?.name}</span> in the <code class="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">{getTargetDirectory(selectedServer || ({} as Server))}/</code> directory.
+						<p class="max-w-md text-sm text-muted-foreground">
+							Files have been added to <span class="font-semibold text-foreground"
+								>{selectedServer?.name}</span
+							>
+							in the
+							<code class="rounded bg-muted px-1.5 py-0.5 font-mono text-xs"
+								>{getTargetDirectory(selectedServer || ({} as Server))}/</code
+							> directory.
 						</p>
 					</div>
 
 					<!-- Installed Files List -->
-					<div class="w-full max-w-md rounded-xl border bg-muted/20 p-3 space-y-1.5 text-left text-xs">
-						<div class="font-semibold text-muted-foreground mb-2 flex items-center justify-between">
+					<div
+						class="w-full max-w-md space-y-1.5 rounded-xl border bg-muted/20 p-3 text-left text-xs"
+					>
+						<div class="mb-2 flex items-center justify-between font-semibold text-muted-foreground">
 							<span>Installed Items ({installedItems.length}):</span>
-							<span class="font-mono text-[11px] text-primary">/{getTargetDirectory(selectedServer || ({} as Server))}/</span>
+							<span class="font-mono text-[11px] text-primary"
+								>/{getTargetDirectory(selectedServer || ({} as Server))}/</span
+							>
 						</div>
 						{#each installedItems as item (item.filename)}
-							<div class="flex items-center justify-between gap-2 py-1 border-b border-border/40 last:border-b-0">
+							<div
+								class="flex items-center justify-between gap-2 border-b border-border/40 py-1 last:border-b-0"
+							>
 								<div class="flex items-center gap-2 truncate">
 									{#if item.isDep}
-										<Puzzle class="h-3.5 w-3.5 text-primary shrink-0" />
+										<Puzzle class="h-3.5 w-3.5 shrink-0 text-primary" />
 									{:else}
-										<Package class="h-3.5 w-3.5 text-green-500 shrink-0" />
+										<Package class="h-3.5 w-3.5 shrink-0 text-green-500" />
 									{/if}
-									<span class="font-medium truncate">{item.name}</span>
+									<span class="truncate font-medium">{item.name}</span>
 									{#if item.isDep}
-										<Badge variant="outline" class="text-[9px] uppercase px-1 py-0 font-bold">Dependency</Badge>
+										<Badge variant="outline" class="px-1 py-0 text-[9px] font-bold uppercase"
+											>Dependency</Badge
+										>
 									{/if}
 								</div>
-								<span class="font-mono text-muted-foreground text-[11px] truncate max-w-36 shrink-0">{item.filename}</span>
+								<span class="max-w-36 shrink-0 truncate font-mono text-[11px] text-muted-foreground"
+									>{item.filename}</span
+								>
 							</div>
 						{/each}
 					</div>
 
 					{#if selectedServer?.status === ServerStatus.RUNNING}
-						<Alert class="mt-2 text-left border-amber-500/30 bg-amber-500/10 text-amber-500">
+						<Alert class="mt-2 border-amber-500/30 bg-amber-500/10 text-left text-amber-500">
 							<AlertCircle class="h-4 w-4 text-amber-500" />
 							<AlertTitle>Server is Running</AlertTitle>
 							<AlertDescription class="text-xs text-amber-500/90">
-								The server is currently running. You may need to restart the server for the new files to take effect.
+								The server is currently running. You may need to restart the server for the new
+								files to take effect.
 							</AlertDescription>
 						</Alert>
 					{/if}
 
 					<div class="flex items-center gap-3 pt-4">
-						<Button variant="outline" onclick={closeDialog}>
-							Done
-						</Button>
+						<Button variant="outline" onclick={closeDialog}>Done</Button>
 						<Button onclick={goToTargetServer} class="gap-2">
 							View Server
 							<ArrowRight class="h-4 w-4" />
@@ -560,41 +578,53 @@
 				<!-- Configuration & Install Form -->
 				{#if servers.length === 0}
 					<div class="flex flex-col items-center justify-center py-10 text-center">
-						<ServerIcon class="h-12 w-12 text-muted-foreground/50 mb-3" />
-						<h4 class="font-semibold text-lg">No Servers Found</h4>
-						<p class="text-sm text-muted-foreground max-w-sm mt-1 mb-4">
-							You need at least one Minecraft server configured in DiscoPanel to install this {project?.project_type === 'resourcepack' ? 'resource pack' : 'mod'}.
+						<ServerIcon class="mb-3 h-12 w-12 text-muted-foreground/50" />
+						<h4 class="text-lg font-semibold">No Servers Found</h4>
+						<p class="mt-1 mb-4 max-w-sm text-sm text-muted-foreground">
+							You need at least one Minecraft server configured in DiscoPanel to install this {project?.project_type ===
+							'resourcepack'
+								? 'resource pack'
+								: 'mod'}.
 						</p>
-						<Button onclick={() => { closeDialog(); goto(resolve('/servers/new')); }}>
+						<Button
+							onclick={() => {
+								closeDialog();
+								goto(resolve('/servers/new'));
+							}}
+						>
 							Create a Server
 						</Button>
 					</div>
 				{:else}
 					<!-- Server Selection -->
 					<div class="space-y-2">
-						<Label class="text-sm font-semibold flex items-center gap-2">
+						<Label class="flex items-center gap-2 text-sm font-semibold">
 							<ServerIcon class="h-4 w-4 text-primary" />
 							Target Server
 						</Label>
 						<Select
 							type="single"
 							value={selectedServerId}
-							onValueChange={(v: string | undefined) => { if (v) selectedServerId = v; }}
+							onValueChange={(v: string | undefined) => {
+								if (v) selectedServerId = v;
+							}}
 							disabled={installStep !== 'idle'}
 						>
-							<SelectTrigger class="w-full h-12">
+							<SelectTrigger class="h-12 w-full">
 								{#if selectedServer}
 									<div class="flex items-center gap-2 truncate">
 										<div
-											class="h-2.5 w-2.5 rounded-full shrink-0 {selectedServer.status === ServerStatus.RUNNING
+											class="h-2.5 w-2.5 shrink-0 rounded-full {selectedServer.status ===
+											ServerStatus.RUNNING
 												? 'bg-green-500'
 												: selectedServer.status === ServerStatus.ERROR
 													? 'bg-red-500'
 													: 'bg-zinc-400'}"
 										></div>
-										<span class="font-medium truncate">{selectedServer.name}</span>
-										<Badge variant="outline" class="text-xs ml-auto shrink-0">
-											{selectedServer.mcVersion || 'Vanilla'} &bull; {selectedServer.modLoader || 'Vanilla'}
+										<span class="truncate font-medium">{selectedServer.name}</span>
+										<Badge variant="outline" class="ml-auto shrink-0 text-xs">
+											{selectedServer.mcVersion || 'Vanilla'} &bull; {selectedServer.modLoader ||
+												'Vanilla'}
 										</Badge>
 									</div>
 								{:else}
@@ -606,14 +636,14 @@
 									<SelectItem value={srv.id}>
 										<div class="flex items-center gap-2">
 											<div
-												class="h-2 w-2 rounded-full shrink-0 {srv.status === ServerStatus.RUNNING
+												class="h-2 w-2 shrink-0 rounded-full {srv.status === ServerStatus.RUNNING
 													? 'bg-green-500'
 													: srv.status === ServerStatus.ERROR
 														? 'bg-red-500'
 														: 'bg-zinc-400'}"
 											></div>
 											<span class="font-medium">{srv.name}</span>
-											<span class="text-xs text-muted-foreground ml-2">
+											<span class="ml-2 text-xs text-muted-foreground">
 												({srv.mcVersion || 'Latest'} - {srv.modLoader || 'Vanilla'})
 											</span>
 										</div>
@@ -625,30 +655,33 @@
 
 					<!-- Server Compatibility Info -->
 					{#if project?.project_type === 'mod' && project?.server_side === 'unsupported'}
-						<Alert class="border-red-500/30 bg-red-500/10 text-red-500 py-3">
+						<Alert class="border-red-500/30 bg-red-500/10 py-3 text-red-500">
 							<AlertCircle class="h-4 w-4 text-red-500" />
 							<AlertTitle class="text-sm font-semibold">Client-Only Mod Warning</AlertTitle>
-							<AlertDescription class="text-xs text-red-500/90 mt-0.5">
-								This mod is marked as Client-Only on Modrinth (unsupported on dedicated servers). It may cause the server to crash if installed.
+							<AlertDescription class="mt-0.5 text-xs text-red-500/90">
+								This mod is marked as Client-Only on Modrinth (unsupported on dedicated servers). It
+								may cause the server to crash if installed.
 							</AlertDescription>
 						</Alert>
 					{/if}
 
 					{#if selectedServer}
 						{#if isServerVanilla(selectedServer) && project?.project_type === 'mod'}
-							<Alert class="border-amber-500/30 bg-amber-500/10 text-amber-500 py-3">
+							<Alert class="border-amber-500/30 bg-amber-500/10 py-3 text-amber-500">
 								<AlertCircle class="h-4 w-4 text-amber-500" />
 								<AlertTitle class="text-sm font-semibold">Vanilla Server Warning</AlertTitle>
-								<AlertDescription class="text-xs text-amber-500/90 mt-0.5">
-									"{selectedServer.name}" is a Vanilla server. Mod JAR files typically require a modloader (Fabric, Forge, NeoForge, etc.) to run.
+								<AlertDescription class="mt-0.5 text-xs text-amber-500/90">
+									"{selectedServer.name}" is a Vanilla server. Mod JAR files typically require a
+									modloader (Fabric, Forge, NeoForge, etc.) to run.
 								</AlertDescription>
 							</Alert>
 						{:else if selectedVersion && !isVersionCompatible(selectedVersion, selectedServer)}
-							<Alert class="border-amber-500/30 bg-amber-500/10 text-amber-500 py-3">
+							<Alert class="border-amber-500/30 bg-amber-500/10 py-3 text-amber-500">
 								<AlertCircle class="h-4 w-4 text-amber-500" />
 								<AlertTitle class="text-sm font-semibold">Compatibility Notice</AlertTitle>
-								<AlertDescription class="text-xs text-amber-500/90 mt-0.5">
-									Selected version does not explicitly declare support for {selectedServer.modLoader} on MC {selectedServer.mcVersion}. It may still work, but proceed with caution.
+								<AlertDescription class="mt-0.5 text-xs text-amber-500/90">
+									Selected version does not explicitly declare support for {selectedServer.modLoader}
+									on MC {selectedServer.mcVersion}. It may still work, but proceed with caution.
 								</AlertDescription>
 							</Alert>
 						{/if}
@@ -657,7 +690,7 @@
 					<!-- Version Selection -->
 					<div class="space-y-2">
 						<div class="flex items-center justify-between">
-							<Label class="text-sm font-semibold flex items-center gap-2">
+							<Label class="flex items-center gap-2 text-sm font-semibold">
 								<Layers class="h-4 w-4 text-primary" />
 								Version / File
 							</Label>
@@ -672,9 +705,11 @@
 						</div>
 
 						{#if loadingVersions}
-							<div class="flex h-12 w-full items-center justify-center rounded-lg border bg-muted/20">
+							<div
+								class="flex h-12 w-full items-center justify-center rounded-lg border bg-muted/20"
+							>
 								<Loader2 class="h-5 w-5 animate-spin text-muted-foreground" />
-								<span class="text-xs text-muted-foreground ml-2">Loading Modrinth versions...</span>
+								<span class="ml-2 text-xs text-muted-foreground">Loading Modrinth versions...</span>
 							</div>
 						{:else if displayVersions.length === 0}
 							<div class="rounded-lg border border-dashed p-4 text-center">
@@ -684,7 +719,7 @@
 								<Button
 									variant="link"
 									size="sm"
-									class="text-xs text-primary mt-1"
+									class="mt-1 text-xs text-primary"
 									onclick={() => (showAllVersions = true)}
 								>
 									Show all {versions.length} versions
@@ -696,26 +731,43 @@
 								<!-- Selected Version Trigger Card -->
 								<button
 									type="button"
-									onclick={() => { if (installStep === 'idle') isVersionPickerOpen = !isVersionPickerOpen; }}
+									onclick={() => {
+										if (installStep === 'idle') isVersionPickerOpen = !isVersionPickerOpen;
+									}}
 									disabled={installStep !== 'idle'}
-									class="flex w-full items-center justify-between gap-3 rounded-xl border-2 bg-card p-3 text-left transition-all hover:border-primary/40 hover:bg-muted/40 focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:pointer-events-none disabled:opacity-50 shadow-sm"
+									class="flex w-full items-center justify-between gap-3 rounded-xl border-2 bg-card p-3 text-left shadow-sm transition-all hover:border-primary/40 hover:bg-muted/40 focus:ring-2 focus:ring-primary/20 focus:outline-none disabled:pointer-events-none disabled:opacity-50"
 								>
 									{#if selectedVersion}
-										<div class="flex items-center gap-3 min-w-0 flex-1">
+										<div class="flex min-w-0 flex-1 items-center gap-3">
 											<Badge
-												variant={selectedVersion.version_type === 'release' ? 'default' : 'secondary'}
-												class="text-[10px] uppercase font-bold shrink-0 {selectedVersion.version_type === 'release' ? 'bg-emerald-600 hover:bg-emerald-600 text-white' : selectedVersion.version_type === 'beta' ? 'bg-amber-600 hover:bg-amber-600 text-white' : 'bg-rose-600 hover:bg-rose-600 text-white'}"
+												variant={selectedVersion.version_type === 'release'
+													? 'default'
+													: 'secondary'}
+												class="shrink-0 text-[10px] font-bold uppercase {selectedVersion.version_type ===
+												'release'
+													? 'bg-emerald-600 text-white hover:bg-emerald-600'
+													: selectedVersion.version_type === 'beta'
+														? 'bg-amber-600 text-white hover:bg-amber-600'
+														: 'bg-rose-600 text-white hover:bg-rose-600'}"
 											>
 												{selectedVersion.version_type}
 											</Badge>
 											<div class="min-w-0 flex-1">
 												<div class="flex items-center gap-2">
-													<span class="font-semibold text-foreground truncate text-sm">
+													<span class="truncate text-sm font-semibold text-foreground">
 														{selectedVersion.name || selectedVersion.version_number}
 													</span>
 												</div>
-												<div class="flex items-center gap-2 text-xs text-muted-foreground truncate mt-0.5">
-													<span>MC: {selectedVersion.game_versions.slice(0, 3).join(', ')}{selectedVersion.game_versions.length > 3 ? ` (+${selectedVersion.game_versions.length - 3})` : ''}</span>
+												<div
+													class="mt-0.5 flex items-center gap-2 truncate text-xs text-muted-foreground"
+												>
+													<span
+														>MC: {selectedVersion.game_versions
+															.slice(0, 3)
+															.join(', ')}{selectedVersion.game_versions.length > 3
+															? ` (+${selectedVersion.game_versions.length - 3})`
+															: ''}</span
+													>
 													{#if selectedVersion.loaders.length > 0}
 														<span>&bull;</span>
 														<span class="capitalize">{selectedVersion.loaders.join(', ')}</span>
@@ -728,12 +780,13 @@
 											</div>
 										</div>
 									{:else}
-										<span class="text-muted-foreground text-sm">Select version to install...</span>
+										<span class="text-sm text-muted-foreground">Select version to install...</span>
 									{/if}
 
-									<div class="flex items-center gap-2 shrink-0 text-muted-foreground">
+									<div class="flex shrink-0 items-center gap-2 text-muted-foreground">
 										<Badge variant="outline" class="text-xs font-normal">
-											{displayVersions.length} {displayVersions.length === 1 ? 'version' : 'versions'}
+											{displayVersions.length}
+											{displayVersions.length === 1 ? 'version' : 'versions'}
 										</Badge>
 										{#if isVersionPickerOpen}
 											<ChevronUp class="h-4 w-4 text-foreground" />
@@ -746,23 +799,25 @@
 								<!-- Smooth Scrollable Version List -->
 								{#if isVersionPickerOpen}
 									<div
-										class="mt-2 rounded-xl border-2 bg-card/98 backdrop-blur-md shadow-2xl overflow-hidden animate-in fade-in-0 zoom-in-95 duration-150 transition-all"
+										class="mt-2 animate-in overflow-hidden rounded-xl border-2 bg-card/98 shadow-2xl backdrop-blur-md transition-all duration-150 fade-in-0 zoom-in-95"
 									>
 										<!-- Quick search filter -->
-										<div class="p-2.5 border-b bg-muted/30">
+										<div class="border-b bg-muted/30 p-2.5">
 											<div class="relative">
-												<Search class="absolute left-2.5 top-2.5 h-3.5 w-3.5 text-muted-foreground" />
+												<Search
+													class="absolute top-2.5 left-2.5 h-3.5 w-3.5 text-muted-foreground"
+												/>
 												<Input
 													placeholder="Search versions (e.g. 1.20, beta, 0.9)..."
 													bind:value={versionSearchQuery}
-													class="h-8.5 pl-8 text-xs bg-background rounded-lg"
+													class="h-8.5 rounded-lg bg-background pl-8 text-xs"
 												/>
 											</div>
 										</div>
 
 										<!-- Buttery-smooth scrollable list -->
 										<div
-											class="max-h-60 overflow-y-auto overscroll-contain p-1.5 space-y-1 focus:outline-none [scrollbar-width:thin] [scrollbar-color:rgba(155,155,155,0.4)_transparent]"
+											class="max-h-60 [scrollbar-width:thin] [scrollbar-color:rgba(155,155,155,0.4)_transparent] space-y-1 overflow-y-auto overscroll-contain p-1.5 focus:outline-none"
 										>
 											{#if filteredDisplayVersions.length === 0}
 												<div class="py-6 text-center text-xs text-muted-foreground">
@@ -776,23 +831,38 @@
 															selectedVersionId = ver.id;
 															isVersionPickerOpen = false;
 														}}
-														class="w-full flex items-center justify-between gap-3 p-2.5 rounded-lg text-left transition-all hover:bg-muted/70 {ver.id === selectedVersionId ? 'bg-primary/10 border border-primary/40 text-foreground' : 'text-muted-foreground'}"
+														class="flex w-full items-center justify-between gap-3 rounded-lg p-2.5 text-left transition-all hover:bg-muted/70 {ver.id ===
+														selectedVersionId
+															? 'border border-primary/40 bg-primary/10 text-foreground'
+															: 'text-muted-foreground'}"
 													>
-														<div class="flex items-center gap-2.5 min-w-0 flex-1">
+														<div class="flex min-w-0 flex-1 items-center gap-2.5">
 															<Badge
 																variant={ver.version_type === 'release' ? 'default' : 'secondary'}
-																class="text-[9px] uppercase font-bold shrink-0 {ver.version_type === 'release' ? 'bg-emerald-600 hover:bg-emerald-600 text-white' : ver.version_type === 'beta' ? 'bg-amber-600 hover:bg-amber-600 text-white' : 'bg-rose-600 hover:bg-rose-600 text-white'}"
+																class="shrink-0 text-[9px] font-bold uppercase {ver.version_type ===
+																'release'
+																	? 'bg-emerald-600 text-white hover:bg-emerald-600'
+																	: ver.version_type === 'beta'
+																		? 'bg-amber-600 text-white hover:bg-amber-600'
+																		: 'bg-rose-600 text-white hover:bg-rose-600'}"
 															>
 																{ver.version_type}
 															</Badge>
 															<div class="min-w-0 flex-1">
 																<div class="flex items-center gap-2">
-																	<span class="font-medium text-foreground truncate text-xs">
+																	<span class="truncate text-xs font-medium text-foreground">
 																		{ver.name || ver.version_number}
 																	</span>
 																</div>
-																<div class="flex items-center gap-2 text-[10px] text-muted-foreground truncate mt-0.5">
-																	<span>MC: {ver.game_versions.slice(0, 3).join(', ')}{ver.game_versions.length > 3 ? ` (+${ver.game_versions.length - 3})` : ''}</span>
+																<div
+																	class="mt-0.5 flex items-center gap-2 truncate text-[10px] text-muted-foreground"
+																>
+																	<span
+																		>MC: {ver.game_versions.slice(0, 3).join(', ')}{ver
+																			.game_versions.length > 3
+																			? ` (+${ver.game_versions.length - 3})`
+																			: ''}</span
+																	>
 																	{#if ver.loaders.length > 0}
 																		<span>&bull;</span>
 																		<span class="capitalize">{ver.loaders.join(', ')}</span>
@@ -801,14 +871,14 @@
 															</div>
 														</div>
 
-														<div class="flex items-center gap-2 shrink-0">
+														<div class="flex shrink-0 items-center gap-2">
 															{#if ver.files[0]}
-																<span class="text-[11px] text-muted-foreground font-mono">
+																<span class="font-mono text-[11px] text-muted-foreground">
 																	{formatBytes(ver.files[0].size)}
 																</span>
 															{/if}
 															{#if ver.id === selectedVersionId}
-																<Check class="h-4 w-4 text-primary shrink-0" />
+																<Check class="h-4 w-4 shrink-0 text-primary" />
 															{/if}
 														</div>
 													</button>
@@ -823,14 +893,16 @@
 
 					<!-- Dependencies Section -->
 					{#if loadingDependencies}
-						<div class="rounded-xl border bg-muted/20 p-3.5 flex items-center gap-2.5 text-xs text-muted-foreground">
+						<div
+							class="flex items-center gap-2.5 rounded-xl border bg-muted/20 p-3.5 text-xs text-muted-foreground"
+						>
 							<Loader2 class="h-4 w-4 animate-spin text-primary" />
 							<span>Resolving mod dependencies for this version...</span>
 						</div>
 					{:else if dependencies.length > 0}
 						<div class="space-y-2.5 rounded-xl border-2 bg-muted/15 p-4">
 							<div class="flex items-center justify-between">
-								<Label class="text-sm font-semibold flex items-center gap-2">
+								<Label class="flex items-center gap-2 text-sm font-semibold">
 									<Puzzle class="h-4 w-4 text-primary" />
 									Dependencies ({dependencies.length})
 								</Label>
@@ -840,10 +912,13 @@
 							</div>
 
 							<p class="text-xs text-muted-foreground">
-								This mod requires or recommends the following dependencies. They will be automatically downloaded and installed:
+								This mod requires or recommends the following dependencies. They will be
+								automatically downloaded and installed:
 							</p>
 
-							<div class="space-y-2 max-h-52 overflow-y-auto overscroll-contain p-1 focus:outline-none [scrollbar-width:thin]">
+							<div
+								class="max-h-52 [scrollbar-width:thin] space-y-2 overflow-y-auto overscroll-contain p-1 focus:outline-none"
+							>
 								{#each dependencies as dep (dep.projectId || dep.projectTitle)}
 									<button
 										type="button"
@@ -853,30 +928,47 @@
 											}
 										}}
 										disabled={installStep !== 'idle'}
-										class="w-full flex items-center justify-between gap-3 p-3 rounded-xl border-2 text-left cursor-pointer select-none transition-all duration-150 ease-out hover:border-primary/80 hover:bg-primary/10 hover:shadow-md hover:shadow-primary/5 disabled:pointer-events-none disabled:opacity-50 {dep.selected ? 'border-primary/70 bg-primary/10 shadow-xs ring-1 ring-primary/40' : 'border-border/60 bg-card/60 opacity-80 hover:opacity-100 hover:border-primary/60'}"
+										class="flex w-full cursor-pointer items-center justify-between gap-3 rounded-xl border-2 p-3 text-left transition-all duration-150 ease-out select-none hover:border-primary/80 hover:bg-primary/10 hover:shadow-md hover:shadow-primary/5 disabled:pointer-events-none disabled:opacity-50 {dep.selected
+											? 'border-primary/70 bg-primary/10 shadow-xs ring-1 ring-primary/40'
+											: 'border-border/60 bg-card/60 opacity-80 hover:border-primary/60 hover:opacity-100'}"
 									>
-										<div class="flex items-center gap-3 min-w-0 flex-1">
+										<div class="flex min-w-0 flex-1 items-center gap-3">
 											{#if dep.projectIcon}
-												<img src={dep.projectIcon} alt={dep.projectTitle} class="h-8 w-8 rounded-lg object-cover shrink-0 shadow-xs" />
+												<img
+													src={dep.projectIcon}
+													alt={dep.projectTitle}
+													class="h-8 w-8 shrink-0 rounded-lg object-cover shadow-xs"
+												/>
 											{:else}
-												<div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10 text-primary shrink-0">
+												<div
+													class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"
+												>
 													<Puzzle class="h-4 w-4" />
 												</div>
 											{/if}
 
 											<div class="min-w-0 flex-1">
 												<div class="flex items-center gap-2">
-													<span class="font-semibold text-foreground text-xs sm:text-sm truncate">{dep.projectTitle}</span>
+													<span class="truncate text-xs font-semibold text-foreground sm:text-sm"
+														>{dep.projectTitle}</span
+													>
 													<Badge
-														variant={dep.dependencyType === 'required' ? 'destructive' : 'secondary'}
-														class="text-[9px] uppercase font-bold shrink-0 {dep.dependencyType === 'required' ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30' : ''}"
+														variant={dep.dependencyType === 'required'
+															? 'destructive'
+															: 'secondary'}
+														class="shrink-0 text-[9px] font-bold uppercase {dep.dependencyType ===
+														'required'
+															? 'border border-amber-500/30 bg-amber-500/20 text-amber-500'
+															: ''}"
 													>
 														{dep.dependencyType}
 													</Badge>
 												</div>
-												<div class="flex items-center gap-2 text-[11px] text-muted-foreground truncate mt-0.5">
+												<div
+													class="mt-0.5 flex items-center gap-2 truncate text-[11px] text-muted-foreground"
+												>
 													{#if dep.filename}
-														<span class="font-mono truncate">{dep.filename}</span>
+														<span class="truncate font-mono">{dep.filename}</span>
 														{#if dep.size > 0}
 															<span>&bull;</span>
 															<span>{formatBytes(dep.size)}</span>
@@ -888,11 +980,8 @@
 											</div>
 										</div>
 
-										<div class="flex items-center gap-2 shrink-0 pointer-events-none">
-											<Checkbox
-												checked={dep.selected}
-												tabindex={-1}
-											/>
+										<div class="pointer-events-none flex shrink-0 items-center gap-2">
+											<Checkbox checked={dep.selected} tabindex={-1} />
 										</div>
 									</button>
 								{/each}
@@ -902,15 +991,19 @@
 
 					<!-- Install Destination Info -->
 					{#if selectedServer && selectedVersion}
-						<div class="rounded-xl border bg-muted/20 p-4 space-y-2 text-xs">
+						<div class="space-y-2 rounded-xl border bg-muted/20 p-4 text-xs">
 							<div class="flex items-center justify-between text-muted-foreground">
 								<span>Target Directory:</span>
-								<span class="font-mono text-foreground font-semibold">/{getTargetDirectory(selectedServer)}/</span>
+								<span class="font-mono font-semibold text-foreground"
+									>/{getTargetDirectory(selectedServer)}/</span
+								>
 							</div>
 							{#if selectedVersion.files[0]}
 								<div class="flex items-center justify-between text-muted-foreground">
 									<span>File Name:</span>
-									<span class="font-mono text-foreground font-medium truncate max-w-xs">{selectedVersion.files[0].filename}</span>
+									<span class="max-w-xs truncate font-mono font-medium text-foreground"
+										>{selectedVersion.files[0].filename}</span
+									>
 								</div>
 								<div class="flex items-center justify-between text-muted-foreground">
 									<span>File Size:</span>
@@ -920,7 +1013,9 @@
 							{#if selectedVersion.loaders.length > 0}
 								<div class="flex items-center justify-between text-muted-foreground">
 									<span>Supported Loaders:</span>
-									<span class="text-foreground capitalize">{selectedVersion.loaders.join(', ')}</span>
+									<span class="text-foreground capitalize"
+										>{selectedVersion.loaders.join(', ')}</span
+									>
 								</div>
 							{/if}
 						</div>
@@ -958,7 +1053,7 @@
 						href={`https://modrinth.com/${project.project_type || 'mod'}/${project.slug}`}
 						target="_blank"
 						rel="noopener noreferrer"
-						class="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+						class="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
 					>
 						<ExternalLink class="h-3 w-3" />
 						View on Modrinth
@@ -968,24 +1063,25 @@
 				{/if}
 
 				<div class="flex items-center gap-2">
-					<Button
-						variant="outline"
-						onclick={closeDialog}
-						disabled={installStep !== 'idle'}
-					>
+					<Button variant="outline" onclick={closeDialog} disabled={installStep !== 'idle'}>
 						Cancel
 					</Button>
 					<Button
 						onclick={handleInstall}
-						disabled={!selectedServer || !selectedVersion || installStep !== 'idle' || loadingVersions}
-						class="bg-linear-to-r from-primary to-primary/85 shadow-md hover:shadow-lg font-semibold min-w-32"
+						disabled={!selectedServer ||
+							!selectedVersion ||
+							installStep !== 'idle' ||
+							loadingVersions}
+						class="min-w-32 bg-linear-to-r from-primary to-primary/85 font-semibold shadow-md hover:shadow-lg"
 					>
 						{#if installStep !== 'idle'}
 							<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 							Installing...
 						{:else}
 							<Download class="mr-2 h-4 w-4" />
-							Install {dependencies.filter((d) => d.selected).length > 0 ? `(${1 + dependencies.filter((d) => d.selected).length} items)` : 'to Server'}
+							Install {dependencies.filter((d) => d.selected).length > 0
+								? `(${1 + dependencies.filter((d) => d.selected).length} items)`
+								: 'to Server'}
 						{/if}
 					</Button>
 				</div>

@@ -456,7 +456,7 @@
 							formData.autoStart = false;
 							return;
 						}
-							formData.autoStart = checked;
+						formData.autoStart = checked;
 					}}
 				/>
 			</div>
@@ -511,8 +511,7 @@
 			<div class="rounded-lg bg-muted/50 p-4">
 				<div class="flex items-center justify-between">
 					<div class="space-y-0.5">
-						<Label for="auto_restart" class="cursor-pointer text-sm font-medium"
-							>Auto-Restart</Label
+						<Label for="auto_restart" class="cursor-pointer text-sm font-medium">Auto-Restart</Label
 						>
 						<p class="text-xs text-muted-foreground">
 							Automatically restart the server when it crashes or exits unexpectedly
@@ -536,9 +535,7 @@
 				{#if formData.autoRestart}
 					<div class="mt-4 grid gap-4 rounded-lg bg-background/60 p-4 sm:grid-cols-2">
 						<div class="space-y-2">
-							<Label for="auto_restart_max_retries" class="text-sm font-medium"
-								>Max Restarts</Label
-							>
+							<Label for="auto_restart_max_retries" class="text-sm font-medium">Max Restarts</Label>
 							<Input
 								id="auto_restart_max_retries"
 								type="number"

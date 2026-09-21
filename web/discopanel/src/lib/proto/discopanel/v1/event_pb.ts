@@ -2,14 +2,17 @@
 // @generated from file discopanel/v1/event.proto (package discopanel.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc } from "@bufbuild/protobuf/codegenv2";
+import type { GenEnum, GenFile } from '@bufbuild/protobuf/codegenv2';
+import { enumDesc, fileDesc } from '@bufbuild/protobuf/codegenv2';
 
 /**
  * Describes the file discopanel/v1/event.proto.
  */
-export const file_discopanel_v1_event: GenFile = /*@__PURE__*/
-  fileDesc("ChlkaXNjb3BhbmVsL3YxL2V2ZW50LnByb3RvEg1kaXNjb3BhbmVsLnYxKqwDChJUcmlnZ2VyZWRFdmVudFR5cGUSJAogVFJJR0dFUkVEX0VWRU5UX1RZUEVfVU5TUEVDSUZJRUQQABIlCiFUUklHR0VSRURfRVZFTlRfVFlQRV9TRVJWRVJfU1RBUlQQARIkCiBUUklHR0VSRURfRVZFTlRfVFlQRV9TRVJWRVJfU1RPUBACEicKI1RSSUdHRVJFRF9FVkVOVF9UWVBFX1NFUlZFUl9IRUFMVEhZEAMSJAogVFJJR0dFUkVEX0VWRU5UX1RZUEVfUExBWUVSX0pPSU4QBBIlCiFUUklHR0VSRURfRVZFTlRfVFlQRV9QTEFZRVJfTEVBVkUQBRInCiNUUklHR0VSRURfRVZFTlRfVFlQRV9TRVJWRVJfUkVTVEFSVBAGEigKJFRSSUdHRVJFRF9FVkVOVF9UWVBFX0FMRVJUX1RSSUdHRVJFRBAHEicKI1RSSUdHRVJFRF9FVkVOVF9UWVBFX0FMRVJUX1JFU09MVkVEEAgSMQotVFJJR0dFUkVEX0VWRU5UX1RZUEVfTU9EUEFDS19VUERBVEVfQVZBSUxBQkxFEAlCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw");
+export const file_discopanel_v1_event: GenFile =
+	/*@__PURE__*/
+	fileDesc(
+		'ChlkaXNjb3BhbmVsL3YxL2V2ZW50LnByb3RvEg1kaXNjb3BhbmVsLnYxKqwDChJUcmlnZ2VyZWRFdmVudFR5cGUSJAogVFJJR0dFUkVEX0VWRU5UX1RZUEVfVU5TUEVDSUZJRUQQABIlCiFUUklHR0VSRURfRVZFTlRfVFlQRV9TRVJWRVJfU1RBUlQQARIkCiBUUklHR0VSRURfRVZFTlRfVFlQRV9TRVJWRVJfU1RPUBACEicKI1RSSUdHRVJFRF9FVkVOVF9UWVBFX1NFUlZFUl9IRUFMVEhZEAMSJAogVFJJR0dFUkVEX0VWRU5UX1RZUEVfUExBWUVSX0pPSU4QBBIlCiFUUklHR0VSRURfRVZFTlRfVFlQRV9QTEFZRVJfTEVBVkUQBRInCiNUUklHR0VSRURfRVZFTlRfVFlQRV9TRVJWRVJfUkVTVEFSVBAGEigKJFRSSUdHRVJFRF9FVkVOVF9UWVBFX0FMRVJUX1RSSUdHRVJFRBAHEicKI1RSSUdHRVJFRF9FVkVOVF9UWVBFX0FMRVJUX1JFU09MVkVEEAgSMQotVFJJR0dFUkVEX0VWRU5UX1RZUEVfTU9EUEFDS19VUERBVEVfQVZBSUxBQkxFEAlCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw'
+	);
 
 /**
  * All-encompassing catalog of events
@@ -17,78 +20,78 @@ export const file_discopanel_v1_event: GenFile = /*@__PURE__*/
  * @generated from enum discopanel.v1.TriggeredEventType
  */
 export enum TriggeredEventType {
-  /**
-   * @generated from enum value: TRIGGERED_EVENT_TYPE_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
+	/**
+	 * @generated from enum value: TRIGGERED_EVENT_TYPE_UNSPECIFIED = 0;
+	 */
+	UNSPECIFIED = 0,
 
-  /**
-   * The parent server container started
-   *
-   * @generated from enum value: TRIGGERED_EVENT_TYPE_SERVER_START = 1;
-   */
-  SERVER_START = 1,
+	/**
+	 * The parent server container started
+	 *
+	 * @generated from enum value: TRIGGERED_EVENT_TYPE_SERVER_START = 1;
+	 */
+	SERVER_START = 1,
 
-  /**
-   * The parent server container stopped
-   *
-   * @generated from enum value: TRIGGERED_EVENT_TYPE_SERVER_STOP = 2;
-   */
-  SERVER_STOP = 2,
+	/**
+	 * The parent server container stopped
+	 *
+	 * @generated from enum value: TRIGGERED_EVENT_TYPE_SERVER_STOP = 2;
+	 */
+	SERVER_STOP = 2,
 
-  /**
-   * The parent server passed its health check
-   *
-   * @generated from enum value: TRIGGERED_EVENT_TYPE_SERVER_HEALTHY = 3;
-   */
-  SERVER_HEALTHY = 3,
+	/**
+	 * The parent server passed its health check
+	 *
+	 * @generated from enum value: TRIGGERED_EVENT_TYPE_SERVER_HEALTHY = 3;
+	 */
+	SERVER_HEALTHY = 3,
 
-  /**
-   * A player joined the server
-   *
-   * @generated from enum value: TRIGGERED_EVENT_TYPE_PLAYER_JOIN = 4;
-   */
-  PLAYER_JOIN = 4,
+	/**
+	 * A player joined the server
+	 *
+	 * @generated from enum value: TRIGGERED_EVENT_TYPE_PLAYER_JOIN = 4;
+	 */
+	PLAYER_JOIN = 4,
 
-  /**
-   * A player left the server
-   *
-   * @generated from enum value: TRIGGERED_EVENT_TYPE_PLAYER_LEAVE = 5;
-   */
-  PLAYER_LEAVE = 5,
+	/**
+	 * A player left the server
+	 *
+	 * @generated from enum value: TRIGGERED_EVENT_TYPE_PLAYER_LEAVE = 5;
+	 */
+	PLAYER_LEAVE = 5,
 
-  /**
-   * The parent server was restarted
-   *
-   * @generated from enum value: TRIGGERED_EVENT_TYPE_SERVER_RESTART = 6;
-   */
-  SERVER_RESTART = 6,
+	/**
+	 * The parent server was restarted
+	 *
+	 * @generated from enum value: TRIGGERED_EVENT_TYPE_SERVER_RESTART = 6;
+	 */
+	SERVER_RESTART = 6,
 
-  /**
-   * An alert rule threshold was breached (data: rule_id, rule_name, metric, value, threshold, message)
-   *
-   * @generated from enum value: TRIGGERED_EVENT_TYPE_ALERT_TRIGGERED = 7;
-   */
-  ALERT_TRIGGERED = 7,
+	/**
+	 * An alert rule threshold was breached (data: rule_id, rule_name, metric, value, threshold, message)
+	 *
+	 * @generated from enum value: TRIGGERED_EVENT_TYPE_ALERT_TRIGGERED = 7;
+	 */
+	ALERT_TRIGGERED = 7,
 
-  /**
-   * A previously-triggered alert recovered (data: rule_id, rule_name, metric, value, threshold, message)
-   *
-   * @generated from enum value: TRIGGERED_EVENT_TYPE_ALERT_RESOLVED = 8;
-   */
-  ALERT_RESOLVED = 8,
+	/**
+	 * A previously-triggered alert recovered (data: rule_id, rule_name, metric, value, threshold, message)
+	 *
+	 * @generated from enum value: TRIGGERED_EVENT_TYPE_ALERT_RESOLVED = 8;
+	 */
+	ALERT_RESOLVED = 8,
 
-  /**
-   * A modpack update is available for a server (data: server_id, modpack_name, current_version, latest_version)
-   *
-   * @generated from enum value: TRIGGERED_EVENT_TYPE_MODPACK_UPDATE_AVAILABLE = 9;
-   */
-  MODPACK_UPDATE_AVAILABLE = 9,
+	/**
+	 * A modpack update is available for a server (data: server_id, modpack_name, current_version, latest_version)
+	 *
+	 * @generated from enum value: TRIGGERED_EVENT_TYPE_MODPACK_UPDATE_AVAILABLE = 9;
+	 */
+	MODPACK_UPDATE_AVAILABLE = 9
 }
 
 /**
  * Describes the enum discopanel.v1.TriggeredEventType.
  */
-export const TriggeredEventTypeSchema: GenEnum<TriggeredEventType> = /*@__PURE__*/
-  enumDesc(file_discopanel_v1_event, 0);
-
+export const TriggeredEventTypeSchema: GenEnum<TriggeredEventType> =
+	/*@__PURE__*/
+	enumDesc(file_discopanel_v1_event, 0);

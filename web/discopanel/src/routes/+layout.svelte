@@ -401,13 +401,17 @@
 				</SidebarFooter>
 			</Sidebar>
 
-				<MobileNavCloser />
+			<MobileNavCloser />
 
-				<GlobalSearch bind:this={globalSearch} />
+			<GlobalSearch bind:this={globalSearch} />
 
-			<SidebarInset class="flex min-h-[100dvh] flex-col overflow-y-auto overflow-x-hidden min-w-0 max-w-full">
+			<SidebarInset
+				class="flex min-h-[100dvh] max-w-full min-w-0 flex-col overflow-x-hidden overflow-y-auto"
+			>
 				<!-- Mobile Header Bar (< md) -->
-				<header class="flex h-14 md:hidden items-center justify-between border-b border-border/50 bg-background/95 px-4 backdrop-blur-md sticky top-0 z-30 shrink-0">
+				<header
+					class="sticky top-0 z-30 flex h-14 shrink-0 items-center justify-between border-b border-border/50 bg-background/95 px-4 backdrop-blur-md md:hidden"
+				>
 					<div class="flex items-center gap-3">
 						<SidebarTrigger class="h-9 w-9" />
 						<a href={resolvePath('/')} class="flex items-center gap-2">
@@ -442,7 +446,7 @@
 						</Button>
 					</div>
 				</header>
-				<div class="flex-1 min-w-0">
+				<div class="min-w-0 flex-1">
 					{@render children?.()}
 				</div>
 			</SidebarInset>

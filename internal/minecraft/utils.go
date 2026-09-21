@@ -8,13 +8,13 @@ import (
 	models "github.com/nickheyer/discopanel/internal/db"
 )
 
-// ParseTPSFromOutput parses TPS value from various server command outputs
-func ParseTPSFromOutput(output string) float64 {
-	// Remove color codes and clean the output
-	output = stripMinecraftColors(output)
+var (
+	mcColorRe   = regexp.MustCompile(`§.`)
+	ansiColorRe = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
-	// Try different parsing patterns
-	patterns := []struct {
+	playerCountRe = regexp.MustCompile(`(\d+)\s*(?:of|/)`)
+
+	tpsPatterns = []struct {
 		regex   *regexp.Regexp
 		extract func([]string) float64
 	}{
@@ -89,8 +89,16 @@ func ParseTPSFromOutput(output string) float64 {
 			},
 		},
 	}
+)
 
-	for _, pattern := range patterns {
+// ParseTPSFromOutput parses TPS value from various server command outputs
+func ParseTPSFromOutput(output string) float64 {
+	// Remove color codes and clean the output
+	output = stripMinecraftColors(output)
+
+	// Try different parsing patterns
+
+	for _, pattern := range tpsPatterns {
 		matches := pattern.regex.FindStringSubmatch(output)
 		if tps := pattern.extract(matches); tps > 0 {
 			return tps
@@ -113,8 +121,7 @@ func ParsePlayerListFromOutput(output string) (int, []string) {
 	var players []string
 
 	// Extract player count
-	re := regexp.MustCompile(`(\d+)\s*(?:of|/)`)
-	matches := re.FindStringSubmatch(output)
+	matches := playerCountRe.FindStringSubmatch(output)
 	if len(matches) > 1 {
 		count, _ = strconv.Atoi(matches[1])
 	}
@@ -147,12 +154,10 @@ func ParsePlayerListFromOutput(output string) (int, []string) {
 
 func stripMinecraftColors(text string) string {
 	// Remove Minecraft color codes (§ followed by a character)
-	re := regexp.MustCompile(`§.`)
-	text = re.ReplaceAllString(text, "")
+	text = mcColorRe.ReplaceAllString(text, "")
 
 	// Also remove ANSI color codes
-	ansiRe := regexp.MustCompile(`\x1b\[[0-9;]*m`)
-	text = ansiRe.ReplaceAllString(text, "")
+	text = ansiColorRe.ReplaceAllString(text, "")
 
 	return text
 }

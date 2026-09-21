@@ -104,7 +104,9 @@
 		<div class="rounded-lg border bg-muted/10 p-3">
 			<div class="space-y-3">
 				<!-- Headers (desktop only) -->
-				<div class="hidden sm:grid grid-cols-12 gap-2 px-1 text-xs font-medium text-muted-foreground">
+				<div
+					class="hidden grid-cols-12 gap-2 px-1 text-xs font-medium text-muted-foreground sm:grid"
+				>
 					<div class="col-span-4">Name</div>
 					<div class="col-span-2">Container Port</div>
 					<div class="col-span-2">Host Port</div>
@@ -115,9 +117,14 @@
 				<!-- Port entries -->
 				{#each ports as port, index (index)}
 					<div class="space-y-2">
-						<div class="flex flex-col sm:grid sm:grid-cols-12 gap-2 p-2.5 sm:p-0 rounded-md border sm:border-0 bg-background/50 sm:bg-transparent items-stretch sm:items-center">
+						<div
+							class="flex flex-col items-stretch gap-2 rounded-md border bg-background/50 p-2.5 sm:grid sm:grid-cols-12 sm:items-center sm:border-0 sm:bg-transparent sm:p-0"
+						>
 							<div class="sm:col-span-4">
-								<label class="block sm:hidden text-[10px] font-semibold text-muted-foreground uppercase mb-1">Port Name</label>
+								<label
+									class="mb-1 block text-[10px] font-semibold text-muted-foreground uppercase sm:hidden"
+									>Port Name</label
+								>
 								<Input
 									type="text"
 									placeholder="e.g., BlueMap Web"
@@ -127,9 +134,12 @@
 									class="h-8 text-xs"
 								/>
 							</div>
-							<div class="grid grid-cols-2 sm:contents gap-2">
+							<div class="grid grid-cols-2 gap-2 sm:contents">
 								<div class="sm:col-span-2">
-									<label class="block sm:hidden text-[10px] font-semibold text-muted-foreground uppercase mb-1">Container</label>
+									<label
+										class="mb-1 block text-[10px] font-semibold text-muted-foreground uppercase sm:hidden"
+										>Container</label
+									>
 									<Input
 										type="number"
 										min="1"
@@ -142,7 +152,10 @@
 									/>
 								</div>
 								<div class="sm:col-span-2">
-									<label class="block sm:hidden text-[10px] font-semibold text-muted-foreground uppercase mb-1">Host</label>
+									<label
+										class="mb-1 block text-[10px] font-semibold text-muted-foreground uppercase sm:hidden"
+										>Host</label
+									>
 									<Input
 										type="number"
 										min="1"
@@ -155,9 +168,12 @@
 									/>
 								</div>
 							</div>
-							<div class="flex items-center justify-between sm:contents gap-2">
-								<div class="sm:col-span-2 flex-1 sm:flex-initial">
-									<label class="block sm:hidden text-[10px] font-semibold text-muted-foreground uppercase mb-1">Protocol</label>
+							<div class="flex items-center justify-between gap-2 sm:contents">
+								<div class="flex-1 sm:col-span-2 sm:flex-initial">
+									<label
+										class="mb-1 block text-[10px] font-semibold text-muted-foreground uppercase sm:hidden"
+										>Protocol</label
+									>
 									<Select
 										type="single"
 										value={port.protocol}
@@ -173,7 +189,7 @@
 										</SelectContent>
 									</Select>
 								</div>
-								<div class="sm:col-span-2 flex justify-end shrink-0 sm:pt-0 pt-4">
+								<div class="flex shrink-0 justify-end pt-4 sm:col-span-2 sm:pt-0">
 									<Button
 										type="button"
 										variant="ghost"

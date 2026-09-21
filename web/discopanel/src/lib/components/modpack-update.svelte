@@ -46,16 +46,8 @@
 		DialogHeader,
 		DialogTitle
 	} from '$lib/components/ui/dialog';
-	import {
-		Select,
-		SelectContent,
-		SelectItem,
-		SelectTrigger
-	} from '$lib/components/ui/select';
-	import {
-		RadioGroup,
-		RadioGroupItem
-	} from '$lib/components/ui/radio-group';
+	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
+	import { RadioGroup, RadioGroupItem } from '$lib/components/ui/radio-group';
 	import {
 		Collapsible,
 		CollapsibleContent,
@@ -257,9 +249,7 @@
 			runCheck();
 		} catch (error) {
 			// Surface backend errors, e.g. FailedPrecondition "server must be stopped"
-			toast.error(
-				`Rollback failed: ${error instanceof Error ? error.message : 'Unknown error'}`
-			);
+			toast.error(`Rollback failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
 		} finally {
 			rollingBack = false;
 		}
@@ -348,8 +338,8 @@
 			<Alert>
 				<AlertCircle class="h-4 w-4" />
 				<AlertDescription class="text-sm">
-					Failed to check for updates. Make sure this server was created from a modpack and that
-					the indexer is reachable.
+					Failed to check for updates. Make sure this server was created from a modpack and that the
+					indexer is reachable.
 				</AlertDescription>
 			</Alert>
 		{:else if check}
@@ -394,12 +384,7 @@
 				{/if}
 				Update Modpack
 			</Button>
-			<Button
-				variant="outline"
-				size="sm"
-				onclick={rollback}
-				disabled={rollingBack}
-			>
+			<Button variant="outline" size="sm" onclick={rollback} disabled={rollingBack}>
 				{#if rollingBack}
 					<Loader2 class="mr-2 h-4 w-4 animate-spin" />
 				{:else}
@@ -453,11 +438,14 @@
 										</p>
 										{#if version.releasedAt}
 											<p class="text-xs text-muted-foreground">
-												Released {timestampToDate(version.releasedAt).toLocaleDateString(undefined, {
-													month: 'short',
-													day: 'numeric',
-													year: 'numeric'
-												})}
+												Released {timestampToDate(version.releasedAt).toLocaleDateString(
+													undefined,
+													{
+														month: 'short',
+														day: 'numeric',
+														year: 'numeric'
+													}
+												)}
 											</p>
 										{/if}
 									</div>
@@ -474,7 +462,7 @@
 				{#if lastUpdate.status === 'updated'}
 					<PackageCheck class="h-4 w-4" />
 				{:else}
-					<AlertCircle class="text-destructive h-4 w-4" />
+					<AlertCircle class="h-4 w-4 text-destructive" />
 				{/if}
 				<AlertDescription class="text-sm">
 					{#if lastUpdate.status === 'updated'}
@@ -517,9 +505,7 @@
 				<Label for="modpack_update_enabled" class="cursor-pointer text-sm font-medium"
 					>Enable Automatic Updates</Label
 				>
-				<p class="text-xs text-muted-foreground">
-					Run scheduled checks for this server's modpack
-				</p>
+				<p class="text-xs text-muted-foreground">Run scheduled checks for this server's modpack</p>
 			</div>
 			<Switch
 				id="modpack_update_enabled"
@@ -551,7 +537,8 @@
 					<Select
 						type="single"
 						value={settingsMode}
-						onValueChange={(value: string) => (settingsMode = value === 'apply' ? 'apply' : 'notify')}
+						onValueChange={(value: string) =>
+							(settingsMode = value === 'apply' ? 'apply' : 'notify')}
 					>
 						<SelectTrigger id="modpack_update_mode" class="h-10">
 							<span>

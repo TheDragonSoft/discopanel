@@ -164,7 +164,7 @@
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
-	class="file-row group flex h-[34px] sm:h-[28px] cursor-pointer items-center pr-2 sm:pr-3 text-xs select-none
+	class="file-row group flex h-[34px] cursor-pointer items-center pr-2 text-xs select-none sm:h-[28px] sm:pr-3
 		{isSelected ? 'bg-primary/10' : ''}
 		{isFocused && !isSelected ? 'bg-accent/50' : ''}
 		{isDragOver && file.isDir ? 'bg-primary/20 ring-1 ring-primary/40 ring-inset' : ''}
@@ -203,10 +203,10 @@
 
 	<!-- Indent + Chevron -->
 	<div class="flex shrink-0 items-center" style="width: {depth * 16}px"></div>
-	<div class="flex w-5 sm:w-4 shrink-0 items-center justify-center">
+	<div class="flex w-5 shrink-0 items-center justify-center sm:w-4">
 		{#if file.isDir}
 			<button
-				class="p-1 sm:p-0 text-muted-foreground hover:text-foreground"
+				class="p-1 text-muted-foreground hover:text-foreground sm:p-0"
 				onclick={(e) => {
 					e.stopPropagation();
 					onToggleExpand(file.path);
@@ -230,7 +230,9 @@
 	</div>
 
 	<!-- Size (right-aligned) -->
-	<span class="w-14 sm:w-16 shrink-0 text-right text-muted-foreground tabular-nums text-[11px] sm:text-xs">
+	<span
+		class="w-14 shrink-0 text-right text-[11px] text-muted-foreground tabular-nums sm:w-16 sm:text-xs"
+	>
 		{#if !file.isDir}
 			{formatBytes(Number(file.size))}
 		{/if}
@@ -244,7 +246,7 @@
 	<!-- Mobile 3-dot action button (< md) -->
 	<button
 		type="button"
-		class="flex h-7 w-7 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground md:hidden shrink-0 ml-1 active:scale-95"
+		class="ml-1 flex h-7 w-7 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted hover:text-foreground active:scale-95 md:hidden"
 		onclick={(e) => {
 			e.stopPropagation();
 			e.preventDefault();

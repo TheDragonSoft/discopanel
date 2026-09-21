@@ -61,9 +61,7 @@
 				})
 			);
 			toast.success(`Template "${name.trim()}" saved`, {
-				description: includeMods
-					? 'The mods directory was captured into the template.'
-					: undefined
+				description: includeMods ? 'The mods directory was captured into the template.' : undefined
 			});
 			open = false;
 			onSaved?.(name.trim());
@@ -112,13 +110,10 @@
 
 			<div class="flex items-start justify-between gap-4 rounded-lg bg-muted/50 p-4">
 				<div class="space-y-1">
-					<Label for="include_mods" class="cursor-pointer text-sm font-medium"
-						>Include Mods</Label
-					>
+					<Label for="include_mods" class="cursor-pointer text-sm font-medium">Include Mods</Label>
 					<p class="text-xs text-muted-foreground">
-						Copies the server's mods directory into the template so deploys come with mods
-						already installed. This can take a while and use significant disk space for large
-						mods folders.
+						Copies the server's mods directory into the template so deploys come with mods already
+						installed. This can take a while and use significant disk space for large mods folders.
 					</p>
 				</div>
 				<Checkbox

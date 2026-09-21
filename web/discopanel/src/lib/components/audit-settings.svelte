@@ -8,11 +8,7 @@
 	import { Input } from '$lib/components/ui/input';
 	import { Badge } from '$lib/components/ui/badge';
 	import { Skeleton } from '$lib/components/ui/skeleton';
-	import {
-		Tooltip,
-		TooltipContent,
-		TooltipTrigger
-	} from '$lib/components/ui/tooltip';
+	import { Tooltip, TooltipContent, TooltipTrigger } from '$lib/components/ui/tooltip';
 	import {
 		AlertDialog,
 		AlertDialogAction,
@@ -30,12 +26,7 @@
 		CardHeader,
 		CardTitle
 	} from '$lib/components/ui/card';
-	import {
-		Select,
-		SelectContent,
-		SelectItem,
-		SelectTrigger
-	} from '$lib/components/ui/select';
+	import { Select, SelectContent, SelectItem, SelectTrigger } from '$lib/components/ui/select';
 	import {
 		Table,
 		TableBody,
@@ -44,14 +35,7 @@
 		TableHeader,
 		TableRow
 	} from '$lib/components/ui/table';
-	import {
-		ScrollText,
-		ChevronLeft,
-		ChevronRight,
-		Trash2,
-		RefreshCw,
-		FileX
-	} from '@lucide/svelte';
+	import { ScrollText, ChevronLeft, ChevronRight, Trash2, RefreshCw, FileX } from '@lucide/svelte';
 	import {
 		ListAuditEntriesRequestSchema,
 		ClearAuditEntriesRequestSchema
@@ -165,7 +149,9 @@
 				}
 			}
 			const response = await rpcClient.audit.clearAuditEntries(request);
-			toast.success(`Deleted ${response.deleted} audit ${Number(response.deleted) === 1 ? 'entry' : 'entries'}`);
+			toast.success(
+				`Deleted ${response.deleted} audit ${Number(response.deleted) === 1 ? 'entry' : 'entries'}`
+			);
 			clearOpen = false;
 			offset = 0;
 			await loadEntries();
@@ -312,10 +298,7 @@
 									{#if entry.status === 'error'}
 										<Tooltip>
 											<TooltipTrigger>
-												<Badge
-													variant="outline"
-													class="cursor-help text-xs {ERROR_BADGE_CLASS}"
-												>
+												<Badge variant="outline" class="cursor-help text-xs {ERROR_BADGE_CLASS}">
 													Error
 												</Badge>
 											</TooltipTrigger>
@@ -324,9 +307,7 @@
 											</TooltipContent>
 										</Tooltip>
 									{:else}
-										<Badge variant="outline" class="text-xs {ONLINE_BADGE_CLASS}">
-											OK
-										</Badge>
+										<Badge variant="outline" class="text-xs {ONLINE_BADGE_CLASS}">OK</Badge>
 									{/if}
 								</TableCell>
 							</TableRow>
@@ -365,8 +346,8 @@
 		<AlertDialogHeader>
 			<AlertDialogTitle>Clear audit entries?</AlertDialogTitle>
 			<AlertDialogDescription>
-				This permanently deletes audit entries and cannot be undone. Optionally pick a date to
-				only delete entries recorded before it — leave it empty to clear everything.
+				This permanently deletes audit entries and cannot be undone. Optionally pick a date to only
+				delete entries recorded before it — leave it empty to clear everything.
 			</AlertDialogDescription>
 		</AlertDialogHeader>
 		<Input type="date" bind:value={clearBeforeDate} class="max-w-48" />

@@ -108,53 +108,53 @@
 	</div>
 
 	<Tabs value={activeTab} onValueChange={(v) => (activeTab = v || activeTab)} class="space-y-6">
-	<!-- TabsList is horizontally scrollable on small screens -->
-	<div class="w-full max-w-full overflow-x-auto pb-1">
-		<TabsList class="flex w-fit max-w-full gap-1">
-			{#if showSettings}
-				<TabsTrigger value="server-config" class="flex items-center gap-2 px-4">
-					<Server class="h-4 w-4" />
-					Server Defaults
-				</TabsTrigger>
-				<TabsTrigger value="routing" class="flex items-center gap-2 px-4">
-					<Globe class="h-4 w-4" />
-					Routing
-				</TabsTrigger>
-				<TabsTrigger value="auth" class="flex items-center gap-2 px-4">
-					<Shield class="h-4 w-4" />
-					Auth
-				</TabsTrigger>
-				<TabsTrigger value="logs" class="flex items-center gap-2 px-4">
-					<ScrollText class="h-4 w-4" />
-					Logs
-				</TabsTrigger>
-				<TabsTrigger value="alerts" class="flex items-center gap-2 px-4">
-					<Bell class="h-4 w-4" />
-					Alerts
-				</TabsTrigger>
-				<TabsTrigger value="audit" class="flex items-center gap-2 px-4">
-					<History class="h-4 w-4" />
-					Audit Log
-				</TabsTrigger>
-				<TabsTrigger value="support" class="flex items-center gap-2 px-4">
-					<HelpCircle class="h-4 w-4" />
-					Support
-				</TabsTrigger>
-			{/if}
-			{#if showUsers}
-				<TabsTrigger value="users" class="flex items-center gap-2 px-4">
-					<Users class="h-4 w-4" />
-					Users
-				</TabsTrigger>
-			{/if}
-			{#if showRoles}
-				<TabsTrigger value="roles" class="flex items-center gap-2 px-4">
-					<KeyRound class="h-4 w-4" />
-					Roles
-				</TabsTrigger>
-			{/if}
-		</TabsList>
-	</div>
+		<!-- TabsList is horizontally scrollable on small screens -->
+		<div class="w-full max-w-full overflow-x-auto pb-1">
+			<TabsList class="flex w-fit max-w-full gap-1">
+				{#if showSettings}
+					<TabsTrigger value="server-config" class="flex items-center gap-2 px-4">
+						<Server class="h-4 w-4" />
+						Server Defaults
+					</TabsTrigger>
+					<TabsTrigger value="routing" class="flex items-center gap-2 px-4">
+						<Globe class="h-4 w-4" />
+						Routing
+					</TabsTrigger>
+					<TabsTrigger value="auth" class="flex items-center gap-2 px-4">
+						<Shield class="h-4 w-4" />
+						Auth
+					</TabsTrigger>
+					<TabsTrigger value="logs" class="flex items-center gap-2 px-4">
+						<ScrollText class="h-4 w-4" />
+						Logs
+					</TabsTrigger>
+					<TabsTrigger value="alerts" class="flex items-center gap-2 px-4">
+						<Bell class="h-4 w-4" />
+						Alerts
+					</TabsTrigger>
+					<TabsTrigger value="audit" class="flex items-center gap-2 px-4">
+						<History class="h-4 w-4" />
+						Audit Log
+					</TabsTrigger>
+					<TabsTrigger value="support" class="flex items-center gap-2 px-4">
+						<HelpCircle class="h-4 w-4" />
+						Support
+					</TabsTrigger>
+				{/if}
+				{#if showUsers}
+					<TabsTrigger value="users" class="flex items-center gap-2 px-4">
+						<Users class="h-4 w-4" />
+						Users
+					</TabsTrigger>
+				{/if}
+				{#if showRoles}
+					<TabsTrigger value="roles" class="flex items-center gap-2 px-4">
+						<KeyRound class="h-4 w-4" />
+						Roles
+					</TabsTrigger>
+				{/if}
+			</TabsList>
+		</div>
 
 		{#if showSettings}
 			<TabsContent value="server-config" class="space-y-4">

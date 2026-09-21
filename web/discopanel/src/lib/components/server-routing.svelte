@@ -169,7 +169,7 @@
 		<Loader2 class="h-8 w-8 animate-spin text-muted-foreground" />
 	</div>
 {:else}
-	<div class="space-y-8 min-w-0 max-w-full">
+	<div class="max-w-full min-w-0 space-y-8">
 		<!-- Local Reverse Proxy Section -->
 		<div class="space-y-4">
 			<div>
@@ -186,7 +186,8 @@
 				<Alert>
 					<AlertCircle class="h-4 w-4" />
 					<AlertDescription>
-						Proxy routing is not enabled in DiscoPanel configuration. Enable it to use custom local hostnames.
+						Proxy routing is not enabled in DiscoPanel configuration. Enable it to use custom local
+						hostnames.
 					</AlertDescription>
 				</Alert>
 			{:else}
@@ -198,12 +199,17 @@
 								<Globe class="h-4 w-4" />
 								Current Proxy Status
 							</CardTitle>
-							<CardDescription>Domain routing state through the DiscoPanel reverse proxy</CardDescription>
+							<CardDescription
+								>Domain routing state through the DiscoPanel reverse proxy</CardDescription
+							>
 						</CardHeader>
 						<CardContent class="space-y-4">
 							{#if routingInfo.currentRoute || routingInfo.proxyHostname}
 								<div class="flex items-center gap-2">
-									<Badge variant="default" class="gap-1 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">
+									<Badge
+										variant="default"
+										class="gap-1 bg-emerald-500/15 text-emerald-600 dark:text-emerald-400"
+									>
 										<CheckCircle2 class="h-3 w-3" />
 										Active Proxy Route
 									</Badge>
@@ -256,7 +262,8 @@
 						<CardHeader>
 							<CardTitle class="text-base">Hostname Configuration</CardTitle>
 							<CardDescription>
-								Set a custom hostname for players to connect to your server through the reverse proxy
+								Set a custom hostname for players to connect to your server through the reverse
+								proxy
 							</CardDescription>
 						</CardHeader>
 						<CardContent class="space-y-4">
@@ -274,7 +281,9 @@
 									<p class="text-sm text-destructive">{hostnameError}</p>
 								{:else if hostname}
 									<p class="text-sm text-muted-foreground">
-										Players will connect using: <span class="font-mono">{getConnectionString()}</span>
+										Players will connect using: <span class="font-mono"
+											>{getConnectionString()}</span
+										>
 									</p>
 								{:else}
 									<p class="text-sm text-muted-foreground">
@@ -288,7 +297,9 @@
 									<AlertDescription>
 										<p class="mb-1 font-medium">DNS Configuration Required</p>
 										<p class="text-sm">
-											Make sure to add a DNS record pointing <code class="font-mono">{getFullHostname()}</code> to your server's IP address.
+											Make sure to add a DNS record pointing <code class="font-mono"
+												>{getFullHostname()}</code
+											> to your server's IP address.
 										</p>
 									</AlertDescription>
 								</Alert>

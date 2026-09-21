@@ -62,8 +62,8 @@
 	import ServerMods from '$lib/components/server-mods.svelte';
 	import ModpackUpdate from '$lib/components/modpack-update.svelte';
 	import ServerFiles from '$lib/components/files/server-files.svelte';
-import QuickConfigEditor from '$lib/components/files/quick-config-editor.svelte';
-import { FileCog } from '@lucide/svelte';
+	import QuickConfigEditor from '$lib/components/files/quick-config-editor.svelte';
+	import { FileCog } from '@lucide/svelte';
 	import ServerRouting from '$lib/components/server-routing.svelte';
 	import ServerTasks from '$lib/components/server-tasks.svelte';
 	import MetricsHistory from '$lib/components/metrics-history.svelte';
@@ -254,7 +254,7 @@ import { FileCog } from '@lucide/svelte';
 	</div>
 {:else if server}
 	<div
-		class="flex min-h-full min-w-0 max-w-full flex-col bg-linear-to-br from-background to-muted/20 p-4 pt-4 sm:p-6 sm:pt-6 lg:p-8"
+		class="flex min-h-full max-w-full min-w-0 flex-col bg-linear-to-br from-background to-muted/20 p-4 pt-4 sm:p-6 sm:pt-6 lg:p-8"
 	>
 		<div
 			class="mb-4 flex shrink-0 flex-col items-start justify-between gap-4 border-b-2 border-border/50 pb-4 sm:mb-6 sm:flex-row sm:items-center sm:pb-6"
@@ -364,7 +364,7 @@ import { FileCog } from '@lucide/svelte';
 						onclick={() => handleServerAction('restart')}
 						disabled={actionLoading}
 						size="default"
-						class="border-2 shadow-md transition-all hover:scale-[1.02] hover:shadow-lg flex"
+						class="flex border-2 shadow-md transition-all hover:scale-[1.02] hover:shadow-lg"
 					>
 						{#if actionLoading}
 							<Loader2 class="mr-1 h-4 w-4 animate-spin sm:mr-2 sm:h-5 sm:w-5" />
@@ -379,7 +379,7 @@ import { FileCog } from '@lucide/svelte';
 						<span class="sm:inline">Stopping...</span>
 					</Button>
 				{/if}
-				<div class="ml-1 h-10 w-px bg-border/50 sm:ml-4 block"></div>
+				<div class="ml-1 block h-10 w-px bg-border/50 sm:ml-4"></div>
 				<DropdownMenu>
 					<DropdownMenuTrigger>
 						{#snippet child({ props })}
@@ -395,12 +395,12 @@ import { FileCog } from '@lucide/svelte';
 							</Button>
 						{/snippet}
 					</DropdownMenuTrigger>
-						<DropdownMenuContent align="end">
-							<DropdownMenuItem class="flew-row flex" onclick={() => (quickConfigOpen = true)}>
-								<FileCog class="mr-2 h-4 w-4" />
-								Quick Edit Config
-							</DropdownMenuItem>
-							<DropdownMenuItem class="flew-row flex" onclick={() => (saveTemplateOpen = true)}>
+					<DropdownMenuContent align="end">
+						<DropdownMenuItem class="flew-row flex" onclick={() => (quickConfigOpen = true)}>
+							<FileCog class="mr-2 h-4 w-4" />
+							Quick Edit Config
+						</DropdownMenuItem>
+						<DropdownMenuItem class="flew-row flex" onclick={() => (saveTemplateOpen = true)}>
 							<PackagePlus class="mr-2 h-4 w-4" />
 							Save as Template
 						</DropdownMenuItem>
@@ -658,9 +658,7 @@ import { FileCog } from '@lucide/svelte';
 						<CardTitle class="text-xs font-bold tracking-widest text-muted-foreground/70 uppercase"
 							>Connection</CardTitle
 						>
-						<p class="text-xs text-muted-foreground/50">
-							Server address
-						</p>
+						<p class="text-xs text-muted-foreground/50">Server address</p>
 					</div>
 					<div class="relative">
 						<div
@@ -686,10 +684,10 @@ import { FileCog } from '@lucide/svelte';
 									{#if server.publicAddress}
 										{server.publicAddress}:{server.publicPort || 25565}
 									{:else if server.proxyHostname}
-											{server.proxyHostname}
-										{:else}
-											localhost:{server.port}
-										{/if}
+										{server.proxyHostname}
+									{:else}
+										localhost:{server.port}
+									{/if}
 								</span>
 								<span class="mt-1 block text-xs text-muted-foreground/60">Click to copy</span>
 							</div>
@@ -698,18 +696,17 @@ import { FileCog } from '@lucide/svelte';
 								variant="ghost"
 								onclick={() => {
 									if (!server) return;
-									const connectionString =
-										server.publicAddress
-											? `${server.publicAddress}:${server.publicPort || 25565}`
-											: server.proxyHostname || `localhost:${server.port}`;
+									const connectionString = server.publicAddress
+										? `${server.publicAddress}:${server.publicPort || 25565}`
+										: server.proxyHostname || `localhost:${server.port}`;
 									copyToClipboard(connectionString);
 								}}
-									class="transition-all duration-300 hover:scale-110 hover:bg-primary/20 hover:text-primary"
-								>
-									<Copy class="h-4 w-4" />
-								</Button>
-							</div>
+								class="transition-all duration-300 hover:scale-110 hover:bg-primary/20 hover:text-primary"
+							>
+								<Copy class="h-4 w-4" />
+							</Button>
 						</div>
+					</div>
 				</CardContent>
 			</Card>
 
@@ -1024,7 +1021,9 @@ import { FileCog } from '@lucide/svelte';
 								{#if server.diskFree && server.diskTotal}
 									<!-- Real filesystem fill: total minus available space -->
 									{@const diskPercent =
-										((Number(server.diskTotal) - Number(server.diskFree)) / Number(server.diskTotal)) * 100}
+										((Number(server.diskTotal) - Number(server.diskFree)) /
+											Number(server.diskTotal)) *
+										100}
 									<div
 										class="relative h-full rounded-full bg-linear-to-r from-purple-500 to-pink-500 transition-all duration-700"
 										style="width: {Math.min(diskPercent, 100)}%"
@@ -1050,7 +1049,9 @@ import { FileCog } from '@lucide/svelte';
 							{#if server.diskUsage !== undefined && Number(server.diskUsage) > 0}
 								<p class="mt-1 text-[10px] text-muted-foreground/50">
 									{#if server.diskFree && server.diskTotal}
-										{formatBytes(Number(server.diskFree))} free of {formatBytes(Number(server.diskTotal))}
+										{formatBytes(Number(server.diskFree))} free of {formatBytes(
+											Number(server.diskTotal)
+										)}
 									{:else if server.diskTotal}
 										{((Number(server.diskUsage) / Number(server.diskTotal)) * 100).toFixed(1)}% of {formatBytes(
 											Number(server.diskTotal)
@@ -1094,9 +1095,9 @@ import { FileCog } from '@lucide/svelte';
 				activeTab = value;
 			}}
 		>
-			<div class="w-full min-w-0 max-w-full flex-shrink-0 overflow-x-auto pb-1 scrollbar-thin">
+			<div class="w-full max-w-full min-w-0 flex-shrink-0 scrollbar-thin overflow-x-auto pb-1">
 				<TabsList
-					class="inline-flex h-11 w-max min-w-full items-center justify-start gap-1 rounded-xl bg-muted/60 p-1 backdrop-blur-sm 2xl:grid 2xl:h-12 2xl:grid-cols-11 2xl:w-full"
+					class="inline-flex h-11 w-max min-w-full items-center justify-start gap-1 rounded-xl bg-muted/60 p-1 backdrop-blur-sm 2xl:grid 2xl:h-12 2xl:w-full 2xl:grid-cols-11"
 				>
 					<TabsTrigger
 						value="overview"

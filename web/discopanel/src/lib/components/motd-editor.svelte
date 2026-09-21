@@ -252,7 +252,9 @@
 	}
 
 	const previewLines = $derived(
-		normalizeMotd(motdText).split('\n').map((line) => parseMotdLine(line))
+		normalizeMotd(motdText)
+			.split('\n')
+			.map((line) => parseMotdLine(line))
 	);
 
 	onMount(() => {
@@ -293,13 +295,15 @@
 									<span
 										style="color: {segment.color}; font-weight: {segment.bold
 											? 'bold'
-											: 'normal'}; font-style: {segment.italic ? 'italic' : 'normal'}; text-decoration: {[
+											: 'normal'}; font-style: {segment.italic
+											? 'italic'
+											: 'normal'}; text-decoration: {[
 											segment.underline ? 'underline' : '',
 											segment.strike ? 'line-through' : ''
 										]
 											.filter(Boolean)
 											.join(' ') || 'none'};"
-										class="{segment.obfuscated ? 'opacity-80 blur-[0.5px]' : ''}"
+										class={segment.obfuscated ? 'opacity-80 blur-[0.5px]' : ''}
 									>
 										{segment.text}
 									</span>
@@ -316,8 +320,8 @@
 				Minecraft color codes like <code class="rounded bg-muted px-1 font-mono">§a</code> (green),
 				<code class="rounded bg-muted px-1 font-mono">§l</code> (bold) and
 				<code class="rounded bg-muted px-1 font-mono">§r</code> (reset) are supported. Use
-				<code class="rounded bg-muted px-1 font-mono">&amp;</code> is not supported — use the
-				section sign character directly.
+				<code class="rounded bg-muted px-1 font-mono">&amp;</code> is not supported — use the section
+				sign character directly.
 			</p>
 		</CardContent>
 	</Card>
@@ -329,8 +333,8 @@
 		>
 			<TriangleAlert class="mt-0.5 h-5 w-5 shrink-0" />
 			<p>
-				MOTD/icon/max-players/online-mode require the server to be stopped; whitelist can be
-				toggled live.
+				MOTD/icon/max-players/online-mode require the server to be stopped; whitelist can be toggled
+				live.
 			</p>
 		</div>
 	{/if}
@@ -398,7 +402,12 @@
 								Upload PNG
 							</Button>
 							{#if iconPreview}
-								<Button variant="outline" class="border-2" disabled={isRunning} onclick={removeIcon}>
+								<Button
+									variant="outline"
+									class="border-2"
+									disabled={isRunning}
+									onclick={removeIcon}
+								>
 									<Trash2 class="mr-2 h-4 w-4" />
 									Remove
 								</Button>
@@ -436,14 +445,18 @@
 						<div class="flex items-center justify-between gap-4">
 							<div class="space-y-0.5">
 								<Label>Online Mode</Label>
-								<p class="text-xs text-muted-foreground">Require premium accounts (needs restart)</p>
+								<p class="text-xs text-muted-foreground">
+									Require premium accounts (needs restart)
+								</p>
 							</div>
 							<Switch bind:checked={onlineMode} disabled={isRunning} />
 						</div>
 						<div class="flex items-center justify-between gap-4">
 							<div class="space-y-0.5">
 								<Label>Whitelist</Label>
-								<p class="text-xs text-muted-foreground">Can be toggled while the server is running</p>
+								<p class="text-xs text-muted-foreground">
+									Can be toggled while the server is running
+								</p>
 							</div>
 							<Switch bind:checked={whitelistEnabled} />
 						</div>

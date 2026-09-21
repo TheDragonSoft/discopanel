@@ -2,204 +2,213 @@
 // @generated from file discopanel/v1/audit.proto (package discopanel.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenFile, GenMessage, GenService } from '@bufbuild/protobuf/codegenv2';
+import { fileDesc, messageDesc, serviceDesc } from '@bufbuild/protobuf/codegenv2';
+import type { Timestamp } from '@bufbuild/protobuf/wkt';
+import { file_google_protobuf_timestamp } from '@bufbuild/protobuf/wkt';
+import type { Message } from '@bufbuild/protobuf';
 
 /**
  * Describes the file discopanel/v1/audit.proto.
  */
-export const file_discopanel_v1_audit: GenFile = /*@__PURE__*/
-  fileDesc("ChlkaXNjb3BhbmVsL3YxL2F1ZGl0LnByb3RvEg1kaXNjb3BhbmVsLnYxItMBCgpBdWRpdEVudHJ5EgoKAmlkGAEgASgJEg8KB3VzZXJfaWQYAiABKAkSEAoIdXNlcm5hbWUYAyABKAkSEQoJcHJvY2VkdXJlGAQgASgJEhAKCHJlc291cmNlGAUgASgJEg4KBmFjdGlvbhgGIAEoCRIRCglvYmplY3RfaWQYByABKAkSDgoGc3RhdHVzGAggASgJEg4KBmRldGFpbBgJIAEoCRIuCgpjcmVhdGVkX2F0GAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJsChdMaXN0QXVkaXRFbnRyaWVzUmVxdWVzdBIQCgh1c2VybmFtZRgBIAEoCRIQCghyZXNvdXJjZRgCIAEoCRIOCgZhY3Rpb24YAyABKAkSDQoFbGltaXQYBCABKAUSDgoGb2Zmc2V0GAUgASgFIlUKGExpc3RBdWRpdEVudHJpZXNSZXNwb25zZRIqCgdlbnRyaWVzGAEgAygLMhkuZGlzY29wYW5lbC52MS5BdWRpdEVudHJ5Eg0KBXRvdGFsGAIgASgFIlYKGENsZWFyQXVkaXRFbnRyaWVzUmVxdWVzdBIvCgZiZWZvcmUYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSACIAQFCCQoHX2JlZm9yZSIsChlDbGVhckF1ZGl0RW50cmllc1Jlc3BvbnNlEg8KB2RlbGV0ZWQYASABKAMy2wEKDEF1ZGl0U2VydmljZRJjChBMaXN0QXVkaXRFbnRyaWVzEiYuZGlzY29wYW5lbC52MS5MaXN0QXVkaXRFbnRyaWVzUmVxdWVzdBonLmRpc2NvcGFuZWwudjEuTGlzdEF1ZGl0RW50cmllc1Jlc3BvbnNlEmYKEUNsZWFyQXVkaXRFbnRyaWVzEicuZGlzY29wYW5lbC52MS5DbGVhckF1ZGl0RW50cmllc1JlcXVlc3QaKC5kaXNjb3BhbmVsLnYxLkNsZWFyQXVkaXRFbnRyaWVzUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+export const file_discopanel_v1_audit: GenFile =
+	/*@__PURE__*/
+	fileDesc(
+		'ChlkaXNjb3BhbmVsL3YxL2F1ZGl0LnByb3RvEg1kaXNjb3BhbmVsLnYxItMBCgpBdWRpdEVudHJ5EgoKAmlkGAEgASgJEg8KB3VzZXJfaWQYAiABKAkSEAoIdXNlcm5hbWUYAyABKAkSEQoJcHJvY2VkdXJlGAQgASgJEhAKCHJlc291cmNlGAUgASgJEg4KBmFjdGlvbhgGIAEoCRIRCglvYmplY3RfaWQYByABKAkSDgoGc3RhdHVzGAggASgJEg4KBmRldGFpbBgJIAEoCRIuCgpjcmVhdGVkX2F0GAogASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCJsChdMaXN0QXVkaXRFbnRyaWVzUmVxdWVzdBIQCgh1c2VybmFtZRgBIAEoCRIQCghyZXNvdXJjZRgCIAEoCRIOCgZhY3Rpb24YAyABKAkSDQoFbGltaXQYBCABKAUSDgoGb2Zmc2V0GAUgASgFIlUKGExpc3RBdWRpdEVudHJpZXNSZXNwb25zZRIqCgdlbnRyaWVzGAEgAygLMhkuZGlzY29wYW5lbC52MS5BdWRpdEVudHJ5Eg0KBXRvdGFsGAIgASgFIlYKGENsZWFyQXVkaXRFbnRyaWVzUmVxdWVzdBIvCgZiZWZvcmUYASABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wSACIAQFCCQoHX2JlZm9yZSIsChlDbGVhckF1ZGl0RW50cmllc1Jlc3BvbnNlEg8KB2RlbGV0ZWQYASABKAMy2wEKDEF1ZGl0U2VydmljZRJjChBMaXN0QXVkaXRFbnRyaWVzEiYuZGlzY29wYW5lbC52MS5MaXN0QXVkaXRFbnRyaWVzUmVxdWVzdBonLmRpc2NvcGFuZWwudjEuTGlzdEF1ZGl0RW50cmllc1Jlc3BvbnNlEmYKEUNsZWFyQXVkaXRFbnRyaWVzEicuZGlzY29wYW5lbC52MS5DbGVhckF1ZGl0RW50cmllc1JlcXVlc3QaKC5kaXNjb3BhbmVsLnYxLkNsZWFyQXVkaXRFbnRyaWVzUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw',
+		[file_google_protobuf_timestamp]
+	);
 
 /**
  * One recorded mutation
  *
  * @generated from message discopanel.v1.AuditEntry
  */
-export type AuditEntry = Message<"discopanel.v1.AuditEntry"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type AuditEntry = Message<'discopanel.v1.AuditEntry'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string user_id = 2;
-   */
-  userId: string;
+	/**
+	 * @generated from field: string user_id = 2;
+	 */
+	userId: string;
 
-  /**
-   * @generated from field: string username = 3;
-   */
-  username: string;
+	/**
+	 * @generated from field: string username = 3;
+	 */
+	username: string;
 
-  /**
-   * e.g. /discopanel.v1.ServerService/StartServer
-   *
-   * @generated from field: string procedure = 4;
-   */
-  procedure: string;
+	/**
+	 * e.g. /discopanel.v1.ServerService/StartServer
+	 *
+	 * @generated from field: string procedure = 4;
+	 */
+	procedure: string;
 
-  /**
-   * RBAC resource, e.g. servers
-   *
-   * @generated from field: string resource = 5;
-   */
-  resource: string;
+	/**
+	 * RBAC resource, e.g. servers
+	 *
+	 * @generated from field: string resource = 5;
+	 */
+	resource: string;
 
-  /**
-   * RBAC action, e.g. start
-   *
-   * @generated from field: string action = 6;
-   */
-  action: string;
+	/**
+	 * RBAC action, e.g. start
+	 *
+	 * @generated from field: string action = 6;
+	 */
+	action: string;
 
-  /**
-   * RBAC object id extracted from the request ("*" when none)
-   *
-   * @generated from field: string object_id = 7;
-   */
-  objectId: string;
+	/**
+	 * RBAC object id extracted from the request ("*" when none)
+	 *
+	 * @generated from field: string object_id = 7;
+	 */
+	objectId: string;
 
-  /**
-   * "ok" or "error"
-   *
-   * @generated from field: string status = 8;
-   */
-  status: string;
+	/**
+	 * "ok" or "error"
+	 *
+	 * @generated from field: string status = 8;
+	 */
+	status: string;
 
-  /**
-   * Error message when status is error, else empty
-   *
-   * @generated from field: string detail = 9;
-   */
-  detail: string;
+	/**
+	 * Error message when status is error, else empty
+	 *
+	 * @generated from field: string detail = 9;
+	 */
+	detail: string;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 10;
-   */
-  createdAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp created_at = 10;
+	 */
+	createdAt?: Timestamp | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.AuditEntry.
  * Use `create(AuditEntrySchema)` to create a new message.
  */
-export const AuditEntrySchema: GenMessage<AuditEntry> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_audit, 0);
+export const AuditEntrySchema: GenMessage<AuditEntry> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_audit, 0);
 
 /**
  * List audit entries request
  *
  * @generated from message discopanel.v1.ListAuditEntriesRequest
  */
-export type ListAuditEntriesRequest = Message<"discopanel.v1.ListAuditEntriesRequest"> & {
-  /**
-   * Optional filter
-   *
-   * @generated from field: string username = 1;
-   */
-  username: string;
+export type ListAuditEntriesRequest = Message<'discopanel.v1.ListAuditEntriesRequest'> & {
+	/**
+	 * Optional filter
+	 *
+	 * @generated from field: string username = 1;
+	 */
+	username: string;
 
-  /**
-   * Optional filter
-   *
-   * @generated from field: string resource = 2;
-   */
-  resource: string;
+	/**
+	 * Optional filter
+	 *
+	 * @generated from field: string resource = 2;
+	 */
+	resource: string;
 
-  /**
-   * Optional filter
-   *
-   * @generated from field: string action = 3;
-   */
-  action: string;
+	/**
+	 * Optional filter
+	 *
+	 * @generated from field: string action = 3;
+	 */
+	action: string;
 
-  /**
-   * 0 = default 100
-   *
-   * @generated from field: int32 limit = 4;
-   */
-  limit: number;
+	/**
+	 * 0 = default 100
+	 *
+	 * @generated from field: int32 limit = 4;
+	 */
+	limit: number;
 
-  /**
-   * @generated from field: int32 offset = 5;
-   */
-  offset: number;
+	/**
+	 * @generated from field: int32 offset = 5;
+	 */
+	offset: number;
 };
 
 /**
  * Describes the message discopanel.v1.ListAuditEntriesRequest.
  * Use `create(ListAuditEntriesRequestSchema)` to create a new message.
  */
-export const ListAuditEntriesRequestSchema: GenMessage<ListAuditEntriesRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_audit, 1);
+export const ListAuditEntriesRequestSchema: GenMessage<ListAuditEntriesRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_audit, 1);
 
 /**
  * List audit entries response
  *
  * @generated from message discopanel.v1.ListAuditEntriesResponse
  */
-export type ListAuditEntriesResponse = Message<"discopanel.v1.ListAuditEntriesResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.AuditEntry entries = 1;
-   */
-  entries: AuditEntry[];
+export type ListAuditEntriesResponse = Message<'discopanel.v1.ListAuditEntriesResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.AuditEntry entries = 1;
+	 */
+	entries: AuditEntry[];
 
-  /**
-   * @generated from field: int32 total = 2;
-   */
-  total: number;
+	/**
+	 * @generated from field: int32 total = 2;
+	 */
+	total: number;
 };
 
 /**
  * Describes the message discopanel.v1.ListAuditEntriesResponse.
  * Use `create(ListAuditEntriesResponseSchema)` to create a new message.
  */
-export const ListAuditEntriesResponseSchema: GenMessage<ListAuditEntriesResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_audit, 2);
+export const ListAuditEntriesResponseSchema: GenMessage<ListAuditEntriesResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_audit, 2);
 
 /**
  * Clear audit entries request
  *
  * @generated from message discopanel.v1.ClearAuditEntriesRequest
  */
-export type ClearAuditEntriesRequest = Message<"discopanel.v1.ClearAuditEntriesRequest"> & {
-  /**
-   * Omit to clear everything
-   *
-   * @generated from field: optional google.protobuf.Timestamp before = 1;
-   */
-  before?: Timestamp | undefined;
+export type ClearAuditEntriesRequest = Message<'discopanel.v1.ClearAuditEntriesRequest'> & {
+	/**
+	 * Omit to clear everything
+	 *
+	 * @generated from field: optional google.protobuf.Timestamp before = 1;
+	 */
+	before?: Timestamp | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.ClearAuditEntriesRequest.
  * Use `create(ClearAuditEntriesRequestSchema)` to create a new message.
  */
-export const ClearAuditEntriesRequestSchema: GenMessage<ClearAuditEntriesRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_audit, 3);
+export const ClearAuditEntriesRequestSchema: GenMessage<ClearAuditEntriesRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_audit, 3);
 
 /**
  * Clear audit entries response
  *
  * @generated from message discopanel.v1.ClearAuditEntriesResponse
  */
-export type ClearAuditEntriesResponse = Message<"discopanel.v1.ClearAuditEntriesResponse"> & {
-  /**
-   * @generated from field: int64 deleted = 1;
-   */
-  deleted: bigint;
+export type ClearAuditEntriesResponse = Message<'discopanel.v1.ClearAuditEntriesResponse'> & {
+	/**
+	 * @generated from field: int64 deleted = 1;
+	 */
+	deleted: bigint;
 };
 
 /**
  * Describes the message discopanel.v1.ClearAuditEntriesResponse.
  * Use `create(ClearAuditEntriesResponseSchema)` to create a new message.
  */
-export const ClearAuditEntriesResponseSchema: GenMessage<ClearAuditEntriesResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_audit, 4);
+export const ClearAuditEntriesResponseSchema: GenMessage<ClearAuditEntriesResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_audit, 4);
 
 /**
  * Audit trail of mutating panel operations
@@ -207,26 +216,24 @@ export const ClearAuditEntriesResponseSchema: GenMessage<ClearAuditEntriesRespon
  * @generated from service discopanel.v1.AuditService
  */
 export const AuditService: GenService<{
-  /**
-   * List audit entries with filters
-   *
-   * @generated from rpc discopanel.v1.AuditService.ListAuditEntries
-   */
-  listAuditEntries: {
-    methodKind: "unary";
-    input: typeof ListAuditEntriesRequestSchema;
-    output: typeof ListAuditEntriesResponseSchema;
-  },
-  /**
-   * Delete audit entries recorded before the given time (or all when omitted)
-   *
-   * @generated from rpc discopanel.v1.AuditService.ClearAuditEntries
-   */
-  clearAuditEntries: {
-    methodKind: "unary";
-    input: typeof ClearAuditEntriesRequestSchema;
-    output: typeof ClearAuditEntriesResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_discopanel_v1_audit, 0);
-
+	/**
+	 * List audit entries with filters
+	 *
+	 * @generated from rpc discopanel.v1.AuditService.ListAuditEntries
+	 */
+	listAuditEntries: {
+		methodKind: 'unary';
+		input: typeof ListAuditEntriesRequestSchema;
+		output: typeof ListAuditEntriesResponseSchema;
+	};
+	/**
+	 * Delete audit entries recorded before the given time (or all when omitted)
+	 *
+	 * @generated from rpc discopanel.v1.AuditService.ClearAuditEntries
+	 */
+	clearAuditEntries: {
+		methodKind: 'unary';
+		input: typeof ClearAuditEntriesRequestSchema;
+		output: typeof ClearAuditEntriesResponseSchema;
+	};
+}> = /*@__PURE__*/ serviceDesc(file_discopanel_v1_audit, 0);

@@ -2,269 +2,281 @@
 // @generated from file discopanel/v1/config.proto (package discopanel.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenFile, GenMessage, GenService } from '@bufbuild/protobuf/codegenv2';
+import { fileDesc, messageDesc, serviceDesc } from '@bufbuild/protobuf/codegenv2';
+import type { Message } from '@bufbuild/protobuf';
 
 /**
  * Describes the file discopanel/v1/config.proto.
  */
-export const file_discopanel_v1_config: GenFile = /*@__PURE__*/
-  fileDesc("ChpkaXNjb3BhbmVsL3YxL2NvbmZpZy5wcm90bxINZGlzY29wYW5lbC52MSLjAQoOQ29uZmlnUHJvcGVydHkSCwoDa2V5GAEgASgJEg0KBWxhYmVsGAIgASgJEg0KBXZhbHVlGAMgASgJEhoKDWRlZmF1bHRfdmFsdWUYBCABKAlIAIgBARIMCgR0eXBlGAUgASgJEhMKC2Rlc2NyaXB0aW9uGAYgASgJEhAKCHJlcXVpcmVkGAcgASgIEg4KBnN5c3RlbRgIIAEoCBIRCgllcGhlbWVyYWwYCSABKAgSDwoHZW52X3ZhchgKIAEoCRIPCgdvcHRpb25zGAsgAygJQhAKDl9kZWZhdWx0X3ZhbHVlIlEKDkNvbmZpZ0NhdGVnb3J5EgwKBG5hbWUYASABKAkSMQoKcHJvcGVydGllcxgCIAMoCzIdLmRpc2NvcGFuZWwudjEuQ29uZmlnUHJvcGVydHkiKwoWR2V0U2VydmVyQ29uZmlnUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkiTAoXR2V0U2VydmVyQ29uZmlnUmVzcG9uc2USMQoKY2F0ZWdvcmllcxgBIAMoCzIdLmRpc2NvcGFuZWwudjEuQ29uZmlnQ2F0ZWdvcnkipgEKGVVwZGF0ZVNlcnZlckNvbmZpZ1JlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEkYKB3VwZGF0ZXMYAiADKAsyNS5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlckNvbmZpZ1JlcXVlc3QuVXBkYXRlc0VudHJ5Gi4KDFVwZGF0ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIk8KGlVwZGF0ZVNlcnZlckNvbmZpZ1Jlc3BvbnNlEjEKCmNhdGVnb3JpZXMYASADKAsyHS5kaXNjb3BhbmVsLnYxLkNvbmZpZ0NhdGVnb3J5IhoKGEdldEdsb2JhbFNldHRpbmdzUmVxdWVzdCJOChlHZXRHbG9iYWxTZXR0aW5nc1Jlc3BvbnNlEjEKCmNhdGVnb3JpZXMYASADKAsyHS5kaXNjb3BhbmVsLnYxLkNvbmZpZ0NhdGVnb3J5IpcBChtVcGRhdGVHbG9iYWxTZXR0aW5nc1JlcXVlc3QSSAoHdXBkYXRlcxgBIAMoCzI3LmRpc2NvcGFuZWwudjEuVXBkYXRlR2xvYmFsU2V0dGluZ3NSZXF1ZXN0LlVwZGF0ZXNFbnRyeRouCgxVcGRhdGVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJRChxVcGRhdGVHbG9iYWxTZXR0aW5nc1Jlc3BvbnNlEjEKCmNhdGVnb3JpZXMYASADKAsyHS5kaXNjb3BhbmVsLnYxLkNvbmZpZ0NhdGVnb3J5MrUDCg1Db25maWdTZXJ2aWNlEmAKD0dldFNlcnZlckNvbmZpZxIlLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyQ29uZmlnUmVxdWVzdBomLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyQ29uZmlnUmVzcG9uc2USaQoSVXBkYXRlU2VydmVyQ29uZmlnEiguZGlzY29wYW5lbC52MS5VcGRhdGVTZXJ2ZXJDb25maWdSZXF1ZXN0GikuZGlzY29wYW5lbC52MS5VcGRhdGVTZXJ2ZXJDb25maWdSZXNwb25zZRJmChFHZXRHbG9iYWxTZXR0aW5ncxInLmRpc2NvcGFuZWwudjEuR2V0R2xvYmFsU2V0dGluZ3NSZXF1ZXN0GiguZGlzY29wYW5lbC52MS5HZXRHbG9iYWxTZXR0aW5nc1Jlc3BvbnNlEm8KFFVwZGF0ZUdsb2JhbFNldHRpbmdzEiouZGlzY29wYW5lbC52MS5VcGRhdGVHbG9iYWxTZXR0aW5nc1JlcXVlc3QaKy5kaXNjb3BhbmVsLnYxLlVwZGF0ZUdsb2JhbFNldHRpbmdzUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw");
+export const file_discopanel_v1_config: GenFile =
+	/*@__PURE__*/
+	fileDesc(
+		'ChpkaXNjb3BhbmVsL3YxL2NvbmZpZy5wcm90bxINZGlzY29wYW5lbC52MSLjAQoOQ29uZmlnUHJvcGVydHkSCwoDa2V5GAEgASgJEg0KBWxhYmVsGAIgASgJEg0KBXZhbHVlGAMgASgJEhoKDWRlZmF1bHRfdmFsdWUYBCABKAlIAIgBARIMCgR0eXBlGAUgASgJEhMKC2Rlc2NyaXB0aW9uGAYgASgJEhAKCHJlcXVpcmVkGAcgASgIEg4KBnN5c3RlbRgIIAEoCBIRCgllcGhlbWVyYWwYCSABKAgSDwoHZW52X3ZhchgKIAEoCRIPCgdvcHRpb25zGAsgAygJQhAKDl9kZWZhdWx0X3ZhbHVlIlEKDkNvbmZpZ0NhdGVnb3J5EgwKBG5hbWUYASABKAkSMQoKcHJvcGVydGllcxgCIAMoCzIdLmRpc2NvcGFuZWwudjEuQ29uZmlnUHJvcGVydHkiKwoWR2V0U2VydmVyQ29uZmlnUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkiTAoXR2V0U2VydmVyQ29uZmlnUmVzcG9uc2USMQoKY2F0ZWdvcmllcxgBIAMoCzIdLmRpc2NvcGFuZWwudjEuQ29uZmlnQ2F0ZWdvcnkipgEKGVVwZGF0ZVNlcnZlckNvbmZpZ1JlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEkYKB3VwZGF0ZXMYAiADKAsyNS5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlckNvbmZpZ1JlcXVlc3QuVXBkYXRlc0VudHJ5Gi4KDFVwZGF0ZXNFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAk6AjgBIk8KGlVwZGF0ZVNlcnZlckNvbmZpZ1Jlc3BvbnNlEjEKCmNhdGVnb3JpZXMYASADKAsyHS5kaXNjb3BhbmVsLnYxLkNvbmZpZ0NhdGVnb3J5IhoKGEdldEdsb2JhbFNldHRpbmdzUmVxdWVzdCJOChlHZXRHbG9iYWxTZXR0aW5nc1Jlc3BvbnNlEjEKCmNhdGVnb3JpZXMYASADKAsyHS5kaXNjb3BhbmVsLnYxLkNvbmZpZ0NhdGVnb3J5IpcBChtVcGRhdGVHbG9iYWxTZXR0aW5nc1JlcXVlc3QSSAoHdXBkYXRlcxgBIAMoCzI3LmRpc2NvcGFuZWwudjEuVXBkYXRlR2xvYmFsU2V0dGluZ3NSZXF1ZXN0LlVwZGF0ZXNFbnRyeRouCgxVcGRhdGVzRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgJOgI4ASJRChxVcGRhdGVHbG9iYWxTZXR0aW5nc1Jlc3BvbnNlEjEKCmNhdGVnb3JpZXMYASADKAsyHS5kaXNjb3BhbmVsLnYxLkNvbmZpZ0NhdGVnb3J5MrUDCg1Db25maWdTZXJ2aWNlEmAKD0dldFNlcnZlckNvbmZpZxIlLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyQ29uZmlnUmVxdWVzdBomLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyQ29uZmlnUmVzcG9uc2USaQoSVXBkYXRlU2VydmVyQ29uZmlnEiguZGlzY29wYW5lbC52MS5VcGRhdGVTZXJ2ZXJDb25maWdSZXF1ZXN0GikuZGlzY29wYW5lbC52MS5VcGRhdGVTZXJ2ZXJDb25maWdSZXNwb25zZRJmChFHZXRHbG9iYWxTZXR0aW5ncxInLmRpc2NvcGFuZWwudjEuR2V0R2xvYmFsU2V0dGluZ3NSZXF1ZXN0GiguZGlzY29wYW5lbC52MS5HZXRHbG9iYWxTZXR0aW5nc1Jlc3BvbnNlEm8KFFVwZGF0ZUdsb2JhbFNldHRpbmdzEiouZGlzY29wYW5lbC52MS5VcGRhdGVHbG9iYWxTZXR0aW5nc1JlcXVlc3QaKy5kaXNjb3BhbmVsLnYxLlVwZGF0ZUdsb2JhbFNldHRpbmdzUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw'
+	);
 
 /**
  * Single configuration field
  *
  * @generated from message discopanel.v1.ConfigProperty
  */
-export type ConfigProperty = Message<"discopanel.v1.ConfigProperty"> & {
-  /**
-   * @generated from field: string key = 1;
-   */
-  key: string;
+export type ConfigProperty = Message<'discopanel.v1.ConfigProperty'> & {
+	/**
+	 * @generated from field: string key = 1;
+	 */
+	key: string;
 
-  /**
-   * @generated from field: string label = 2;
-   */
-  label: string;
+	/**
+	 * @generated from field: string label = 2;
+	 */
+	label: string;
 
-  /**
-   * @generated from field: string value = 3;
-   */
-  value: string;
+	/**
+	 * @generated from field: string value = 3;
+	 */
+	value: string;
 
-  /**
-   * @generated from field: optional string default_value = 4;
-   */
-  defaultValue?: string | undefined;
+	/**
+	 * @generated from field: optional string default_value = 4;
+	 */
+	defaultValue?: string | undefined;
 
-  /**
-   * text, number, checkbox, select, password
-   *
-   * @generated from field: string type = 5;
-   */
-  type: string;
+	/**
+	 * text, number, checkbox, select, password
+	 *
+	 * @generated from field: string type = 5;
+	 */
+	type: string;
 
-  /**
-   * @generated from field: string description = 6;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 6;
+	 */
+	description: string;
 
-  /**
-   * @generated from field: bool required = 7;
-   */
-  required: boolean;
+	/**
+	 * @generated from field: bool required = 7;
+	 */
+	required: boolean;
 
-  /**
-   * If true, field is auto-populated and read-only
-   *
-   * @generated from field: bool system = 8;
-   */
-  system: boolean;
+	/**
+	 * If true, field is auto-populated and read-only
+	 *
+	 * @generated from field: bool system = 8;
+	 */
+	system: boolean;
 
-  /**
-   * If true, field is cleared after server start
-   *
-   * @generated from field: bool ephemeral = 9;
-   */
-  ephemeral: boolean;
+	/**
+	 * If true, field is cleared after server start
+	 *
+	 * @generated from field: bool ephemeral = 9;
+	 */
+	ephemeral: boolean;
 
-  /**
-   * @generated from field: string env_var = 10;
-   */
-  envVar: string;
+	/**
+	 * @generated from field: string env_var = 10;
+	 */
+	envVar: string;
 
-  /**
-   * For select type
-   *
-   * @generated from field: repeated string options = 11;
-   */
-  options: string[];
+	/**
+	 * For select type
+	 *
+	 * @generated from field: repeated string options = 11;
+	 */
+	options: string[];
 };
 
 /**
  * Describes the message discopanel.v1.ConfigProperty.
  * Use `create(ConfigPropertySchema)` to create a new message.
  */
-export const ConfigPropertySchema: GenMessage<ConfigProperty> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_config, 0);
+export const ConfigPropertySchema: GenMessage<ConfigProperty> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_config, 0);
 
 /**
  * Group of related config fields
  *
  * @generated from message discopanel.v1.ConfigCategory
  */
-export type ConfigCategory = Message<"discopanel.v1.ConfigCategory"> & {
-  /**
-   * @generated from field: string name = 1;
-   */
-  name: string;
+export type ConfigCategory = Message<'discopanel.v1.ConfigCategory'> & {
+	/**
+	 * @generated from field: string name = 1;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: repeated discopanel.v1.ConfigProperty properties = 2;
-   */
-  properties: ConfigProperty[];
+	/**
+	 * @generated from field: repeated discopanel.v1.ConfigProperty properties = 2;
+	 */
+	properties: ConfigProperty[];
 };
 
 /**
  * Describes the message discopanel.v1.ConfigCategory.
  * Use `create(ConfigCategorySchema)` to create a new message.
  */
-export const ConfigCategorySchema: GenMessage<ConfigCategory> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_config, 1);
+export const ConfigCategorySchema: GenMessage<ConfigCategory> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_config, 1);
 
 /**
  * Server config request
  *
  * @generated from message discopanel.v1.GetServerConfigRequest
  */
-export type GetServerConfigRequest = Message<"discopanel.v1.GetServerConfigRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type GetServerConfigRequest = Message<'discopanel.v1.GetServerConfigRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetServerConfigRequest.
  * Use `create(GetServerConfigRequestSchema)` to create a new message.
  */
-export const GetServerConfigRequestSchema: GenMessage<GetServerConfigRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_config, 2);
+export const GetServerConfigRequestSchema: GenMessage<GetServerConfigRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_config, 2);
 
 /**
  * Categorized server settings
  *
  * @generated from message discopanel.v1.GetServerConfigResponse
  */
-export type GetServerConfigResponse = Message<"discopanel.v1.GetServerConfigResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ConfigCategory categories = 1;
-   */
-  categories: ConfigCategory[];
+export type GetServerConfigResponse = Message<'discopanel.v1.GetServerConfigResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ConfigCategory categories = 1;
+	 */
+	categories: ConfigCategory[];
 };
 
 /**
  * Describes the message discopanel.v1.GetServerConfigResponse.
  * Use `create(GetServerConfigResponseSchema)` to create a new message.
  */
-export const GetServerConfigResponseSchema: GenMessage<GetServerConfigResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_config, 3);
+export const GetServerConfigResponseSchema: GenMessage<GetServerConfigResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_config, 3);
 
 /**
  * Config fields to update
  *
  * @generated from message discopanel.v1.UpdateServerConfigRequest
  */
-export type UpdateServerConfigRequest = Message<"discopanel.v1.UpdateServerConfigRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type UpdateServerConfigRequest = Message<'discopanel.v1.UpdateServerConfigRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: map<string, string> updates = 2;
-   */
-  updates: { [key: string]: string };
+	/**
+	 * @generated from field: map<string, string> updates = 2;
+	 */
+	updates: { [key: string]: string };
 };
 
 /**
  * Describes the message discopanel.v1.UpdateServerConfigRequest.
  * Use `create(UpdateServerConfigRequestSchema)` to create a new message.
  */
-export const UpdateServerConfigRequestSchema: GenMessage<UpdateServerConfigRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_config, 4);
+export const UpdateServerConfigRequestSchema: GenMessage<UpdateServerConfigRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_config, 4);
 
 /**
  * Updated server settings
  *
  * @generated from message discopanel.v1.UpdateServerConfigResponse
  */
-export type UpdateServerConfigResponse = Message<"discopanel.v1.UpdateServerConfigResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ConfigCategory categories = 1;
-   */
-  categories: ConfigCategory[];
+export type UpdateServerConfigResponse = Message<'discopanel.v1.UpdateServerConfigResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ConfigCategory categories = 1;
+	 */
+	categories: ConfigCategory[];
 };
 
 /**
  * Describes the message discopanel.v1.UpdateServerConfigResponse.
  * Use `create(UpdateServerConfigResponseSchema)` to create a new message.
  */
-export const UpdateServerConfigResponseSchema: GenMessage<UpdateServerConfigResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_config, 5);
+export const UpdateServerConfigResponseSchema: GenMessage<UpdateServerConfigResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_config, 5);
 
 /**
  * Empty global settings request
  *
  * @generated from message discopanel.v1.GetGlobalSettingsRequest
  */
-export type GetGlobalSettingsRequest = Message<"discopanel.v1.GetGlobalSettingsRequest"> & {
-};
+export type GetGlobalSettingsRequest = Message<'discopanel.v1.GetGlobalSettingsRequest'> & {};
 
 /**
  * Describes the message discopanel.v1.GetGlobalSettingsRequest.
  * Use `create(GetGlobalSettingsRequestSchema)` to create a new message.
  */
-export const GetGlobalSettingsRequestSchema: GenMessage<GetGlobalSettingsRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_config, 6);
+export const GetGlobalSettingsRequestSchema: GenMessage<GetGlobalSettingsRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_config, 6);
 
 /**
  * Categorized global defaults
  *
  * @generated from message discopanel.v1.GetGlobalSettingsResponse
  */
-export type GetGlobalSettingsResponse = Message<"discopanel.v1.GetGlobalSettingsResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ConfigCategory categories = 1;
-   */
-  categories: ConfigCategory[];
+export type GetGlobalSettingsResponse = Message<'discopanel.v1.GetGlobalSettingsResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ConfigCategory categories = 1;
+	 */
+	categories: ConfigCategory[];
 };
 
 /**
  * Describes the message discopanel.v1.GetGlobalSettingsResponse.
  * Use `create(GetGlobalSettingsResponseSchema)` to create a new message.
  */
-export const GetGlobalSettingsResponseSchema: GenMessage<GetGlobalSettingsResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_config, 7);
+export const GetGlobalSettingsResponseSchema: GenMessage<GetGlobalSettingsResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_config, 7);
 
 /**
  * Global fields to update
  *
  * @generated from message discopanel.v1.UpdateGlobalSettingsRequest
  */
-export type UpdateGlobalSettingsRequest = Message<"discopanel.v1.UpdateGlobalSettingsRequest"> & {
-  /**
-   * @generated from field: map<string, string> updates = 1;
-   */
-  updates: { [key: string]: string };
+export type UpdateGlobalSettingsRequest = Message<'discopanel.v1.UpdateGlobalSettingsRequest'> & {
+	/**
+	 * @generated from field: map<string, string> updates = 1;
+	 */
+	updates: { [key: string]: string };
 };
 
 /**
  * Describes the message discopanel.v1.UpdateGlobalSettingsRequest.
  * Use `create(UpdateGlobalSettingsRequestSchema)` to create a new message.
  */
-export const UpdateGlobalSettingsRequestSchema: GenMessage<UpdateGlobalSettingsRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_config, 8);
+export const UpdateGlobalSettingsRequestSchema: GenMessage<UpdateGlobalSettingsRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_config, 8);
 
 /**
  * Updated global defaults
  *
  * @generated from message discopanel.v1.UpdateGlobalSettingsResponse
  */
-export type UpdateGlobalSettingsResponse = Message<"discopanel.v1.UpdateGlobalSettingsResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ConfigCategory categories = 1;
-   */
-  categories: ConfigCategory[];
+export type UpdateGlobalSettingsResponse = Message<'discopanel.v1.UpdateGlobalSettingsResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ConfigCategory categories = 1;
+	 */
+	categories: ConfigCategory[];
 };
 
 /**
  * Describes the message discopanel.v1.UpdateGlobalSettingsResponse.
  * Use `create(UpdateGlobalSettingsResponseSchema)` to create a new message.
  */
-export const UpdateGlobalSettingsResponseSchema: GenMessage<UpdateGlobalSettingsResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_config, 9);
+export const UpdateGlobalSettingsResponseSchema: GenMessage<UpdateGlobalSettingsResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_config, 9);
 
 /**
  * Configuration management
@@ -272,46 +284,44 @@ export const UpdateGlobalSettingsResponseSchema: GenMessage<UpdateGlobalSettings
  * @generated from service discopanel.v1.ConfigService
  */
 export const ConfigService: GenService<{
-  /**
-   * Fetch server environment variables
-   *
-   * @generated from rpc discopanel.v1.ConfigService.GetServerConfig
-   */
-  getServerConfig: {
-    methodKind: "unary";
-    input: typeof GetServerConfigRequestSchema;
-    output: typeof GetServerConfigResponseSchema;
-  },
-  /**
-   * Update server environment variables
-   *
-   * @generated from rpc discopanel.v1.ConfigService.UpdateServerConfig
-   */
-  updateServerConfig: {
-    methodKind: "unary";
-    input: typeof UpdateServerConfigRequestSchema;
-    output: typeof UpdateServerConfigResponseSchema;
-  },
-  /**
-   * Fetch system-wide defaults
-   *
-   * @generated from rpc discopanel.v1.ConfigService.GetGlobalSettings
-   */
-  getGlobalSettings: {
-    methodKind: "unary";
-    input: typeof GetGlobalSettingsRequestSchema;
-    output: typeof GetGlobalSettingsResponseSchema;
-  },
-  /**
-   * Update system-wide defaults
-   *
-   * @generated from rpc discopanel.v1.ConfigService.UpdateGlobalSettings
-   */
-  updateGlobalSettings: {
-    methodKind: "unary";
-    input: typeof UpdateGlobalSettingsRequestSchema;
-    output: typeof UpdateGlobalSettingsResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_discopanel_v1_config, 0);
-
+	/**
+	 * Fetch server environment variables
+	 *
+	 * @generated from rpc discopanel.v1.ConfigService.GetServerConfig
+	 */
+	getServerConfig: {
+		methodKind: 'unary';
+		input: typeof GetServerConfigRequestSchema;
+		output: typeof GetServerConfigResponseSchema;
+	};
+	/**
+	 * Update server environment variables
+	 *
+	 * @generated from rpc discopanel.v1.ConfigService.UpdateServerConfig
+	 */
+	updateServerConfig: {
+		methodKind: 'unary';
+		input: typeof UpdateServerConfigRequestSchema;
+		output: typeof UpdateServerConfigResponseSchema;
+	};
+	/**
+	 * Fetch system-wide defaults
+	 *
+	 * @generated from rpc discopanel.v1.ConfigService.GetGlobalSettings
+	 */
+	getGlobalSettings: {
+		methodKind: 'unary';
+		input: typeof GetGlobalSettingsRequestSchema;
+		output: typeof GetGlobalSettingsResponseSchema;
+	};
+	/**
+	 * Update system-wide defaults
+	 *
+	 * @generated from rpc discopanel.v1.ConfigService.UpdateGlobalSettings
+	 */
+	updateGlobalSettings: {
+		methodKind: 'unary';
+		input: typeof UpdateGlobalSettingsRequestSchema;
+		output: typeof UpdateGlobalSettingsResponseSchema;
+	};
+}> = /*@__PURE__*/ serviceDesc(file_discopanel_v1_config, 0);

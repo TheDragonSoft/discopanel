@@ -125,7 +125,8 @@
 		const unsubLogs = wsClient.onLogs((serverId, logs) => {
 			if (serverId === server.id) {
 				const processed = logs.map((l, i) => processLog(l, i));
-				logEntries = processed.length > MAX_LOG_ENTRIES ? processed.slice(-MAX_LOG_ENTRIES) : processed;
+				logEntries =
+					processed.length > MAX_LOG_ENTRIES ? processed.slice(-MAX_LOG_ENTRIES) : processed;
 			}
 		});
 
@@ -206,7 +207,8 @@
 			const response = await rpcClient.server.getServerLogs(request);
 			const logs = response.logs || [];
 			const processed = logs.map((l, i) => processLog(l, i));
-			logEntries = processed.length > MAX_LOG_ENTRIES ? processed.slice(-MAX_LOG_ENTRIES) : processed;
+			logEntries =
+				processed.length > MAX_LOG_ENTRIES ? processed.slice(-MAX_LOG_ENTRIES) : processed;
 		} catch (error) {
 			console.error('Failed to fetch logs:', error);
 		} finally {
@@ -312,20 +314,24 @@
 
 <ResizablePaneGroup
 	direction="vertical"
-	class="h-full max-h-[800px] min-h-[320px] sm:min-h-[400px] w-full overflow-hidden rounded-lg border bg-black"
+	class="h-full max-h-[800px] min-h-[320px] w-full overflow-hidden rounded-lg border bg-black sm:min-h-[400px]"
 >
 	<ResizablePane defaultSize={75} minSize={30}>
 		<div class="flex h-full flex-col">
-			<div class="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-3 sm:px-4 py-2">
+			<div
+				class="flex items-center justify-between border-b border-zinc-800 bg-zinc-900 px-3 py-2 sm:px-4"
+			>
 				<div class="flex items-center gap-2">
-					<Terminal class="h-4 w-4 text-green-500 shrink-0" />
-					<span class="font-mono text-xs sm:text-sm text-green-500 font-semibold truncate">Console</span>
+					<Terminal class="h-4 w-4 shrink-0 text-green-500" />
+					<span class="truncate font-mono text-xs font-semibold text-green-500 sm:text-sm"
+						>Console</span
+					>
 					<Badge
 						variant={server.status === ServerStatus.RUNNING ||
 						server.status === ServerStatus.UNHEALTHY
 							? 'default'
 							: 'secondary'}
-						class="text-[10px] sm:text-xs px-1.5 py-0"
+						class="px-1.5 py-0 text-[10px] sm:text-xs"
 					>
 						{getStringForEnum(ServerStatus, server.status)?.toLowerCase()}
 					</Badge>
@@ -343,7 +349,7 @@
 								variant="ghost"
 								onclick={fetchLogs}
 								disabled={loading}
-								class="h-8 w-8 sm:h-7 sm:w-7 p-0 text-zinc-400 hover:text-white"
+								class="h-8 w-8 p-0 text-zinc-400 hover:text-white sm:h-7 sm:w-7"
 							>
 								{#if loading}
 									<Loader2 class="h-3.5 w-3.5 animate-spin" />
@@ -361,7 +367,7 @@
 								variant="ghost"
 								onclick={uploadToMCLogs}
 								disabled={uploading}
-								class="h-8 w-8 sm:h-7 sm:w-7 p-0 text-zinc-400 hover:text-white"
+								class="h-8 w-8 p-0 text-zinc-400 hover:text-white sm:h-7 sm:w-7"
 							>
 								{#if uploading}
 									<Loader2 class="h-3.5 w-3.5 animate-spin" />
@@ -379,7 +385,7 @@
 								variant="ghost"
 								onclick={downloadLogs}
 								disabled={logEntries.length === 0}
-								class="h-8 w-8 sm:h-7 sm:w-7 p-0 text-zinc-400 hover:text-white"
+								class="h-8 w-8 p-0 text-zinc-400 hover:text-white sm:h-7 sm:w-7"
 							>
 								<Download class="h-3.5 w-3.5" />
 							</Button>
@@ -393,7 +399,7 @@
 								variant="ghost"
 								onclick={clearLogs}
 								disabled={logEntries.length === 0}
-								class="h-8 w-8 sm:h-7 sm:w-7 p-0 text-zinc-400 hover:text-white"
+								class="h-8 w-8 p-0 text-zinc-400 hover:text-white sm:h-7 sm:w-7"
 							>
 								<Trash2 class="h-3.5 w-3.5" />
 							</Button>
@@ -403,7 +409,7 @@
 				</div>
 			</div>
 			<div
-				class="custom-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-auto bg-black px-4 py-2 [overscroll-behavior-y:contain]"
+				class="custom-scrollbar min-h-0 flex-1 overflow-x-auto overflow-y-auto [overscroll-behavior-y:contain] bg-black px-4 py-2"
 				bind:this={scrollAreaRef}
 				onscroll={handleScroll}
 			>
@@ -420,7 +426,10 @@
 						</div>
 					{:else}
 						{#each logEntries as entry (entry.id)}
-							<div class="log-line break-all whitespace-pre-wrap select-text" data-type={entry.level}>
+							<div
+								class="log-line break-all whitespace-pre-wrap select-text"
+								data-type={entry.level}
+							>
 								<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 								{@html entry.html}
 							</div>
@@ -433,14 +442,16 @@
 
 	<ResizableHandle class="bg-zinc-800 hover:bg-zinc-700" />
 
-	<div class="flex flex-col bg-zinc-950 shrink-0">
+	<div class="flex shrink-0 flex-col bg-zinc-950">
 		<!-- Quick Command Chips for Mobile -->
-		<div class="flex items-center gap-1.5 px-3 pt-2 pb-1 overflow-x-auto scrollbar-none border-t border-zinc-900">
+		<div
+			class="flex scrollbar-none items-center gap-1.5 overflow-x-auto border-t border-zinc-900 px-3 pt-2 pb-1"
+		>
 			{#each ['/list', '/tps', '/help', '/save-all', 'Clear'] as quickCmd}
 				<Button
 					variant="outline"
 					size="sm"
-					class="h-6.5 px-2 text-[11px] bg-zinc-900 border-zinc-700 text-zinc-300 hover:text-white hover:bg-zinc-800 shrink-0"
+					class="h-6.5 shrink-0 border-zinc-700 bg-zinc-900 px-2 text-[11px] text-zinc-300 hover:bg-zinc-800 hover:text-white"
 					onclick={() => {
 						if (quickCmd === 'Clear') {
 							clearLogs();
@@ -449,7 +460,8 @@
 							sendCommand();
 						}
 					}}
-					disabled={server.status !== ServerStatus.RUNNING && server.status !== ServerStatus.UNHEALTHY}
+					disabled={server.status !== ServerStatus.RUNNING &&
+						server.status !== ServerStatus.UNHEALTHY}
 				>
 					{quickCmd}
 				</Button>
@@ -457,7 +469,9 @@
 		</div>
 
 		<div class="flex shrink-0 gap-2 p-3 pt-2">
-			<div class="flex flex-1 items-center gap-2 rounded-md bg-zinc-900/60 px-2.5 py-1 border border-zinc-800 focus-within:border-primary/60">
+			<div
+				class="flex flex-1 items-center gap-2 rounded-md border border-zinc-800 bg-zinc-900/60 px-2.5 py-1 focus-within:border-primary/60"
+			>
 				<span class="font-mono text-sm text-green-500 select-none">$</span>
 				<input
 					type="text"
@@ -481,7 +495,7 @@
 				onclick={sendCommand}
 				disabled={server.status === ServerStatus.STOPPED || !command.trim()}
 				size="sm"
-				class="h-9 w-9 p-0 bg-zinc-800 text-white hover:bg-zinc-700 shrink-0"
+				class="h-9 w-9 shrink-0 bg-zinc-800 p-0 text-white hover:bg-zinc-700"
 			>
 				<Send class="h-3.5 w-3.5" />
 			</Button>
@@ -489,7 +503,7 @@
 
 		<div class="flex shrink-0 items-center justify-between px-3 pb-2 text-xs text-zinc-500">
 			<div class="flex items-center gap-4">
-				<label class="flex items-center gap-2 cursor-pointer py-0.5">
+				<label class="flex cursor-pointer items-center gap-2 py-0.5">
 					<input type="checkbox" bind:checked={autoScroll} class="h-3.5 w-3.5 rounded" />
 					<span>Auto-scroll</span>
 				</label>

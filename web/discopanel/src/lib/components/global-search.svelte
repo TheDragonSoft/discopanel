@@ -92,19 +92,13 @@
 
 	function matches(label: string, keywords: string, q: string): boolean {
 		if (!q) return true;
-		return (
-			label.toLowerCase().includes(q) ||
-			keywords.toLowerCase().includes(q)
-		);
+		return label.toLowerCase().includes(q) || keywords.toLowerCase().includes(q);
 	}
 
 	let matchingServers = $derived.by(() => {
 		const q = query.trim().toLowerCase();
 		return $activitySortedServers
-			.filter(
-				(server) =>
-					matches(server.name, server.description ?? '', q)
-			)
+			.filter((server) => matches(server.name, server.description ?? '', q))
 			.slice(0, 8);
 	});
 

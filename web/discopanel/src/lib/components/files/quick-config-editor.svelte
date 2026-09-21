@@ -170,7 +170,13 @@
 	>
 		<div class="absolute top-3 right-3 z-20 flex gap-1">
 			{#if view === 'edit'}
-				<Button variant="ghost" size="icon" class="h-8 w-8" onclick={backToList} title="Back to file list">
+				<Button
+					variant="ghost"
+					size="icon"
+					class="h-8 w-8"
+					onclick={backToList}
+					title="Back to file list"
+				>
 					<ArrowLeft class="h-4 w-4" />
 					<span class="sr-only">Back</span>
 				</Button>
@@ -225,7 +231,8 @@
 									<p class="truncate font-mono text-xs text-muted-foreground">{file.path}</p>
 								</div>
 								{#if file.name === 'server.properties'}
-									<span class="shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground"
+									<span
+										class="shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground"
 										>server</span
 									>
 								{/if}
@@ -262,9 +269,7 @@
 					{/if}
 				</div>
 				<div class="flex items-center justify-end gap-2">
-					<Button variant="outline" size="sm" class="h-8" onclick={handleClose}>
-						Close
-					</Button>
+					<Button variant="outline" size="sm" class="h-8" onclick={handleClose}>Close</Button>
 					<Button
 						onclick={handleSave}
 						disabled={!isDirty || saving || loadingFile}
