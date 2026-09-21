@@ -184,7 +184,9 @@
 			applyResults = response.results;
 			const failed = response.results.filter((r) => !r.success).length;
 			if (failed > 0) {
-				toast.warning(`Whitelist applied with ${failed} server ${failed === 1 ? 'failure' : 'failures'}`);
+				toast.warning(
+					`Whitelist applied with ${failed} server ${failed === 1 ? 'failure' : 'failures'}`
+				);
 			} else {
 				toast.success('Whitelist applied successfully');
 			}
@@ -206,7 +208,9 @@
 			const response = await rpcClient.admin.pullWhitelist(
 				create(PullWhitelistRequestSchema, { serverId: pullServerId })
 			);
-			toast.success(`Imported ${response.imported.length} name${response.imported.length === 1 ? '' : 's'} from the server whitelist`);
+			toast.success(
+				`Imported ${response.imported.length} name${response.imported.length === 1 ? '' : 's'} from the server whitelist`
+			);
 			pullOpen = false;
 			await loadEntries();
 		} catch (error) {
@@ -283,12 +287,7 @@
 				</CardDescription>
 			</div>
 			<div class="flex flex-wrap items-center gap-2">
-				<Button
-					variant="outline"
-					size="sm"
-					class="border-2"
-					onclick={openPullDialog}
-				>
+				<Button variant="outline" size="sm" class="border-2" onclick={openPullDialog}>
 					<Download class="mr-2 h-4 w-4" />
 					Pull from server
 				</Button>
@@ -356,67 +355,81 @@
 			{:else}
 				<div class="w-full overflow-x-auto">
 					<Table>
-					<TableHeader>
-						<TableRow>
-							<TableHead>Name</TableHead>
-							<TableHead>Note</TableHead>
-							<TableHead>Added</TableHead>
-							<TableHead class="text-right">Actions</TableHead>
-						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{#each entries as entry (entry.id)}
+						<TableHeader>
 							<TableRow>
-								<TableCell class="font-medium">{entry.name}</TableCell>
-								<TableCell>
-									{#if editingId === entry.id}
-										<div class="flex items-center gap-1">
-											<Input
-												bind:value={editNote}
-												class="h-8 max-w-64"
-												onkeydown={(e) => {
-													if (e.key === 'Enter') saveNote(entry);
-													if (e.key === 'Escape') editingId = '';
-												}}
-											/>
-											<Button variant="ghost" size="sm" class="h-8 w-8" aria-label="Save note for {entry.name}" onclick={() => saveNote(entry)}>
-												<Check class="h-4 w-4" />
-											</Button>
-											<Button variant="ghost" size="sm" class="h-8 w-8" aria-label="Cancel editing note for {entry.name}" onclick={() => (editingId = '')}>
-												<X class="h-4 w-4" />
-											</Button>
-										</div>
-									{:else}
-										<button
-											class="group flex items-center gap-1 text-left text-muted-foreground hover:text-foreground"
-											onclick={() => startEditNote(entry)}
-											title="Click to edit note"
-										>
-											<span class="truncate">{entry.note || '—'}</span>
-											<Pencil class="h-3 w-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-60" />
-										</button>
-									{/if}
-								</TableCell>
-								<TableCell class="text-muted-foreground">
-									{timestampToDate(entry.createdAt).getTime() > 0
-										? timestampToDate(entry.createdAt).toLocaleDateString()
-										: '—'}
-								</TableCell>
-								<TableCell class="text-right">
-									<Button
-										variant="ghost"
-										size="sm"
-										class="h-8 w-8 text-destructive hover:text-destructive"
-										aria-label="Remove {entry.name} from whitelist"
-										onclick={() => removeEntry(entry)}
-									>
-										<Trash2 class="h-4 w-4" />
-									</Button>
-								</TableCell>
+								<TableHead>Name</TableHead>
+								<TableHead>Note</TableHead>
+								<TableHead>Added</TableHead>
+								<TableHead class="text-right">Actions</TableHead>
 							</TableRow>
-						{/each}
-					</TableBody>
-				</Table>
+						</TableHeader>
+						<TableBody>
+							{#each entries as entry (entry.id)}
+								<TableRow>
+									<TableCell class="font-medium">{entry.name}</TableCell>
+									<TableCell>
+										{#if editingId === entry.id}
+											<div class="flex items-center gap-1">
+												<Input
+													bind:value={editNote}
+													class="h-8 max-w-64"
+													onkeydown={(e) => {
+														if (e.key === 'Enter') saveNote(entry);
+														if (e.key === 'Escape') editingId = '';
+													}}
+												/>
+												<Button
+													variant="ghost"
+													size="sm"
+													class="h-8 w-8"
+													aria-label="Save note for {entry.name}"
+													onclick={() => saveNote(entry)}
+												>
+													<Check class="h-4 w-4" />
+												</Button>
+												<Button
+													variant="ghost"
+													size="sm"
+													class="h-8 w-8"
+													aria-label="Cancel editing note for {entry.name}"
+													onclick={() => (editingId = '')}
+												>
+													<X class="h-4 w-4" />
+												</Button>
+											</div>
+										{:else}
+											<button
+												class="group flex items-center gap-1 text-left text-muted-foreground hover:text-foreground"
+												onclick={() => startEditNote(entry)}
+												title="Click to edit note"
+											>
+												<span class="truncate">{entry.note || '—'}</span>
+												<Pencil
+													class="h-3 w-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-60"
+												/>
+											</button>
+										{/if}
+									</TableCell>
+									<TableCell class="text-muted-foreground">
+										{timestampToDate(entry.createdAt).getTime() > 0
+											? timestampToDate(entry.createdAt).toLocaleDateString()
+											: '—'}
+									</TableCell>
+									<TableCell class="text-right">
+										<Button
+											variant="ghost"
+											size="sm"
+											class="h-8 w-8 text-destructive hover:text-destructive"
+											aria-label="Remove {entry.name} from whitelist"
+											onclick={() => removeEntry(entry)}
+										>
+											<Trash2 class="h-4 w-4" />
+										</Button>
+									</TableCell>
+								</TableRow>
+							{/each}
+						</TableBody>
+					</Table>
 				</div>
 			{/if}
 		</CardContent>
@@ -430,21 +443,14 @@
 				Bans
 			</CardTitle>
 			<CardDescription>
-				Ban or unban a player on the selected servers via RCON. Leave all servers unchecked to target every server.
+				Ban or unban a player on the selected servers via RCON. Leave all servers unchecked to
+				target every server.
 			</CardDescription>
 		</CardHeader>
 		<CardContent class="space-y-4">
 			<div class="flex flex-col gap-2 sm:flex-row">
-				<Input
-					placeholder="Player name"
-					bind:value={banName}
-					class="sm:max-w-48"
-				/>
-				<Input
-					placeholder="Reason (optional)"
-					bind:value={banReason}
-					class="flex-1"
-				/>
+				<Input placeholder="Player name" bind:value={banName} class="sm:max-w-48" />
+				<Input placeholder="Reason (optional)" bind:value={banReason} class="flex-1" />
 				<div class="flex gap-2">
 					<Button
 						variant="destructive"
@@ -467,7 +473,9 @@
 			</div>
 
 			<div class="flex flex-wrap gap-x-6 gap-y-2">
-				<Label class="w-full text-sm font-medium">Servers ({serverSelectionLabel(banSelected)})</Label>
+				<Label class="w-full text-sm font-medium"
+					>Servers ({serverSelectionLabel(banSelected)})</Label
+				>
 				{#each servers as server (server.id)}
 					<Label class="flex cursor-pointer items-center gap-2 text-sm font-normal">
 						<Checkbox
@@ -495,7 +503,8 @@
 		<DialogHeader>
 			<DialogTitle>Apply whitelist to servers</DialogTitle>
 			<DialogDescription>
-				Converge the selected servers to the panel whitelist via RCON. Leave all servers unchecked to apply to every server.
+				Converge the selected servers to the panel whitelist via RCON. Leave all servers unchecked
+				to apply to every server.
 			</DialogDescription>
 		</DialogHeader>
 
@@ -518,7 +527,12 @@
 				{/if}
 			</div>
 			<DialogFooter>
-				<Button variant="outline" class="border-2" onclick={() => (applyOpen = false)} disabled={applying}>
+				<Button
+					variant="outline"
+					class="border-2"
+					onclick={() => (applyOpen = false)}
+					disabled={applying}
+				>
 					Cancel
 				</Button>
 				<Button onclick={applyWhitelist} disabled={applying}>
@@ -529,7 +543,8 @@
 		{:else}
 			<ServerOpResults results={applyResults} />
 			<DialogFooter>
-				<Button variant="outline" class="border-2" onclick={() => (applyOpen = false)}>Close</Button>
+				<Button variant="outline" class="border-2" onclick={() => (applyOpen = false)}>Close</Button
+				>
 				<Button
 					variant="secondary"
 					onclick={() => {
@@ -556,17 +571,24 @@
 			<Label class="text-sm font-medium">Server</Label>
 			<select
 				bind:value={pullServerId}
-				class="border-input bg-background flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+				class="flex h-9 w-full rounded-md border border-input bg-background px-3 py-1 text-sm shadow-sm focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
 			>
 				<option value="" disabled>Select a server...</option>
 				{#each servers as server (server.id)}
 					<option value={server.id}>{server.name}</option>
 				{/each}
 			</select>
-			<Badge variant="secondary" class="text-xs">Pulling replaces nothing — names are merged into the panel list</Badge>
+			<Badge variant="secondary" class="text-xs"
+				>Pulling replaces nothing — names are merged into the panel list</Badge
+			>
 		</div>
 		<DialogFooter>
-			<Button variant="outline" class="border-2" onclick={() => (pullOpen = false)} disabled={pulling}>
+			<Button
+				variant="outline"
+				class="border-2"
+				onclick={() => (pullOpen = false)}
+				disabled={pulling}
+			>
 				Cancel
 			</Button>
 			<Button onclick={pullWhitelist} disabled={pulling || !pullServerId}>

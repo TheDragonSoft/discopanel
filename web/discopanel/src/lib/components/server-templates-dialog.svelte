@@ -164,7 +164,9 @@
 		const modsWarning = template.hasMods
 			? `\n\nThis template has captured mods (${formatBytes(Number(template.modsSizeBytes))}) which will be permanently removed.`
 			: '';
-		if (!confirm(`Are you sure you want to delete the template "${template.name}"?${modsWarning}`)) {
+		if (
+			!confirm(`Are you sure you want to delete the template "${template.name}"?${modsWarning}`)
+		) {
 			return;
 		}
 

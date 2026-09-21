@@ -405,7 +405,12 @@
 								<TableCell class="text-sm">{serverLabel(rule.serverId)}</TableCell>
 								<TableCell>
 									<Badge variant="outline" class="font-mono text-xs">
-										{conditionLabel(rule.metric, rule.comparator, rule.threshold, rule.durationSecs)}
+										{conditionLabel(
+											rule.metric,
+											rule.comparator,
+											rule.threshold,
+											rule.durationSecs
+										)}
 									</Badge>
 								</TableCell>
 								<TableCell class="text-xs text-muted-foreground">
@@ -560,9 +565,7 @@
 						{/each}
 					</Select.Content>
 				</Select.Root>
-				<p class="text-xs text-muted-foreground">
-					"All servers" applies the rule to every server.
-				</p>
+				<p class="text-xs text-muted-foreground">"All servers" applies the rule to every server.</p>
 			</div>
 
 			<div class="grid grid-cols-2 gap-4">
@@ -602,13 +605,11 @@
 						<Select.Content>
 							<Select.Item
 								value={AlertComparator.ABOVE.toString()}
-								label="Above (metric > threshold)"
-								>Above (metric &gt; threshold)</Select.Item
+								label="Above (metric > threshold)">Above (metric &gt; threshold)</Select.Item
 							>
 							<Select.Item
 								value={AlertComparator.BELOW.toString()}
-								label="Below (metric < threshold)"
-								>Below (metric &lt; threshold)</Select.Item
+								label="Below (metric < threshold)">Below (metric &lt; threshold)</Select.Item
 							>
 						</Select.Content>
 					</Select.Root>
@@ -631,26 +632,14 @@
 			<div class="grid grid-cols-2 gap-4">
 				<div class="space-y-2">
 					<Label for="ruleDuration">Duration (mins)</Label>
-					<Input
-						id="ruleDuration"
-						type="number"
-						bind:value={formDurationMins}
-						min="0"
-						step="0.5"
-					/>
+					<Input id="ruleDuration" type="number" bind:value={formDurationMins} min="0" step="0.5" />
 					<p class="text-xs text-muted-foreground">
 						Condition must hold this long before firing. 0 = immediate.
 					</p>
 				</div>
 				<div class="space-y-2">
 					<Label for="ruleCooldown">Cooldown (mins)</Label>
-					<Input
-						id="ruleCooldown"
-						type="number"
-						bind:value={formCooldownMins}
-						min="0"
-						step="0.5"
-					/>
+					<Input id="ruleCooldown" type="number" bind:value={formCooldownMins} min="0" step="0.5" />
 					<p class="text-xs text-muted-foreground">
 						Minimum time between repeat firings. 0 = default (5m).
 					</p>

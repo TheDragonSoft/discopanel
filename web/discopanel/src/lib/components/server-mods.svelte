@@ -333,7 +333,7 @@
 	<!-- Minimalist Drag & Drop Overlay -->
 	{#if isDragging && canHaveMods()}
 		<div
-			class="absolute inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-xs bg-background/80 dark:bg-zinc-950/80 pointer-events-none select-none transition-opacity duration-150 rounded-xl"
+			class="pointer-events-none absolute inset-0 z-50 flex items-center justify-center rounded-xl bg-background/80 p-4 backdrop-blur-xs transition-opacity duration-150 select-none dark:bg-zinc-950/80"
 		>
 			<div
 				class="flex h-full min-h-[300px] w-full flex-col items-center justify-center rounded-xl border-2 border-dashed border-primary/60 bg-muted/20 p-6"
@@ -345,20 +345,22 @@
 		</div>
 	{/if}
 
-	<CardHeader class="p-5 sm:p-6 pb-4 border-b border-border/40">
+	<CardHeader class="border-b border-border/40 p-5 pb-4 sm:p-6">
 		<div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 			<div>
 				<div class="flex items-center gap-2.5">
-					<CardTitle class="text-lg sm:text-xl font-bold tracking-tight">Mod Management</CardTitle>
+					<CardTitle class="text-lg font-bold tracking-tight sm:text-xl">Mod Management</CardTitle>
 					{#if canHaveMods() && !loading && mods.length > 0}
-						<Badge variant="secondary" class="text-xs font-semibold px-2 py-0.5">
-							{mods.length} {mods.length === 1 ? 'mod' : 'mods'} ({enabledCount} active)
+						<Badge variant="secondary" class="px-2 py-0.5 text-xs font-semibold">
+							{mods.length}
+							{mods.length === 1 ? 'mod' : 'mods'} ({enabledCount} active)
 						</Badge>
 					{/if}
 				</div>
 				<p class="mt-1 text-sm text-muted-foreground">
 					{#if canHaveMods()}
-						Manage mods in the <span class="font-mono text-foreground/80">{getModsDirectory()}</span> directory
+						Manage mods in the <span class="font-mono text-foreground/80">{getModsDirectory()}</span
+						> directory
 					{:else}
 						This server type does not support mods
 					{/if}
@@ -403,16 +405,16 @@
 
 		{#if canHaveMods() && mods.length > 3}
 			<div class="relative mt-3">
-				<Search class="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+				<Search class="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 				<Input
 					placeholder="Search installed mods by name, filename, author..."
 					bind:value={searchQuery}
-					class="pl-9 h-9.5 text-sm bg-background/50"
+					class="h-9.5 bg-background/50 pl-9 text-sm"
 				/>
 				{#if searchQuery}
 					<button
 						onclick={() => (searchQuery = '')}
-						class="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5"
+						class="absolute top-1/2 right-3 -translate-y-1/2 p-0.5 text-muted-foreground hover:text-foreground"
 						aria-label="Clear search"
 					>
 						<X class="h-4 w-4" />
@@ -423,7 +425,7 @@
 	</CardHeader>
 
 	{#if uploading && uploadProgress}
-		<div class="px-6 py-4 bg-muted/20 border-b border-border/40">
+		<div class="border-b border-border/40 bg-muted/20 px-6 py-4">
 			<div class="mb-2 flex items-center justify-between">
 				<span class="text-sm font-medium text-foreground">
 					Uploading: <span class="font-mono text-muted-foreground">{currentUploadFilename}</span>
@@ -450,25 +452,27 @@
 		</div>
 	{/if}
 
-	<CardContent class="p-5 sm:p-6 space-y-3">
+	<CardContent class="space-y-3 p-5 sm:p-6">
 		{#if !canHaveMods()}
 			<div class="flex flex-col items-center justify-center py-20 text-muted-foreground">
 				<Package class="mb-4 h-12 w-12 opacity-50" />
 				<p class="text-base font-medium">This server type does not support mods</p>
 			</div>
 		{:else if loading && mods.length === 0}
-			<div class="flex flex-col items-center justify-center py-20 gap-3 text-muted-foreground">
+			<div class="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground">
 				<Loader2 class="h-9 w-9 animate-spin text-primary" />
 				<p class="text-sm font-medium">Scanning server mods...</p>
 			</div>
 		{:else if mods.length === 0}
-			<div class="flex flex-col items-center justify-center py-20 text-muted-foreground space-y-2">
-				<div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50 mb-2">
+			<div class="flex flex-col items-center justify-center space-y-2 py-20 text-muted-foreground">
+				<div class="mb-2 flex h-16 w-16 items-center justify-center rounded-2xl bg-muted/50">
 					<Package class="h-8 w-8 opacity-60" />
 				</div>
 				<p class="text-base font-semibold text-foreground">No mods installed</p>
-				<p class="text-sm text-muted-foreground max-w-sm text-center">Browse mods on Modrinth or drop / upload mod JAR files directly.</p>
-				<div class="flex flex-wrap items-center justify-center gap-3 mt-3">
+				<p class="max-w-sm text-center text-sm text-muted-foreground">
+					Browse mods on Modrinth or drop / upload mod JAR files directly.
+				</p>
+				<div class="mt-3 flex flex-wrap items-center justify-center gap-3">
 					<Button href="/mods" class="shadow-xs">
 						<Plus class="mr-2 h-4 w-4" />
 						Add Mods
@@ -480,8 +484,8 @@
 				</div>
 			</div>
 		{:else if filteredMods.length === 0}
-			<div class="flex flex-col items-center justify-center py-16 text-muted-foreground space-y-2">
-				<Search class="h-10 w-10 opacity-40 mb-1" />
+			<div class="flex flex-col items-center justify-center space-y-2 py-16 text-muted-foreground">
+				<Search class="mb-1 h-10 w-10 opacity-40" />
 				<p class="text-base font-medium">No mods match "{searchQuery}"</p>
 				<Button variant="link" size="sm" onclick={() => (searchQuery = '')}>
 					Clear search filter
@@ -491,9 +495,9 @@
 			<div class="space-y-3">
 				{#each filteredMods as mod (mod.id)}
 					<div
-						class="group flex items-center justify-between gap-4 sm:gap-5 rounded-xl border p-4 sm:p-4.5 bg-card/60 transition-[border-color,background-color,box-shadow] duration-150 hover:border-primary/40 hover:bg-card/95 hover:shadow-xs [content-visibility:auto] [contain-intrinsic-size:auto_80px] {mod.enabled
+						class="group flex items-center justify-between gap-4 rounded-xl border bg-card/60 p-4 transition-[border-color,background-color,box-shadow] duration-150 [contain-intrinsic-size:auto_80px] [content-visibility:auto] hover:border-primary/40 hover:bg-card/95 hover:shadow-xs sm:gap-5 sm:p-4.5 {mod.enabled
 							? 'border-border/60'
-							: 'opacity-70 bg-muted/20 border-dashed border-border/40'}"
+							: 'border-dashed border-border/40 bg-muted/20 opacity-70'}"
 					>
 						<!-- Left: Switch + Mod Picture + Name & Meta -->
 						<div class="flex min-w-0 flex-1 items-center gap-4">
@@ -503,8 +507,10 @@
 									checked={mod.enabled}
 									onCheckedChange={() => toggleMod(mod)}
 									disabled={togglingModIds.has(mod.id)}
-									class="data-[state=checked]:bg-emerald-500 cursor-pointer"
-									aria-label={mod.enabled ? `Disable ${mod.displayName}` : `Enable ${mod.displayName}`}
+									class="cursor-pointer data-[state=checked]:bg-emerald-500"
+									aria-label={mod.enabled
+										? `Disable ${mod.displayName}`
+										: `Enable ${mod.displayName}`}
 								/>
 							</div>
 
@@ -518,7 +524,7 @@
 										alt={mod.displayName}
 										loading="lazy"
 										decoding="async"
-										class="h-full w-full object-contain p-1 rounded-lg"
+										class="h-full w-full rounded-lg object-contain p-1"
 										onerror={(e) => {
 											const target = e.currentTarget as HTMLElement;
 											target.style.display = 'none';
@@ -526,11 +532,15 @@
 											if (fallback) fallback.classList.remove('hidden');
 										}}
 									/>
-									<div class="hidden flex h-full w-full items-center justify-center text-primary/70 bg-primary/5">
+									<div
+										class="flex hidden h-full w-full items-center justify-center bg-primary/5 text-primary/70"
+									>
 										<Blocks class="h-7 w-7" />
 									</div>
 								{:else}
-									<div class="flex h-full w-full items-center justify-center text-primary/70 bg-primary/5">
+									<div
+										class="flex h-full w-full items-center justify-center bg-primary/5 text-primary/70"
+									>
 										<Blocks class="h-7 w-7" />
 									</div>
 								{/if}
@@ -539,38 +549,40 @@
 							<!-- Mod Name & Metadata Details -->
 							<div class="min-w-0 flex-1">
 								<div class="flex flex-wrap items-center gap-2">
-									<h4 class="font-semibold text-base tracking-tight text-foreground truncate">
+									<h4 class="truncate text-base font-semibold tracking-tight text-foreground">
 										{mod.displayName}
 									</h4>
 									{#if mod.version}
-										<Badge variant="secondary" class="text-xs font-mono font-medium px-2 py-0.5">
+										<Badge variant="secondary" class="px-2 py-0.5 font-mono text-xs font-medium">
 											{mod.version}
 										</Badge>
 									{/if}
 									{#if mod.enabled}
 										<Badge
 											variant="outline"
-											class="text-[11px] text-emerald-600 dark:text-emerald-400 border-emerald-500/30 bg-emerald-500/10 font-medium px-2 py-0.5"
+											class="border-emerald-500/30 bg-emerald-500/10 px-2 py-0.5 text-[11px] font-medium text-emerald-600 dark:text-emerald-400"
 										>
 											Active
 										</Badge>
 									{:else}
 										<Badge
 											variant="outline"
-											class="text-[11px] text-muted-foreground border-border bg-muted/30 font-medium px-2 py-0.5"
+											class="border-border bg-muted/30 px-2 py-0.5 text-[11px] font-medium text-muted-foreground"
 										>
 											Disabled
 										</Badge>
 									{/if}
 									{#if mod.author}
-										<span class="text-xs text-muted-foreground hidden md:inline">
+										<span class="hidden text-xs text-muted-foreground md:inline">
 											by <span class="font-medium text-foreground/80">{mod.author}</span>
 										</span>
 									{/if}
 								</div>
 
 								<!-- Subtitle: filename, size, date, website link -->
-								<div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+								<div
+									class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground"
+								>
 									<span class="flex items-center gap-1 font-mono text-[11px]">
 										<FileText class="h-3.5 w-3.5 shrink-0" />
 										{mod.fileName}
@@ -579,7 +591,9 @@
 									<span>{formatBytes(Number(mod.fileSize))}</span>
 									{#if mod.uploadedAt}
 										<span>•</span>
-										<span>{new Date(Number(mod.uploadedAt.seconds) * 1000).toLocaleDateString()}</span>
+										<span
+											>{new Date(Number(mod.uploadedAt.seconds) * 1000).toLocaleDateString()}</span
+										>
 									{/if}
 									{#if mod.website}
 										<span>•</span>
@@ -587,7 +601,7 @@
 											href={mod.website}
 											target="_blank"
 											rel="noopener noreferrer"
-											class="inline-flex items-center gap-0.5 text-primary hover:underline transition-colors"
+											class="inline-flex items-center gap-0.5 text-primary transition-colors hover:underline"
 										>
 											<ExternalLink class="h-3 w-3" />
 											Website
@@ -596,7 +610,7 @@
 								</div>
 
 								{#if mod.description}
-									<p class="mt-1 text-xs text-muted-foreground line-clamp-1 leading-normal">
+									<p class="mt-1 line-clamp-1 text-xs leading-normal text-muted-foreground">
 										{mod.description}
 									</p>
 								{/if}
@@ -604,11 +618,11 @@
 						</div>
 
 						<!-- Right: Action Buttons (Download & Delete) -->
-						<div class="flex items-center gap-1 shrink-0">
+						<div class="flex shrink-0 items-center gap-1">
 							<Button
 								size="icon"
 								variant="ghost"
-								class="h-8.5 w-8.5 text-muted-foreground hover:text-foreground hover:bg-muted"
+								class="h-8.5 w-8.5 text-muted-foreground hover:bg-muted hover:text-foreground"
 								onclick={() => downloadMod(mod)}
 								title="Download mod"
 							>
@@ -617,7 +631,7 @@
 							<Button
 								size="icon"
 								variant="ghost"
-								class="h-8.5 w-8.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+								class="h-8.5 w-8.5 text-muted-foreground hover:bg-destructive/10 hover:text-destructive"
 								onclick={() => deleteMod(mod)}
 								title="Delete mod"
 							>

@@ -47,7 +47,10 @@
 			<polygon points="11,48 18,52 18,58 11,54" fill="#5C3D26" />
 			<polygon points="4,40 11,44 11,48 4,44" fill="#966E4E" />
 			<polygon points="18,32 25,36 25,44 18,40" fill="#7A5538" />
-			<polygon points="4,20 32,36 32,42 28,40 28,44 23,41 23,46 18,43 18,39 13,36 13,42 9,40 9,35 4,32" fill="#5C8E32" />
+			<polygon
+				points="4,20 32,36 32,42 28,40 28,44 23,41 23,46 18,43 18,39 13,36 13,42 9,40 9,35 4,32"
+				fill="#5C8E32"
+			/>
 			<polygon points="4,20 13,25 13,31 9,29 9,35 4,32" fill="#6DA33D" />
 			<polygon points="18,28 28,34 28,40 23,37 23,42 18,39" fill="#4E7C28" />
 
@@ -59,7 +62,10 @@
 			<polygon points="53,42 60,38 60,44 53,48" fill="#543823" />
 			<polygon points="39,52 46,48 46,56 39,60" fill="#402816" />
 			<polygon points="46,50 53,46 53,54 46,58" fill="#67462E" />
-			<polygon points="32,36 60,20 60,31 55,34 55,29 50,32 50,38 45,35 45,41 40,38 40,43 36,41 36,45 32,43" fill="#446D23" />
+			<polygon
+				points="32,36 60,20 60,31 55,34 55,29 50,32 50,38 45,35 45,41 40,38 40,43 36,41 36,45 32,43"
+				fill="#446D23"
+			/>
 			<polygon points="32,36 40,31 40,37 36,35 36,41 32,39" fill="#4E7C28" />
 			<polygon points="45,29 55,23 55,29 50,32 50,35 45,32" fill="#385C1B" />
 
@@ -79,8 +85,21 @@
 			<polygon points="29,26 39,32 32,36 22,30" fill="#58942C" />
 
 			<!-- Highlight Edges -->
-			<polyline points="4,20 32,4 60,20" stroke="#8CE64A" stroke-width="0.75" stroke-linecap="round" fill="none" opacity="0.6" />
-			<polyline points="4,20 32,36 60,20" stroke="#2D4D14" stroke-width="0.5" fill="none" opacity="0.4" />
+			<polyline
+				points="4,20 32,4 60,20"
+				stroke="#8CE64A"
+				stroke-width="0.75"
+				stroke-linecap="round"
+				fill="none"
+				opacity="0.6"
+			/>
+			<polyline
+				points="4,20 32,36 60,20"
+				stroke="#2D4D14"
+				stroke-width="0.5"
+				fill="none"
+				opacity="0.4"
+			/>
 			<line x1="32" y1="36" x2="32" y2="60" stroke="#3A2414" stroke-width="0.75" opacity="0.4" />
 		</g>
 	</svg>

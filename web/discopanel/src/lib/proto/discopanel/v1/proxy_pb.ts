@@ -2,615 +2,637 @@
 // @generated from file discopanel/v1/proxy.proto (package discopanel.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { ProxyListener } from "./common_pb";
-import { file_discopanel_v1_common } from "./common_pb";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenFile, GenMessage, GenService } from '@bufbuild/protobuf/codegenv2';
+import { fileDesc, messageDesc, serviceDesc } from '@bufbuild/protobuf/codegenv2';
+import type { ProxyListener } from './common_pb';
+import { file_discopanel_v1_common } from './common_pb';
+import type { Message } from '@bufbuild/protobuf';
 
 /**
  * Describes the file discopanel/v1/proxy.proto.
  */
-export const file_discopanel_v1_proxy: GenFile = /*@__PURE__*/
-  fileDesc("ChlkaXNjb3BhbmVsL3YxL3Byb3h5LnByb3RvEg1kaXNjb3BhbmVsLnYxIm0KClByb3h5Um91dGUSEQoJc2VydmVyX2lkGAEgASgJEhAKCGhvc3RuYW1lGAIgASgJEhQKDGJhY2tlbmRfaG9zdBgDIAEoCRIUCgxiYWNrZW5kX3BvcnQYBCABKAUSDgoGYWN0aXZlGAUgASgIIhcKFUdldFByb3h5Um91dGVzUmVxdWVzdCJDChZHZXRQcm94eVJvdXRlc1Jlc3BvbnNlEikKBnJvdXRlcxgBIAMoCzIZLmRpc2NvcGFuZWwudjEuUHJveHlSb3V0ZSIXChVHZXRQcm94eVN0YXR1c1JlcXVlc3Qi9wEKFkdldFByb3h5U3RhdHVzUmVzcG9uc2USDwoHZW5hYmxlZBgBIAEoCBIQCghiYXNlX3VybBgCIAEoCRIUCgxsaXN0ZW5fcG9ydHMYAyADKAUSLwoJbGlzdGVuZXJzGAQgAygLMhwuZGlzY29wYW5lbC52MS5Qcm94eUxpc3RlbmVyEhMKC2xpc3Rlbl9wb3J0GAUgASgFEg8KB3J1bm5pbmcYBiABKAgSFQoNYWN0aXZlX3JvdXRlcxgHIAEoBRIfChJmYWxsYmFja19zZXJ2ZXJfaWQYCCABKAlIAIgBAUIVChNfZmFsbGJhY2tfc2VydmVyX2lkInUKGFVwZGF0ZVByb3h5Q29uZmlnUmVxdWVzdBIPCgdlbmFibGVkGAEgASgIEhAKCGJhc2VfdXJsGAIgASgJEh8KEmZhbGxiYWNrX3NlcnZlcl9pZBgDIAEoCUgAiAEBQhUKE19mYWxsYmFja19zZXJ2ZXJfaWQi+gEKGVVwZGF0ZVByb3h5Q29uZmlnUmVzcG9uc2USDwoHZW5hYmxlZBgBIAEoCBIQCghiYXNlX3VybBgCIAEoCRIUCgxsaXN0ZW5fcG9ydHMYAyADKAUSLwoJbGlzdGVuZXJzGAQgAygLMhwuZGlzY29wYW5lbC52MS5Qcm94eUxpc3RlbmVyEhMKC2xpc3Rlbl9wb3J0GAUgASgFEg8KB3J1bm5pbmcYBiABKAgSFQoNYWN0aXZlX3JvdXRlcxgHIAEoBRIfChJmYWxsYmFja19zZXJ2ZXJfaWQYCCABKAlIAIgBAUIVChNfZmFsbGJhY2tfc2VydmVyX2lkIhoKGEdldFByb3h5TGlzdGVuZXJzUmVxdWVzdCJeChZQcm94eUxpc3RlbmVyV2l0aENvdW50Ei4KCGxpc3RlbmVyGAEgASgLMhwuZGlzY29wYW5lbC52MS5Qcm94eUxpc3RlbmVyEhQKDHNlcnZlcl9jb3VudBgCIAEoBSJVChlHZXRQcm94eUxpc3RlbmVyc1Jlc3BvbnNlEjgKCWxpc3RlbmVycxgBIAMoCzIlLmRpc2NvcGFuZWwudjEuUHJveHlMaXN0ZW5lcldpdGhDb3VudCJyChpDcmVhdGVQcm94eUxpc3RlbmVyUmVxdWVzdBIMCgRuYW1lGAEgASgJEhMKC2Rlc2NyaXB0aW9uGAIgASgJEgwKBHBvcnQYAyABKAUSDwoHZW5hYmxlZBgEIAEoCBISCgppc19kZWZhdWx0GAUgASgIIk0KG0NyZWF0ZVByb3h5TGlzdGVuZXJSZXNwb25zZRIuCghsaXN0ZW5lchgBIAEoCzIcLmRpc2NvcGFuZWwudjEuUHJveHlMaXN0ZW5lciJ+ChpVcGRhdGVQcm94eUxpc3RlbmVyUmVxdWVzdBIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEgwKBHBvcnQYBCABKAUSDwoHZW5hYmxlZBgFIAEoCBISCgppc19kZWZhdWx0GAYgASgIIk0KG1VwZGF0ZVByb3h5TGlzdGVuZXJSZXNwb25zZRIuCghsaXN0ZW5lchgBIAEoCzIcLmRpc2NvcGFuZWwudjEuUHJveHlMaXN0ZW5lciIoChpEZWxldGVQcm94eUxpc3RlbmVyUmVxdWVzdBIKCgJpZBgBIAEoCSItChtEZWxldGVQcm94eUxpc3RlbmVyUmVzcG9uc2USDgoGc3RhdHVzGAEgASgJIiwKF0dldFNlcnZlclJvdXRpbmdSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCSIvCgtTZXJ2ZXJSb3V0ZRIQCghob3N0bmFtZRgBIAEoCRIOCgZhY3RpdmUYAiABKAgi8QEKGEdldFNlcnZlclJvdXRpbmdSZXNwb25zZRIVCg1wcm94eV9lbmFibGVkGAEgASgIEhYKDnByb3h5X2hvc3RuYW1lGAIgASgJEhoKEnN1Z2dlc3RlZF9ob3N0bmFtZRgDIAEoCRIQCghiYXNlX3VybBgEIAEoCRITCgtsaXN0ZW5fcG9ydBgFIAEoBRI2Cg1jdXJyZW50X3JvdXRlGAYgASgLMhouZGlzY29wYW5lbC52MS5TZXJ2ZXJSb3V0ZUgAiAEBEhkKEXByb3h5X2xpc3RlbmVyX2lkGAcgASgJQhAKDl9jdXJyZW50X3JvdXRlImIKGlVwZGF0ZVNlcnZlclJvdXRpbmdSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIWCg5wcm94eV9ob3N0bmFtZRgCIAEoCRIZChFwcm94eV9saXN0ZW5lcl9pZBgDIAEoCSJaChtVcGRhdGVTZXJ2ZXJSb3V0aW5nUmVzcG9uc2USDgoGc3RhdHVzGAEgASgJEhAKCGhvc3RuYW1lGAIgASgJEhkKEXByb3h5X2xpc3RlbmVyX2lkGAMgASgJMrkHCgxQcm94eVNlcnZpY2USXQoOR2V0UHJveHlSb3V0ZXMSJC5kaXNjb3BhbmVsLnYxLkdldFByb3h5Um91dGVzUmVxdWVzdBolLmRpc2NvcGFuZWwudjEuR2V0UHJveHlSb3V0ZXNSZXNwb25zZRJdCg5HZXRQcm94eVN0YXR1cxIkLmRpc2NvcGFuZWwudjEuR2V0UHJveHlTdGF0dXNSZXF1ZXN0GiUuZGlzY29wYW5lbC52MS5HZXRQcm94eVN0YXR1c1Jlc3BvbnNlEmYKEVVwZGF0ZVByb3h5Q29uZmlnEicuZGlzY29wYW5lbC52MS5VcGRhdGVQcm94eUNvbmZpZ1JlcXVlc3QaKC5kaXNjb3BhbmVsLnYxLlVwZGF0ZVByb3h5Q29uZmlnUmVzcG9uc2USZgoRR2V0UHJveHlMaXN0ZW5lcnMSJy5kaXNjb3BhbmVsLnYxLkdldFByb3h5TGlzdGVuZXJzUmVxdWVzdBooLmRpc2NvcGFuZWwudjEuR2V0UHJveHlMaXN0ZW5lcnNSZXNwb25zZRJsChNDcmVhdGVQcm94eUxpc3RlbmVyEikuZGlzY29wYW5lbC52MS5DcmVhdGVQcm94eUxpc3RlbmVyUmVxdWVzdBoqLmRpc2NvcGFuZWwudjEuQ3JlYXRlUHJveHlMaXN0ZW5lclJlc3BvbnNlEmwKE1VwZGF0ZVByb3h5TGlzdGVuZXISKS5kaXNjb3BhbmVsLnYxLlVwZGF0ZVByb3h5TGlzdGVuZXJSZXF1ZXN0GiouZGlzY29wYW5lbC52MS5VcGRhdGVQcm94eUxpc3RlbmVyUmVzcG9uc2USbAoTRGVsZXRlUHJveHlMaXN0ZW5lchIpLmRpc2NvcGFuZWwudjEuRGVsZXRlUHJveHlMaXN0ZW5lclJlcXVlc3QaKi5kaXNjb3BhbmVsLnYxLkRlbGV0ZVByb3h5TGlzdGVuZXJSZXNwb25zZRJjChBHZXRTZXJ2ZXJSb3V0aW5nEiYuZGlzY29wYW5lbC52MS5HZXRTZXJ2ZXJSb3V0aW5nUmVxdWVzdBonLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyUm91dGluZ1Jlc3BvbnNlEmwKE1VwZGF0ZVNlcnZlclJvdXRpbmcSKS5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlclJvdXRpbmdSZXF1ZXN0GiouZGlzY29wYW5lbC52MS5VcGRhdGVTZXJ2ZXJSb3V0aW5nUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw", [file_discopanel_v1_common]);
+export const file_discopanel_v1_proxy: GenFile =
+	/*@__PURE__*/
+	fileDesc(
+		'ChlkaXNjb3BhbmVsL3YxL3Byb3h5LnByb3RvEg1kaXNjb3BhbmVsLnYxIm0KClByb3h5Um91dGUSEQoJc2VydmVyX2lkGAEgASgJEhAKCGhvc3RuYW1lGAIgASgJEhQKDGJhY2tlbmRfaG9zdBgDIAEoCRIUCgxiYWNrZW5kX3BvcnQYBCABKAUSDgoGYWN0aXZlGAUgASgIIhcKFUdldFByb3h5Um91dGVzUmVxdWVzdCJDChZHZXRQcm94eVJvdXRlc1Jlc3BvbnNlEikKBnJvdXRlcxgBIAMoCzIZLmRpc2NvcGFuZWwudjEuUHJveHlSb3V0ZSIXChVHZXRQcm94eVN0YXR1c1JlcXVlc3Qi9wEKFkdldFByb3h5U3RhdHVzUmVzcG9uc2USDwoHZW5hYmxlZBgBIAEoCBIQCghiYXNlX3VybBgCIAEoCRIUCgxsaXN0ZW5fcG9ydHMYAyADKAUSLwoJbGlzdGVuZXJzGAQgAygLMhwuZGlzY29wYW5lbC52MS5Qcm94eUxpc3RlbmVyEhMKC2xpc3Rlbl9wb3J0GAUgASgFEg8KB3J1bm5pbmcYBiABKAgSFQoNYWN0aXZlX3JvdXRlcxgHIAEoBRIfChJmYWxsYmFja19zZXJ2ZXJfaWQYCCABKAlIAIgBAUIVChNfZmFsbGJhY2tfc2VydmVyX2lkInUKGFVwZGF0ZVByb3h5Q29uZmlnUmVxdWVzdBIPCgdlbmFibGVkGAEgASgIEhAKCGJhc2VfdXJsGAIgASgJEh8KEmZhbGxiYWNrX3NlcnZlcl9pZBgDIAEoCUgAiAEBQhUKE19mYWxsYmFja19zZXJ2ZXJfaWQi+gEKGVVwZGF0ZVByb3h5Q29uZmlnUmVzcG9uc2USDwoHZW5hYmxlZBgBIAEoCBIQCghiYXNlX3VybBgCIAEoCRIUCgxsaXN0ZW5fcG9ydHMYAyADKAUSLwoJbGlzdGVuZXJzGAQgAygLMhwuZGlzY29wYW5lbC52MS5Qcm94eUxpc3RlbmVyEhMKC2xpc3Rlbl9wb3J0GAUgASgFEg8KB3J1bm5pbmcYBiABKAgSFQoNYWN0aXZlX3JvdXRlcxgHIAEoBRIfChJmYWxsYmFja19zZXJ2ZXJfaWQYCCABKAlIAIgBAUIVChNfZmFsbGJhY2tfc2VydmVyX2lkIhoKGEdldFByb3h5TGlzdGVuZXJzUmVxdWVzdCJeChZQcm94eUxpc3RlbmVyV2l0aENvdW50Ei4KCGxpc3RlbmVyGAEgASgLMhwuZGlzY29wYW5lbC52MS5Qcm94eUxpc3RlbmVyEhQKDHNlcnZlcl9jb3VudBgCIAEoBSJVChlHZXRQcm94eUxpc3RlbmVyc1Jlc3BvbnNlEjgKCWxpc3RlbmVycxgBIAMoCzIlLmRpc2NvcGFuZWwudjEuUHJveHlMaXN0ZW5lcldpdGhDb3VudCJyChpDcmVhdGVQcm94eUxpc3RlbmVyUmVxdWVzdBIMCgRuYW1lGAEgASgJEhMKC2Rlc2NyaXB0aW9uGAIgASgJEgwKBHBvcnQYAyABKAUSDwoHZW5hYmxlZBgEIAEoCBISCgppc19kZWZhdWx0GAUgASgIIk0KG0NyZWF0ZVByb3h5TGlzdGVuZXJSZXNwb25zZRIuCghsaXN0ZW5lchgBIAEoCzIcLmRpc2NvcGFuZWwudjEuUHJveHlMaXN0ZW5lciJ+ChpVcGRhdGVQcm94eUxpc3RlbmVyUmVxdWVzdBIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEgwKBHBvcnQYBCABKAUSDwoHZW5hYmxlZBgFIAEoCBISCgppc19kZWZhdWx0GAYgASgIIk0KG1VwZGF0ZVByb3h5TGlzdGVuZXJSZXNwb25zZRIuCghsaXN0ZW5lchgBIAEoCzIcLmRpc2NvcGFuZWwudjEuUHJveHlMaXN0ZW5lciIoChpEZWxldGVQcm94eUxpc3RlbmVyUmVxdWVzdBIKCgJpZBgBIAEoCSItChtEZWxldGVQcm94eUxpc3RlbmVyUmVzcG9uc2USDgoGc3RhdHVzGAEgASgJIiwKF0dldFNlcnZlclJvdXRpbmdSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCSIvCgtTZXJ2ZXJSb3V0ZRIQCghob3N0bmFtZRgBIAEoCRIOCgZhY3RpdmUYAiABKAgi8QEKGEdldFNlcnZlclJvdXRpbmdSZXNwb25zZRIVCg1wcm94eV9lbmFibGVkGAEgASgIEhYKDnByb3h5X2hvc3RuYW1lGAIgASgJEhoKEnN1Z2dlc3RlZF9ob3N0bmFtZRgDIAEoCRIQCghiYXNlX3VybBgEIAEoCRITCgtsaXN0ZW5fcG9ydBgFIAEoBRI2Cg1jdXJyZW50X3JvdXRlGAYgASgLMhouZGlzY29wYW5lbC52MS5TZXJ2ZXJSb3V0ZUgAiAEBEhkKEXByb3h5X2xpc3RlbmVyX2lkGAcgASgJQhAKDl9jdXJyZW50X3JvdXRlImIKGlVwZGF0ZVNlcnZlclJvdXRpbmdSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIWCg5wcm94eV9ob3N0bmFtZRgCIAEoCRIZChFwcm94eV9saXN0ZW5lcl9pZBgDIAEoCSJaChtVcGRhdGVTZXJ2ZXJSb3V0aW5nUmVzcG9uc2USDgoGc3RhdHVzGAEgASgJEhAKCGhvc3RuYW1lGAIgASgJEhkKEXByb3h5X2xpc3RlbmVyX2lkGAMgASgJMrkHCgxQcm94eVNlcnZpY2USXQoOR2V0UHJveHlSb3V0ZXMSJC5kaXNjb3BhbmVsLnYxLkdldFByb3h5Um91dGVzUmVxdWVzdBolLmRpc2NvcGFuZWwudjEuR2V0UHJveHlSb3V0ZXNSZXNwb25zZRJdCg5HZXRQcm94eVN0YXR1cxIkLmRpc2NvcGFuZWwudjEuR2V0UHJveHlTdGF0dXNSZXF1ZXN0GiUuZGlzY29wYW5lbC52MS5HZXRQcm94eVN0YXR1c1Jlc3BvbnNlEmYKEVVwZGF0ZVByb3h5Q29uZmlnEicuZGlzY29wYW5lbC52MS5VcGRhdGVQcm94eUNvbmZpZ1JlcXVlc3QaKC5kaXNjb3BhbmVsLnYxLlVwZGF0ZVByb3h5Q29uZmlnUmVzcG9uc2USZgoRR2V0UHJveHlMaXN0ZW5lcnMSJy5kaXNjb3BhbmVsLnYxLkdldFByb3h5TGlzdGVuZXJzUmVxdWVzdBooLmRpc2NvcGFuZWwudjEuR2V0UHJveHlMaXN0ZW5lcnNSZXNwb25zZRJsChNDcmVhdGVQcm94eUxpc3RlbmVyEikuZGlzY29wYW5lbC52MS5DcmVhdGVQcm94eUxpc3RlbmVyUmVxdWVzdBoqLmRpc2NvcGFuZWwudjEuQ3JlYXRlUHJveHlMaXN0ZW5lclJlc3BvbnNlEmwKE1VwZGF0ZVByb3h5TGlzdGVuZXISKS5kaXNjb3BhbmVsLnYxLlVwZGF0ZVByb3h5TGlzdGVuZXJSZXF1ZXN0GiouZGlzY29wYW5lbC52MS5VcGRhdGVQcm94eUxpc3RlbmVyUmVzcG9uc2USbAoTRGVsZXRlUHJveHlMaXN0ZW5lchIpLmRpc2NvcGFuZWwudjEuRGVsZXRlUHJveHlMaXN0ZW5lclJlcXVlc3QaKi5kaXNjb3BhbmVsLnYxLkRlbGV0ZVByb3h5TGlzdGVuZXJSZXNwb25zZRJjChBHZXRTZXJ2ZXJSb3V0aW5nEiYuZGlzY29wYW5lbC52MS5HZXRTZXJ2ZXJSb3V0aW5nUmVxdWVzdBonLmRpc2NvcGFuZWwudjEuR2V0U2VydmVyUm91dGluZ1Jlc3BvbnNlEmwKE1VwZGF0ZVNlcnZlclJvdXRpbmcSKS5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlclJvdXRpbmdSZXF1ZXN0GiouZGlzY29wYW5lbC52MS5VcGRhdGVTZXJ2ZXJSb3V0aW5nUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw',
+		[file_discopanel_v1_common]
+	);
 
 /**
  * Active proxy connection
  *
  * @generated from message discopanel.v1.ProxyRoute
  */
-export type ProxyRoute = Message<"discopanel.v1.ProxyRoute"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type ProxyRoute = Message<'discopanel.v1.ProxyRoute'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string hostname = 2;
-   */
-  hostname: string;
+	/**
+	 * @generated from field: string hostname = 2;
+	 */
+	hostname: string;
 
-  /**
-   * @generated from field: string backend_host = 3;
-   */
-  backendHost: string;
+	/**
+	 * @generated from field: string backend_host = 3;
+	 */
+	backendHost: string;
 
-  /**
-   * @generated from field: int32 backend_port = 4;
-   */
-  backendPort: number;
+	/**
+	 * @generated from field: int32 backend_port = 4;
+	 */
+	backendPort: number;
 
-  /**
-   * @generated from field: bool active = 5;
-   */
-  active: boolean;
+	/**
+	 * @generated from field: bool active = 5;
+	 */
+	active: boolean;
 };
 
 /**
  * Describes the message discopanel.v1.ProxyRoute.
  * Use `create(ProxyRouteSchema)` to create a new message.
  */
-export const ProxyRouteSchema: GenMessage<ProxyRoute> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 0);
+export const ProxyRouteSchema: GenMessage<ProxyRoute> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 0);
 
 /**
  * Empty routes request
  *
  * @generated from message discopanel.v1.GetProxyRoutesRequest
  */
-export type GetProxyRoutesRequest = Message<"discopanel.v1.GetProxyRoutesRequest"> & {
-};
+export type GetProxyRoutesRequest = Message<'discopanel.v1.GetProxyRoutesRequest'> & {};
 
 /**
  * Describes the message discopanel.v1.GetProxyRoutesRequest.
  * Use `create(GetProxyRoutesRequestSchema)` to create a new message.
  */
-export const GetProxyRoutesRequestSchema: GenMessage<GetProxyRoutesRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 1);
+export const GetProxyRoutesRequestSchema: GenMessage<GetProxyRoutesRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 1);
 
 /**
  * All proxy routes
  *
  * @generated from message discopanel.v1.GetProxyRoutesResponse
  */
-export type GetProxyRoutesResponse = Message<"discopanel.v1.GetProxyRoutesResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ProxyRoute routes = 1;
-   */
-  routes: ProxyRoute[];
+export type GetProxyRoutesResponse = Message<'discopanel.v1.GetProxyRoutesResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ProxyRoute routes = 1;
+	 */
+	routes: ProxyRoute[];
 };
 
 /**
  * Describes the message discopanel.v1.GetProxyRoutesResponse.
  * Use `create(GetProxyRoutesResponseSchema)` to create a new message.
  */
-export const GetProxyRoutesResponseSchema: GenMessage<GetProxyRoutesResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 2);
+export const GetProxyRoutesResponseSchema: GenMessage<GetProxyRoutesResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 2);
 
 /**
  * Empty status request
  *
  * @generated from message discopanel.v1.GetProxyStatusRequest
  */
-export type GetProxyStatusRequest = Message<"discopanel.v1.GetProxyStatusRequest"> & {
-};
+export type GetProxyStatusRequest = Message<'discopanel.v1.GetProxyStatusRequest'> & {};
 
 /**
  * Describes the message discopanel.v1.GetProxyStatusRequest.
  * Use `create(GetProxyStatusRequestSchema)` to create a new message.
  */
-export const GetProxyStatusRequestSchema: GenMessage<GetProxyStatusRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 3);
+export const GetProxyStatusRequestSchema: GenMessage<GetProxyStatusRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 3);
 
 /**
  * Proxy system state
  *
  * @generated from message discopanel.v1.GetProxyStatusResponse
  */
-export type GetProxyStatusResponse = Message<"discopanel.v1.GetProxyStatusResponse"> & {
-  /**
-   * @generated from field: bool enabled = 1;
-   */
-  enabled: boolean;
+export type GetProxyStatusResponse = Message<'discopanel.v1.GetProxyStatusResponse'> & {
+	/**
+	 * @generated from field: bool enabled = 1;
+	 */
+	enabled: boolean;
 
-  /**
-   * @generated from field: string base_url = 2;
-   */
-  baseUrl: string;
+	/**
+	 * @generated from field: string base_url = 2;
+	 */
+	baseUrl: string;
 
-  /**
-   * @generated from field: repeated int32 listen_ports = 3;
-   */
-  listenPorts: number[];
+	/**
+	 * @generated from field: repeated int32 listen_ports = 3;
+	 */
+	listenPorts: number[];
 
-  /**
-   * @generated from field: repeated discopanel.v1.ProxyListener listeners = 4;
-   */
-  listeners: ProxyListener[];
+	/**
+	 * @generated from field: repeated discopanel.v1.ProxyListener listeners = 4;
+	 */
+	listeners: ProxyListener[];
 
-  /**
-   * Primary port
-   *
-   * @generated from field: int32 listen_port = 5;
-   */
-  listenPort: number;
+	/**
+	 * Primary port
+	 *
+	 * @generated from field: int32 listen_port = 5;
+	 */
+	listenPort: number;
 
-  /**
-   * @generated from field: bool running = 6;
-   */
-  running: boolean;
+	/**
+	 * @generated from field: bool running = 6;
+	 */
+	running: boolean;
 
-  /**
-   * @generated from field: int32 active_routes = 7;
-   */
-  activeRoutes: number;
+	/**
+	 * @generated from field: int32 active_routes = 7;
+	 */
+	activeRoutes: number;
 
-  /**
-   * Lobby for offline hostname routes (empty = disabled)
-   *
-   * @generated from field: optional string fallback_server_id = 8;
-   */
-  fallbackServerId?: string | undefined;
+	/**
+	 * Lobby for offline hostname routes (empty = disabled)
+	 *
+	 * @generated from field: optional string fallback_server_id = 8;
+	 */
+	fallbackServerId?: string | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.GetProxyStatusResponse.
  * Use `create(GetProxyStatusResponseSchema)` to create a new message.
  */
-export const GetProxyStatusResponseSchema: GenMessage<GetProxyStatusResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 4);
+export const GetProxyStatusResponseSchema: GenMessage<GetProxyStatusResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 4);
 
 /**
  * Proxy settings to update
  *
  * @generated from message discopanel.v1.UpdateProxyConfigRequest
  */
-export type UpdateProxyConfigRequest = Message<"discopanel.v1.UpdateProxyConfigRequest"> & {
-  /**
-   * @generated from field: bool enabled = 1;
-   */
-  enabled: boolean;
+export type UpdateProxyConfigRequest = Message<'discopanel.v1.UpdateProxyConfigRequest'> & {
+	/**
+	 * @generated from field: bool enabled = 1;
+	 */
+	enabled: boolean;
 
-  /**
-   * @generated from field: string base_url = 2;
-   */
-  baseUrl: string;
+	/**
+	 * @generated from field: string base_url = 2;
+	 */
+	baseUrl: string;
 
-  /**
-   * Lobby for offline hostname routes (empty = disabled)
-   *
-   * @generated from field: optional string fallback_server_id = 3;
-   */
-  fallbackServerId?: string | undefined;
+	/**
+	 * Lobby for offline hostname routes (empty = disabled)
+	 *
+	 * @generated from field: optional string fallback_server_id = 3;
+	 */
+	fallbackServerId?: string | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateProxyConfigRequest.
  * Use `create(UpdateProxyConfigRequestSchema)` to create a new message.
  */
-export const UpdateProxyConfigRequestSchema: GenMessage<UpdateProxyConfigRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 5);
+export const UpdateProxyConfigRequestSchema: GenMessage<UpdateProxyConfigRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 5);
 
 /**
  * Updated proxy state
  *
  * @generated from message discopanel.v1.UpdateProxyConfigResponse
  */
-export type UpdateProxyConfigResponse = Message<"discopanel.v1.UpdateProxyConfigResponse"> & {
-  /**
-   * @generated from field: bool enabled = 1;
-   */
-  enabled: boolean;
+export type UpdateProxyConfigResponse = Message<'discopanel.v1.UpdateProxyConfigResponse'> & {
+	/**
+	 * @generated from field: bool enabled = 1;
+	 */
+	enabled: boolean;
 
-  /**
-   * @generated from field: string base_url = 2;
-   */
-  baseUrl: string;
+	/**
+	 * @generated from field: string base_url = 2;
+	 */
+	baseUrl: string;
 
-  /**
-   * @generated from field: repeated int32 listen_ports = 3;
-   */
-  listenPorts: number[];
+	/**
+	 * @generated from field: repeated int32 listen_ports = 3;
+	 */
+	listenPorts: number[];
 
-  /**
-   * @generated from field: repeated discopanel.v1.ProxyListener listeners = 4;
-   */
-  listeners: ProxyListener[];
+	/**
+	 * @generated from field: repeated discopanel.v1.ProxyListener listeners = 4;
+	 */
+	listeners: ProxyListener[];
 
-  /**
-   * @generated from field: int32 listen_port = 5;
-   */
-  listenPort: number;
+	/**
+	 * @generated from field: int32 listen_port = 5;
+	 */
+	listenPort: number;
 
-  /**
-   * @generated from field: bool running = 6;
-   */
-  running: boolean;
+	/**
+	 * @generated from field: bool running = 6;
+	 */
+	running: boolean;
 
-  /**
-   * @generated from field: int32 active_routes = 7;
-   */
-  activeRoutes: number;
+	/**
+	 * @generated from field: int32 active_routes = 7;
+	 */
+	activeRoutes: number;
 
-  /**
-   * @generated from field: optional string fallback_server_id = 8;
-   */
-  fallbackServerId?: string | undefined;
+	/**
+	 * @generated from field: optional string fallback_server_id = 8;
+	 */
+	fallbackServerId?: string | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateProxyConfigResponse.
  * Use `create(UpdateProxyConfigResponseSchema)` to create a new message.
  */
-export const UpdateProxyConfigResponseSchema: GenMessage<UpdateProxyConfigResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 6);
+export const UpdateProxyConfigResponseSchema: GenMessage<UpdateProxyConfigResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 6);
 
 /**
  * Empty listeners request
  *
  * @generated from message discopanel.v1.GetProxyListenersRequest
  */
-export type GetProxyListenersRequest = Message<"discopanel.v1.GetProxyListenersRequest"> & {
-};
+export type GetProxyListenersRequest = Message<'discopanel.v1.GetProxyListenersRequest'> & {};
 
 /**
  * Describes the message discopanel.v1.GetProxyListenersRequest.
  * Use `create(GetProxyListenersRequestSchema)` to create a new message.
  */
-export const GetProxyListenersRequestSchema: GenMessage<GetProxyListenersRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 7);
+export const GetProxyListenersRequestSchema: GenMessage<GetProxyListenersRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 7);
 
 /**
  * Listener with usage count
  *
  * @generated from message discopanel.v1.ProxyListenerWithCount
  */
-export type ProxyListenerWithCount = Message<"discopanel.v1.ProxyListenerWithCount"> & {
-  /**
-   * @generated from field: discopanel.v1.ProxyListener listener = 1;
-   */
-  listener?: ProxyListener | undefined;
+export type ProxyListenerWithCount = Message<'discopanel.v1.ProxyListenerWithCount'> & {
+	/**
+	 * @generated from field: discopanel.v1.ProxyListener listener = 1;
+	 */
+	listener?: ProxyListener | undefined;
 
-  /**
-   * @generated from field: int32 server_count = 2;
-   */
-  serverCount: number;
+	/**
+	 * @generated from field: int32 server_count = 2;
+	 */
+	serverCount: number;
 };
 
 /**
  * Describes the message discopanel.v1.ProxyListenerWithCount.
  * Use `create(ProxyListenerWithCountSchema)` to create a new message.
  */
-export const ProxyListenerWithCountSchema: GenMessage<ProxyListenerWithCount> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 8);
+export const ProxyListenerWithCountSchema: GenMessage<ProxyListenerWithCount> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 8);
 
 /**
  * All configured listeners
  *
  * @generated from message discopanel.v1.GetProxyListenersResponse
  */
-export type GetProxyListenersResponse = Message<"discopanel.v1.GetProxyListenersResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ProxyListenerWithCount listeners = 1;
-   */
-  listeners: ProxyListenerWithCount[];
+export type GetProxyListenersResponse = Message<'discopanel.v1.GetProxyListenersResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ProxyListenerWithCount listeners = 1;
+	 */
+	listeners: ProxyListenerWithCount[];
 };
 
 /**
  * Describes the message discopanel.v1.GetProxyListenersResponse.
  * Use `create(GetProxyListenersResponseSchema)` to create a new message.
  */
-export const GetProxyListenersResponseSchema: GenMessage<GetProxyListenersResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 9);
+export const GetProxyListenersResponseSchema: GenMessage<GetProxyListenersResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 9);
 
 /**
  * New listener configuration
  *
  * @generated from message discopanel.v1.CreateProxyListenerRequest
  */
-export type CreateProxyListenerRequest = Message<"discopanel.v1.CreateProxyListenerRequest"> & {
-  /**
-   * @generated from field: string name = 1;
-   */
-  name: string;
+export type CreateProxyListenerRequest = Message<'discopanel.v1.CreateProxyListenerRequest'> & {
+	/**
+	 * @generated from field: string name = 1;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string description = 2;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 2;
+	 */
+	description: string;
 
-  /**
-   * @generated from field: int32 port = 3;
-   */
-  port: number;
+	/**
+	 * @generated from field: int32 port = 3;
+	 */
+	port: number;
 
-  /**
-   * @generated from field: bool enabled = 4;
-   */
-  enabled: boolean;
+	/**
+	 * @generated from field: bool enabled = 4;
+	 */
+	enabled: boolean;
 
-  /**
-   * @generated from field: bool is_default = 5;
-   */
-  isDefault: boolean;
+	/**
+	 * @generated from field: bool is_default = 5;
+	 */
+	isDefault: boolean;
 };
 
 /**
  * Describes the message discopanel.v1.CreateProxyListenerRequest.
  * Use `create(CreateProxyListenerRequestSchema)` to create a new message.
  */
-export const CreateProxyListenerRequestSchema: GenMessage<CreateProxyListenerRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 10);
+export const CreateProxyListenerRequestSchema: GenMessage<CreateProxyListenerRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 10);
 
 /**
  * Created listener
  *
  * @generated from message discopanel.v1.CreateProxyListenerResponse
  */
-export type CreateProxyListenerResponse = Message<"discopanel.v1.CreateProxyListenerResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.ProxyListener listener = 1;
-   */
-  listener?: ProxyListener | undefined;
+export type CreateProxyListenerResponse = Message<'discopanel.v1.CreateProxyListenerResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.ProxyListener listener = 1;
+	 */
+	listener?: ProxyListener | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.CreateProxyListenerResponse.
  * Use `create(CreateProxyListenerResponseSchema)` to create a new message.
  */
-export const CreateProxyListenerResponseSchema: GenMessage<CreateProxyListenerResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 11);
+export const CreateProxyListenerResponseSchema: GenMessage<CreateProxyListenerResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 11);
 
 /**
  * Listener fields to update
  *
  * @generated from message discopanel.v1.UpdateProxyListenerRequest
  */
-export type UpdateProxyListenerRequest = Message<"discopanel.v1.UpdateProxyListenerRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type UpdateProxyListenerRequest = Message<'discopanel.v1.UpdateProxyListenerRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+	/**
+	 * @generated from field: string name = 2;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string description = 3;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 3;
+	 */
+	description: string;
 
-  /**
-   * @generated from field: int32 port = 4;
-   */
-  port: number;
+	/**
+	 * @generated from field: int32 port = 4;
+	 */
+	port: number;
 
-  /**
-   * @generated from field: bool enabled = 5;
-   */
-  enabled: boolean;
+	/**
+	 * @generated from field: bool enabled = 5;
+	 */
+	enabled: boolean;
 
-  /**
-   * @generated from field: bool is_default = 6;
-   */
-  isDefault: boolean;
+	/**
+	 * @generated from field: bool is_default = 6;
+	 */
+	isDefault: boolean;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateProxyListenerRequest.
  * Use `create(UpdateProxyListenerRequestSchema)` to create a new message.
  */
-export const UpdateProxyListenerRequestSchema: GenMessage<UpdateProxyListenerRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 12);
+export const UpdateProxyListenerRequestSchema: GenMessage<UpdateProxyListenerRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 12);
 
 /**
  * Updated listener
  *
  * @generated from message discopanel.v1.UpdateProxyListenerResponse
  */
-export type UpdateProxyListenerResponse = Message<"discopanel.v1.UpdateProxyListenerResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.ProxyListener listener = 1;
-   */
-  listener?: ProxyListener | undefined;
+export type UpdateProxyListenerResponse = Message<'discopanel.v1.UpdateProxyListenerResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.ProxyListener listener = 1;
+	 */
+	listener?: ProxyListener | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateProxyListenerResponse.
  * Use `create(UpdateProxyListenerResponseSchema)` to create a new message.
  */
-export const UpdateProxyListenerResponseSchema: GenMessage<UpdateProxyListenerResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 13);
+export const UpdateProxyListenerResponseSchema: GenMessage<UpdateProxyListenerResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 13);
 
 /**
  * Listener to delete
  *
  * @generated from message discopanel.v1.DeleteProxyListenerRequest
  */
-export type DeleteProxyListenerRequest = Message<"discopanel.v1.DeleteProxyListenerRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type DeleteProxyListenerRequest = Message<'discopanel.v1.DeleteProxyListenerRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 };
 
 /**
  * Describes the message discopanel.v1.DeleteProxyListenerRequest.
  * Use `create(DeleteProxyListenerRequestSchema)` to create a new message.
  */
-export const DeleteProxyListenerRequestSchema: GenMessage<DeleteProxyListenerRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 14);
+export const DeleteProxyListenerRequestSchema: GenMessage<DeleteProxyListenerRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 14);
 
 /**
  * Deletion status
  *
  * @generated from message discopanel.v1.DeleteProxyListenerResponse
  */
-export type DeleteProxyListenerResponse = Message<"discopanel.v1.DeleteProxyListenerResponse"> & {
-  /**
-   * @generated from field: string status = 1;
-   */
-  status: string;
+export type DeleteProxyListenerResponse = Message<'discopanel.v1.DeleteProxyListenerResponse'> & {
+	/**
+	 * @generated from field: string status = 1;
+	 */
+	status: string;
 };
 
 /**
  * Describes the message discopanel.v1.DeleteProxyListenerResponse.
  * Use `create(DeleteProxyListenerResponseSchema)` to create a new message.
  */
-export const DeleteProxyListenerResponseSchema: GenMessage<DeleteProxyListenerResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 15);
+export const DeleteProxyListenerResponseSchema: GenMessage<DeleteProxyListenerResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 15);
 
 /**
  * Server routing lookup
  *
  * @generated from message discopanel.v1.GetServerRoutingRequest
  */
-export type GetServerRoutingRequest = Message<"discopanel.v1.GetServerRoutingRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type GetServerRoutingRequest = Message<'discopanel.v1.GetServerRoutingRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetServerRoutingRequest.
  * Use `create(GetServerRoutingRequestSchema)` to create a new message.
  */
-export const GetServerRoutingRequestSchema: GenMessage<GetServerRoutingRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 16);
+export const GetServerRoutingRequestSchema: GenMessage<GetServerRoutingRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 16);
 
 /**
  * Active server route
  *
  * @generated from message discopanel.v1.ServerRoute
  */
-export type ServerRoute = Message<"discopanel.v1.ServerRoute"> & {
-  /**
-   * @generated from field: string hostname = 1;
-   */
-  hostname: string;
+export type ServerRoute = Message<'discopanel.v1.ServerRoute'> & {
+	/**
+	 * @generated from field: string hostname = 1;
+	 */
+	hostname: string;
 
-  /**
-   * @generated from field: bool active = 2;
-   */
-  active: boolean;
+	/**
+	 * @generated from field: bool active = 2;
+	 */
+	active: boolean;
 };
 
 /**
  * Describes the message discopanel.v1.ServerRoute.
  * Use `create(ServerRouteSchema)` to create a new message.
  */
-export const ServerRouteSchema: GenMessage<ServerRoute> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 17);
+export const ServerRouteSchema: GenMessage<ServerRoute> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 17);
 
 /**
  * Server proxy configuration
  *
  * @generated from message discopanel.v1.GetServerRoutingResponse
  */
-export type GetServerRoutingResponse = Message<"discopanel.v1.GetServerRoutingResponse"> & {
-  /**
-   * @generated from field: bool proxy_enabled = 1;
-   */
-  proxyEnabled: boolean;
+export type GetServerRoutingResponse = Message<'discopanel.v1.GetServerRoutingResponse'> & {
+	/**
+	 * @generated from field: bool proxy_enabled = 1;
+	 */
+	proxyEnabled: boolean;
 
-  /**
-   * @generated from field: string proxy_hostname = 2;
-   */
-  proxyHostname: string;
+	/**
+	 * @generated from field: string proxy_hostname = 2;
+	 */
+	proxyHostname: string;
 
-  /**
-   * @generated from field: string suggested_hostname = 3;
-   */
-  suggestedHostname: string;
+	/**
+	 * @generated from field: string suggested_hostname = 3;
+	 */
+	suggestedHostname: string;
 
-  /**
-   * @generated from field: string base_url = 4;
-   */
-  baseUrl: string;
+	/**
+	 * @generated from field: string base_url = 4;
+	 */
+	baseUrl: string;
 
-  /**
-   * @generated from field: int32 listen_port = 5;
-   */
-  listenPort: number;
+	/**
+	 * @generated from field: int32 listen_port = 5;
+	 */
+	listenPort: number;
 
-  /**
-   * @generated from field: optional discopanel.v1.ServerRoute current_route = 6;
-   */
-  currentRoute?: ServerRoute | undefined;
+	/**
+	 * @generated from field: optional discopanel.v1.ServerRoute current_route = 6;
+	 */
+	currentRoute?: ServerRoute | undefined;
 
-  /**
-   * @generated from field: string proxy_listener_id = 7;
-   */
-  proxyListenerId: string;
+	/**
+	 * @generated from field: string proxy_listener_id = 7;
+	 */
+	proxyListenerId: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetServerRoutingResponse.
  * Use `create(GetServerRoutingResponseSchema)` to create a new message.
  */
-export const GetServerRoutingResponseSchema: GenMessage<GetServerRoutingResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 18);
+export const GetServerRoutingResponseSchema: GenMessage<GetServerRoutingResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 18);
 
 /**
  * Hostname and listener to assign
  *
  * @generated from message discopanel.v1.UpdateServerRoutingRequest
  */
-export type UpdateServerRoutingRequest = Message<"discopanel.v1.UpdateServerRoutingRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type UpdateServerRoutingRequest = Message<'discopanel.v1.UpdateServerRoutingRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string proxy_hostname = 2;
-   */
-  proxyHostname: string;
+	/**
+	 * @generated from field: string proxy_hostname = 2;
+	 */
+	proxyHostname: string;
 
-  /**
-   * @generated from field: string proxy_listener_id = 3;
-   */
-  proxyListenerId: string;
+	/**
+	 * @generated from field: string proxy_listener_id = 3;
+	 */
+	proxyListenerId: string;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateServerRoutingRequest.
  * Use `create(UpdateServerRoutingRequestSchema)` to create a new message.
  */
-export const UpdateServerRoutingRequestSchema: GenMessage<UpdateServerRoutingRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 19);
+export const UpdateServerRoutingRequestSchema: GenMessage<UpdateServerRoutingRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 19);
 
 /**
  * Routing update result
  *
  * @generated from message discopanel.v1.UpdateServerRoutingResponse
  */
-export type UpdateServerRoutingResponse = Message<"discopanel.v1.UpdateServerRoutingResponse"> & {
-  /**
-   * @generated from field: string status = 1;
-   */
-  status: string;
+export type UpdateServerRoutingResponse = Message<'discopanel.v1.UpdateServerRoutingResponse'> & {
+	/**
+	 * @generated from field: string status = 1;
+	 */
+	status: string;
 
-  /**
-   * @generated from field: string hostname = 2;
-   */
-  hostname: string;
+	/**
+	 * @generated from field: string hostname = 2;
+	 */
+	hostname: string;
 
-  /**
-   * @generated from field: string proxy_listener_id = 3;
-   */
-  proxyListenerId: string;
+	/**
+	 * @generated from field: string proxy_listener_id = 3;
+	 */
+	proxyListenerId: string;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateServerRoutingResponse.
  * Use `create(UpdateServerRoutingResponseSchema)` to create a new message.
  */
-export const UpdateServerRoutingResponseSchema: GenMessage<UpdateServerRoutingResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_proxy, 20);
+export const UpdateServerRoutingResponseSchema: GenMessage<UpdateServerRoutingResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_proxy, 20);
 
 /**
  * TCP proxy and routing management
@@ -618,96 +640,94 @@ export const UpdateServerRoutingResponseSchema: GenMessage<UpdateServerRoutingRe
  * @generated from service discopanel.v1.ProxyService
  */
 export const ProxyService: GenService<{
-  /**
-   * List active proxy routes
-   *
-   * @generated from rpc discopanel.v1.ProxyService.GetProxyRoutes
-   */
-  getProxyRoutes: {
-    methodKind: "unary";
-    input: typeof GetProxyRoutesRequestSchema;
-    output: typeof GetProxyRoutesResponseSchema;
-  },
-  /**
-   * Check proxy system status
-   *
-   * @generated from rpc discopanel.v1.ProxyService.GetProxyStatus
-   */
-  getProxyStatus: {
-    methodKind: "unary";
-    input: typeof GetProxyStatusRequestSchema;
-    output: typeof GetProxyStatusResponseSchema;
-  },
-  /**
-   * Modify proxy settings
-   *
-   * @generated from rpc discopanel.v1.ProxyService.UpdateProxyConfig
-   */
-  updateProxyConfig: {
-    methodKind: "unary";
-    input: typeof UpdateProxyConfigRequestSchema;
-    output: typeof UpdateProxyConfigResponseSchema;
-  },
-  /**
-   * List all proxy listeners
-   *
-   * @generated from rpc discopanel.v1.ProxyService.GetProxyListeners
-   */
-  getProxyListeners: {
-    methodKind: "unary";
-    input: typeof GetProxyListenersRequestSchema;
-    output: typeof GetProxyListenersResponseSchema;
-  },
-  /**
-   * Add new listener port
-   *
-   * @generated from rpc discopanel.v1.ProxyService.CreateProxyListener
-   */
-  createProxyListener: {
-    methodKind: "unary";
-    input: typeof CreateProxyListenerRequestSchema;
-    output: typeof CreateProxyListenerResponseSchema;
-  },
-  /**
-   * Modify listener settings
-   *
-   * @generated from rpc discopanel.v1.ProxyService.UpdateProxyListener
-   */
-  updateProxyListener: {
-    methodKind: "unary";
-    input: typeof UpdateProxyListenerRequestSchema;
-    output: typeof UpdateProxyListenerResponseSchema;
-  },
-  /**
-   * Remove listener port
-   *
-   * @generated from rpc discopanel.v1.ProxyService.DeleteProxyListener
-   */
-  deleteProxyListener: {
-    methodKind: "unary";
-    input: typeof DeleteProxyListenerRequestSchema;
-    output: typeof DeleteProxyListenerResponseSchema;
-  },
-  /**
-   * Get server proxy configuration
-   *
-   * @generated from rpc discopanel.v1.ProxyService.GetServerRouting
-   */
-  getServerRouting: {
-    methodKind: "unary";
-    input: typeof GetServerRoutingRequestSchema;
-    output: typeof GetServerRoutingResponseSchema;
-  },
-  /**
-   * Update server proxy hostname
-   *
-   * @generated from rpc discopanel.v1.ProxyService.UpdateServerRouting
-   */
-  updateServerRouting: {
-    methodKind: "unary";
-    input: typeof UpdateServerRoutingRequestSchema;
-    output: typeof UpdateServerRoutingResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_discopanel_v1_proxy, 0);
-
+	/**
+	 * List active proxy routes
+	 *
+	 * @generated from rpc discopanel.v1.ProxyService.GetProxyRoutes
+	 */
+	getProxyRoutes: {
+		methodKind: 'unary';
+		input: typeof GetProxyRoutesRequestSchema;
+		output: typeof GetProxyRoutesResponseSchema;
+	};
+	/**
+	 * Check proxy system status
+	 *
+	 * @generated from rpc discopanel.v1.ProxyService.GetProxyStatus
+	 */
+	getProxyStatus: {
+		methodKind: 'unary';
+		input: typeof GetProxyStatusRequestSchema;
+		output: typeof GetProxyStatusResponseSchema;
+	};
+	/**
+	 * Modify proxy settings
+	 *
+	 * @generated from rpc discopanel.v1.ProxyService.UpdateProxyConfig
+	 */
+	updateProxyConfig: {
+		methodKind: 'unary';
+		input: typeof UpdateProxyConfigRequestSchema;
+		output: typeof UpdateProxyConfigResponseSchema;
+	};
+	/**
+	 * List all proxy listeners
+	 *
+	 * @generated from rpc discopanel.v1.ProxyService.GetProxyListeners
+	 */
+	getProxyListeners: {
+		methodKind: 'unary';
+		input: typeof GetProxyListenersRequestSchema;
+		output: typeof GetProxyListenersResponseSchema;
+	};
+	/**
+	 * Add new listener port
+	 *
+	 * @generated from rpc discopanel.v1.ProxyService.CreateProxyListener
+	 */
+	createProxyListener: {
+		methodKind: 'unary';
+		input: typeof CreateProxyListenerRequestSchema;
+		output: typeof CreateProxyListenerResponseSchema;
+	};
+	/**
+	 * Modify listener settings
+	 *
+	 * @generated from rpc discopanel.v1.ProxyService.UpdateProxyListener
+	 */
+	updateProxyListener: {
+		methodKind: 'unary';
+		input: typeof UpdateProxyListenerRequestSchema;
+		output: typeof UpdateProxyListenerResponseSchema;
+	};
+	/**
+	 * Remove listener port
+	 *
+	 * @generated from rpc discopanel.v1.ProxyService.DeleteProxyListener
+	 */
+	deleteProxyListener: {
+		methodKind: 'unary';
+		input: typeof DeleteProxyListenerRequestSchema;
+		output: typeof DeleteProxyListenerResponseSchema;
+	};
+	/**
+	 * Get server proxy configuration
+	 *
+	 * @generated from rpc discopanel.v1.ProxyService.GetServerRouting
+	 */
+	getServerRouting: {
+		methodKind: 'unary';
+		input: typeof GetServerRoutingRequestSchema;
+		output: typeof GetServerRoutingResponseSchema;
+	};
+	/**
+	 * Update server proxy hostname
+	 *
+	 * @generated from rpc discopanel.v1.ProxyService.UpdateServerRouting
+	 */
+	updateServerRouting: {
+		methodKind: 'unary';
+		input: typeof UpdateServerRoutingRequestSchema;
+		output: typeof UpdateServerRoutingResponseSchema;
+	};
+}> = /*@__PURE__*/ serviceDesc(file_discopanel_v1_proxy, 0);

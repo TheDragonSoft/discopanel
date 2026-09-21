@@ -74,16 +74,16 @@
 		};
 	});
 
-		$effect(() => {
-			// Track tab visibility reactively (prop)
-			activeRef = active;
-			if (server.id !== prevServerId) {
-				prevServerId = server.id;
-				initialized = false;
-				samples = [];
-				traffic = null;
-				loading = true;
-			}
+	$effect(() => {
+		// Track tab visibility reactively (prop)
+		activeRef = active;
+		if (server.id !== prevServerId) {
+			prevServerId = server.id;
+			initialized = false;
+			samples = [];
+			traffic = null;
+			loading = true;
+		}
 		const rs = rangeSecs;
 		if (active && !initialized) {
 			initialized = true;
@@ -216,7 +216,8 @@
 		const maxPlayers = server.maxPlayersSlp || server.maxPlayers || 0;
 		const peakPlayers = Math.max(...players, 0);
 
-		const last = <T>(arr: T[]): T | undefined => (arr.length > 0 ? arr[arr.length - 1] : undefined);
+		const last = <T,>(arr: T[]): T | undefined =>
+			arr.length > 0 ? arr[arr.length - 1] : undefined;
 		const lastCpu = last(cpu);
 		const lastMem = last(mem);
 		const lastTps = last(tps);
@@ -313,9 +314,7 @@
 						</Badge>
 					{/if}
 				</h3>
-				<p class="text-sm text-muted-foreground">
-					CPU, memory, TPS and player trends over time.
-				</p>
+				<p class="text-sm text-muted-foreground">CPU, memory, TPS and player trends over time.</p>
 			</div>
 		</div>
 		<div class="flex items-center gap-2">
@@ -406,8 +405,7 @@
 					<div class="mb-2 flex items-center justify-between gap-2">
 						<div class="flex items-center gap-2">
 							<SpecIcon class="h-4 w-4" style="color: {spec.color}" />
-							<span
-								class="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
+							<span class="text-xs font-semibold tracking-wider text-muted-foreground uppercase"
 								>{spec.title}</span
 							>
 						</div>
@@ -416,9 +414,7 @@
 						>
 					</div>
 					{#if spec.values.length === 0}
-						<div
-							class="flex h-20 items-center justify-center text-xs text-muted-foreground"
-						>
+						<div class="flex h-20 items-center justify-center text-xs text-muted-foreground">
 							No data in this range
 						</div>
 					{:else}
@@ -439,7 +435,7 @@
 								{@const refY = yFor(spec.refLine, spec).toFixed(2)}
 								<line
 									x1="0"
-									x2="{W}"
+									x2={W}
 									y1={refY}
 									y2={refY}
 									class="text-muted-foreground/40"
@@ -473,7 +469,9 @@
 							{/if}
 						</svg>
 					{/if}
-					<div class="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground/70">
+					<div
+						class="mt-1.5 flex items-center justify-between text-[10px] text-muted-foreground/70"
+					>
 						<span class="flex items-center gap-1">
 							<Clock class="h-3 w-3" />
 							{timeRangeLabel}

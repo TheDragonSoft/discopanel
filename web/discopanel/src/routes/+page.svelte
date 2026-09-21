@@ -67,10 +67,7 @@
 	let actionBusyId = $state<string | null>(null);
 
 	// Quick actions (start/stop/restart) — same RPC flow as the servers page
-	async function handleServerAction(
-		action: 'start' | 'stop' | 'restart',
-		server: ServerType
-	) {
+	async function handleServerAction(action: 'start' | 'stop' | 'restart', server: ServerType) {
 		actionBusyId = server.id;
 		try {
 			switch (action) {
@@ -164,8 +161,7 @@
 			dashboardServers.length > 0
 				? ` / ${dashboardServers?.[0]?.diskTotal && formatBytes(Number(dashboardServers[0].diskTotal))}`
 				: '',
-		diskFree:
-			dashboardServers.length > 0 ? Number(dashboardServers[0].diskFree || 0) : 0,
+		diskFree: dashboardServers.length > 0 ? Number(dashboardServers[0].diskFree || 0) : 0,
 		avgCpu: dashboardServers
 			.filter((s) => s.cpuPercent && s.cpuPercent > 0)
 			.reduce((acc, s, _, arr) => acc + (s.cpuPercent || 0) / arr.length, 0)
@@ -263,9 +259,7 @@
 		</div>
 	</div>
 {:else}
-	<div
-		class="h-full flex-1 space-y-8 bg-linear-to-br from-background to-muted/10 p-8 pt-6"
-	>
+	<div class="h-full flex-1 space-y-8 bg-linear-to-br from-background to-muted/10 p-8 pt-6">
 		<div class="flex flex-wrap items-center justify-between gap-4 border-b-2 border-border/50 pb-6">
 			<div class="flex items-center gap-4">
 				<div
@@ -274,7 +268,9 @@
 					<LayoutDashboard class="h-8 w-8 text-primary" />
 				</div>
 				<div class="animate-in space-y-1 duration-500 slide-in-from-left-5">
-					<h2 class="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-4xl font-bold tracking-tight text-transparent">
+					<h2
+						class="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-4xl font-bold tracking-tight text-transparent"
+					>
 						Dashboard
 					</h2>
 					<p class="text-base text-muted-foreground">
@@ -304,9 +300,7 @@
 		</div>
 
 		<!-- Aggregate health strip -->
-		<Card
-			class="animate-in border-border/50 duration-500 fade-in-50 slide-in-from-bottom-2"
-		>
+		<Card class="animate-in border-border/50 duration-500 fade-in-50 slide-in-from-bottom-2">
 			<CardContent class="grid grid-cols-2 gap-4 p-5 sm:grid-cols-3 lg:grid-cols-5">
 				<div class="flex items-center gap-3">
 					<div
@@ -315,9 +309,9 @@
 						<Server class="h-5 w-5 text-blue-500" />
 					</div>
 					<div class="min-w-0">
-						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
-							>Servers</p
-						>
+						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+							Servers
+						</p>
 						<p class="text-2xl leading-tight font-bold">{stats.total}</p>
 					</div>
 				</div>
@@ -328,9 +322,9 @@
 						<CheckCircle class="h-5 w-5 text-green-500" />
 					</div>
 					<div class="min-w-0">
-						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
-							>Running</p
-						>
+						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+							Running
+						</p>
 						<p class="text-2xl leading-tight font-bold text-green-500 dark:text-green-400">
 							{stats.running}
 						</p>
@@ -343,9 +337,9 @@
 						<XCircle class="h-5 w-5 text-gray-400" />
 					</div>
 					<div class="min-w-0">
-						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
-							>Stopped</p
-						>
+						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+							Stopped
+						</p>
 						<p class="text-2xl leading-tight font-bold">{stats.stopped}</p>
 					</div>
 				</div>
@@ -356,12 +350,14 @@
 						<AlertTriangle class="h-5 w-5 text-red-500" />
 					</div>
 					<div class="min-w-0">
-						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
-							>Issues</p
-						>
-						<p class="text-2xl leading-tight font-bold {stats.error > 0
+						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+							Issues
+						</p>
+						<p
+							class="text-2xl leading-tight font-bold {stats.error > 0
 								? 'text-red-500 dark:text-red-400'
-								: ''}">
+								: ''}"
+						>
 							{stats.error}
 						</p>
 					</div>
@@ -373,9 +369,9 @@
 						<Users class="h-5 w-5 text-green-500" />
 					</div>
 					<div class="min-w-0">
-						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
-							>Players Online</p
-						>
+						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+							Players Online
+						</p>
 						<p class="text-2xl leading-tight font-bold">{stats.totalPlayers}</p>
 					</div>
 				</div>
@@ -458,8 +454,7 @@
 												{serverStatusLabel(server.status)}
 											</Badge>
 											<Badge variant="outline" class="text-xs">{server.mcVersion}</Badge>
-											{#if server.modLoader !== ModLoader.VANILLA &&
-												server.modLoader !== ModLoader.UNSPECIFIED}
+											{#if server.modLoader !== ModLoader.VANILLA && server.modLoader !== ModLoader.UNSPECIFIED}
 												<Badge variant="outline" class="text-xs capitalize">
 													{getModLoaderDisplay(server.modLoader)}
 												</Badge>
@@ -480,9 +475,7 @@
 												<Play class="h-4 w-4 text-green-500" />
 											</Button>
 										{/if}
-										{#if server.status === ServerStatus.RUNNING ||
-											server.status === ServerStatus.UNHEALTHY ||
-											server.status === ServerStatus.STARTING}
+										{#if server.status === ServerStatus.RUNNING || server.status === ServerStatus.UNHEALTHY || server.status === ServerStatus.STARTING}
 											<Button
 												variant="ghost"
 												size="icon"
@@ -495,8 +488,7 @@
 												<Square class="h-4 w-4 text-red-500" />
 											</Button>
 										{/if}
-										{#if server.status === ServerStatus.RUNNING ||
-											server.status === ServerStatus.UNHEALTHY}
+										{#if server.status === ServerStatus.RUNNING || server.status === ServerStatus.UNHEALTHY}
 											<Button
 												variant="ghost"
 												size="icon"
@@ -521,9 +513,7 @@
 										</Button>
 									</div>
 								</div>
-								<div
-									class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-border/40 pt-3"
-								>
+								<div class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-border/40 pt-3">
 									<div>
 										<p
 											class="flex items-center gap-1 text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
@@ -676,7 +666,7 @@
 							<p class="text-sm">No players online</p>
 						</div>
 					{:else}
-						<div class="scrollbar-thin max-h-56 space-y-2 overflow-y-auto pr-1">
+						<div class="max-h-56 scrollbar-thin space-y-2 overflow-y-auto pr-1">
 							{#each onlinePlayers as op (op.playerId + op.serverId)}
 								<div
 									class="flex items-center justify-between gap-2 rounded-lg border bg-muted/30 px-3 py-2"
@@ -805,7 +795,9 @@
 										>{formatBytes(stats.totalDiskUsage)}{stats.totalDiskSize}</span
 									>
 									{#if stats.diskFree > 0}
-										<span class="text-xs text-muted-foreground">· {formatBytes(stats.diskFree)} free</span>
+										<span class="text-xs text-muted-foreground"
+											>· {formatBytes(stats.diskFree)} free</span
+										>
 									{/if}
 								{:else}
 									<Database class="h-4 w-4 text-gray-400" />

@@ -2,886 +2,920 @@
 // @generated from file discopanel/v1/modpack.proto (package discopanel.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenFile, GenMessage, GenService } from '@bufbuild/protobuf/codegenv2';
+import { fileDesc, messageDesc, serviceDesc } from '@bufbuild/protobuf/codegenv2';
+import type { Timestamp } from '@bufbuild/protobuf/wkt';
+import { file_google_protobuf_timestamp } from '@bufbuild/protobuf/wkt';
+import type { Message } from '@bufbuild/protobuf';
 
 /**
  * Describes the file discopanel/v1/modpack.proto.
  */
-export const file_discopanel_v1_modpack: GenFile = /*@__PURE__*/
-  fileDesc("ChtkaXNjb3BhbmVsL3YxL21vZHBhY2sucHJvdG8SDWRpc2NvcGFuZWwudjEioQQKDkluZGV4ZWRNb2RwYWNrEgoKAmlkGAEgASgJEhIKCmluZGV4ZXJfaWQYAiABKAkSDwoHaW5kZXhlchgDIAEoCRIMCgRuYW1lGAQgASgJEgwKBHNsdWcYBSABKAkSDwoHc3VtbWFyeRgGIAEoCRITCgtkZXNjcmlwdGlvbhgHIAEoCRIQCghsb2dvX3VybBgIIAEoCRITCgt3ZWJzaXRlX3VybBgJIAEoCRIWCg5kb3dubG9hZF9jb3VudBgKIAEoBRISCgpjYXRlZ29yaWVzGAsgASgJEhUKDWdhbWVfdmVyc2lvbnMYDCABKAkSEwoLbW9kX2xvYWRlcnMYDSABKAkSFgoObGF0ZXN0X2ZpbGVfaWQYDiABKAkSMAoMZGF0ZV9jcmVhdGVkGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCg1kYXRlX21vZGlmaWVkGBAgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCg1kYXRlX3JlbGVhc2VkGBEgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBISCgptY192ZXJzaW9uGBIgASgJEhQKDGphdmFfdmVyc2lvbhgTIAEoBRIUCgxkb2NrZXJfaW1hZ2UYFCABKAkSFwoPcmVjb21tZW5kZWRfcmFtGBUgASgFEhQKDGlzX2Zhdm9yaXRlZBgWIAEoCCLxAQoLTW9kcGFja0ZpbGUSCgoCaWQYASABKAkSEgoKbW9kcGFja19pZBgCIAEoCRIUCgxkaXNwbGF5X25hbWUYAyABKAkSEQoJZmlsZV9uYW1lGAQgASgJEi0KCWZpbGVfZGF0ZRgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASEwoLZmlsZV9sZW5ndGgYBiABKAMSFAoMcmVsZWFzZV90eXBlGAcgASgJEhQKDGRvd25sb2FkX3VybBgIIAEoCRIVCg1nYW1lX3ZlcnNpb25zGAkgAygJEhIKCnNvcnRfaW5kZXgYCiABKAUiggEKFVNlYXJjaE1vZHBhY2tzUmVxdWVzdBINCgVxdWVyeRgBIAEoCRIUCgxnYW1lX3ZlcnNpb24YAiABKAkSEgoKbW9kX2xvYWRlchgDIAEoCRIPCgdpbmRleGVyGAQgASgJEgwKBHBhZ2UYBSABKAUSEQoJcGFnZV9zaXplGAYgASgFInkKFlNlYXJjaE1vZHBhY2tzUmVzcG9uc2USLwoIbW9kcGFja3MYASADKAsyHS5kaXNjb3BhbmVsLnYxLkluZGV4ZWRNb2RwYWNrEg0KBXRvdGFsGAIgASgFEgwKBHBhZ2UYAyABKAUSEQoJcGFnZV9zaXplGAQgASgFIh8KEUdldE1vZHBhY2tSZXF1ZXN0EgoKAmlkGAEgASgJIkQKEkdldE1vZHBhY2tSZXNwb25zZRIuCgdtb2RwYWNrGAEgASgLMh0uZGlzY29wYW5lbC52MS5JbmRleGVkTW9kcGFjayInChdHZXRNb2RwYWNrQnlTbHVnUmVxdWVzdBIMCgRzbHVnGAEgASgJIkoKGEdldE1vZHBhY2tCeVNsdWdSZXNwb25zZRIuCgdtb2RwYWNrGAEgASgLMh0uZGlzY29wYW5lbC52MS5JbmRleGVkTW9kcGFjayIlChZHZXRNb2RwYWNrQnlVUkxSZXF1ZXN0EgsKA3VybBgBIAEoCSJJChdHZXRNb2RwYWNrQnlVUkxSZXNwb25zZRIuCgdtb2RwYWNrGAEgASgLMh0uZGlzY29wYW5lbC52MS5JbmRleGVkTW9kcGFjayJfChNTeW5jTW9kcGFja3NSZXF1ZXN0Eg0KBXF1ZXJ5GAEgASgJEhQKDGdhbWVfdmVyc2lvbhgCIAEoCRISCgptb2RfbG9hZGVyGAMgASgJEg8KB2luZGV4ZXIYBCABKAkiPQoUU3luY01vZHBhY2tzUmVzcG9uc2USFAoMc3luY2VkX2NvdW50GAEgASgFEg8KB21lc3NhZ2UYAiABKAkiXAocSW1wb3J0VXBsb2FkZWRNb2RwYWNrUmVxdWVzdBIZChF1cGxvYWRfc2Vzc2lvbl9pZBgBIAEoCRIMCgRuYW1lGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJImAKHUltcG9ydFVwbG9hZGVkTW9kcGFja1Jlc3BvbnNlEi4KB21vZHBhY2sYASABKAsyHS5kaXNjb3BhbmVsLnYxLkluZGV4ZWRNb2RwYWNrEg8KB21lc3NhZ2UYAiABKAkiIgoURGVsZXRlTW9kcGFja1JlcXVlc3QSCgoCaWQYASABKAkiKAoVRGVsZXRlTW9kcGFja1Jlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkiIwoVVG9nZ2xlRmF2b3JpdGVSZXF1ZXN0EgoKAmlkGAEgASgJIj8KFlRvZ2dsZUZhdm9yaXRlUmVzcG9uc2USFAoMaXNfZmF2b3JpdGVkGAEgASgIEg8KB21lc3NhZ2UYAiABKAkiFgoUTGlzdEZhdm9yaXRlc1JlcXVlc3QiSAoVTGlzdEZhdm9yaXRlc1Jlc3BvbnNlEi8KCG1vZHBhY2tzGAEgAygLMh0uZGlzY29wYW5lbC52MS5JbmRleGVkTW9kcGFjayIZChdHZXRJbmRleGVyU3RhdHVzUmVxdWVzdCLfAgoYR2V0SW5kZXhlclN0YXR1c1Jlc3BvbnNlEloKEmluZGV4ZXJzX2F2YWlsYWJsZRgBIAMoCzI+LmRpc2NvcGFuZWwudjEuR2V0SW5kZXhlclN0YXR1c1Jlc3BvbnNlLkluZGV4ZXJzQXZhaWxhYmxlRW50cnkSFgoOdG90YWxfbW9kcGFja3MYAiABKAUSWwoTbW9kcGFja3NfYnlfaW5kZXhlchgDIAMoCzI+LmRpc2NvcGFuZWwudjEuR2V0SW5kZXhlclN0YXR1c1Jlc3BvbnNlLk1vZHBhY2tzQnlJbmRleGVyRW50cnkaOAoWSW5kZXhlcnNBdmFpbGFibGVFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAg6AjgBGjgKFk1vZHBhY2tzQnlJbmRleGVyRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgFOgI4ASIlChdHZXRNb2RwYWNrQ29uZmlnUmVxdWVzdBIKCgJpZBgBIAEoCSKOAQoYR2V0TW9kcGFja0NvbmZpZ1Jlc3BvbnNlEkMKBmNvbmZpZxgBIAMoCzIzLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja0NvbmZpZ1Jlc3BvbnNlLkNvbmZpZ0VudHJ5Gi0KC0NvbmZpZ0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiJAoWR2V0TW9kcGFja0ZpbGVzUmVxdWVzdBIKCgJpZBgBIAEoCSJEChdHZXRNb2RwYWNrRmlsZXNSZXNwb25zZRIpCgVmaWxlcxgBIAMoCzIaLmRpc2NvcGFuZWwudjEuTW9kcGFja0ZpbGUinAEKB1ZlcnNpb24SCgoCaWQYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJEhQKDHJlbGVhc2VfdHlwZRgDIAEoCRItCglmaWxlX2RhdGUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhIKCnNvcnRfaW5kZXgYBSABKAUSFgoOdmVyc2lvbl9udW1iZXIYBiABKAkiUQoZR2V0TW9kcGFja1ZlcnNpb25zUmVxdWVzdBIKCgJpZBgBIAEoCRIUCgxnYW1lX3ZlcnNpb24YAiABKAkSEgoKbW9kX2xvYWRlchgDIAEoCSJGChpHZXRNb2RwYWNrVmVyc2lvbnNSZXNwb25zZRIoCgh2ZXJzaW9ucxgBIAMoCzIWLmRpc2NvcGFuZWwudjEuVmVyc2lvbiIlChdTeW5jTW9kcGFja0ZpbGVzUmVxdWVzdBIKCgJpZBgBIAEoCSJBChhTeW5jTW9kcGFja0ZpbGVzUmVzcG9uc2USFAoMc3luY2VkX2NvdW50GAEgASgFEg8KB21lc3NhZ2UYAiABKAky6QoKDk1vZHBhY2tTZXJ2aWNlEl0KDlNlYXJjaE1vZHBhY2tzEiQuZGlzY29wYW5lbC52MS5TZWFyY2hNb2RwYWNrc1JlcXVlc3QaJS5kaXNjb3BhbmVsLnYxLlNlYXJjaE1vZHBhY2tzUmVzcG9uc2USUQoKR2V0TW9kcGFjaxIgLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja1JlcXVlc3QaIS5kaXNjb3BhbmVsLnYxLkdldE1vZHBhY2tSZXNwb25zZRJjChBHZXRNb2RwYWNrQnlTbHVnEiYuZGlzY29wYW5lbC52MS5HZXRNb2RwYWNrQnlTbHVnUmVxdWVzdBonLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja0J5U2x1Z1Jlc3BvbnNlEmAKD0dldE1vZHBhY2tCeVVSTBIlLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja0J5VVJMUmVxdWVzdBomLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja0J5VVJMUmVzcG9uc2USVwoMU3luY01vZHBhY2tzEiIuZGlzY29wYW5lbC52MS5TeW5jTW9kcGFja3NSZXF1ZXN0GiMuZGlzY29wYW5lbC52MS5TeW5jTW9kcGFja3NSZXNwb25zZRJyChVJbXBvcnRVcGxvYWRlZE1vZHBhY2sSKy5kaXNjb3BhbmVsLnYxLkltcG9ydFVwbG9hZGVkTW9kcGFja1JlcXVlc3QaLC5kaXNjb3BhbmVsLnYxLkltcG9ydFVwbG9hZGVkTW9kcGFja1Jlc3BvbnNlEloKDURlbGV0ZU1vZHBhY2sSIy5kaXNjb3BhbmVsLnYxLkRlbGV0ZU1vZHBhY2tSZXF1ZXN0GiQuZGlzY29wYW5lbC52MS5EZWxldGVNb2RwYWNrUmVzcG9uc2USXQoOVG9nZ2xlRmF2b3JpdGUSJC5kaXNjb3BhbmVsLnYxLlRvZ2dsZUZhdm9yaXRlUmVxdWVzdBolLmRpc2NvcGFuZWwudjEuVG9nZ2xlRmF2b3JpdGVSZXNwb25zZRJaCg1MaXN0RmF2b3JpdGVzEiMuZGlzY29wYW5lbC52MS5MaXN0RmF2b3JpdGVzUmVxdWVzdBokLmRpc2NvcGFuZWwudjEuTGlzdEZhdm9yaXRlc1Jlc3BvbnNlEmMKEEdldEluZGV4ZXJTdGF0dXMSJi5kaXNjb3BhbmVsLnYxLkdldEluZGV4ZXJTdGF0dXNSZXF1ZXN0GicuZGlzY29wYW5lbC52MS5HZXRJbmRleGVyU3RhdHVzUmVzcG9uc2USYwoQR2V0TW9kcGFja0NvbmZpZxImLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja0NvbmZpZ1JlcXVlc3QaJy5kaXNjb3BhbmVsLnYxLkdldE1vZHBhY2tDb25maWdSZXNwb25zZRJgCg9HZXRNb2RwYWNrRmlsZXMSJS5kaXNjb3BhbmVsLnYxLkdldE1vZHBhY2tGaWxlc1JlcXVlc3QaJi5kaXNjb3BhbmVsLnYxLkdldE1vZHBhY2tGaWxlc1Jlc3BvbnNlEmkKEkdldE1vZHBhY2tWZXJzaW9ucxIoLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja1ZlcnNpb25zUmVxdWVzdBopLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja1ZlcnNpb25zUmVzcG9uc2USYwoQU3luY01vZHBhY2tGaWxlcxImLmRpc2NvcGFuZWwudjEuU3luY01vZHBhY2tGaWxlc1JlcXVlc3QaJy5kaXNjb3BhbmVsLnYxLlN5bmNNb2RwYWNrRmlsZXNSZXNwb25zZUJGWkRnaXRodWIuY29tL25pY2toZXllci9kaXNjb3BhbmVsL3BrZy9wcm90by9kaXNjb3BhbmVsL3YxO2Rpc2NvcGFuZWx2MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+export const file_discopanel_v1_modpack: GenFile =
+	/*@__PURE__*/
+	fileDesc(
+		'ChtkaXNjb3BhbmVsL3YxL21vZHBhY2sucHJvdG8SDWRpc2NvcGFuZWwudjEioQQKDkluZGV4ZWRNb2RwYWNrEgoKAmlkGAEgASgJEhIKCmluZGV4ZXJfaWQYAiABKAkSDwoHaW5kZXhlchgDIAEoCRIMCgRuYW1lGAQgASgJEgwKBHNsdWcYBSABKAkSDwoHc3VtbWFyeRgGIAEoCRITCgtkZXNjcmlwdGlvbhgHIAEoCRIQCghsb2dvX3VybBgIIAEoCRITCgt3ZWJzaXRlX3VybBgJIAEoCRIWCg5kb3dubG9hZF9jb3VudBgKIAEoBRISCgpjYXRlZ29yaWVzGAsgASgJEhUKDWdhbWVfdmVyc2lvbnMYDCABKAkSEwoLbW9kX2xvYWRlcnMYDSABKAkSFgoObGF0ZXN0X2ZpbGVfaWQYDiABKAkSMAoMZGF0ZV9jcmVhdGVkGA8gASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCg1kYXRlX21vZGlmaWVkGBAgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBIxCg1kYXRlX3JlbGVhc2VkGBEgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBISCgptY192ZXJzaW9uGBIgASgJEhQKDGphdmFfdmVyc2lvbhgTIAEoBRIUCgxkb2NrZXJfaW1hZ2UYFCABKAkSFwoPcmVjb21tZW5kZWRfcmFtGBUgASgFEhQKDGlzX2Zhdm9yaXRlZBgWIAEoCCLxAQoLTW9kcGFja0ZpbGUSCgoCaWQYASABKAkSEgoKbW9kcGFja19pZBgCIAEoCRIUCgxkaXNwbGF5X25hbWUYAyABKAkSEQoJZmlsZV9uYW1lGAQgASgJEi0KCWZpbGVfZGF0ZRgFIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASEwoLZmlsZV9sZW5ndGgYBiABKAMSFAoMcmVsZWFzZV90eXBlGAcgASgJEhQKDGRvd25sb2FkX3VybBgIIAEoCRIVCg1nYW1lX3ZlcnNpb25zGAkgAygJEhIKCnNvcnRfaW5kZXgYCiABKAUiggEKFVNlYXJjaE1vZHBhY2tzUmVxdWVzdBINCgVxdWVyeRgBIAEoCRIUCgxnYW1lX3ZlcnNpb24YAiABKAkSEgoKbW9kX2xvYWRlchgDIAEoCRIPCgdpbmRleGVyGAQgASgJEgwKBHBhZ2UYBSABKAUSEQoJcGFnZV9zaXplGAYgASgFInkKFlNlYXJjaE1vZHBhY2tzUmVzcG9uc2USLwoIbW9kcGFja3MYASADKAsyHS5kaXNjb3BhbmVsLnYxLkluZGV4ZWRNb2RwYWNrEg0KBXRvdGFsGAIgASgFEgwKBHBhZ2UYAyABKAUSEQoJcGFnZV9zaXplGAQgASgFIh8KEUdldE1vZHBhY2tSZXF1ZXN0EgoKAmlkGAEgASgJIkQKEkdldE1vZHBhY2tSZXNwb25zZRIuCgdtb2RwYWNrGAEgASgLMh0uZGlzY29wYW5lbC52MS5JbmRleGVkTW9kcGFjayInChdHZXRNb2RwYWNrQnlTbHVnUmVxdWVzdBIMCgRzbHVnGAEgASgJIkoKGEdldE1vZHBhY2tCeVNsdWdSZXNwb25zZRIuCgdtb2RwYWNrGAEgASgLMh0uZGlzY29wYW5lbC52MS5JbmRleGVkTW9kcGFjayIlChZHZXRNb2RwYWNrQnlVUkxSZXF1ZXN0EgsKA3VybBgBIAEoCSJJChdHZXRNb2RwYWNrQnlVUkxSZXNwb25zZRIuCgdtb2RwYWNrGAEgASgLMh0uZGlzY29wYW5lbC52MS5JbmRleGVkTW9kcGFjayJfChNTeW5jTW9kcGFja3NSZXF1ZXN0Eg0KBXF1ZXJ5GAEgASgJEhQKDGdhbWVfdmVyc2lvbhgCIAEoCRISCgptb2RfbG9hZGVyGAMgASgJEg8KB2luZGV4ZXIYBCABKAkiPQoUU3luY01vZHBhY2tzUmVzcG9uc2USFAoMc3luY2VkX2NvdW50GAEgASgFEg8KB21lc3NhZ2UYAiABKAkiXAocSW1wb3J0VXBsb2FkZWRNb2RwYWNrUmVxdWVzdBIZChF1cGxvYWRfc2Vzc2lvbl9pZBgBIAEoCRIMCgRuYW1lGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJImAKHUltcG9ydFVwbG9hZGVkTW9kcGFja1Jlc3BvbnNlEi4KB21vZHBhY2sYASABKAsyHS5kaXNjb3BhbmVsLnYxLkluZGV4ZWRNb2RwYWNrEg8KB21lc3NhZ2UYAiABKAkiIgoURGVsZXRlTW9kcGFja1JlcXVlc3QSCgoCaWQYASABKAkiKAoVRGVsZXRlTW9kcGFja1Jlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkiIwoVVG9nZ2xlRmF2b3JpdGVSZXF1ZXN0EgoKAmlkGAEgASgJIj8KFlRvZ2dsZUZhdm9yaXRlUmVzcG9uc2USFAoMaXNfZmF2b3JpdGVkGAEgASgIEg8KB21lc3NhZ2UYAiABKAkiFgoUTGlzdEZhdm9yaXRlc1JlcXVlc3QiSAoVTGlzdEZhdm9yaXRlc1Jlc3BvbnNlEi8KCG1vZHBhY2tzGAEgAygLMh0uZGlzY29wYW5lbC52MS5JbmRleGVkTW9kcGFjayIZChdHZXRJbmRleGVyU3RhdHVzUmVxdWVzdCLfAgoYR2V0SW5kZXhlclN0YXR1c1Jlc3BvbnNlEloKEmluZGV4ZXJzX2F2YWlsYWJsZRgBIAMoCzI+LmRpc2NvcGFuZWwudjEuR2V0SW5kZXhlclN0YXR1c1Jlc3BvbnNlLkluZGV4ZXJzQXZhaWxhYmxlRW50cnkSFgoOdG90YWxfbW9kcGFja3MYAiABKAUSWwoTbW9kcGFja3NfYnlfaW5kZXhlchgDIAMoCzI+LmRpc2NvcGFuZWwudjEuR2V0SW5kZXhlclN0YXR1c1Jlc3BvbnNlLk1vZHBhY2tzQnlJbmRleGVyRW50cnkaOAoWSW5kZXhlcnNBdmFpbGFibGVFbnRyeRILCgNrZXkYASABKAkSDQoFdmFsdWUYAiABKAg6AjgBGjgKFk1vZHBhY2tzQnlJbmRleGVyRW50cnkSCwoDa2V5GAEgASgJEg0KBXZhbHVlGAIgASgFOgI4ASIlChdHZXRNb2RwYWNrQ29uZmlnUmVxdWVzdBIKCgJpZBgBIAEoCSKOAQoYR2V0TW9kcGFja0NvbmZpZ1Jlc3BvbnNlEkMKBmNvbmZpZxgBIAMoCzIzLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja0NvbmZpZ1Jlc3BvbnNlLkNvbmZpZ0VudHJ5Gi0KC0NvbmZpZ0VudHJ5EgsKA2tleRgBIAEoCRINCgV2YWx1ZRgCIAEoCToCOAEiJAoWR2V0TW9kcGFja0ZpbGVzUmVxdWVzdBIKCgJpZBgBIAEoCSJEChdHZXRNb2RwYWNrRmlsZXNSZXNwb25zZRIpCgVmaWxlcxgBIAMoCzIaLmRpc2NvcGFuZWwudjEuTW9kcGFja0ZpbGUinAEKB1ZlcnNpb24SCgoCaWQYASABKAkSFAoMZGlzcGxheV9uYW1lGAIgASgJEhQKDHJlbGVhc2VfdHlwZRgDIAEoCRItCglmaWxlX2RhdGUYBCABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhIKCnNvcnRfaW5kZXgYBSABKAUSFgoOdmVyc2lvbl9udW1iZXIYBiABKAkiUQoZR2V0TW9kcGFja1ZlcnNpb25zUmVxdWVzdBIKCgJpZBgBIAEoCRIUCgxnYW1lX3ZlcnNpb24YAiABKAkSEgoKbW9kX2xvYWRlchgDIAEoCSJGChpHZXRNb2RwYWNrVmVyc2lvbnNSZXNwb25zZRIoCgh2ZXJzaW9ucxgBIAMoCzIWLmRpc2NvcGFuZWwudjEuVmVyc2lvbiIlChdTeW5jTW9kcGFja0ZpbGVzUmVxdWVzdBIKCgJpZBgBIAEoCSJBChhTeW5jTW9kcGFja0ZpbGVzUmVzcG9uc2USFAoMc3luY2VkX2NvdW50GAEgASgFEg8KB21lc3NhZ2UYAiABKAky6QoKDk1vZHBhY2tTZXJ2aWNlEl0KDlNlYXJjaE1vZHBhY2tzEiQuZGlzY29wYW5lbC52MS5TZWFyY2hNb2RwYWNrc1JlcXVlc3QaJS5kaXNjb3BhbmVsLnYxLlNlYXJjaE1vZHBhY2tzUmVzcG9uc2USUQoKR2V0TW9kcGFjaxIgLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja1JlcXVlc3QaIS5kaXNjb3BhbmVsLnYxLkdldE1vZHBhY2tSZXNwb25zZRJjChBHZXRNb2RwYWNrQnlTbHVnEiYuZGlzY29wYW5lbC52MS5HZXRNb2RwYWNrQnlTbHVnUmVxdWVzdBonLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja0J5U2x1Z1Jlc3BvbnNlEmAKD0dldE1vZHBhY2tCeVVSTBIlLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja0J5VVJMUmVxdWVzdBomLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja0J5VVJMUmVzcG9uc2USVwoMU3luY01vZHBhY2tzEiIuZGlzY29wYW5lbC52MS5TeW5jTW9kcGFja3NSZXF1ZXN0GiMuZGlzY29wYW5lbC52MS5TeW5jTW9kcGFja3NSZXNwb25zZRJyChVJbXBvcnRVcGxvYWRlZE1vZHBhY2sSKy5kaXNjb3BhbmVsLnYxLkltcG9ydFVwbG9hZGVkTW9kcGFja1JlcXVlc3QaLC5kaXNjb3BhbmVsLnYxLkltcG9ydFVwbG9hZGVkTW9kcGFja1Jlc3BvbnNlEloKDURlbGV0ZU1vZHBhY2sSIy5kaXNjb3BhbmVsLnYxLkRlbGV0ZU1vZHBhY2tSZXF1ZXN0GiQuZGlzY29wYW5lbC52MS5EZWxldGVNb2RwYWNrUmVzcG9uc2USXQoOVG9nZ2xlRmF2b3JpdGUSJC5kaXNjb3BhbmVsLnYxLlRvZ2dsZUZhdm9yaXRlUmVxdWVzdBolLmRpc2NvcGFuZWwudjEuVG9nZ2xlRmF2b3JpdGVSZXNwb25zZRJaCg1MaXN0RmF2b3JpdGVzEiMuZGlzY29wYW5lbC52MS5MaXN0RmF2b3JpdGVzUmVxdWVzdBokLmRpc2NvcGFuZWwudjEuTGlzdEZhdm9yaXRlc1Jlc3BvbnNlEmMKEEdldEluZGV4ZXJTdGF0dXMSJi5kaXNjb3BhbmVsLnYxLkdldEluZGV4ZXJTdGF0dXNSZXF1ZXN0GicuZGlzY29wYW5lbC52MS5HZXRJbmRleGVyU3RhdHVzUmVzcG9uc2USYwoQR2V0TW9kcGFja0NvbmZpZxImLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja0NvbmZpZ1JlcXVlc3QaJy5kaXNjb3BhbmVsLnYxLkdldE1vZHBhY2tDb25maWdSZXNwb25zZRJgCg9HZXRNb2RwYWNrRmlsZXMSJS5kaXNjb3BhbmVsLnYxLkdldE1vZHBhY2tGaWxlc1JlcXVlc3QaJi5kaXNjb3BhbmVsLnYxLkdldE1vZHBhY2tGaWxlc1Jlc3BvbnNlEmkKEkdldE1vZHBhY2tWZXJzaW9ucxIoLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja1ZlcnNpb25zUmVxdWVzdBopLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja1ZlcnNpb25zUmVzcG9uc2USYwoQU3luY01vZHBhY2tGaWxlcxImLmRpc2NvcGFuZWwudjEuU3luY01vZHBhY2tGaWxlc1JlcXVlc3QaJy5kaXNjb3BhbmVsLnYxLlN5bmNNb2RwYWNrRmlsZXNSZXNwb25zZUJGWkRnaXRodWIuY29tL25pY2toZXllci9kaXNjb3BhbmVsL3BrZy9wcm90by9kaXNjb3BhbmVsL3YxO2Rpc2NvcGFuZWx2MWIGcHJvdG8z',
+		[file_google_protobuf_timestamp]
+	);
 
 /**
  * Indexed modpack metadata
  *
  * @generated from message discopanel.v1.IndexedModpack
  */
-export type IndexedModpack = Message<"discopanel.v1.IndexedModpack"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type IndexedModpack = Message<'discopanel.v1.IndexedModpack'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string indexer_id = 2;
-   */
-  indexerId: string;
+	/**
+	 * @generated from field: string indexer_id = 2;
+	 */
+	indexerId: string;
 
-  /**
-   * @generated from field: string indexer = 3;
-   */
-  indexer: string;
+	/**
+	 * @generated from field: string indexer = 3;
+	 */
+	indexer: string;
 
-  /**
-   * @generated from field: string name = 4;
-   */
-  name: string;
+	/**
+	 * @generated from field: string name = 4;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string slug = 5;
-   */
-  slug: string;
+	/**
+	 * @generated from field: string slug = 5;
+	 */
+	slug: string;
 
-  /**
-   * @generated from field: string summary = 6;
-   */
-  summary: string;
+	/**
+	 * @generated from field: string summary = 6;
+	 */
+	summary: string;
 
-  /**
-   * @generated from field: string description = 7;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 7;
+	 */
+	description: string;
 
-  /**
-   * @generated from field: string logo_url = 8;
-   */
-  logoUrl: string;
+	/**
+	 * @generated from field: string logo_url = 8;
+	 */
+	logoUrl: string;
 
-  /**
-   * @generated from field: string website_url = 9;
-   */
-  websiteUrl: string;
+	/**
+	 * @generated from field: string website_url = 9;
+	 */
+	websiteUrl: string;
 
-  /**
-   * @generated from field: int32 download_count = 10;
-   */
-  downloadCount: number;
+	/**
+	 * @generated from field: int32 download_count = 10;
+	 */
+	downloadCount: number;
 
-  /**
-   * JSON array
-   *
-   * @generated from field: string categories = 11;
-   */
-  categories: string;
+	/**
+	 * JSON array
+	 *
+	 * @generated from field: string categories = 11;
+	 */
+	categories: string;
 
-  /**
-   * JSON array
-   *
-   * @generated from field: string game_versions = 12;
-   */
-  gameVersions: string;
+	/**
+	 * JSON array
+	 *
+	 * @generated from field: string game_versions = 12;
+	 */
+	gameVersions: string;
 
-  /**
-   * JSON array
-   *
-   * @generated from field: string mod_loaders = 13;
-   */
-  modLoaders: string;
+	/**
+	 * JSON array
+	 *
+	 * @generated from field: string mod_loaders = 13;
+	 */
+	modLoaders: string;
 
-  /**
-   * @generated from field: string latest_file_id = 14;
-   */
-  latestFileId: string;
+	/**
+	 * @generated from field: string latest_file_id = 14;
+	 */
+	latestFileId: string;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp date_created = 15;
-   */
-  dateCreated?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp date_created = 15;
+	 */
+	dateCreated?: Timestamp | undefined;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp date_modified = 16;
-   */
-  dateModified?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp date_modified = 16;
+	 */
+	dateModified?: Timestamp | undefined;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp date_released = 17;
-   */
-  dateReleased?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp date_released = 17;
+	 */
+	dateReleased?: Timestamp | undefined;
 
-  /**
-   * @generated from field: string mc_version = 18;
-   */
-  mcVersion: string;
+	/**
+	 * @generated from field: string mc_version = 18;
+	 */
+	mcVersion: string;
 
-  /**
-   * @generated from field: int32 java_version = 19;
-   */
-  javaVersion: number;
+	/**
+	 * @generated from field: int32 java_version = 19;
+	 */
+	javaVersion: number;
 
-  /**
-   * @generated from field: string docker_image = 20;
-   */
-  dockerImage: string;
+	/**
+	 * @generated from field: string docker_image = 20;
+	 */
+	dockerImage: string;
 
-  /**
-   * @generated from field: int32 recommended_ram = 21;
-   */
-  recommendedRam: number;
+	/**
+	 * @generated from field: int32 recommended_ram = 21;
+	 */
+	recommendedRam: number;
 
-  /**
-   * @generated from field: bool is_favorited = 22;
-   */
-  isFavorited: boolean;
+	/**
+	 * @generated from field: bool is_favorited = 22;
+	 */
+	isFavorited: boolean;
 };
 
 /**
  * Describes the message discopanel.v1.IndexedModpack.
  * Use `create(IndexedModpackSchema)` to create a new message.
  */
-export const IndexedModpackSchema: GenMessage<IndexedModpack> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 0);
+export const IndexedModpackSchema: GenMessage<IndexedModpack> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 0);
 
 /**
  * Modpack version file
  *
  * @generated from message discopanel.v1.ModpackFile
  */
-export type ModpackFile = Message<"discopanel.v1.ModpackFile"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type ModpackFile = Message<'discopanel.v1.ModpackFile'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string modpack_id = 2;
-   */
-  modpackId: string;
+	/**
+	 * @generated from field: string modpack_id = 2;
+	 */
+	modpackId: string;
 
-  /**
-   * @generated from field: string display_name = 3;
-   */
-  displayName: string;
+	/**
+	 * @generated from field: string display_name = 3;
+	 */
+	displayName: string;
 
-  /**
-   * @generated from field: string file_name = 4;
-   */
-  fileName: string;
+	/**
+	 * @generated from field: string file_name = 4;
+	 */
+	fileName: string;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp file_date = 5;
-   */
-  fileDate?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp file_date = 5;
+	 */
+	fileDate?: Timestamp | undefined;
 
-  /**
-   * @generated from field: int64 file_length = 6;
-   */
-  fileLength: bigint;
+	/**
+	 * @generated from field: int64 file_length = 6;
+	 */
+	fileLength: bigint;
 
-  /**
-   * @generated from field: string release_type = 7;
-   */
-  releaseType: string;
+	/**
+	 * @generated from field: string release_type = 7;
+	 */
+	releaseType: string;
 
-  /**
-   * @generated from field: string download_url = 8;
-   */
-  downloadUrl: string;
+	/**
+	 * @generated from field: string download_url = 8;
+	 */
+	downloadUrl: string;
 
-  /**
-   * @generated from field: repeated string game_versions = 9;
-   */
-  gameVersions: string[];
+	/**
+	 * @generated from field: repeated string game_versions = 9;
+	 */
+	gameVersions: string[];
 
-  /**
-   * @generated from field: int32 sort_index = 10;
-   */
-  sortIndex: number;
+	/**
+	 * @generated from field: int32 sort_index = 10;
+	 */
+	sortIndex: number;
 };
 
 /**
  * Describes the message discopanel.v1.ModpackFile.
  * Use `create(ModpackFileSchema)` to create a new message.
  */
-export const ModpackFileSchema: GenMessage<ModpackFile> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 1);
+export const ModpackFileSchema: GenMessage<ModpackFile> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 1);
 
 /**
  * Modpack search filters
  *
  * @generated from message discopanel.v1.SearchModpacksRequest
  */
-export type SearchModpacksRequest = Message<"discopanel.v1.SearchModpacksRequest"> & {
-  /**
-   * @generated from field: string query = 1;
-   */
-  query: string;
+export type SearchModpacksRequest = Message<'discopanel.v1.SearchModpacksRequest'> & {
+	/**
+	 * @generated from field: string query = 1;
+	 */
+	query: string;
 
-  /**
-   * @generated from field: string game_version = 2;
-   */
-  gameVersion: string;
+	/**
+	 * @generated from field: string game_version = 2;
+	 */
+	gameVersion: string;
 
-  /**
-   * @generated from field: string mod_loader = 3;
-   */
-  modLoader: string;
+	/**
+	 * @generated from field: string mod_loader = 3;
+	 */
+	modLoader: string;
 
-  /**
-   * @generated from field: string indexer = 4;
-   */
-  indexer: string;
+	/**
+	 * @generated from field: string indexer = 4;
+	 */
+	indexer: string;
 
-  /**
-   * @generated from field: int32 page = 5;
-   */
-  page: number;
+	/**
+	 * @generated from field: int32 page = 5;
+	 */
+	page: number;
 
-  /**
-   * @generated from field: int32 page_size = 6;
-   */
-  pageSize: number;
+	/**
+	 * @generated from field: int32 page_size = 6;
+	 */
+	pageSize: number;
 };
 
 /**
  * Describes the message discopanel.v1.SearchModpacksRequest.
  * Use `create(SearchModpacksRequestSchema)` to create a new message.
  */
-export const SearchModpacksRequestSchema: GenMessage<SearchModpacksRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 2);
+export const SearchModpacksRequestSchema: GenMessage<SearchModpacksRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 2);
 
 /**
  * Paginated search results
  *
  * @generated from message discopanel.v1.SearchModpacksResponse
  */
-export type SearchModpacksResponse = Message<"discopanel.v1.SearchModpacksResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.IndexedModpack modpacks = 1;
-   */
-  modpacks: IndexedModpack[];
+export type SearchModpacksResponse = Message<'discopanel.v1.SearchModpacksResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.IndexedModpack modpacks = 1;
+	 */
+	modpacks: IndexedModpack[];
 
-  /**
-   * @generated from field: int32 total = 2;
-   */
-  total: number;
+	/**
+	 * @generated from field: int32 total = 2;
+	 */
+	total: number;
 
-  /**
-   * @generated from field: int32 page = 3;
-   */
-  page: number;
+	/**
+	 * @generated from field: int32 page = 3;
+	 */
+	page: number;
 
-  /**
-   * @generated from field: int32 page_size = 4;
-   */
-  pageSize: number;
+	/**
+	 * @generated from field: int32 page_size = 4;
+	 */
+	pageSize: number;
 };
 
 /**
  * Describes the message discopanel.v1.SearchModpacksResponse.
  * Use `create(SearchModpacksResponseSchema)` to create a new message.
  */
-export const SearchModpacksResponseSchema: GenMessage<SearchModpacksResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 3);
+export const SearchModpacksResponseSchema: GenMessage<SearchModpacksResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 3);
 
 /**
  * Modpack lookup
  *
  * @generated from message discopanel.v1.GetModpackRequest
  */
-export type GetModpackRequest = Message<"discopanel.v1.GetModpackRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type GetModpackRequest = Message<'discopanel.v1.GetModpackRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackRequest.
  * Use `create(GetModpackRequestSchema)` to create a new message.
  */
-export const GetModpackRequestSchema: GenMessage<GetModpackRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 4);
+export const GetModpackRequestSchema: GenMessage<GetModpackRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 4);
 
 /**
  * Single modpack details
  *
  * @generated from message discopanel.v1.GetModpackResponse
  */
-export type GetModpackResponse = Message<"discopanel.v1.GetModpackResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.IndexedModpack modpack = 1;
-   */
-  modpack?: IndexedModpack | undefined;
+export type GetModpackResponse = Message<'discopanel.v1.GetModpackResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.IndexedModpack modpack = 1;
+	 */
+	modpack?: IndexedModpack | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackResponse.
  * Use `create(GetModpackResponseSchema)` to create a new message.
  */
-export const GetModpackResponseSchema: GenMessage<GetModpackResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 5);
+export const GetModpackResponseSchema: GenMessage<GetModpackResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 5);
 
 /**
  * Slug lookup
  *
  * @generated from message discopanel.v1.GetModpackBySlugRequest
  */
-export type GetModpackBySlugRequest = Message<"discopanel.v1.GetModpackBySlugRequest"> & {
-  /**
-   * @generated from field: string slug = 1;
-   */
-  slug: string;
+export type GetModpackBySlugRequest = Message<'discopanel.v1.GetModpackBySlugRequest'> & {
+	/**
+	 * @generated from field: string slug = 1;
+	 */
+	slug: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackBySlugRequest.
  * Use `create(GetModpackBySlugRequestSchema)` to create a new message.
  */
-export const GetModpackBySlugRequestSchema: GenMessage<GetModpackBySlugRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 6);
+export const GetModpackBySlugRequestSchema: GenMessage<GetModpackBySlugRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 6);
 
 /**
  * Slug lookup response (modpack may be null if not found)
  *
  * @generated from message discopanel.v1.GetModpackBySlugResponse
  */
-export type GetModpackBySlugResponse = Message<"discopanel.v1.GetModpackBySlugResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.IndexedModpack modpack = 1;
-   */
-  modpack?: IndexedModpack | undefined;
+export type GetModpackBySlugResponse = Message<'discopanel.v1.GetModpackBySlugResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.IndexedModpack modpack = 1;
+	 */
+	modpack?: IndexedModpack | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackBySlugResponse.
  * Use `create(GetModpackBySlugResponseSchema)` to create a new message.
  */
-export const GetModpackBySlugResponseSchema: GenMessage<GetModpackBySlugResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 7);
+export const GetModpackBySlugResponseSchema: GenMessage<GetModpackBySlugResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 7);
 
 /**
  * URL lookup
  *
  * @generated from message discopanel.v1.GetModpackByURLRequest
  */
-export type GetModpackByURLRequest = Message<"discopanel.v1.GetModpackByURLRequest"> & {
-  /**
-   * @generated from field: string url = 1;
-   */
-  url: string;
+export type GetModpackByURLRequest = Message<'discopanel.v1.GetModpackByURLRequest'> & {
+	/**
+	 * @generated from field: string url = 1;
+	 */
+	url: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackByURLRequest.
  * Use `create(GetModpackByURLRequestSchema)` to create a new message.
  */
-export const GetModpackByURLRequestSchema: GenMessage<GetModpackByURLRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 8);
+export const GetModpackByURLRequestSchema: GenMessage<GetModpackByURLRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 8);
 
 /**
  * URL lookup response (modpack may be null if not found)
  *
  * @generated from message discopanel.v1.GetModpackByURLResponse
  */
-export type GetModpackByURLResponse = Message<"discopanel.v1.GetModpackByURLResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.IndexedModpack modpack = 1;
-   */
-  modpack?: IndexedModpack | undefined;
+export type GetModpackByURLResponse = Message<'discopanel.v1.GetModpackByURLResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.IndexedModpack modpack = 1;
+	 */
+	modpack?: IndexedModpack | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackByURLResponse.
  * Use `create(GetModpackByURLResponseSchema)` to create a new message.
  */
-export const GetModpackByURLResponseSchema: GenMessage<GetModpackByURLResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 9);
+export const GetModpackByURLResponseSchema: GenMessage<GetModpackByURLResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 9);
 
 /**
  * External modpack sync parameters
  *
  * @generated from message discopanel.v1.SyncModpacksRequest
  */
-export type SyncModpacksRequest = Message<"discopanel.v1.SyncModpacksRequest"> & {
-  /**
-   * @generated from field: string query = 1;
-   */
-  query: string;
+export type SyncModpacksRequest = Message<'discopanel.v1.SyncModpacksRequest'> & {
+	/**
+	 * @generated from field: string query = 1;
+	 */
+	query: string;
 
-  /**
-   * @generated from field: string game_version = 2;
-   */
-  gameVersion: string;
+	/**
+	 * @generated from field: string game_version = 2;
+	 */
+	gameVersion: string;
 
-  /**
-   * @generated from field: string mod_loader = 3;
-   */
-  modLoader: string;
+	/**
+	 * @generated from field: string mod_loader = 3;
+	 */
+	modLoader: string;
 
-  /**
-   * "fuego" or "modrinth"
-   *
-   * @generated from field: string indexer = 4;
-   */
-  indexer: string;
+	/**
+	 * "fuego" or "modrinth"
+	 *
+	 * @generated from field: string indexer = 4;
+	 */
+	indexer: string;
 };
 
 /**
  * Describes the message discopanel.v1.SyncModpacksRequest.
  * Use `create(SyncModpacksRequestSchema)` to create a new message.
  */
-export const SyncModpacksRequestSchema: GenMessage<SyncModpacksRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 10);
+export const SyncModpacksRequestSchema: GenMessage<SyncModpacksRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 10);
 
 /**
  * Sync operation result
  *
  * @generated from message discopanel.v1.SyncModpacksResponse
  */
-export type SyncModpacksResponse = Message<"discopanel.v1.SyncModpacksResponse"> & {
-  /**
-   * @generated from field: int32 synced_count = 1;
-   */
-  syncedCount: number;
+export type SyncModpacksResponse = Message<'discopanel.v1.SyncModpacksResponse'> & {
+	/**
+	 * @generated from field: int32 synced_count = 1;
+	 */
+	syncedCount: number;
 
-  /**
-   * @generated from field: string message = 2;
-   */
-  message: string;
+	/**
+	 * @generated from field: string message = 2;
+	 */
+	message: string;
 };
 
 /**
  * Describes the message discopanel.v1.SyncModpacksResponse.
  * Use `create(SyncModpacksResponseSchema)` to create a new message.
  */
-export const SyncModpacksResponseSchema: GenMessage<SyncModpacksResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 11);
+export const SyncModpacksResponseSchema: GenMessage<SyncModpacksResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 11);
 
 /**
  * Import modpack from chunked upload session
  *
  * @generated from message discopanel.v1.ImportUploadedModpackRequest
  */
-export type ImportUploadedModpackRequest = Message<"discopanel.v1.ImportUploadedModpackRequest"> & {
-  /**
-   * @generated from field: string upload_session_id = 1;
-   */
-  uploadSessionId: string;
+export type ImportUploadedModpackRequest = Message<'discopanel.v1.ImportUploadedModpackRequest'> & {
+	/**
+	 * @generated from field: string upload_session_id = 1;
+	 */
+	uploadSessionId: string;
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+	/**
+	 * @generated from field: string name = 2;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string description = 3;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 3;
+	 */
+	description: string;
 };
 
 /**
  * Describes the message discopanel.v1.ImportUploadedModpackRequest.
  * Use `create(ImportUploadedModpackRequestSchema)` to create a new message.
  */
-export const ImportUploadedModpackRequestSchema: GenMessage<ImportUploadedModpackRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 12);
+export const ImportUploadedModpackRequestSchema: GenMessage<ImportUploadedModpackRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 12);
 
 /**
  * Import result
  *
  * @generated from message discopanel.v1.ImportUploadedModpackResponse
  */
-export type ImportUploadedModpackResponse = Message<"discopanel.v1.ImportUploadedModpackResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.IndexedModpack modpack = 1;
-   */
-  modpack?: IndexedModpack | undefined;
+export type ImportUploadedModpackResponse =
+	Message<'discopanel.v1.ImportUploadedModpackResponse'> & {
+		/**
+		 * @generated from field: discopanel.v1.IndexedModpack modpack = 1;
+		 */
+		modpack?: IndexedModpack | undefined;
 
-  /**
-   * @generated from field: string message = 2;
-   */
-  message: string;
-};
+		/**
+		 * @generated from field: string message = 2;
+		 */
+		message: string;
+	};
 
 /**
  * Describes the message discopanel.v1.ImportUploadedModpackResponse.
  * Use `create(ImportUploadedModpackResponseSchema)` to create a new message.
  */
-export const ImportUploadedModpackResponseSchema: GenMessage<ImportUploadedModpackResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 13);
+export const ImportUploadedModpackResponseSchema: GenMessage<ImportUploadedModpackResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 13);
 
 /**
  * Modpack to delete
  *
  * @generated from message discopanel.v1.DeleteModpackRequest
  */
-export type DeleteModpackRequest = Message<"discopanel.v1.DeleteModpackRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type DeleteModpackRequest = Message<'discopanel.v1.DeleteModpackRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 };
 
 /**
  * Describes the message discopanel.v1.DeleteModpackRequest.
  * Use `create(DeleteModpackRequestSchema)` to create a new message.
  */
-export const DeleteModpackRequestSchema: GenMessage<DeleteModpackRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 14);
+export const DeleteModpackRequestSchema: GenMessage<DeleteModpackRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 14);
 
 /**
  * Deletion confirmation
  *
  * @generated from message discopanel.v1.DeleteModpackResponse
  */
-export type DeleteModpackResponse = Message<"discopanel.v1.DeleteModpackResponse"> & {
-  /**
-   * @generated from field: string message = 1;
-   */
-  message: string;
+export type DeleteModpackResponse = Message<'discopanel.v1.DeleteModpackResponse'> & {
+	/**
+	 * @generated from field: string message = 1;
+	 */
+	message: string;
 };
 
 /**
  * Describes the message discopanel.v1.DeleteModpackResponse.
  * Use `create(DeleteModpackResponseSchema)` to create a new message.
  */
-export const DeleteModpackResponseSchema: GenMessage<DeleteModpackResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 15);
+export const DeleteModpackResponseSchema: GenMessage<DeleteModpackResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 15);
 
 /**
  * Favorite toggle target
  *
  * @generated from message discopanel.v1.ToggleFavoriteRequest
  */
-export type ToggleFavoriteRequest = Message<"discopanel.v1.ToggleFavoriteRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type ToggleFavoriteRequest = Message<'discopanel.v1.ToggleFavoriteRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 };
 
 /**
  * Describes the message discopanel.v1.ToggleFavoriteRequest.
  * Use `create(ToggleFavoriteRequestSchema)` to create a new message.
  */
-export const ToggleFavoriteRequestSchema: GenMessage<ToggleFavoriteRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 16);
+export const ToggleFavoriteRequestSchema: GenMessage<ToggleFavoriteRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 16);
 
 /**
  * Favorite status
  *
  * @generated from message discopanel.v1.ToggleFavoriteResponse
  */
-export type ToggleFavoriteResponse = Message<"discopanel.v1.ToggleFavoriteResponse"> & {
-  /**
-   * @generated from field: bool is_favorited = 1;
-   */
-  isFavorited: boolean;
+export type ToggleFavoriteResponse = Message<'discopanel.v1.ToggleFavoriteResponse'> & {
+	/**
+	 * @generated from field: bool is_favorited = 1;
+	 */
+	isFavorited: boolean;
 
-  /**
-   * @generated from field: string message = 2;
-   */
-  message: string;
+	/**
+	 * @generated from field: string message = 2;
+	 */
+	message: string;
 };
 
 /**
  * Describes the message discopanel.v1.ToggleFavoriteResponse.
  * Use `create(ToggleFavoriteResponseSchema)` to create a new message.
  */
-export const ToggleFavoriteResponseSchema: GenMessage<ToggleFavoriteResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 17);
+export const ToggleFavoriteResponseSchema: GenMessage<ToggleFavoriteResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 17);
 
 /**
  * Empty favorites request
  *
  * @generated from message discopanel.v1.ListFavoritesRequest
  */
-export type ListFavoritesRequest = Message<"discopanel.v1.ListFavoritesRequest"> & {
-};
+export type ListFavoritesRequest = Message<'discopanel.v1.ListFavoritesRequest'> & {};
 
 /**
  * Describes the message discopanel.v1.ListFavoritesRequest.
  * Use `create(ListFavoritesRequestSchema)` to create a new message.
  */
-export const ListFavoritesRequestSchema: GenMessage<ListFavoritesRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 18);
+export const ListFavoritesRequestSchema: GenMessage<ListFavoritesRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 18);
 
 /**
  * Favorited modpacks
  *
  * @generated from message discopanel.v1.ListFavoritesResponse
  */
-export type ListFavoritesResponse = Message<"discopanel.v1.ListFavoritesResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.IndexedModpack modpacks = 1;
-   */
-  modpacks: IndexedModpack[];
+export type ListFavoritesResponse = Message<'discopanel.v1.ListFavoritesResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.IndexedModpack modpacks = 1;
+	 */
+	modpacks: IndexedModpack[];
 };
 
 /**
  * Describes the message discopanel.v1.ListFavoritesResponse.
  * Use `create(ListFavoritesResponseSchema)` to create a new message.
  */
-export const ListFavoritesResponseSchema: GenMessage<ListFavoritesResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 19);
+export const ListFavoritesResponseSchema: GenMessage<ListFavoritesResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 19);
 
 /**
  * Empty status request
  *
  * @generated from message discopanel.v1.GetIndexerStatusRequest
  */
-export type GetIndexerStatusRequest = Message<"discopanel.v1.GetIndexerStatusRequest"> & {
-};
+export type GetIndexerStatusRequest = Message<'discopanel.v1.GetIndexerStatusRequest'> & {};
 
 /**
  * Describes the message discopanel.v1.GetIndexerStatusRequest.
  * Use `create(GetIndexerStatusRequestSchema)` to create a new message.
  */
-export const GetIndexerStatusRequestSchema: GenMessage<GetIndexerStatusRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 20);
+export const GetIndexerStatusRequestSchema: GenMessage<GetIndexerStatusRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 20);
 
 /**
  * Indexer system status
  *
  * @generated from message discopanel.v1.GetIndexerStatusResponse
  */
-export type GetIndexerStatusResponse = Message<"discopanel.v1.GetIndexerStatusResponse"> & {
-  /**
-   * @generated from field: map<string, bool> indexers_available = 1;
-   */
-  indexersAvailable: { [key: string]: boolean };
+export type GetIndexerStatusResponse = Message<'discopanel.v1.GetIndexerStatusResponse'> & {
+	/**
+	 * @generated from field: map<string, bool> indexers_available = 1;
+	 */
+	indexersAvailable: { [key: string]: boolean };
 
-  /**
-   * @generated from field: int32 total_modpacks = 2;
-   */
-  totalModpacks: number;
+	/**
+	 * @generated from field: int32 total_modpacks = 2;
+	 */
+	totalModpacks: number;
 
-  /**
-   * @generated from field: map<string, int32> modpacks_by_indexer = 3;
-   */
-  modpacksByIndexer: { [key: string]: number };
+	/**
+	 * @generated from field: map<string, int32> modpacks_by_indexer = 3;
+	 */
+	modpacksByIndexer: { [key: string]: number };
 };
 
 /**
  * Describes the message discopanel.v1.GetIndexerStatusResponse.
  * Use `create(GetIndexerStatusResponseSchema)` to create a new message.
  */
-export const GetIndexerStatusResponseSchema: GenMessage<GetIndexerStatusResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 21);
+export const GetIndexerStatusResponseSchema: GenMessage<GetIndexerStatusResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 21);
 
 /**
  * Config lookup
  *
  * @generated from message discopanel.v1.GetModpackConfigRequest
  */
-export type GetModpackConfigRequest = Message<"discopanel.v1.GetModpackConfigRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type GetModpackConfigRequest = Message<'discopanel.v1.GetModpackConfigRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackConfigRequest.
  * Use `create(GetModpackConfigRequestSchema)` to create a new message.
  */
-export const GetModpackConfigRequestSchema: GenMessage<GetModpackConfigRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 22);
+export const GetModpackConfigRequestSchema: GenMessage<GetModpackConfigRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 22);
 
 /**
  * Modpack configuration
  *
  * @generated from message discopanel.v1.GetModpackConfigResponse
  */
-export type GetModpackConfigResponse = Message<"discopanel.v1.GetModpackConfigResponse"> & {
-  /**
-   * @generated from field: map<string, string> config = 1;
-   */
-  config: { [key: string]: string };
+export type GetModpackConfigResponse = Message<'discopanel.v1.GetModpackConfigResponse'> & {
+	/**
+	 * @generated from field: map<string, string> config = 1;
+	 */
+	config: { [key: string]: string };
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackConfigResponse.
  * Use `create(GetModpackConfigResponseSchema)` to create a new message.
  */
-export const GetModpackConfigResponseSchema: GenMessage<GetModpackConfigResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 23);
+export const GetModpackConfigResponseSchema: GenMessage<GetModpackConfigResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 23);
 
 /**
  * Files lookup
  *
  * @generated from message discopanel.v1.GetModpackFilesRequest
  */
-export type GetModpackFilesRequest = Message<"discopanel.v1.GetModpackFilesRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type GetModpackFilesRequest = Message<'discopanel.v1.GetModpackFilesRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackFilesRequest.
  * Use `create(GetModpackFilesRequestSchema)` to create a new message.
  */
-export const GetModpackFilesRequestSchema: GenMessage<GetModpackFilesRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 24);
+export const GetModpackFilesRequestSchema: GenMessage<GetModpackFilesRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 24);
 
 /**
  * Available files list
  *
  * @generated from message discopanel.v1.GetModpackFilesResponse
  */
-export type GetModpackFilesResponse = Message<"discopanel.v1.GetModpackFilesResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ModpackFile files = 1;
-   */
-  files: ModpackFile[];
+export type GetModpackFilesResponse = Message<'discopanel.v1.GetModpackFilesResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ModpackFile files = 1;
+	 */
+	files: ModpackFile[];
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackFilesResponse.
  * Use `create(GetModpackFilesResponseSchema)` to create a new message.
  */
-export const GetModpackFilesResponseSchema: GenMessage<GetModpackFilesResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 25);
+export const GetModpackFilesResponseSchema: GenMessage<GetModpackFilesResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 25);
 
 /**
  * Modpack version info
  *
  * @generated from message discopanel.v1.Version
  */
-export type Version = Message<"discopanel.v1.Version"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type Version = Message<'discopanel.v1.Version'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string display_name = 2;
-   */
-  displayName: string;
+	/**
+	 * @generated from field: string display_name = 2;
+	 */
+	displayName: string;
 
-  /**
-   * @generated from field: string release_type = 3;
-   */
-  releaseType: string;
+	/**
+	 * @generated from field: string release_type = 3;
+	 */
+	releaseType: string;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp file_date = 4;
-   */
-  fileDate?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp file_date = 4;
+	 */
+	fileDate?: Timestamp | undefined;
 
-  /**
-   * @generated from field: int32 sort_index = 5;
-   */
-  sortIndex: number;
+	/**
+	 * @generated from field: int32 sort_index = 5;
+	 */
+	sortIndex: number;
 
-  /**
-   * @generated from field: string version_number = 6;
-   */
-  versionNumber: string;
+	/**
+	 * @generated from field: string version_number = 6;
+	 */
+	versionNumber: string;
 };
 
 /**
  * Describes the message discopanel.v1.Version.
  * Use `create(VersionSchema)` to create a new message.
  */
-export const VersionSchema: GenMessage<Version> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 26);
+export const VersionSchema: GenMessage<Version> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 26);
 
 /**
  * Version filter parameters
  *
  * @generated from message discopanel.v1.GetModpackVersionsRequest
  */
-export type GetModpackVersionsRequest = Message<"discopanel.v1.GetModpackVersionsRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type GetModpackVersionsRequest = Message<'discopanel.v1.GetModpackVersionsRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string game_version = 2;
-   */
-  gameVersion: string;
+	/**
+	 * @generated from field: string game_version = 2;
+	 */
+	gameVersion: string;
 
-  /**
-   * @generated from field: string mod_loader = 3;
-   */
-  modLoader: string;
+	/**
+	 * @generated from field: string mod_loader = 3;
+	 */
+	modLoader: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackVersionsRequest.
  * Use `create(GetModpackVersionsRequestSchema)` to create a new message.
  */
-export const GetModpackVersionsRequestSchema: GenMessage<GetModpackVersionsRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 27);
+export const GetModpackVersionsRequestSchema: GenMessage<GetModpackVersionsRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 27);
 
 /**
  * Available versions
  *
  * @generated from message discopanel.v1.GetModpackVersionsResponse
  */
-export type GetModpackVersionsResponse = Message<"discopanel.v1.GetModpackVersionsResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.Version versions = 1;
-   */
-  versions: Version[];
+export type GetModpackVersionsResponse = Message<'discopanel.v1.GetModpackVersionsResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.Version versions = 1;
+	 */
+	versions: Version[];
 };
 
 /**
  * Describes the message discopanel.v1.GetModpackVersionsResponse.
  * Use `create(GetModpackVersionsResponseSchema)` to create a new message.
  */
-export const GetModpackVersionsResponseSchema: GenMessage<GetModpackVersionsResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 28);
+export const GetModpackVersionsResponseSchema: GenMessage<GetModpackVersionsResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 28);
 
 /**
  * Files sync target
  *
  * @generated from message discopanel.v1.SyncModpackFilesRequest
  */
-export type SyncModpackFilesRequest = Message<"discopanel.v1.SyncModpackFilesRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type SyncModpackFilesRequest = Message<'discopanel.v1.SyncModpackFilesRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 };
 
 /**
  * Describes the message discopanel.v1.SyncModpackFilesRequest.
  * Use `create(SyncModpackFilesRequestSchema)` to create a new message.
  */
-export const SyncModpackFilesRequestSchema: GenMessage<SyncModpackFilesRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 29);
+export const SyncModpackFilesRequestSchema: GenMessage<SyncModpackFilesRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 29);
 
 /**
  * Files sync result
  *
  * @generated from message discopanel.v1.SyncModpackFilesResponse
  */
-export type SyncModpackFilesResponse = Message<"discopanel.v1.SyncModpackFilesResponse"> & {
-  /**
-   * @generated from field: int32 synced_count = 1;
-   */
-  syncedCount: number;
+export type SyncModpackFilesResponse = Message<'discopanel.v1.SyncModpackFilesResponse'> & {
+	/**
+	 * @generated from field: int32 synced_count = 1;
+	 */
+	syncedCount: number;
 
-  /**
-   * @generated from field: string message = 2;
-   */
-  message: string;
+	/**
+	 * @generated from field: string message = 2;
+	 */
+	message: string;
 };
 
 /**
  * Describes the message discopanel.v1.SyncModpackFilesResponse.
  * Use `create(SyncModpackFilesResponseSchema)` to create a new message.
  */
-export const SyncModpackFilesResponseSchema: GenMessage<SyncModpackFilesResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack, 30);
+export const SyncModpackFilesResponseSchema: GenMessage<SyncModpackFilesResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack, 30);
 
 /**
  * Modpack indexing and management
@@ -889,146 +923,144 @@ export const SyncModpackFilesResponseSchema: GenMessage<SyncModpackFilesResponse
  * @generated from service discopanel.v1.ModpackService
  */
 export const ModpackService: GenService<{
-  /**
-   * Query indexed modpacks
-   *
-   * @generated from rpc discopanel.v1.ModpackService.SearchModpacks
-   */
-  searchModpacks: {
-    methodKind: "unary";
-    input: typeof SearchModpacksRequestSchema;
-    output: typeof SearchModpacksResponseSchema;
-  },
-  /**
-   * Get modpack details
-   *
-   * @generated from rpc discopanel.v1.ModpackService.GetModpack
-   */
-  getModpack: {
-    methodKind: "unary";
-    input: typeof GetModpackRequestSchema;
-    output: typeof GetModpackResponseSchema;
-  },
-  /**
-   * Get modpack by slug
-   *
-   * @generated from rpc discopanel.v1.ModpackService.GetModpackBySlug
-   */
-  getModpackBySlug: {
-    methodKind: "unary";
-    input: typeof GetModpackBySlugRequestSchema;
-    output: typeof GetModpackBySlugResponseSchema;
-  },
-  /**
-   * Get modpack by website URL
-   *
-   * @generated from rpc discopanel.v1.ModpackService.GetModpackByURL
-   */
-  getModpackByURL: {
-    methodKind: "unary";
-    input: typeof GetModpackByURLRequestSchema;
-    output: typeof GetModpackByURLResponseSchema;
-  },
-  /**
-   * Fetch modpacks from external sources
-   *
-   * @generated from rpc discopanel.v1.ModpackService.SyncModpacks
-   */
-  syncModpacks: {
-    methodKind: "unary";
-    input: typeof SyncModpacksRequestSchema;
-    output: typeof SyncModpacksResponseSchema;
-  },
-  /**
-   * Import modpack from chunked upload session
-   *
-   * @generated from rpc discopanel.v1.ModpackService.ImportUploadedModpack
-   */
-  importUploadedModpack: {
-    methodKind: "unary";
-    input: typeof ImportUploadedModpackRequestSchema;
-    output: typeof ImportUploadedModpackResponseSchema;
-  },
-  /**
-   * Remove indexed modpack
-   *
-   * @generated from rpc discopanel.v1.ModpackService.DeleteModpack
-   */
-  deleteModpack: {
-    methodKind: "unary";
-    input: typeof DeleteModpackRequestSchema;
-    output: typeof DeleteModpackResponseSchema;
-  },
-  /**
-   * Mark modpack as favorite
-   *
-   * @generated from rpc discopanel.v1.ModpackService.ToggleFavorite
-   */
-  toggleFavorite: {
-    methodKind: "unary";
-    input: typeof ToggleFavoriteRequestSchema;
-    output: typeof ToggleFavoriteResponseSchema;
-  },
-  /**
-   * Get favorited modpacks
-   *
-   * @generated from rpc discopanel.v1.ModpackService.ListFavorites
-   */
-  listFavorites: {
-    methodKind: "unary";
-    input: typeof ListFavoritesRequestSchema;
-    output: typeof ListFavoritesResponseSchema;
-  },
-  /**
-   * Check indexer availability
-   *
-   * @generated from rpc discopanel.v1.ModpackService.GetIndexerStatus
-   */
-  getIndexerStatus: {
-    methodKind: "unary";
-    input: typeof GetIndexerStatusRequestSchema;
-    output: typeof GetIndexerStatusResponseSchema;
-  },
-  /**
-   * Get modpack configuration
-   *
-   * @generated from rpc discopanel.v1.ModpackService.GetModpackConfig
-   */
-  getModpackConfig: {
-    methodKind: "unary";
-    input: typeof GetModpackConfigRequestSchema;
-    output: typeof GetModpackConfigResponseSchema;
-  },
-  /**
-   * List modpack file versions
-   *
-   * @generated from rpc discopanel.v1.ModpackService.GetModpackFiles
-   */
-  getModpackFiles: {
-    methodKind: "unary";
-    input: typeof GetModpackFilesRequestSchema;
-    output: typeof GetModpackFilesResponseSchema;
-  },
-  /**
-   * List available versions
-   *
-   * @generated from rpc discopanel.v1.ModpackService.GetModpackVersions
-   */
-  getModpackVersions: {
-    methodKind: "unary";
-    input: typeof GetModpackVersionsRequestSchema;
-    output: typeof GetModpackVersionsResponseSchema;
-  },
-  /**
-   * Sync version files from source
-   *
-   * @generated from rpc discopanel.v1.ModpackService.SyncModpackFiles
-   */
-  syncModpackFiles: {
-    methodKind: "unary";
-    input: typeof SyncModpackFilesRequestSchema;
-    output: typeof SyncModpackFilesResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_discopanel_v1_modpack, 0);
-
+	/**
+	 * Query indexed modpacks
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.SearchModpacks
+	 */
+	searchModpacks: {
+		methodKind: 'unary';
+		input: typeof SearchModpacksRequestSchema;
+		output: typeof SearchModpacksResponseSchema;
+	};
+	/**
+	 * Get modpack details
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.GetModpack
+	 */
+	getModpack: {
+		methodKind: 'unary';
+		input: typeof GetModpackRequestSchema;
+		output: typeof GetModpackResponseSchema;
+	};
+	/**
+	 * Get modpack by slug
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.GetModpackBySlug
+	 */
+	getModpackBySlug: {
+		methodKind: 'unary';
+		input: typeof GetModpackBySlugRequestSchema;
+		output: typeof GetModpackBySlugResponseSchema;
+	};
+	/**
+	 * Get modpack by website URL
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.GetModpackByURL
+	 */
+	getModpackByURL: {
+		methodKind: 'unary';
+		input: typeof GetModpackByURLRequestSchema;
+		output: typeof GetModpackByURLResponseSchema;
+	};
+	/**
+	 * Fetch modpacks from external sources
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.SyncModpacks
+	 */
+	syncModpacks: {
+		methodKind: 'unary';
+		input: typeof SyncModpacksRequestSchema;
+		output: typeof SyncModpacksResponseSchema;
+	};
+	/**
+	 * Import modpack from chunked upload session
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.ImportUploadedModpack
+	 */
+	importUploadedModpack: {
+		methodKind: 'unary';
+		input: typeof ImportUploadedModpackRequestSchema;
+		output: typeof ImportUploadedModpackResponseSchema;
+	};
+	/**
+	 * Remove indexed modpack
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.DeleteModpack
+	 */
+	deleteModpack: {
+		methodKind: 'unary';
+		input: typeof DeleteModpackRequestSchema;
+		output: typeof DeleteModpackResponseSchema;
+	};
+	/**
+	 * Mark modpack as favorite
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.ToggleFavorite
+	 */
+	toggleFavorite: {
+		methodKind: 'unary';
+		input: typeof ToggleFavoriteRequestSchema;
+		output: typeof ToggleFavoriteResponseSchema;
+	};
+	/**
+	 * Get favorited modpacks
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.ListFavorites
+	 */
+	listFavorites: {
+		methodKind: 'unary';
+		input: typeof ListFavoritesRequestSchema;
+		output: typeof ListFavoritesResponseSchema;
+	};
+	/**
+	 * Check indexer availability
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.GetIndexerStatus
+	 */
+	getIndexerStatus: {
+		methodKind: 'unary';
+		input: typeof GetIndexerStatusRequestSchema;
+		output: typeof GetIndexerStatusResponseSchema;
+	};
+	/**
+	 * Get modpack configuration
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.GetModpackConfig
+	 */
+	getModpackConfig: {
+		methodKind: 'unary';
+		input: typeof GetModpackConfigRequestSchema;
+		output: typeof GetModpackConfigResponseSchema;
+	};
+	/**
+	 * List modpack file versions
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.GetModpackFiles
+	 */
+	getModpackFiles: {
+		methodKind: 'unary';
+		input: typeof GetModpackFilesRequestSchema;
+		output: typeof GetModpackFilesResponseSchema;
+	};
+	/**
+	 * List available versions
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.GetModpackVersions
+	 */
+	getModpackVersions: {
+		methodKind: 'unary';
+		input: typeof GetModpackVersionsRequestSchema;
+		output: typeof GetModpackVersionsResponseSchema;
+	};
+	/**
+	 * Sync version files from source
+	 *
+	 * @generated from rpc discopanel.v1.ModpackService.SyncModpackFiles
+	 */
+	syncModpackFiles: {
+		methodKind: 'unary';
+		input: typeof SyncModpackFilesRequestSchema;
+		output: typeof SyncModpackFilesResponseSchema;
+	};
+}> = /*@__PURE__*/ serviceDesc(file_discopanel_v1_modpack, 0);

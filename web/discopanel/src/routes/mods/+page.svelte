@@ -221,9 +221,7 @@
 		isDialogOpen = true;
 	}
 
-	let displayProjects = $derived(
-		showFavorites ? favorites : (searchResults?.hits || [])
-	);
+	let displayProjects = $derived(showFavorites ? favorites : searchResults?.hits || []);
 
 	let totalPages = $derived(
 		searchResults ? Math.ceil(searchResults.total_hits / searchParams.pageSize) : 1
@@ -239,7 +237,7 @@
 	<div class="flex items-center justify-between border-b-2 border-border/50 pb-6">
 		<div class="flex items-center gap-4">
 			<div
-				class="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary/20 to-primary/10 shadow-lg text-primary"
+				class="flex h-16 w-16 items-center justify-center rounded-2xl bg-linear-to-br from-primary/20 to-primary/10 text-primary shadow-lg"
 			>
 				<Blocks class="h-8 w-8" />
 			</div>
@@ -277,19 +275,19 @@
 	<!-- Search & Filter Controls -->
 	{#if !showFavorites}
 		<div class="flex flex-col gap-4">
-			<div class="grid grid-cols-1 sm:grid-cols-2 lg:flex lg:flex-wrap gap-2">
+			<div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:flex lg:flex-wrap">
 				<!-- Search text input -->
-				<div class="col-span-1 sm:col-span-2 lg:flex-1 lg:min-w-64 flex gap-2">
+				<div class="col-span-1 flex gap-2 sm:col-span-2 lg:min-w-64 lg:flex-1">
 					<Input
 						placeholder="Search mods & resource packs..."
 						bind:value={searchParams.query}
 						onkeydown={(e) => e.key === 'Enter' && performSearch(true)}
-						class="flex-1 h-10"
+						class="h-10 flex-1"
 					/>
 					<Button
 						onclick={() => performSearch(true)}
 						disabled={loading}
-						class="lg:hidden bg-linear-to-r from-primary to-primary/80 h-10 shrink-0 px-3"
+						class="h-10 shrink-0 bg-linear-to-r from-primary to-primary/80 px-3 lg:hidden"
 					>
 						{#if loading}
 							<Loader2 class="h-4 w-4 animate-spin" />
@@ -311,7 +309,7 @@
 					}}
 					disabled={loading}
 				>
-					<SelectTrigger class="w-full lg:w-40 h-10">
+					<SelectTrigger class="h-10 w-full lg:w-40">
 						<span>
 							{searchParams.projectType === 'all'
 								? 'All Types'
@@ -345,7 +343,7 @@
 					}}
 					disabled={loading}
 				>
-					<SelectTrigger class="w-full lg:w-44 h-10">
+					<SelectTrigger class="h-10 w-full lg:w-44">
 						<span>
 							{searchParams.environment === 'all'
 								? 'All Environments'
@@ -377,7 +375,7 @@
 					}}
 					disabled={loading}
 				>
-					<SelectTrigger class="w-full lg:w-36 h-10">
+					<SelectTrigger class="h-10 w-full lg:w-36">
 						<span>{searchParams.gameVersion || 'All Versions'}</span>
 					</SelectTrigger>
 					<SelectContent class="max-h-64">
@@ -398,7 +396,7 @@
 					}}
 					disabled={loading}
 				>
-					<SelectTrigger class="w-full lg:w-36 h-10">
+					<SelectTrigger class="h-10 w-full lg:w-36">
 						<span>
 							{searchParams.modLoader
 								? modLoaders.find((l) => l.value === searchParams.modLoader)?.label ||
@@ -425,7 +423,7 @@
 					}}
 					disabled={loading}
 				>
-					<SelectTrigger class="w-full lg:w-40 h-10">
+					<SelectTrigger class="h-10 w-full lg:w-40">
 						<span>
 							{searchParams.sortBy === 'downloads'
 								? 'Most Downloads'
@@ -451,7 +449,7 @@
 				<Button
 					onclick={() => performSearch(true)}
 					disabled={loading}
-					class="hidden lg:flex bg-linear-to-r from-primary to-primary/80 shadow-md transition-all hover:scale-[1.02] hover:from-primary/90 hover:to-primary/70 hover:shadow-lg h-10"
+					class="hidden h-10 bg-linear-to-r from-primary to-primary/80 shadow-md transition-all hover:scale-[1.02] hover:from-primary/90 hover:to-primary/70 hover:shadow-lg lg:flex"
 				>
 					{#if loading}
 						<Loader2 class="mr-2 h-4 w-4 animate-spin" />
@@ -467,7 +465,7 @@
 
 	<!-- Results Cards Grid -->
 	{#if loading}
-		<div class="flex flex-col items-center justify-center py-24 text-muted-foreground space-y-4">
+		<div class="flex flex-col items-center justify-center space-y-4 py-24 text-muted-foreground">
 			<Loader2 class="h-10 w-10 animate-spin text-primary" />
 			<p class="text-sm font-medium">Fetching content from Modrinth...</p>
 		</div>
@@ -478,7 +476,7 @@
 					class="group relative flex flex-col justify-between overflow-hidden border-2 bg-linear-to-br from-card to-card/80 transition-all duration-300 hover:border-primary/50 hover:shadow-2xl"
 				>
 					<div
-						class="absolute inset-0 bg-linear-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100 pointer-events-none"
+						class="pointer-events-none absolute inset-0 bg-linear-to-br from-primary/10 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
 					></div>
 
 					<div>
@@ -488,11 +486,11 @@
 									<img
 										src={project.icon_url}
 										alt={project.title}
-										class="h-16 w-16 rounded-xl object-cover shadow-sm shrink-0"
+										class="h-16 w-16 shrink-0 rounded-xl object-cover shadow-sm"
 									/>
 								{:else}
 									<div
-										class="flex h-16 w-16 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-sm shrink-0"
+										class="flex h-16 w-16 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary shadow-sm"
 									>
 										{#if project.project_type === 'resourcepack'}
 											<Layers class="h-8 w-8" />
@@ -506,32 +504,41 @@
 									<CardTitle class="line-clamp-1 text-lg font-semibold tracking-tight">
 										{project.title}
 									</CardTitle>
-									<p class="text-xs text-muted-foreground mt-0.5">
+									<p class="mt-0.5 text-xs text-muted-foreground">
 										by <span class="font-medium text-foreground">{project.author}</span>
 									</p>
-									<div class="mt-1.5 flex items-center gap-1.5 flex-wrap">
+									<div class="mt-1.5 flex flex-wrap items-center gap-1.5">
 										<Badge variant="secondary" class="text-[10px] font-semibold uppercase">
-											{project.project_type === 'resourcepack' ? 'Resource Pack' : project.project_type}
+											{project.project_type === 'resourcepack'
+												? 'Resource Pack'
+												: project.project_type}
 										</Badge>
 										{#if project.project_type === 'mod'}
 											{#if project.server_side === 'unsupported'}
-												<Badge variant="outline" class="text-[10px] text-amber-500 border-amber-500/30">
+												<Badge
+													variant="outline"
+													class="border-amber-500/30 text-[10px] text-amber-500"
+												>
 													Client Only
 												</Badge>
 											{:else if project.client_side === 'unsupported'}
-												<Badge variant="outline" class="text-[10px] text-blue-500 border-blue-500/30">
+												<Badge
+													variant="outline"
+													class="border-blue-500/30 text-[10px] text-blue-500"
+												>
 													Server Only
 												</Badge>
 											{:else if project.server_side && project.client_side}
-												<Badge variant="outline" class="text-[10px] text-emerald-500 border-emerald-500/30">
+												<Badge
+													variant="outline"
+													class="border-emerald-500/30 text-[10px] text-emerald-500"
+												>
 													Server & Client
 												</Badge>
 											{/if}
 										{/if}
-										<Badge variant="outline" class="text-[10px]">
-											modrinth
-										</Badge>
-										<span class="text-xs text-muted-foreground flex items-center gap-1 ml-auto">
+										<Badge variant="outline" class="text-[10px]">modrinth</Badge>
+										<span class="ml-auto flex items-center gap-1 text-xs text-muted-foreground">
 											<Download class="h-3 w-3" />
 											{formatNumber(project.downloads)}
 										</span>
@@ -542,10 +549,12 @@
 									size="icon"
 									variant={isFavorited(project.project_id) ? 'default' : 'outline'}
 									onclick={() => toggleFavorite(project)}
-									class="transition-transform hover:scale-110 shrink-0 h-8 w-8"
+									class="h-8 w-8 shrink-0 transition-transform hover:scale-110"
 									title={isFavorited(project.project_id) ? 'Remove favorite' : 'Add favorite'}
 								>
-									<Heart class={`h-4 w-4 ${isFavorited(project.project_id) ? 'fill-current' : ''}`} />
+									<Heart
+										class={`h-4 w-4 ${isFavorited(project.project_id) ? 'fill-current' : ''}`}
+									/>
 								</Button>
 							</div>
 						</CardHeader>
@@ -563,14 +572,16 @@
 											<Badge variant="outline" class="text-[10px] lowercase">{cat}</Badge>
 										{/each}
 										{#if project.categories.length > 4}
-											<span class="text-[10px] text-muted-foreground">+{project.categories.length - 4}</span>
+											<span class="text-[10px] text-muted-foreground"
+												>+{project.categories.length - 4}</span
+											>
 										{/if}
 									</div>
 								{/if}
 
 								<!-- Versions preview -->
 								{#if project.versions?.length > 0}
-									<div class="text-xs text-muted-foreground truncate">
+									<div class="truncate text-xs text-muted-foreground">
 										MC: {project.versions.slice(0, 3).join(', ')}
 										{#if project.versions.length > 3}
 											+{project.versions.length - 3} more
@@ -588,7 +599,7 @@
 							target="_blank"
 							rel="noopener noreferrer"
 						>
-							<Button variant="outline" size="sm" class="text-xs h-8">
+							<Button variant="outline" size="sm" class="h-8 text-xs">
 								<ExternalLink class="mr-1 h-3 w-3" />
 								View
 							</Button>
@@ -597,7 +608,7 @@
 						<Button
 							size="sm"
 							onclick={() => openUseInServer(project)}
-							class="text-xs font-semibold shadow-sm transition-all hover:scale-[1.02] hover:shadow-md h-8 bg-linear-to-r from-primary to-primary/85"
+							class="h-8 bg-linear-to-r from-primary to-primary/85 text-xs font-semibold shadow-sm transition-all hover:scale-[1.02] hover:shadow-md"
 						>
 							<Download class="mr-1.5 h-3.5 w-3.5" />
 							Use in Server
@@ -640,26 +651,29 @@
 
 		<!-- Empty States -->
 		{#if displayProjects.length === 0}
-			<div class="py-20 text-center space-y-3">
-				<div class="flex h-12 w-12 items-center justify-center rounded-full bg-muted mx-auto text-muted-foreground">
+			<div class="space-y-3 py-20 text-center">
+				<div
+					class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted text-muted-foreground"
+				>
 					{#if showFavorites}
 						<Heart class="h-6 w-6" />
 					{:else}
 						<Blocks class="h-6 w-6" />
 					{/if}
 				</div>
-				<h3 class="font-semibold text-lg">
+				<h3 class="text-lg font-semibold">
 					{#if showFavorites}
 						No favorite items yet
 					{:else}
 						No mods or resource packs found
 					{/if}
 				</h3>
-				<p class="text-sm text-muted-foreground max-w-md mx-auto">
+				<p class="mx-auto max-w-md text-sm text-muted-foreground">
 					{#if showFavorites}
 						Browse mods and resource packs and click the heart icon on any card to save favorites.
 					{:else if searchParams.query}
-						No results found for "{searchParams.query}". Try searching with different keywords or clearing filters.
+						No results found for "{searchParams.query}". Try searching with different keywords or
+						clearing filters.
 					{:else}
 						Try adjusting your filters to find what you are looking for.
 					{/if}

@@ -295,7 +295,7 @@
 										title="Start {server.name}"
 										aria-label="Start {server.name}"
 										disabled={loading}
-										class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-green-500/10 hover:text-green-500 disabled:opacity-50"
+										class="flex h-9 w-9 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-green-500/10 hover:text-green-500 disabled:opacity-50 sm:h-8 sm:w-8"
 										onclick={() => handleServerAction('start', server)}
 									>
 										<Play class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
@@ -306,7 +306,7 @@
 										title="Stop {server.name}"
 										aria-label="Stop {server.name}"
 										disabled={loading}
-										class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50"
+										class="flex h-9 w-9 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:opacity-50 sm:h-8 sm:w-8"
 										onclick={() => handleServerAction('stop', server)}
 									>
 										<Square class="h-3 w-3 sm:h-2.5 sm:w-2.5" />
@@ -317,7 +317,7 @@
 										title="Restart {server.name}"
 										aria-label="Restart {server.name}"
 										disabled={loading}
-										class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-yellow-500/10 hover:text-yellow-500 disabled:opacity-50"
+										class="flex h-9 w-9 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-yellow-500/10 hover:text-yellow-500 disabled:opacity-50 sm:h-8 sm:w-8"
 										onclick={() => handleServerAction('restart', server)}
 									>
 										<RotateCw class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
@@ -327,7 +327,7 @@
 									title="Recreate {server.name}"
 									aria-label="Recreate {server.name}"
 									disabled={loading}
-									class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50"
+									class="flex h-9 w-9 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-muted disabled:opacity-50 sm:h-8 sm:w-8"
 									onclick={() => handleServerAction('recreate', server)}
 								>
 									<RefreshCcw class="h-3.5 w-3.5 sm:h-3 sm:w-3" />
@@ -336,7 +336,7 @@
 									title="Save {server.name} as Template"
 									aria-label="Save {server.name} as Template"
 									disabled={loading}
-									class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+									class="flex h-9 w-9 items-center justify-center border-r border-border/60 text-muted-foreground transition-colors hover:bg-primary/10 hover:text-primary disabled:opacity-50 sm:h-8 sm:w-8"
 									onclick={() => {
 										saveTemplateServer = server;
 										saveTemplateOpen = true;
@@ -348,7 +348,7 @@
 									title="Delete {server.name}"
 									aria-label="Delete {server.name}"
 									disabled={loading}
-									class="flex h-9 w-9 sm:h-8 sm:w-8 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50"
+									class="flex h-9 w-9 items-center justify-center text-muted-foreground transition-colors hover:bg-destructive/10 hover:text-destructive disabled:opacity-50 sm:h-8 sm:w-8"
 									onclick={() => deleteServer(server)}
 								>
 									<Trash2 class="h-3.5 w-3.5 sm:h-3 sm:w-3" />

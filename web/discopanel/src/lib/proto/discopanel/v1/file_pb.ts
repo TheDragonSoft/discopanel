@@ -2,773 +2,804 @@
 // @generated from file discopanel/v1/file.proto (package discopanel.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenFile, GenMessage, GenService } from '@bufbuild/protobuf/codegenv2';
+import { fileDesc, messageDesc, serviceDesc } from '@bufbuild/protobuf/codegenv2';
+import type { Message } from '@bufbuild/protobuf';
 
 /**
  * Describes the file discopanel/v1/file.proto.
  */
-export const file_discopanel_v1_file: GenFile = /*@__PURE__*/
-  fileDesc("ChhkaXNjb3BhbmVsL3YxL2ZpbGUucHJvdG8SDWRpc2NvcGFuZWwudjEilgEKCEZpbGVJbmZvEgwKBG5hbWUYASABKAkSDAoEcGF0aBgCIAEoCRIOCgZpc19kaXIYAyABKAgSDAoEc2l6ZRgEIAEoAxIQCghtb2RpZmllZBgFIAEoAxITCgtpc19lZGl0YWJsZRgGIAEoCBIpCghjaGlsZHJlbhgHIAMoCzIXLmRpc2NvcGFuZWwudjEuRmlsZUluZm8iQQoQTGlzdEZpbGVzUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkSDAoEcGF0aBgCIAEoCRIMCgR0cmVlGAMgASgIIjsKEUxpc3RGaWxlc1Jlc3BvbnNlEiYKBWZpbGVzGAEgAygLMhcuZGlzY29wYW5lbC52MS5GaWxlSW5mbyIxCg5HZXRGaWxlUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkSDAoEcGF0aBgCIAEoCSI1Cg9HZXRGaWxlUmVzcG9uc2USDwoHY29udGVudBgBIAEoDBIRCgltaW1lX3R5cGUYAiABKAkicwoXU2F2ZVVwbG9hZGVkRmlsZVJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEhkKEXVwbG9hZF9zZXNzaW9uX2lkGAIgASgJEhgKEGRlc3RpbmF0aW9uX3BhdGgYAyABKAkSEAoIZmlsZW5hbWUYBCABKAkiOQoYU2F2ZVVwbG9hZGVkRmlsZVJlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkSDAoEcGF0aBgCIAEoCSJFChFVcGRhdGVGaWxlUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkSDAoEcGF0aBgCIAEoCRIPCgdjb250ZW50GAMgASgMIjMKElVwZGF0ZUZpbGVSZXNwb25zZRIPCgdtZXNzYWdlGAEgASgJEgwKBHBhdGgYAiABKAkiQwoRRGVsZXRlRmlsZVJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEgwKBHBhdGgYAiABKAkSDQoFcGF0aHMYAyADKAkiFAoSRGVsZXRlRmlsZVJlc3BvbnNlIjYKE0NyZWF0ZUZvbGRlclJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEgwKBHBhdGgYAiABKAkiJwoUQ3JlYXRlRm9sZGVyUmVzcG9uc2USDwoHbWVzc2FnZRgBIAEoCSJTCg9Nb3ZlRmlsZVJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEhMKC3NvdXJjZV9wYXRoGAIgASgJEhgKEGRlc3RpbmF0aW9uX3BhdGgYAyABKAkiIwoQTW92ZUZpbGVSZXNwb25zZRIPCgdtZXNzYWdlGAEgASgJIlMKD0NvcHlGaWxlUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkSEwoLc291cmNlX3BhdGgYAiABKAkSGAoQZGVzdGluYXRpb25fcGF0aBgDIAEoCSIjChBDb3B5RmlsZVJlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkiaAoUQ3JlYXRlQXJjaGl2ZVJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEg0KBXBhdGhzGAIgAygJEhgKEGRlc3RpbmF0aW9uX3BhdGgYAyABKAkSFAoMYXJjaGl2ZV9uYW1lGAQgASgJIlYKFUNyZWF0ZUFyY2hpdmVSZXNwb25zZRIPCgdtZXNzYWdlGAEgASgJEhQKDGFyY2hpdmVfcGF0aBgCIAEoCRIWCg5maWxlc19hcmNoaXZlZBgDIAEoBSI6ChZEb3dubG9hZEFyY2hpdmVSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRINCgVwYXRocxgCIAMoCSJTChdEb3dubG9hZEFyY2hpdmVSZXNwb25zZRISCgpzZXNzaW9uX2lkGAEgASgJEhAKCGZpbGVuYW1lGAIgASgJEhIKCnRvdGFsX3NpemUYAyABKAMiRgoRUmVuYW1lRmlsZVJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEgwKBHBhdGgYAiABKAkSEAoIbmV3X25hbWUYAyABKAkiNwoSUmVuYW1lRmlsZVJlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkSEAoIbmV3X3BhdGgYAiABKAkiOAoVRXh0cmFjdEFyY2hpdmVSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIMCgRwYXRoGAIgASgJIi4KFkV4dHJhY3RBcmNoaXZlUmVzcG9uc2USFAoMb3BlcmF0aW9uX2lkGAEgASgJIjIKGkdldEV4dHJhY3Rpb25TdGF0dXNSZXF1ZXN0EhQKDG9wZXJhdGlvbl9pZBgBIAEoCSJUChtHZXRFeHRyYWN0aW9uU3RhdHVzUmVzcG9uc2USDQoFc3RhdGUYASABKAkSFwoPZmlsZXNfZXh0cmFjdGVkGAIgASgFEg0KBWVycm9yGAMgASgJIjoKF0luaXRGaWxlRG93bmxvYWRSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIMCgRwYXRoGAIgASgJIlQKGEluaXRGaWxlRG93bmxvYWRSZXNwb25zZRISCgpzZXNzaW9uX2lkGAEgASgJEhAKCGZpbGVuYW1lGAIgASgJEhIKCnRvdGFsX3NpemUYAyABKAMy6AkKC0ZpbGVTZXJ2aWNlEk4KCUxpc3RGaWxlcxIfLmRpc2NvcGFuZWwudjEuTGlzdEZpbGVzUmVxdWVzdBogLmRpc2NvcGFuZWwudjEuTGlzdEZpbGVzUmVzcG9uc2USSAoHR2V0RmlsZRIdLmRpc2NvcGFuZWwudjEuR2V0RmlsZVJlcXVlc3QaHi5kaXNjb3BhbmVsLnYxLkdldEZpbGVSZXNwb25zZRJjChBTYXZlVXBsb2FkZWRGaWxlEiYuZGlzY29wYW5lbC52MS5TYXZlVXBsb2FkZWRGaWxlUmVxdWVzdBonLmRpc2NvcGFuZWwudjEuU2F2ZVVwbG9hZGVkRmlsZVJlc3BvbnNlElEKClVwZGF0ZUZpbGUSIC5kaXNjb3BhbmVsLnYxLlVwZGF0ZUZpbGVSZXF1ZXN0GiEuZGlzY29wYW5lbC52MS5VcGRhdGVGaWxlUmVzcG9uc2USUQoKRGVsZXRlRmlsZRIgLmRpc2NvcGFuZWwudjEuRGVsZXRlRmlsZVJlcXVlc3QaIS5kaXNjb3BhbmVsLnYxLkRlbGV0ZUZpbGVSZXNwb25zZRJRCgpSZW5hbWVGaWxlEiAuZGlzY29wYW5lbC52MS5SZW5hbWVGaWxlUmVxdWVzdBohLmRpc2NvcGFuZWwudjEuUmVuYW1lRmlsZVJlc3BvbnNlEl0KDkV4dHJhY3RBcmNoaXZlEiQuZGlzY29wYW5lbC52MS5FeHRyYWN0QXJjaGl2ZVJlcXVlc3QaJS5kaXNjb3BhbmVsLnYxLkV4dHJhY3RBcmNoaXZlUmVzcG9uc2USVwoMQ3JlYXRlRm9sZGVyEiIuZGlzY29wYW5lbC52MS5DcmVhdGVGb2xkZXJSZXF1ZXN0GiMuZGlzY29wYW5lbC52MS5DcmVhdGVGb2xkZXJSZXNwb25zZRJLCghNb3ZlRmlsZRIeLmRpc2NvcGFuZWwudjEuTW92ZUZpbGVSZXF1ZXN0Gh8uZGlzY29wYW5lbC52MS5Nb3ZlRmlsZVJlc3BvbnNlEksKCENvcHlGaWxlEh4uZGlzY29wYW5lbC52MS5Db3B5RmlsZVJlcXVlc3QaHy5kaXNjb3BhbmVsLnYxLkNvcHlGaWxlUmVzcG9uc2USWgoNQ3JlYXRlQXJjaGl2ZRIjLmRpc2NvcGFuZWwudjEuQ3JlYXRlQXJjaGl2ZVJlcXVlc3QaJC5kaXNjb3BhbmVsLnYxLkNyZWF0ZUFyY2hpdmVSZXNwb25zZRJgCg9Eb3dubG9hZEFyY2hpdmUSJS5kaXNjb3BhbmVsLnYxLkRvd25sb2FkQXJjaGl2ZVJlcXVlc3QaJi5kaXNjb3BhbmVsLnYxLkRvd25sb2FkQXJjaGl2ZVJlc3BvbnNlEmMKEEluaXRGaWxlRG93bmxvYWQSJi5kaXNjb3BhbmVsLnYxLkluaXRGaWxlRG93bmxvYWRSZXF1ZXN0GicuZGlzY29wYW5lbC52MS5Jbml0RmlsZURvd25sb2FkUmVzcG9uc2USbAoTR2V0RXh0cmFjdGlvblN0YXR1cxIpLmRpc2NvcGFuZWwudjEuR2V0RXh0cmFjdGlvblN0YXR1c1JlcXVlc3QaKi5kaXNjb3BhbmVsLnYxLkdldEV4dHJhY3Rpb25TdGF0dXNSZXNwb25zZUJGWkRnaXRodWIuY29tL25pY2toZXllci9kaXNjb3BhbmVsL3BrZy9wcm90by9kaXNjb3BhbmVsL3YxO2Rpc2NvcGFuZWx2MWIGcHJvdG8z");
+export const file_discopanel_v1_file: GenFile =
+	/*@__PURE__*/
+	fileDesc(
+		'ChhkaXNjb3BhbmVsL3YxL2ZpbGUucHJvdG8SDWRpc2NvcGFuZWwudjEilgEKCEZpbGVJbmZvEgwKBG5hbWUYASABKAkSDAoEcGF0aBgCIAEoCRIOCgZpc19kaXIYAyABKAgSDAoEc2l6ZRgEIAEoAxIQCghtb2RpZmllZBgFIAEoAxITCgtpc19lZGl0YWJsZRgGIAEoCBIpCghjaGlsZHJlbhgHIAMoCzIXLmRpc2NvcGFuZWwudjEuRmlsZUluZm8iQQoQTGlzdEZpbGVzUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkSDAoEcGF0aBgCIAEoCRIMCgR0cmVlGAMgASgIIjsKEUxpc3RGaWxlc1Jlc3BvbnNlEiYKBWZpbGVzGAEgAygLMhcuZGlzY29wYW5lbC52MS5GaWxlSW5mbyIxCg5HZXRGaWxlUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkSDAoEcGF0aBgCIAEoCSI1Cg9HZXRGaWxlUmVzcG9uc2USDwoHY29udGVudBgBIAEoDBIRCgltaW1lX3R5cGUYAiABKAkicwoXU2F2ZVVwbG9hZGVkRmlsZVJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEhkKEXVwbG9hZF9zZXNzaW9uX2lkGAIgASgJEhgKEGRlc3RpbmF0aW9uX3BhdGgYAyABKAkSEAoIZmlsZW5hbWUYBCABKAkiOQoYU2F2ZVVwbG9hZGVkRmlsZVJlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkSDAoEcGF0aBgCIAEoCSJFChFVcGRhdGVGaWxlUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkSDAoEcGF0aBgCIAEoCRIPCgdjb250ZW50GAMgASgMIjMKElVwZGF0ZUZpbGVSZXNwb25zZRIPCgdtZXNzYWdlGAEgASgJEgwKBHBhdGgYAiABKAkiQwoRRGVsZXRlRmlsZVJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEgwKBHBhdGgYAiABKAkSDQoFcGF0aHMYAyADKAkiFAoSRGVsZXRlRmlsZVJlc3BvbnNlIjYKE0NyZWF0ZUZvbGRlclJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEgwKBHBhdGgYAiABKAkiJwoUQ3JlYXRlRm9sZGVyUmVzcG9uc2USDwoHbWVzc2FnZRgBIAEoCSJTCg9Nb3ZlRmlsZVJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEhMKC3NvdXJjZV9wYXRoGAIgASgJEhgKEGRlc3RpbmF0aW9uX3BhdGgYAyABKAkiIwoQTW92ZUZpbGVSZXNwb25zZRIPCgdtZXNzYWdlGAEgASgJIlMKD0NvcHlGaWxlUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkSEwoLc291cmNlX3BhdGgYAiABKAkSGAoQZGVzdGluYXRpb25fcGF0aBgDIAEoCSIjChBDb3B5RmlsZVJlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkiaAoUQ3JlYXRlQXJjaGl2ZVJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEg0KBXBhdGhzGAIgAygJEhgKEGRlc3RpbmF0aW9uX3BhdGgYAyABKAkSFAoMYXJjaGl2ZV9uYW1lGAQgASgJIlYKFUNyZWF0ZUFyY2hpdmVSZXNwb25zZRIPCgdtZXNzYWdlGAEgASgJEhQKDGFyY2hpdmVfcGF0aBgCIAEoCRIWCg5maWxlc19hcmNoaXZlZBgDIAEoBSI6ChZEb3dubG9hZEFyY2hpdmVSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRINCgVwYXRocxgCIAMoCSJTChdEb3dubG9hZEFyY2hpdmVSZXNwb25zZRISCgpzZXNzaW9uX2lkGAEgASgJEhAKCGZpbGVuYW1lGAIgASgJEhIKCnRvdGFsX3NpemUYAyABKAMiRgoRUmVuYW1lRmlsZVJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEgwKBHBhdGgYAiABKAkSEAoIbmV3X25hbWUYAyABKAkiNwoSUmVuYW1lRmlsZVJlc3BvbnNlEg8KB21lc3NhZ2UYASABKAkSEAoIbmV3X3BhdGgYAiABKAkiOAoVRXh0cmFjdEFyY2hpdmVSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIMCgRwYXRoGAIgASgJIi4KFkV4dHJhY3RBcmNoaXZlUmVzcG9uc2USFAoMb3BlcmF0aW9uX2lkGAEgASgJIjIKGkdldEV4dHJhY3Rpb25TdGF0dXNSZXF1ZXN0EhQKDG9wZXJhdGlvbl9pZBgBIAEoCSJUChtHZXRFeHRyYWN0aW9uU3RhdHVzUmVzcG9uc2USDQoFc3RhdGUYASABKAkSFwoPZmlsZXNfZXh0cmFjdGVkGAIgASgFEg0KBWVycm9yGAMgASgJIjoKF0luaXRGaWxlRG93bmxvYWRSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIMCgRwYXRoGAIgASgJIlQKGEluaXRGaWxlRG93bmxvYWRSZXNwb25zZRISCgpzZXNzaW9uX2lkGAEgASgJEhAKCGZpbGVuYW1lGAIgASgJEhIKCnRvdGFsX3NpemUYAyABKAMy6AkKC0ZpbGVTZXJ2aWNlEk4KCUxpc3RGaWxlcxIfLmRpc2NvcGFuZWwudjEuTGlzdEZpbGVzUmVxdWVzdBogLmRpc2NvcGFuZWwudjEuTGlzdEZpbGVzUmVzcG9uc2USSAoHR2V0RmlsZRIdLmRpc2NvcGFuZWwudjEuR2V0RmlsZVJlcXVlc3QaHi5kaXNjb3BhbmVsLnYxLkdldEZpbGVSZXNwb25zZRJjChBTYXZlVXBsb2FkZWRGaWxlEiYuZGlzY29wYW5lbC52MS5TYXZlVXBsb2FkZWRGaWxlUmVxdWVzdBonLmRpc2NvcGFuZWwudjEuU2F2ZVVwbG9hZGVkRmlsZVJlc3BvbnNlElEKClVwZGF0ZUZpbGUSIC5kaXNjb3BhbmVsLnYxLlVwZGF0ZUZpbGVSZXF1ZXN0GiEuZGlzY29wYW5lbC52MS5VcGRhdGVGaWxlUmVzcG9uc2USUQoKRGVsZXRlRmlsZRIgLmRpc2NvcGFuZWwudjEuRGVsZXRlRmlsZVJlcXVlc3QaIS5kaXNjb3BhbmVsLnYxLkRlbGV0ZUZpbGVSZXNwb25zZRJRCgpSZW5hbWVGaWxlEiAuZGlzY29wYW5lbC52MS5SZW5hbWVGaWxlUmVxdWVzdBohLmRpc2NvcGFuZWwudjEuUmVuYW1lRmlsZVJlc3BvbnNlEl0KDkV4dHJhY3RBcmNoaXZlEiQuZGlzY29wYW5lbC52MS5FeHRyYWN0QXJjaGl2ZVJlcXVlc3QaJS5kaXNjb3BhbmVsLnYxLkV4dHJhY3RBcmNoaXZlUmVzcG9uc2USVwoMQ3JlYXRlRm9sZGVyEiIuZGlzY29wYW5lbC52MS5DcmVhdGVGb2xkZXJSZXF1ZXN0GiMuZGlzY29wYW5lbC52MS5DcmVhdGVGb2xkZXJSZXNwb25zZRJLCghNb3ZlRmlsZRIeLmRpc2NvcGFuZWwudjEuTW92ZUZpbGVSZXF1ZXN0Gh8uZGlzY29wYW5lbC52MS5Nb3ZlRmlsZVJlc3BvbnNlEksKCENvcHlGaWxlEh4uZGlzY29wYW5lbC52MS5Db3B5RmlsZVJlcXVlc3QaHy5kaXNjb3BhbmVsLnYxLkNvcHlGaWxlUmVzcG9uc2USWgoNQ3JlYXRlQXJjaGl2ZRIjLmRpc2NvcGFuZWwudjEuQ3JlYXRlQXJjaGl2ZVJlcXVlc3QaJC5kaXNjb3BhbmVsLnYxLkNyZWF0ZUFyY2hpdmVSZXNwb25zZRJgCg9Eb3dubG9hZEFyY2hpdmUSJS5kaXNjb3BhbmVsLnYxLkRvd25sb2FkQXJjaGl2ZVJlcXVlc3QaJi5kaXNjb3BhbmVsLnYxLkRvd25sb2FkQXJjaGl2ZVJlc3BvbnNlEmMKEEluaXRGaWxlRG93bmxvYWQSJi5kaXNjb3BhbmVsLnYxLkluaXRGaWxlRG93bmxvYWRSZXF1ZXN0GicuZGlzY29wYW5lbC52MS5Jbml0RmlsZURvd25sb2FkUmVzcG9uc2USbAoTR2V0RXh0cmFjdGlvblN0YXR1cxIpLmRpc2NvcGFuZWwudjEuR2V0RXh0cmFjdGlvblN0YXR1c1JlcXVlc3QaKi5kaXNjb3BhbmVsLnYxLkdldEV4dHJhY3Rpb25TdGF0dXNSZXNwb25zZUJGWkRnaXRodWIuY29tL25pY2toZXllci9kaXNjb3BhbmVsL3BrZy9wcm90by9kaXNjb3BhbmVsL3YxO2Rpc2NvcGFuZWx2MWIGcHJvdG8z'
+	);
 
 /**
  * File metadata and tree
  *
  * @generated from message discopanel.v1.FileInfo
  */
-export type FileInfo = Message<"discopanel.v1.FileInfo"> & {
-  /**
-   * @generated from field: string name = 1;
-   */
-  name: string;
+export type FileInfo = Message<'discopanel.v1.FileInfo'> & {
+	/**
+	 * @generated from field: string name = 1;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string path = 2;
-   */
-  path: string;
+	/**
+	 * @generated from field: string path = 2;
+	 */
+	path: string;
 
-  /**
-   * @generated from field: bool is_dir = 3;
-   */
-  isDir: boolean;
+	/**
+	 * @generated from field: bool is_dir = 3;
+	 */
+	isDir: boolean;
 
-  /**
-   * @generated from field: int64 size = 4;
-   */
-  size: bigint;
+	/**
+	 * @generated from field: int64 size = 4;
+	 */
+	size: bigint;
 
-  /**
-   * @generated from field: int64 modified = 5;
-   */
-  modified: bigint;
+	/**
+	 * @generated from field: int64 modified = 5;
+	 */
+	modified: bigint;
 
-  /**
-   * @generated from field: bool is_editable = 6;
-   */
-  isEditable: boolean;
+	/**
+	 * @generated from field: bool is_editable = 6;
+	 */
+	isEditable: boolean;
 
-  /**
-   * @generated from field: repeated discopanel.v1.FileInfo children = 7;
-   */
-  children: FileInfo[];
+	/**
+	 * @generated from field: repeated discopanel.v1.FileInfo children = 7;
+	 */
+	children: FileInfo[];
 };
 
 /**
  * Describes the message discopanel.v1.FileInfo.
  * Use `create(FileInfoSchema)` to create a new message.
  */
-export const FileInfoSchema: GenMessage<FileInfo> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 0);
+export const FileInfoSchema: GenMessage<FileInfo> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 0);
 
 /**
  * Directory listing parameters
  *
  * @generated from message discopanel.v1.ListFilesRequest
  */
-export type ListFilesRequest = Message<"discopanel.v1.ListFilesRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type ListFilesRequest = Message<'discopanel.v1.ListFilesRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string path = 2;
-   */
-  path: string;
+	/**
+	 * @generated from field: string path = 2;
+	 */
+	path: string;
 
-  /**
-   * @generated from field: bool tree = 3;
-   */
-  tree: boolean;
+	/**
+	 * @generated from field: bool tree = 3;
+	 */
+	tree: boolean;
 };
 
 /**
  * Describes the message discopanel.v1.ListFilesRequest.
  * Use `create(ListFilesRequestSchema)` to create a new message.
  */
-export const ListFilesRequestSchema: GenMessage<ListFilesRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 1);
+export const ListFilesRequestSchema: GenMessage<ListFilesRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 1);
 
 /**
  * Directory contents
  *
  * @generated from message discopanel.v1.ListFilesResponse
  */
-export type ListFilesResponse = Message<"discopanel.v1.ListFilesResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.FileInfo files = 1;
-   */
-  files: FileInfo[];
+export type ListFilesResponse = Message<'discopanel.v1.ListFilesResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.FileInfo files = 1;
+	 */
+	files: FileInfo[];
 };
 
 /**
  * Describes the message discopanel.v1.ListFilesResponse.
  * Use `create(ListFilesResponseSchema)` to create a new message.
  */
-export const ListFilesResponseSchema: GenMessage<ListFilesResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 2);
+export const ListFilesResponseSchema: GenMessage<ListFilesResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 2);
 
 /**
  * File download parameters
  *
  * @generated from message discopanel.v1.GetFileRequest
  */
-export type GetFileRequest = Message<"discopanel.v1.GetFileRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type GetFileRequest = Message<'discopanel.v1.GetFileRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string path = 2;
-   */
-  path: string;
+	/**
+	 * @generated from field: string path = 2;
+	 */
+	path: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetFileRequest.
  * Use `create(GetFileRequestSchema)` to create a new message.
  */
-export const GetFileRequestSchema: GenMessage<GetFileRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 3);
+export const GetFileRequestSchema: GenMessage<GetFileRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 3);
 
 /**
  * File binary content
  *
  * @generated from message discopanel.v1.GetFileResponse
  */
-export type GetFileResponse = Message<"discopanel.v1.GetFileResponse"> & {
-  /**
-   * @generated from field: bytes content = 1;
-   */
-  content: Uint8Array;
+export type GetFileResponse = Message<'discopanel.v1.GetFileResponse'> & {
+	/**
+	 * @generated from field: bytes content = 1;
+	 */
+	content: Uint8Array;
 
-  /**
-   * @generated from field: string mime_type = 2;
-   */
-  mimeType: string;
+	/**
+	 * @generated from field: string mime_type = 2;
+	 */
+	mimeType: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetFileResponse.
  * Use `create(GetFileResponseSchema)` to create a new message.
  */
-export const GetFileResponseSchema: GenMessage<GetFileResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 4);
+export const GetFileResponseSchema: GenMessage<GetFileResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 4);
 
 /**
  * File upload data
  *
  * @generated from message discopanel.v1.SaveUploadedFileRequest
  */
-export type SaveUploadedFileRequest = Message<"discopanel.v1.SaveUploadedFileRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type SaveUploadedFileRequest = Message<'discopanel.v1.SaveUploadedFileRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string upload_session_id = 2;
-   */
-  uploadSessionId: string;
+	/**
+	 * @generated from field: string upload_session_id = 2;
+	 */
+	uploadSessionId: string;
 
-  /**
-   * Target dir
-   *
-   * @generated from field: string destination_path = 3;
-   */
-  destinationPath: string;
+	/**
+	 * Target dir
+	 *
+	 * @generated from field: string destination_path = 3;
+	 */
+	destinationPath: string;
 
-  /**
-   * Target filename
-   *
-   * @generated from field: string filename = 4;
-   */
-  filename: string;
+	/**
+	 * Target filename
+	 *
+	 * @generated from field: string filename = 4;
+	 */
+	filename: string;
 };
 
 /**
  * Describes the message discopanel.v1.SaveUploadedFileRequest.
  * Use `create(SaveUploadedFileRequestSchema)` to create a new message.
  */
-export const SaveUploadedFileRequestSchema: GenMessage<SaveUploadedFileRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 5);
+export const SaveUploadedFileRequestSchema: GenMessage<SaveUploadedFileRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 5);
 
 /**
  * Save uploaded file result
  *
  * @generated from message discopanel.v1.SaveUploadedFileResponse
  */
-export type SaveUploadedFileResponse = Message<"discopanel.v1.SaveUploadedFileResponse"> & {
-  /**
-   * @generated from field: string message = 1;
-   */
-  message: string;
+export type SaveUploadedFileResponse = Message<'discopanel.v1.SaveUploadedFileResponse'> & {
+	/**
+	 * @generated from field: string message = 1;
+	 */
+	message: string;
 
-  /**
-   * @generated from field: string path = 2;
-   */
-  path: string;
+	/**
+	 * @generated from field: string path = 2;
+	 */
+	path: string;
 };
 
 /**
  * Describes the message discopanel.v1.SaveUploadedFileResponse.
  * Use `create(SaveUploadedFileResponseSchema)` to create a new message.
  */
-export const SaveUploadedFileResponseSchema: GenMessage<SaveUploadedFileResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 6);
+export const SaveUploadedFileResponseSchema: GenMessage<SaveUploadedFileResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 6);
 
 /**
  * File content update
  *
  * @generated from message discopanel.v1.UpdateFileRequest
  */
-export type UpdateFileRequest = Message<"discopanel.v1.UpdateFileRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type UpdateFileRequest = Message<'discopanel.v1.UpdateFileRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string path = 2;
-   */
-  path: string;
+	/**
+	 * @generated from field: string path = 2;
+	 */
+	path: string;
 
-  /**
-   * @generated from field: bytes content = 3;
-   */
-  content: Uint8Array;
+	/**
+	 * @generated from field: bytes content = 3;
+	 */
+	content: Uint8Array;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateFileRequest.
  * Use `create(UpdateFileRequestSchema)` to create a new message.
  */
-export const UpdateFileRequestSchema: GenMessage<UpdateFileRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 7);
+export const UpdateFileRequestSchema: GenMessage<UpdateFileRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 7);
 
 /**
  * Update confirmation
  *
  * @generated from message discopanel.v1.UpdateFileResponse
  */
-export type UpdateFileResponse = Message<"discopanel.v1.UpdateFileResponse"> & {
-  /**
-   * @generated from field: string message = 1;
-   */
-  message: string;
+export type UpdateFileResponse = Message<'discopanel.v1.UpdateFileResponse'> & {
+	/**
+	 * @generated from field: string message = 1;
+	 */
+	message: string;
 
-  /**
-   * @generated from field: string path = 2;
-   */
-  path: string;
+	/**
+	 * @generated from field: string path = 2;
+	 */
+	path: string;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateFileResponse.
  * Use `create(UpdateFileResponseSchema)` to create a new message.
  */
-export const UpdateFileResponseSchema: GenMessage<UpdateFileResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 8);
+export const UpdateFileResponseSchema: GenMessage<UpdateFileResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 8);
 
 /**
  * File to delete
  *
  * @generated from message discopanel.v1.DeleteFileRequest
  */
-export type DeleteFileRequest = Message<"discopanel.v1.DeleteFileRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type DeleteFileRequest = Message<'discopanel.v1.DeleteFileRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string path = 2;
-   */
-  path: string;
+	/**
+	 * @generated from field: string path = 2;
+	 */
+	path: string;
 
-  /**
-   * Bulk delete
-   *
-   * @generated from field: repeated string paths = 3;
-   */
-  paths: string[];
+	/**
+	 * Bulk delete
+	 *
+	 * @generated from field: repeated string paths = 3;
+	 */
+	paths: string[];
 };
 
 /**
  * Describes the message discopanel.v1.DeleteFileRequest.
  * Use `create(DeleteFileRequestSchema)` to create a new message.
  */
-export const DeleteFileRequestSchema: GenMessage<DeleteFileRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 9);
+export const DeleteFileRequestSchema: GenMessage<DeleteFileRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 9);
 
 /**
  * Empty delete response
  *
  * @generated from message discopanel.v1.DeleteFileResponse
  */
-export type DeleteFileResponse = Message<"discopanel.v1.DeleteFileResponse"> & {
-};
+export type DeleteFileResponse = Message<'discopanel.v1.DeleteFileResponse'> & {};
 
 /**
  * Describes the message discopanel.v1.DeleteFileResponse.
  * Use `create(DeleteFileResponseSchema)` to create a new message.
  */
-export const DeleteFileResponseSchema: GenMessage<DeleteFileResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 10);
+export const DeleteFileResponseSchema: GenMessage<DeleteFileResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 10);
 
 /**
  * Folder creation parameters
  *
  * @generated from message discopanel.v1.CreateFolderRequest
  */
-export type CreateFolderRequest = Message<"discopanel.v1.CreateFolderRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type CreateFolderRequest = Message<'discopanel.v1.CreateFolderRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string path = 2;
-   */
-  path: string;
+	/**
+	 * @generated from field: string path = 2;
+	 */
+	path: string;
 };
 
 /**
  * Describes the message discopanel.v1.CreateFolderRequest.
  * Use `create(CreateFolderRequestSchema)` to create a new message.
  */
-export const CreateFolderRequestSchema: GenMessage<CreateFolderRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 11);
+export const CreateFolderRequestSchema: GenMessage<CreateFolderRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 11);
 
 /**
  * Folder creation result
  *
  * @generated from message discopanel.v1.CreateFolderResponse
  */
-export type CreateFolderResponse = Message<"discopanel.v1.CreateFolderResponse"> & {
-  /**
-   * @generated from field: string message = 1;
-   */
-  message: string;
+export type CreateFolderResponse = Message<'discopanel.v1.CreateFolderResponse'> & {
+	/**
+	 * @generated from field: string message = 1;
+	 */
+	message: string;
 };
 
 /**
  * Describes the message discopanel.v1.CreateFolderResponse.
  * Use `create(CreateFolderResponseSchema)` to create a new message.
  */
-export const CreateFolderResponseSchema: GenMessage<CreateFolderResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 12);
+export const CreateFolderResponseSchema: GenMessage<CreateFolderResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 12);
 
 /**
  * File move parameters
  *
  * @generated from message discopanel.v1.MoveFileRequest
  */
-export type MoveFileRequest = Message<"discopanel.v1.MoveFileRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type MoveFileRequest = Message<'discopanel.v1.MoveFileRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string source_path = 2;
-   */
-  sourcePath: string;
+	/**
+	 * @generated from field: string source_path = 2;
+	 */
+	sourcePath: string;
 
-  /**
-   * @generated from field: string destination_path = 3;
-   */
-  destinationPath: string;
+	/**
+	 * @generated from field: string destination_path = 3;
+	 */
+	destinationPath: string;
 };
 
 /**
  * Describes the message discopanel.v1.MoveFileRequest.
  * Use `create(MoveFileRequestSchema)` to create a new message.
  */
-export const MoveFileRequestSchema: GenMessage<MoveFileRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 13);
+export const MoveFileRequestSchema: GenMessage<MoveFileRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 13);
 
 /**
  * File move result
  *
  * @generated from message discopanel.v1.MoveFileResponse
  */
-export type MoveFileResponse = Message<"discopanel.v1.MoveFileResponse"> & {
-  /**
-   * @generated from field: string message = 1;
-   */
-  message: string;
+export type MoveFileResponse = Message<'discopanel.v1.MoveFileResponse'> & {
+	/**
+	 * @generated from field: string message = 1;
+	 */
+	message: string;
 };
 
 /**
  * Describes the message discopanel.v1.MoveFileResponse.
  * Use `create(MoveFileResponseSchema)` to create a new message.
  */
-export const MoveFileResponseSchema: GenMessage<MoveFileResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 14);
+export const MoveFileResponseSchema: GenMessage<MoveFileResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 14);
 
 /**
  * File copy parameters
  *
  * @generated from message discopanel.v1.CopyFileRequest
  */
-export type CopyFileRequest = Message<"discopanel.v1.CopyFileRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type CopyFileRequest = Message<'discopanel.v1.CopyFileRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string source_path = 2;
-   */
-  sourcePath: string;
+	/**
+	 * @generated from field: string source_path = 2;
+	 */
+	sourcePath: string;
 
-  /**
-   * @generated from field: string destination_path = 3;
-   */
-  destinationPath: string;
+	/**
+	 * @generated from field: string destination_path = 3;
+	 */
+	destinationPath: string;
 };
 
 /**
  * Describes the message discopanel.v1.CopyFileRequest.
  * Use `create(CopyFileRequestSchema)` to create a new message.
  */
-export const CopyFileRequestSchema: GenMessage<CopyFileRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 15);
+export const CopyFileRequestSchema: GenMessage<CopyFileRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 15);
 
 /**
  * File copy result
  *
  * @generated from message discopanel.v1.CopyFileResponse
  */
-export type CopyFileResponse = Message<"discopanel.v1.CopyFileResponse"> & {
-  /**
-   * @generated from field: string message = 1;
-   */
-  message: string;
+export type CopyFileResponse = Message<'discopanel.v1.CopyFileResponse'> & {
+	/**
+	 * @generated from field: string message = 1;
+	 */
+	message: string;
 };
 
 /**
  * Describes the message discopanel.v1.CopyFileResponse.
  * Use `create(CopyFileResponseSchema)` to create a new message.
  */
-export const CopyFileResponseSchema: GenMessage<CopyFileResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 16);
+export const CopyFileResponseSchema: GenMessage<CopyFileResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 16);
 
 /**
  * Archive creation parameters
  *
  * @generated from message discopanel.v1.CreateArchiveRequest
  */
-export type CreateArchiveRequest = Message<"discopanel.v1.CreateArchiveRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type CreateArchiveRequest = Message<'discopanel.v1.CreateArchiveRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: repeated string paths = 2;
-   */
-  paths: string[];
+	/**
+	 * @generated from field: repeated string paths = 2;
+	 */
+	paths: string[];
 
-  /**
-   * @generated from field: string destination_path = 3;
-   */
-  destinationPath: string;
+	/**
+	 * @generated from field: string destination_path = 3;
+	 */
+	destinationPath: string;
 
-  /**
-   * @generated from field: string archive_name = 4;
-   */
-  archiveName: string;
+	/**
+	 * @generated from field: string archive_name = 4;
+	 */
+	archiveName: string;
 };
 
 /**
  * Describes the message discopanel.v1.CreateArchiveRequest.
  * Use `create(CreateArchiveRequestSchema)` to create a new message.
  */
-export const CreateArchiveRequestSchema: GenMessage<CreateArchiveRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 17);
+export const CreateArchiveRequestSchema: GenMessage<CreateArchiveRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 17);
 
 /**
  * Archive creation result
  *
  * @generated from message discopanel.v1.CreateArchiveResponse
  */
-export type CreateArchiveResponse = Message<"discopanel.v1.CreateArchiveResponse"> & {
-  /**
-   * @generated from field: string message = 1;
-   */
-  message: string;
+export type CreateArchiveResponse = Message<'discopanel.v1.CreateArchiveResponse'> & {
+	/**
+	 * @generated from field: string message = 1;
+	 */
+	message: string;
 
-  /**
-   * @generated from field: string archive_path = 2;
-   */
-  archivePath: string;
+	/**
+	 * @generated from field: string archive_path = 2;
+	 */
+	archivePath: string;
 
-  /**
-   * @generated from field: int32 files_archived = 3;
-   */
-  filesArchived: number;
+	/**
+	 * @generated from field: int32 files_archived = 3;
+	 */
+	filesArchived: number;
 };
 
 /**
  * Describes the message discopanel.v1.CreateArchiveResponse.
  * Use `create(CreateArchiveResponseSchema)` to create a new message.
  */
-export const CreateArchiveResponseSchema: GenMessage<CreateArchiveResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 18);
+export const CreateArchiveResponseSchema: GenMessage<CreateArchiveResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 18);
 
 /**
  * Archive download parameters
  *
  * @generated from message discopanel.v1.DownloadArchiveRequest
  */
-export type DownloadArchiveRequest = Message<"discopanel.v1.DownloadArchiveRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type DownloadArchiveRequest = Message<'discopanel.v1.DownloadArchiveRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: repeated string paths = 2;
-   */
-  paths: string[];
+	/**
+	 * @generated from field: repeated string paths = 2;
+	 */
+	paths: string[];
 };
 
 /**
  * Describes the message discopanel.v1.DownloadArchiveRequest.
  * Use `create(DownloadArchiveRequestSchema)` to create a new message.
  */
-export const DownloadArchiveRequestSchema: GenMessage<DownloadArchiveRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 19);
+export const DownloadArchiveRequestSchema: GenMessage<DownloadArchiveRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 19);
 
 /**
  * Archive download session
  *
  * @generated from message discopanel.v1.DownloadArchiveResponse
  */
-export type DownloadArchiveResponse = Message<"discopanel.v1.DownloadArchiveResponse"> & {
-  /**
-   * @generated from field: string session_id = 1;
-   */
-  sessionId: string;
+export type DownloadArchiveResponse = Message<'discopanel.v1.DownloadArchiveResponse'> & {
+	/**
+	 * @generated from field: string session_id = 1;
+	 */
+	sessionId: string;
 
-  /**
-   * @generated from field: string filename = 2;
-   */
-  filename: string;
+	/**
+	 * @generated from field: string filename = 2;
+	 */
+	filename: string;
 
-  /**
-   * @generated from field: int64 total_size = 3;
-   */
-  totalSize: bigint;
+	/**
+	 * @generated from field: int64 total_size = 3;
+	 */
+	totalSize: bigint;
 };
 
 /**
  * Describes the message discopanel.v1.DownloadArchiveResponse.
  * Use `create(DownloadArchiveResponseSchema)` to create a new message.
  */
-export const DownloadArchiveResponseSchema: GenMessage<DownloadArchiveResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 20);
+export const DownloadArchiveResponseSchema: GenMessage<DownloadArchiveResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 20);
 
 /**
  * File rename parameters
  *
  * @generated from message discopanel.v1.RenameFileRequest
  */
-export type RenameFileRequest = Message<"discopanel.v1.RenameFileRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type RenameFileRequest = Message<'discopanel.v1.RenameFileRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string path = 2;
-   */
-  path: string;
+	/**
+	 * @generated from field: string path = 2;
+	 */
+	path: string;
 
-  /**
-   * @generated from field: string new_name = 3;
-   */
-  newName: string;
+	/**
+	 * @generated from field: string new_name = 3;
+	 */
+	newName: string;
 };
 
 /**
  * Describes the message discopanel.v1.RenameFileRequest.
  * Use `create(RenameFileRequestSchema)` to create a new message.
  */
-export const RenameFileRequestSchema: GenMessage<RenameFileRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 21);
+export const RenameFileRequestSchema: GenMessage<RenameFileRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 21);
 
 /**
  * Rename result
  *
  * @generated from message discopanel.v1.RenameFileResponse
  */
-export type RenameFileResponse = Message<"discopanel.v1.RenameFileResponse"> & {
-  /**
-   * @generated from field: string message = 1;
-   */
-  message: string;
+export type RenameFileResponse = Message<'discopanel.v1.RenameFileResponse'> & {
+	/**
+	 * @generated from field: string message = 1;
+	 */
+	message: string;
 
-  /**
-   * @generated from field: string new_path = 2;
-   */
-  newPath: string;
+	/**
+	 * @generated from field: string new_path = 2;
+	 */
+	newPath: string;
 };
 
 /**
  * Describes the message discopanel.v1.RenameFileResponse.
  * Use `create(RenameFileResponseSchema)` to create a new message.
  */
-export const RenameFileResponseSchema: GenMessage<RenameFileResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 22);
+export const RenameFileResponseSchema: GenMessage<RenameFileResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 22);
 
 /**
  * Archive to extract
  *
  * @generated from message discopanel.v1.ExtractArchiveRequest
  */
-export type ExtractArchiveRequest = Message<"discopanel.v1.ExtractArchiveRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type ExtractArchiveRequest = Message<'discopanel.v1.ExtractArchiveRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string path = 2;
-   */
-  path: string;
+	/**
+	 * @generated from field: string path = 2;
+	 */
+	path: string;
 };
 
 /**
  * Describes the message discopanel.v1.ExtractArchiveRequest.
  * Use `create(ExtractArchiveRequestSchema)` to create a new message.
  */
-export const ExtractArchiveRequestSchema: GenMessage<ExtractArchiveRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 23);
+export const ExtractArchiveRequestSchema: GenMessage<ExtractArchiveRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 23);
 
 /**
  * Extraction started
  *
  * @generated from message discopanel.v1.ExtractArchiveResponse
  */
-export type ExtractArchiveResponse = Message<"discopanel.v1.ExtractArchiveResponse"> & {
-  /**
-   * @generated from field: string operation_id = 1;
-   */
-  operationId: string;
+export type ExtractArchiveResponse = Message<'discopanel.v1.ExtractArchiveResponse'> & {
+	/**
+	 * @generated from field: string operation_id = 1;
+	 */
+	operationId: string;
 };
 
 /**
  * Describes the message discopanel.v1.ExtractArchiveResponse.
  * Use `create(ExtractArchiveResponseSchema)` to create a new message.
  */
-export const ExtractArchiveResponseSchema: GenMessage<ExtractArchiveResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 24);
+export const ExtractArchiveResponseSchema: GenMessage<ExtractArchiveResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 24);
 
 /**
  * Extraction status poll
  *
  * @generated from message discopanel.v1.GetExtractionStatusRequest
  */
-export type GetExtractionStatusRequest = Message<"discopanel.v1.GetExtractionStatusRequest"> & {
-  /**
-   * @generated from field: string operation_id = 1;
-   */
-  operationId: string;
+export type GetExtractionStatusRequest = Message<'discopanel.v1.GetExtractionStatusRequest'> & {
+	/**
+	 * @generated from field: string operation_id = 1;
+	 */
+	operationId: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetExtractionStatusRequest.
  * Use `create(GetExtractionStatusRequestSchema)` to create a new message.
  */
-export const GetExtractionStatusRequestSchema: GenMessage<GetExtractionStatusRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 25);
+export const GetExtractionStatusRequestSchema: GenMessage<GetExtractionStatusRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 25);
 
 /**
  * Extraction progress
  *
  * @generated from message discopanel.v1.GetExtractionStatusResponse
  */
-export type GetExtractionStatusResponse = Message<"discopanel.v1.GetExtractionStatusResponse"> & {
-  /**
-   * @generated from field: string state = 1;
-   */
-  state: string;
+export type GetExtractionStatusResponse = Message<'discopanel.v1.GetExtractionStatusResponse'> & {
+	/**
+	 * @generated from field: string state = 1;
+	 */
+	state: string;
 
-  /**
-   * @generated from field: int32 files_extracted = 2;
-   */
-  filesExtracted: number;
+	/**
+	 * @generated from field: int32 files_extracted = 2;
+	 */
+	filesExtracted: number;
 
-  /**
-   * @generated from field: string error = 3;
-   */
-  error: string;
+	/**
+	 * @generated from field: string error = 3;
+	 */
+	error: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetExtractionStatusResponse.
  * Use `create(GetExtractionStatusResponseSchema)` to create a new message.
  */
-export const GetExtractionStatusResponseSchema: GenMessage<GetExtractionStatusResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 26);
+export const GetExtractionStatusResponseSchema: GenMessage<GetExtractionStatusResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 26);
 
 /**
  * Single file download session
  *
  * @generated from message discopanel.v1.InitFileDownloadRequest
  */
-export type InitFileDownloadRequest = Message<"discopanel.v1.InitFileDownloadRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type InitFileDownloadRequest = Message<'discopanel.v1.InitFileDownloadRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string path = 2;
-   */
-  path: string;
+	/**
+	 * @generated from field: string path = 2;
+	 */
+	path: string;
 };
 
 /**
  * Describes the message discopanel.v1.InitFileDownloadRequest.
  * Use `create(InitFileDownloadRequestSchema)` to create a new message.
  */
-export const InitFileDownloadRequestSchema: GenMessage<InitFileDownloadRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 27);
+export const InitFileDownloadRequestSchema: GenMessage<InitFileDownloadRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 27);
 
 /**
  * Download session
  *
  * @generated from message discopanel.v1.InitFileDownloadResponse
  */
-export type InitFileDownloadResponse = Message<"discopanel.v1.InitFileDownloadResponse"> & {
-  /**
-   * @generated from field: string session_id = 1;
-   */
-  sessionId: string;
+export type InitFileDownloadResponse = Message<'discopanel.v1.InitFileDownloadResponse'> & {
+	/**
+	 * @generated from field: string session_id = 1;
+	 */
+	sessionId: string;
 
-  /**
-   * @generated from field: string filename = 2;
-   */
-  filename: string;
+	/**
+	 * @generated from field: string filename = 2;
+	 */
+	filename: string;
 
-  /**
-   * @generated from field: int64 total_size = 3;
-   */
-  totalSize: bigint;
+	/**
+	 * @generated from field: int64 total_size = 3;
+	 */
+	totalSize: bigint;
 };
 
 /**
  * Describes the message discopanel.v1.InitFileDownloadResponse.
  * Use `create(InitFileDownloadResponseSchema)` to create a new message.
  */
-export const InitFileDownloadResponseSchema: GenMessage<InitFileDownloadResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_file, 28);
+export const InitFileDownloadResponseSchema: GenMessage<InitFileDownloadResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_file, 28);
 
 /**
  * Server file management
@@ -776,146 +807,144 @@ export const InitFileDownloadResponseSchema: GenMessage<InitFileDownloadResponse
  * @generated from service discopanel.v1.FileService
  */
 export const FileService: GenService<{
-  /**
-   * Browse server directory
-   *
-   * @generated from rpc discopanel.v1.FileService.ListFiles
-   */
-  listFiles: {
-    methodKind: "unary";
-    input: typeof ListFilesRequestSchema;
-    output: typeof ListFilesResponseSchema;
-  },
-  /**
-   * Download file content
-   *
-   * @generated from rpc discopanel.v1.FileService.GetFile
-   */
-  getFile: {
-    methodKind: "unary";
-    input: typeof GetFileRequestSchema;
-    output: typeof GetFileResponseSchema;
-  },
-  /**
-   * Save an uploaded file
-   *
-   * @generated from rpc discopanel.v1.FileService.SaveUploadedFile
-   */
-  saveUploadedFile: {
-    methodKind: "unary";
-    input: typeof SaveUploadedFileRequestSchema;
-    output: typeof SaveUploadedFileResponseSchema;
-  },
-  /**
-   * Modify file content
-   *
-   * @generated from rpc discopanel.v1.FileService.UpdateFile
-   */
-  updateFile: {
-    methodKind: "unary";
-    input: typeof UpdateFileRequestSchema;
-    output: typeof UpdateFileResponseSchema;
-  },
-  /**
-   * Remove file or directory
-   *
-   * @generated from rpc discopanel.v1.FileService.DeleteFile
-   */
-  deleteFile: {
-    methodKind: "unary";
-    input: typeof DeleteFileRequestSchema;
-    output: typeof DeleteFileResponseSchema;
-  },
-  /**
-   * Change file name
-   *
-   * @generated from rpc discopanel.v1.FileService.RenameFile
-   */
-  renameFile: {
-    methodKind: "unary";
-    input: typeof RenameFileRequestSchema;
-    output: typeof RenameFileResponseSchema;
-  },
-  /**
-   * Unzip archive file
-   *
-   * @generated from rpc discopanel.v1.FileService.ExtractArchive
-   */
-  extractArchive: {
-    methodKind: "unary";
-    input: typeof ExtractArchiveRequestSchema;
-    output: typeof ExtractArchiveResponseSchema;
-  },
-  /**
-   * Create a new folder
-   *
-   * @generated from rpc discopanel.v1.FileService.CreateFolder
-   */
-  createFolder: {
-    methodKind: "unary";
-    input: typeof CreateFolderRequestSchema;
-    output: typeof CreateFolderResponseSchema;
-  },
-  /**
-   * Move a file or directory
-   *
-   * @generated from rpc discopanel.v1.FileService.MoveFile
-   */
-  moveFile: {
-    methodKind: "unary";
-    input: typeof MoveFileRequestSchema;
-    output: typeof MoveFileResponseSchema;
-  },
-  /**
-   * Copy a file or directory
-   *
-   * @generated from rpc discopanel.v1.FileService.CopyFile
-   */
-  copyFile: {
-    methodKind: "unary";
-    input: typeof CopyFileRequestSchema;
-    output: typeof CopyFileResponseSchema;
-  },
-  /**
-   * Create a zip archive from selected paths
-   *
-   * @generated from rpc discopanel.v1.FileService.CreateArchive
-   */
-  createArchive: {
-    methodKind: "unary";
-    input: typeof CreateArchiveRequestSchema;
-    output: typeof CreateArchiveResponseSchema;
-  },
-  /**
-   * Download multiple files/folders as a zip
-   *
-   * @generated from rpc discopanel.v1.FileService.DownloadArchive
-   */
-  downloadArchive: {
-    methodKind: "unary";
-    input: typeof DownloadArchiveRequestSchema;
-    output: typeof DownloadArchiveResponseSchema;
-  },
-  /**
-   * Initiate a single-file download session (actual bytes served via GET /api/v1/download/{session_id})
-   *
-   * @generated from rpc discopanel.v1.FileService.InitFileDownload
-   */
-  initFileDownload: {
-    methodKind: "unary";
-    input: typeof InitFileDownloadRequestSchema;
-    output: typeof InitFileDownloadResponseSchema;
-  },
-  /**
-   * Poll extraction progress
-   *
-   * @generated from rpc discopanel.v1.FileService.GetExtractionStatus
-   */
-  getExtractionStatus: {
-    methodKind: "unary";
-    input: typeof GetExtractionStatusRequestSchema;
-    output: typeof GetExtractionStatusResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_discopanel_v1_file, 0);
-
+	/**
+	 * Browse server directory
+	 *
+	 * @generated from rpc discopanel.v1.FileService.ListFiles
+	 */
+	listFiles: {
+		methodKind: 'unary';
+		input: typeof ListFilesRequestSchema;
+		output: typeof ListFilesResponseSchema;
+	};
+	/**
+	 * Download file content
+	 *
+	 * @generated from rpc discopanel.v1.FileService.GetFile
+	 */
+	getFile: {
+		methodKind: 'unary';
+		input: typeof GetFileRequestSchema;
+		output: typeof GetFileResponseSchema;
+	};
+	/**
+	 * Save an uploaded file
+	 *
+	 * @generated from rpc discopanel.v1.FileService.SaveUploadedFile
+	 */
+	saveUploadedFile: {
+		methodKind: 'unary';
+		input: typeof SaveUploadedFileRequestSchema;
+		output: typeof SaveUploadedFileResponseSchema;
+	};
+	/**
+	 * Modify file content
+	 *
+	 * @generated from rpc discopanel.v1.FileService.UpdateFile
+	 */
+	updateFile: {
+		methodKind: 'unary';
+		input: typeof UpdateFileRequestSchema;
+		output: typeof UpdateFileResponseSchema;
+	};
+	/**
+	 * Remove file or directory
+	 *
+	 * @generated from rpc discopanel.v1.FileService.DeleteFile
+	 */
+	deleteFile: {
+		methodKind: 'unary';
+		input: typeof DeleteFileRequestSchema;
+		output: typeof DeleteFileResponseSchema;
+	};
+	/**
+	 * Change file name
+	 *
+	 * @generated from rpc discopanel.v1.FileService.RenameFile
+	 */
+	renameFile: {
+		methodKind: 'unary';
+		input: typeof RenameFileRequestSchema;
+		output: typeof RenameFileResponseSchema;
+	};
+	/**
+	 * Unzip archive file
+	 *
+	 * @generated from rpc discopanel.v1.FileService.ExtractArchive
+	 */
+	extractArchive: {
+		methodKind: 'unary';
+		input: typeof ExtractArchiveRequestSchema;
+		output: typeof ExtractArchiveResponseSchema;
+	};
+	/**
+	 * Create a new folder
+	 *
+	 * @generated from rpc discopanel.v1.FileService.CreateFolder
+	 */
+	createFolder: {
+		methodKind: 'unary';
+		input: typeof CreateFolderRequestSchema;
+		output: typeof CreateFolderResponseSchema;
+	};
+	/**
+	 * Move a file or directory
+	 *
+	 * @generated from rpc discopanel.v1.FileService.MoveFile
+	 */
+	moveFile: {
+		methodKind: 'unary';
+		input: typeof MoveFileRequestSchema;
+		output: typeof MoveFileResponseSchema;
+	};
+	/**
+	 * Copy a file or directory
+	 *
+	 * @generated from rpc discopanel.v1.FileService.CopyFile
+	 */
+	copyFile: {
+		methodKind: 'unary';
+		input: typeof CopyFileRequestSchema;
+		output: typeof CopyFileResponseSchema;
+	};
+	/**
+	 * Create a zip archive from selected paths
+	 *
+	 * @generated from rpc discopanel.v1.FileService.CreateArchive
+	 */
+	createArchive: {
+		methodKind: 'unary';
+		input: typeof CreateArchiveRequestSchema;
+		output: typeof CreateArchiveResponseSchema;
+	};
+	/**
+	 * Download multiple files/folders as a zip
+	 *
+	 * @generated from rpc discopanel.v1.FileService.DownloadArchive
+	 */
+	downloadArchive: {
+		methodKind: 'unary';
+		input: typeof DownloadArchiveRequestSchema;
+		output: typeof DownloadArchiveResponseSchema;
+	};
+	/**
+	 * Initiate a single-file download session (actual bytes served via GET /api/v1/download/{session_id})
+	 *
+	 * @generated from rpc discopanel.v1.FileService.InitFileDownload
+	 */
+	initFileDownload: {
+		methodKind: 'unary';
+		input: typeof InitFileDownloadRequestSchema;
+		output: typeof InitFileDownloadResponseSchema;
+	};
+	/**
+	 * Poll extraction progress
+	 *
+	 * @generated from rpc discopanel.v1.FileService.GetExtractionStatus
+	 */
+	getExtractionStatus: {
+		methodKind: 'unary';
+		input: typeof GetExtractionStatusRequestSchema;
+		output: typeof GetExtractionStatusResponseSchema;
+	};
+}> = /*@__PURE__*/ serviceDesc(file_discopanel_v1_file, 0);

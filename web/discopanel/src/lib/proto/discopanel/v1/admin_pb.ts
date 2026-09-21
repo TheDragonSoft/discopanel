@@ -2,541 +2,565 @@
 // @generated from file discopanel/v1/admin.proto (package discopanel.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenFile, GenMessage, GenService } from '@bufbuild/protobuf/codegenv2';
+import { fileDesc, messageDesc, serviceDesc } from '@bufbuild/protobuf/codegenv2';
+import type { Timestamp } from '@bufbuild/protobuf/wkt';
+import { file_google_protobuf_timestamp } from '@bufbuild/protobuf/wkt';
+import type { Message } from '@bufbuild/protobuf';
 
 /**
  * Describes the file discopanel/v1/admin.proto.
  */
-export const file_discopanel_v1_admin: GenFile = /*@__PURE__*/
-  fileDesc("ChlkaXNjb3BhbmVsL3YxL2FkbWluLnByb3RvEg1kaXNjb3BhbmVsLnYxImgKDldoaXRlbGlzdEVudHJ5EgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSDAoEbm90ZRgDIAEoCRIuCgpjcmVhdGVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKLAQoOU2VydmVyT3BSZXN1bHQSEQoJc2VydmVyX2lkGAEgASgJEhMKC3NlcnZlcl9uYW1lGAIgASgJEg8KB3N1Y2Nlc3MYAyABKAgSDwoHbWVzc2FnZRgEIAEoCRINCgVhZGRlZBgFIAMoCRIPCgdyZW1vdmVkGAYgAygJEg8KB2N1cnJlbnQYByADKAkiLQobTGlzdFdoaXRlbGlzdEVudHJpZXNSZXF1ZXN0Eg4KBnNlYXJjaBgBIAEoCSJOChxMaXN0V2hpdGVsaXN0RW50cmllc1Jlc3BvbnNlEi4KB2VudHJpZXMYASADKAsyHS5kaXNjb3BhbmVsLnYxLldoaXRlbGlzdEVudHJ5IjYKGEFkZFdoaXRlbGlzdEVudHJ5UmVxdWVzdBIMCgRuYW1lGAEgASgJEgwKBG5vdGUYAiABKAkiSQoZQWRkV2hpdGVsaXN0RW50cnlSZXNwb25zZRIsCgVlbnRyeRgBIAEoCzIdLmRpc2NvcGFuZWwudjEuV2hpdGVsaXN0RW50cnkiKQobUmVtb3ZlV2hpdGVsaXN0RW50cnlSZXF1ZXN0EgoKAmlkGAEgASgJIh4KHFJlbW92ZVdoaXRlbGlzdEVudHJ5UmVzcG9uc2UiKwoVQXBwbHlXaGl0ZWxpc3RSZXF1ZXN0EhIKCnNlcnZlcl9pZHMYASADKAkiSAoWQXBwbHlXaGl0ZWxpc3RSZXNwb25zZRIuCgdyZXN1bHRzGAEgAygLMh0uZGlzY29wYW5lbC52MS5TZXJ2ZXJPcFJlc3VsdCIpChRQdWxsV2hpdGVsaXN0UmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkiKQoVUHVsbFdoaXRlbGlzdFJlc3BvbnNlEhAKCGltcG9ydGVkGAIgAygJIkQKEEJhblBsYXllclJlcXVlc3QSEgoKc2VydmVyX2lkcxgBIAMoCRIMCgRuYW1lGAIgASgJEg4KBnJlYXNvbhgDIAEoCSJDChFCYW5QbGF5ZXJSZXNwb25zZRIuCgdyZXN1bHRzGAEgAygLMh0uZGlzY29wYW5lbC52MS5TZXJ2ZXJPcFJlc3VsdCI2ChJVbmJhblBsYXllclJlcXVlc3QSEgoKc2VydmVyX2lkcxgBIAMoCRIMCgRuYW1lGAIgASgJIkUKE1VuYmFuUGxheWVyUmVzcG9uc2USLgoHcmVzdWx0cxgBIAMoCzIdLmRpc2NvcGFuZWwudjEuU2VydmVyT3BSZXN1bHQiKQoUR2V0U2VydmVyTW90ZFJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJIngKFUdldFNlcnZlck1vdGRSZXNwb25zZRIMCgRtb3RkGAEgASgJEgwKBGljb24YAiABKAkSGQoRd2hpdGVsaXN0X2VuYWJsZWQYAyABKAgSEwoLb25saW5lX21vZGUYBCABKAgSEwoLbWF4X3BsYXllcnMYBSABKAUi7gEKF1VwZGF0ZVNlcnZlck1vdGRSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIRCgRtb3RkGAIgASgJSACIAQESEQoEaWNvbhgDIAEoCUgBiAEBEh4KEXdoaXRlbGlzdF9lbmFibGVkGAQgASgISAKIAQESGAoLb25saW5lX21vZGUYBSABKAhIA4gBARIYCgttYXhfcGxheWVycxgGIAEoBUgEiAEBQgcKBV9tb3RkQgcKBV9pY29uQhQKEl93aGl0ZWxpc3RfZW5hYmxlZEIOCgxfb25saW5lX21vZGVCDgoMX21heF9wbGF5ZXJzIioKGFVwZGF0ZVNlcnZlck1vdGRSZXNwb25zZRIOCgZzdGF0dXMYASABKAky+gYKDEFkbWluU2VydmljZRJvChRMaXN0V2hpdGVsaXN0RW50cmllcxIqLmRpc2NvcGFuZWwudjEuTGlzdFdoaXRlbGlzdEVudHJpZXNSZXF1ZXN0GisuZGlzY29wYW5lbC52MS5MaXN0V2hpdGVsaXN0RW50cmllc1Jlc3BvbnNlEmYKEUFkZFdoaXRlbGlzdEVudHJ5EicuZGlzY29wYW5lbC52MS5BZGRXaGl0ZWxpc3RFbnRyeVJlcXVlc3QaKC5kaXNjb3BhbmVsLnYxLkFkZFdoaXRlbGlzdEVudHJ5UmVzcG9uc2USbwoUUmVtb3ZlV2hpdGVsaXN0RW50cnkSKi5kaXNjb3BhbmVsLnYxLlJlbW92ZVdoaXRlbGlzdEVudHJ5UmVxdWVzdBorLmRpc2NvcGFuZWwudjEuUmVtb3ZlV2hpdGVsaXN0RW50cnlSZXNwb25zZRJdCg5BcHBseVdoaXRlbGlzdBIkLmRpc2NvcGFuZWwudjEuQXBwbHlXaGl0ZWxpc3RSZXF1ZXN0GiUuZGlzY29wYW5lbC52MS5BcHBseVdoaXRlbGlzdFJlc3BvbnNlEloKDVB1bGxXaGl0ZWxpc3QSIy5kaXNjb3BhbmVsLnYxLlB1bGxXaGl0ZWxpc3RSZXF1ZXN0GiQuZGlzY29wYW5lbC52MS5QdWxsV2hpdGVsaXN0UmVzcG9uc2USTgoJQmFuUGxheWVyEh8uZGlzY29wYW5lbC52MS5CYW5QbGF5ZXJSZXF1ZXN0GiAuZGlzY29wYW5lbC52MS5CYW5QbGF5ZXJSZXNwb25zZRJUCgtVbmJhblBsYXllchIhLmRpc2NvcGFuZWwudjEuVW5iYW5QbGF5ZXJSZXF1ZXN0GiIuZGlzY29wYW5lbC52MS5VbmJhblBsYXllclJlc3BvbnNlEloKDUdldFNlcnZlck1vdGQSIy5kaXNjb3BhbmVsLnYxLkdldFNlcnZlck1vdGRSZXF1ZXN0GiQuZGlzY29wYW5lbC52MS5HZXRTZXJ2ZXJNb3RkUmVzcG9uc2USYwoQVXBkYXRlU2VydmVyTW90ZBImLmRpc2NvcGFuZWwudjEuVXBkYXRlU2VydmVyTW90ZFJlcXVlc3QaJy5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlck1vdGRSZXNwb25zZUJGWkRnaXRodWIuY29tL25pY2toZXllci9kaXNjb3BhbmVsL3BrZy9wcm90by9kaXNjb3BhbmVsL3YxO2Rpc2NvcGFuZWx2MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+export const file_discopanel_v1_admin: GenFile =
+	/*@__PURE__*/
+	fileDesc(
+		'ChlkaXNjb3BhbmVsL3YxL2FkbWluLnByb3RvEg1kaXNjb3BhbmVsLnYxImgKDldoaXRlbGlzdEVudHJ5EgoKAmlkGAEgASgJEgwKBG5hbWUYAiABKAkSDAoEbm90ZRgDIAEoCRIuCgpjcmVhdGVkX2F0GAQgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcCKLAQoOU2VydmVyT3BSZXN1bHQSEQoJc2VydmVyX2lkGAEgASgJEhMKC3NlcnZlcl9uYW1lGAIgASgJEg8KB3N1Y2Nlc3MYAyABKAgSDwoHbWVzc2FnZRgEIAEoCRINCgVhZGRlZBgFIAMoCRIPCgdyZW1vdmVkGAYgAygJEg8KB2N1cnJlbnQYByADKAkiLQobTGlzdFdoaXRlbGlzdEVudHJpZXNSZXF1ZXN0Eg4KBnNlYXJjaBgBIAEoCSJOChxMaXN0V2hpdGVsaXN0RW50cmllc1Jlc3BvbnNlEi4KB2VudHJpZXMYASADKAsyHS5kaXNjb3BhbmVsLnYxLldoaXRlbGlzdEVudHJ5IjYKGEFkZFdoaXRlbGlzdEVudHJ5UmVxdWVzdBIMCgRuYW1lGAEgASgJEgwKBG5vdGUYAiABKAkiSQoZQWRkV2hpdGVsaXN0RW50cnlSZXNwb25zZRIsCgVlbnRyeRgBIAEoCzIdLmRpc2NvcGFuZWwudjEuV2hpdGVsaXN0RW50cnkiKQobUmVtb3ZlV2hpdGVsaXN0RW50cnlSZXF1ZXN0EgoKAmlkGAEgASgJIh4KHFJlbW92ZVdoaXRlbGlzdEVudHJ5UmVzcG9uc2UiKwoVQXBwbHlXaGl0ZWxpc3RSZXF1ZXN0EhIKCnNlcnZlcl9pZHMYASADKAkiSAoWQXBwbHlXaGl0ZWxpc3RSZXNwb25zZRIuCgdyZXN1bHRzGAEgAygLMh0uZGlzY29wYW5lbC52MS5TZXJ2ZXJPcFJlc3VsdCIpChRQdWxsV2hpdGVsaXN0UmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkiKQoVUHVsbFdoaXRlbGlzdFJlc3BvbnNlEhAKCGltcG9ydGVkGAIgAygJIkQKEEJhblBsYXllclJlcXVlc3QSEgoKc2VydmVyX2lkcxgBIAMoCRIMCgRuYW1lGAIgASgJEg4KBnJlYXNvbhgDIAEoCSJDChFCYW5QbGF5ZXJSZXNwb25zZRIuCgdyZXN1bHRzGAEgAygLMh0uZGlzY29wYW5lbC52MS5TZXJ2ZXJPcFJlc3VsdCI2ChJVbmJhblBsYXllclJlcXVlc3QSEgoKc2VydmVyX2lkcxgBIAMoCRIMCgRuYW1lGAIgASgJIkUKE1VuYmFuUGxheWVyUmVzcG9uc2USLgoHcmVzdWx0cxgBIAMoCzIdLmRpc2NvcGFuZWwudjEuU2VydmVyT3BSZXN1bHQiKQoUR2V0U2VydmVyTW90ZFJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJIngKFUdldFNlcnZlck1vdGRSZXNwb25zZRIMCgRtb3RkGAEgASgJEgwKBGljb24YAiABKAkSGQoRd2hpdGVsaXN0X2VuYWJsZWQYAyABKAgSEwoLb25saW5lX21vZGUYBCABKAgSEwoLbWF4X3BsYXllcnMYBSABKAUi7gEKF1VwZGF0ZVNlcnZlck1vdGRSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIRCgRtb3RkGAIgASgJSACIAQESEQoEaWNvbhgDIAEoCUgBiAEBEh4KEXdoaXRlbGlzdF9lbmFibGVkGAQgASgISAKIAQESGAoLb25saW5lX21vZGUYBSABKAhIA4gBARIYCgttYXhfcGxheWVycxgGIAEoBUgEiAEBQgcKBV9tb3RkQgcKBV9pY29uQhQKEl93aGl0ZWxpc3RfZW5hYmxlZEIOCgxfb25saW5lX21vZGVCDgoMX21heF9wbGF5ZXJzIioKGFVwZGF0ZVNlcnZlck1vdGRSZXNwb25zZRIOCgZzdGF0dXMYASABKAky+gYKDEFkbWluU2VydmljZRJvChRMaXN0V2hpdGVsaXN0RW50cmllcxIqLmRpc2NvcGFuZWwudjEuTGlzdFdoaXRlbGlzdEVudHJpZXNSZXF1ZXN0GisuZGlzY29wYW5lbC52MS5MaXN0V2hpdGVsaXN0RW50cmllc1Jlc3BvbnNlEmYKEUFkZFdoaXRlbGlzdEVudHJ5EicuZGlzY29wYW5lbC52MS5BZGRXaGl0ZWxpc3RFbnRyeVJlcXVlc3QaKC5kaXNjb3BhbmVsLnYxLkFkZFdoaXRlbGlzdEVudHJ5UmVzcG9uc2USbwoUUmVtb3ZlV2hpdGVsaXN0RW50cnkSKi5kaXNjb3BhbmVsLnYxLlJlbW92ZVdoaXRlbGlzdEVudHJ5UmVxdWVzdBorLmRpc2NvcGFuZWwudjEuUmVtb3ZlV2hpdGVsaXN0RW50cnlSZXNwb25zZRJdCg5BcHBseVdoaXRlbGlzdBIkLmRpc2NvcGFuZWwudjEuQXBwbHlXaGl0ZWxpc3RSZXF1ZXN0GiUuZGlzY29wYW5lbC52MS5BcHBseVdoaXRlbGlzdFJlc3BvbnNlEloKDVB1bGxXaGl0ZWxpc3QSIy5kaXNjb3BhbmVsLnYxLlB1bGxXaGl0ZWxpc3RSZXF1ZXN0GiQuZGlzY29wYW5lbC52MS5QdWxsV2hpdGVsaXN0UmVzcG9uc2USTgoJQmFuUGxheWVyEh8uZGlzY29wYW5lbC52MS5CYW5QbGF5ZXJSZXF1ZXN0GiAuZGlzY29wYW5lbC52MS5CYW5QbGF5ZXJSZXNwb25zZRJUCgtVbmJhblBsYXllchIhLmRpc2NvcGFuZWwudjEuVW5iYW5QbGF5ZXJSZXF1ZXN0GiIuZGlzY29wYW5lbC52MS5VbmJhblBsYXllclJlc3BvbnNlEloKDUdldFNlcnZlck1vdGQSIy5kaXNjb3BhbmVsLnYxLkdldFNlcnZlck1vdGRSZXF1ZXN0GiQuZGlzY29wYW5lbC52MS5HZXRTZXJ2ZXJNb3RkUmVzcG9uc2USYwoQVXBkYXRlU2VydmVyTW90ZBImLmRpc2NvcGFuZWwudjEuVXBkYXRlU2VydmVyTW90ZFJlcXVlc3QaJy5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlck1vdGRSZXNwb25zZUJGWkRnaXRodWIuY29tL25pY2toZXllci9kaXNjb3BhbmVsL3BrZy9wcm90by9kaXNjb3BhbmVsL3YxO2Rpc2NvcGFuZWx2MWIGcHJvdG8z',
+		[file_google_protobuf_timestamp]
+	);
 
 /**
  * A whitelisted player (panel-side desired state)
  *
  * @generated from message discopanel.v1.WhitelistEntry
  */
-export type WhitelistEntry = Message<"discopanel.v1.WhitelistEntry"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type WhitelistEntry = Message<'discopanel.v1.WhitelistEntry'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+	/**
+	 * @generated from field: string name = 2;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string note = 3;
-   */
-  note: string;
+	/**
+	 * @generated from field: string note = 3;
+	 */
+	note: string;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 4;
-   */
-  createdAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp created_at = 4;
+	 */
+	createdAt?: Timestamp | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.WhitelistEntry.
  * Use `create(WhitelistEntrySchema)` to create a new message.
  */
-export const WhitelistEntrySchema: GenMessage<WhitelistEntry> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 0);
+export const WhitelistEntrySchema: GenMessage<WhitelistEntry> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 0);
 
 /**
  * Outcome of applying whitelist/ban commands to one server
  *
  * @generated from message discopanel.v1.ServerOpResult
  */
-export type ServerOpResult = Message<"discopanel.v1.ServerOpResult"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type ServerOpResult = Message<'discopanel.v1.ServerOpResult'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string server_name = 2;
-   */
-  serverName: string;
+	/**
+	 * @generated from field: string server_name = 2;
+	 */
+	serverName: string;
 
-  /**
-   * @generated from field: bool success = 3;
-   */
-  success: boolean;
+	/**
+	 * @generated from field: bool success = 3;
+	 */
+	success: boolean;
 
-  /**
-   * @generated from field: string message = 4;
-   */
-  message: string;
+	/**
+	 * @generated from field: string message = 4;
+	 */
+	message: string;
 
-  /**
-   * Names added on this server (whitelist apply)
-   *
-   * @generated from field: repeated string added = 5;
-   */
-  added: string[];
+	/**
+	 * Names added on this server (whitelist apply)
+	 *
+	 * @generated from field: repeated string added = 5;
+	 */
+	added: string[];
 
-  /**
-   * Names removed on this server (whitelist apply)
-   *
-   * @generated from field: repeated string removed = 6;
-   */
-  removed: string[];
+	/**
+	 * Names removed on this server (whitelist apply)
+	 *
+	 * @generated from field: repeated string removed = 6;
+	 */
+	removed: string[];
 
-  /**
-   * Final whitelist on this server (empty for ban ops)
-   *
-   * @generated from field: repeated string current = 7;
-   */
-  current: string[];
+	/**
+	 * Final whitelist on this server (empty for ban ops)
+	 *
+	 * @generated from field: repeated string current = 7;
+	 */
+	current: string[];
 };
 
 /**
  * Describes the message discopanel.v1.ServerOpResult.
  * Use `create(ServerOpResultSchema)` to create a new message.
  */
-export const ServerOpResultSchema: GenMessage<ServerOpResult> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 1);
+export const ServerOpResultSchema: GenMessage<ServerOpResult> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 1);
 
 /**
  * List whitelist entries request
  *
  * @generated from message discopanel.v1.ListWhitelistEntriesRequest
  */
-export type ListWhitelistEntriesRequest = Message<"discopanel.v1.ListWhitelistEntriesRequest"> & {
-  /**
-   * Optional name substring filter
-   *
-   * @generated from field: string search = 1;
-   */
-  search: string;
+export type ListWhitelistEntriesRequest = Message<'discopanel.v1.ListWhitelistEntriesRequest'> & {
+	/**
+	 * Optional name substring filter
+	 *
+	 * @generated from field: string search = 1;
+	 */
+	search: string;
 };
 
 /**
  * Describes the message discopanel.v1.ListWhitelistEntriesRequest.
  * Use `create(ListWhitelistEntriesRequestSchema)` to create a new message.
  */
-export const ListWhitelistEntriesRequestSchema: GenMessage<ListWhitelistEntriesRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 2);
+export const ListWhitelistEntriesRequestSchema: GenMessage<ListWhitelistEntriesRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 2);
 
 /**
  * List whitelist entries response
  *
  * @generated from message discopanel.v1.ListWhitelistEntriesResponse
  */
-export type ListWhitelistEntriesResponse = Message<"discopanel.v1.ListWhitelistEntriesResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.WhitelistEntry entries = 1;
-   */
-  entries: WhitelistEntry[];
+export type ListWhitelistEntriesResponse = Message<'discopanel.v1.ListWhitelistEntriesResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.WhitelistEntry entries = 1;
+	 */
+	entries: WhitelistEntry[];
 };
 
 /**
  * Describes the message discopanel.v1.ListWhitelistEntriesResponse.
  * Use `create(ListWhitelistEntriesResponseSchema)` to create a new message.
  */
-export const ListWhitelistEntriesResponseSchema: GenMessage<ListWhitelistEntriesResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 3);
+export const ListWhitelistEntriesResponseSchema: GenMessage<ListWhitelistEntriesResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 3);
 
 /**
  * Add whitelist entry request
  *
  * @generated from message discopanel.v1.AddWhitelistEntryRequest
  */
-export type AddWhitelistEntryRequest = Message<"discopanel.v1.AddWhitelistEntryRequest"> & {
-  /**
-   * @generated from field: string name = 1;
-   */
-  name: string;
+export type AddWhitelistEntryRequest = Message<'discopanel.v1.AddWhitelistEntryRequest'> & {
+	/**
+	 * @generated from field: string name = 1;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string note = 2;
-   */
-  note: string;
+	/**
+	 * @generated from field: string note = 2;
+	 */
+	note: string;
 };
 
 /**
  * Describes the message discopanel.v1.AddWhitelistEntryRequest.
  * Use `create(AddWhitelistEntryRequestSchema)` to create a new message.
  */
-export const AddWhitelistEntryRequestSchema: GenMessage<AddWhitelistEntryRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 4);
+export const AddWhitelistEntryRequestSchema: GenMessage<AddWhitelistEntryRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 4);
 
 /**
  * Add whitelist entry response
  *
  * @generated from message discopanel.v1.AddWhitelistEntryResponse
  */
-export type AddWhitelistEntryResponse = Message<"discopanel.v1.AddWhitelistEntryResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.WhitelistEntry entry = 1;
-   */
-  entry?: WhitelistEntry | undefined;
+export type AddWhitelistEntryResponse = Message<'discopanel.v1.AddWhitelistEntryResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.WhitelistEntry entry = 1;
+	 */
+	entry?: WhitelistEntry | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.AddWhitelistEntryResponse.
  * Use `create(AddWhitelistEntryResponseSchema)` to create a new message.
  */
-export const AddWhitelistEntryResponseSchema: GenMessage<AddWhitelistEntryResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 5);
+export const AddWhitelistEntryResponseSchema: GenMessage<AddWhitelistEntryResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 5);
 
 /**
  * Remove whitelist entry request
  *
  * @generated from message discopanel.v1.RemoveWhitelistEntryRequest
  */
-export type RemoveWhitelistEntryRequest = Message<"discopanel.v1.RemoveWhitelistEntryRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type RemoveWhitelistEntryRequest = Message<'discopanel.v1.RemoveWhitelistEntryRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 };
 
 /**
  * Describes the message discopanel.v1.RemoveWhitelistEntryRequest.
  * Use `create(RemoveWhitelistEntryRequestSchema)` to create a new message.
  */
-export const RemoveWhitelistEntryRequestSchema: GenMessage<RemoveWhitelistEntryRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 6);
+export const RemoveWhitelistEntryRequestSchema: GenMessage<RemoveWhitelistEntryRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 6);
 
 /**
  * Remove whitelist entry response
  *
  * @generated from message discopanel.v1.RemoveWhitelistEntryResponse
  */
-export type RemoveWhitelistEntryResponse = Message<"discopanel.v1.RemoveWhitelistEntryResponse"> & {
-};
+export type RemoveWhitelistEntryResponse =
+	Message<'discopanel.v1.RemoveWhitelistEntryResponse'> & {};
 
 /**
  * Describes the message discopanel.v1.RemoveWhitelistEntryResponse.
  * Use `create(RemoveWhitelistEntryResponseSchema)` to create a new message.
  */
-export const RemoveWhitelistEntryResponseSchema: GenMessage<RemoveWhitelistEntryResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 7);
+export const RemoveWhitelistEntryResponseSchema: GenMessage<RemoveWhitelistEntryResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 7);
 
 /**
  * Apply whitelist request
  *
  * @generated from message discopanel.v1.ApplyWhitelistRequest
  */
-export type ApplyWhitelistRequest = Message<"discopanel.v1.ApplyWhitelistRequest"> & {
-  /**
-   * Empty = all servers
-   *
-   * @generated from field: repeated string server_ids = 1;
-   */
-  serverIds: string[];
+export type ApplyWhitelistRequest = Message<'discopanel.v1.ApplyWhitelistRequest'> & {
+	/**
+	 * Empty = all servers
+	 *
+	 * @generated from field: repeated string server_ids = 1;
+	 */
+	serverIds: string[];
 };
 
 /**
  * Describes the message discopanel.v1.ApplyWhitelistRequest.
  * Use `create(ApplyWhitelistRequestSchema)` to create a new message.
  */
-export const ApplyWhitelistRequestSchema: GenMessage<ApplyWhitelistRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 8);
+export const ApplyWhitelistRequestSchema: GenMessage<ApplyWhitelistRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 8);
 
 /**
  * Apply whitelist response
  *
  * @generated from message discopanel.v1.ApplyWhitelistResponse
  */
-export type ApplyWhitelistResponse = Message<"discopanel.v1.ApplyWhitelistResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ServerOpResult results = 1;
-   */
-  results: ServerOpResult[];
+export type ApplyWhitelistResponse = Message<'discopanel.v1.ApplyWhitelistResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ServerOpResult results = 1;
+	 */
+	results: ServerOpResult[];
 };
 
 /**
  * Describes the message discopanel.v1.ApplyWhitelistResponse.
  * Use `create(ApplyWhitelistResponseSchema)` to create a new message.
  */
-export const ApplyWhitelistResponseSchema: GenMessage<ApplyWhitelistResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 9);
+export const ApplyWhitelistResponseSchema: GenMessage<ApplyWhitelistResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 9);
 
 /**
  * Pull whitelist request
  *
  * @generated from message discopanel.v1.PullWhitelistRequest
  */
-export type PullWhitelistRequest = Message<"discopanel.v1.PullWhitelistRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type PullWhitelistRequest = Message<'discopanel.v1.PullWhitelistRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 };
 
 /**
  * Describes the message discopanel.v1.PullWhitelistRequest.
  * Use `create(PullWhitelistRequestSchema)` to create a new message.
  */
-export const PullWhitelistRequestSchema: GenMessage<PullWhitelistRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 10);
+export const PullWhitelistRequestSchema: GenMessage<PullWhitelistRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 10);
 
 /**
  * Pull whitelist response
  *
  * @generated from message discopanel.v1.PullWhitelistResponse
  */
-export type PullWhitelistResponse = Message<"discopanel.v1.PullWhitelistResponse"> & {
-  /**
-   * Names now in the panel whitelist
-   *
-   * @generated from field: repeated string imported = 2;
-   */
-  imported: string[];
+export type PullWhitelistResponse = Message<'discopanel.v1.PullWhitelistResponse'> & {
+	/**
+	 * Names now in the panel whitelist
+	 *
+	 * @generated from field: repeated string imported = 2;
+	 */
+	imported: string[];
 };
 
 /**
  * Describes the message discopanel.v1.PullWhitelistResponse.
  * Use `create(PullWhitelistResponseSchema)` to create a new message.
  */
-export const PullWhitelistResponseSchema: GenMessage<PullWhitelistResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 11);
+export const PullWhitelistResponseSchema: GenMessage<PullWhitelistResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 11);
 
 /**
  * Ban player request
  *
  * @generated from message discopanel.v1.BanPlayerRequest
  */
-export type BanPlayerRequest = Message<"discopanel.v1.BanPlayerRequest"> & {
-  /**
-   * Empty = all servers
-   *
-   * @generated from field: repeated string server_ids = 1;
-   */
-  serverIds: string[];
+export type BanPlayerRequest = Message<'discopanel.v1.BanPlayerRequest'> & {
+	/**
+	 * Empty = all servers
+	 *
+	 * @generated from field: repeated string server_ids = 1;
+	 */
+	serverIds: string[];
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+	/**
+	 * @generated from field: string name = 2;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string reason = 3;
-   */
-  reason: string;
+	/**
+	 * @generated from field: string reason = 3;
+	 */
+	reason: string;
 };
 
 /**
  * Describes the message discopanel.v1.BanPlayerRequest.
  * Use `create(BanPlayerRequestSchema)` to create a new message.
  */
-export const BanPlayerRequestSchema: GenMessage<BanPlayerRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 12);
+export const BanPlayerRequestSchema: GenMessage<BanPlayerRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 12);
 
 /**
  * Ban player response
  *
  * @generated from message discopanel.v1.BanPlayerResponse
  */
-export type BanPlayerResponse = Message<"discopanel.v1.BanPlayerResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ServerOpResult results = 1;
-   */
-  results: ServerOpResult[];
+export type BanPlayerResponse = Message<'discopanel.v1.BanPlayerResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ServerOpResult results = 1;
+	 */
+	results: ServerOpResult[];
 };
 
 /**
  * Describes the message discopanel.v1.BanPlayerResponse.
  * Use `create(BanPlayerResponseSchema)` to create a new message.
  */
-export const BanPlayerResponseSchema: GenMessage<BanPlayerResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 13);
+export const BanPlayerResponseSchema: GenMessage<BanPlayerResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 13);
 
 /**
  * Unban player request
  *
  * @generated from message discopanel.v1.UnbanPlayerRequest
  */
-export type UnbanPlayerRequest = Message<"discopanel.v1.UnbanPlayerRequest"> & {
-  /**
-   * Empty = all servers
-   *
-   * @generated from field: repeated string server_ids = 1;
-   */
-  serverIds: string[];
+export type UnbanPlayerRequest = Message<'discopanel.v1.UnbanPlayerRequest'> & {
+	/**
+	 * Empty = all servers
+	 *
+	 * @generated from field: repeated string server_ids = 1;
+	 */
+	serverIds: string[];
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+	/**
+	 * @generated from field: string name = 2;
+	 */
+	name: string;
 };
 
 /**
  * Describes the message discopanel.v1.UnbanPlayerRequest.
  * Use `create(UnbanPlayerRequestSchema)` to create a new message.
  */
-export const UnbanPlayerRequestSchema: GenMessage<UnbanPlayerRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 14);
+export const UnbanPlayerRequestSchema: GenMessage<UnbanPlayerRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 14);
 
 /**
  * Unban player response
  *
  * @generated from message discopanel.v1.UnbanPlayerResponse
  */
-export type UnbanPlayerResponse = Message<"discopanel.v1.UnbanPlayerResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ServerOpResult results = 1;
-   */
-  results: ServerOpResult[];
+export type UnbanPlayerResponse = Message<'discopanel.v1.UnbanPlayerResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ServerOpResult results = 1;
+	 */
+	results: ServerOpResult[];
 };
 
 /**
  * Describes the message discopanel.v1.UnbanPlayerResponse.
  * Use `create(UnbanPlayerResponseSchema)` to create a new message.
  */
-export const UnbanPlayerResponseSchema: GenMessage<UnbanPlayerResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 15);
+export const UnbanPlayerResponseSchema: GenMessage<UnbanPlayerResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 15);
 
 /**
  * Get MOTD request
  *
  * @generated from message discopanel.v1.GetServerMotdRequest
  */
-export type GetServerMotdRequest = Message<"discopanel.v1.GetServerMotdRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type GetServerMotdRequest = Message<'discopanel.v1.GetServerMotdRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetServerMotdRequest.
  * Use `create(GetServerMotdRequestSchema)` to create a new message.
  */
-export const GetServerMotdRequestSchema: GenMessage<GetServerMotdRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 16);
+export const GetServerMotdRequestSchema: GenMessage<GetServerMotdRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 16);
 
 /**
  * Get MOTD response
  *
  * @generated from message discopanel.v1.GetServerMotdResponse
  */
-export type GetServerMotdResponse = Message<"discopanel.v1.GetServerMotdResponse"> & {
-  /**
-   * Raw motd value from server.properties (escaped \u00A7 etc.)
-   *
-   * @generated from field: string motd = 1;
-   */
-  motd: string;
+export type GetServerMotdResponse = Message<'discopanel.v1.GetServerMotdResponse'> & {
+	/**
+	 * Raw motd value from server.properties (escaped \u00A7 etc.)
+	 *
+	 * @generated from field: string motd = 1;
+	 */
+	motd: string;
 
-  /**
-   * Base64 PNG of icon.png, empty when absent
-   *
-   * @generated from field: string icon = 2;
-   */
-  icon: string;
+	/**
+	 * Base64 PNG of icon.png, empty when absent
+	 *
+	 * @generated from field: string icon = 2;
+	 */
+	icon: string;
 
-  /**
-   * Current white-list setting in server.properties
-   *
-   * @generated from field: bool whitelist_enabled = 3;
-   */
-  whitelistEnabled: boolean;
+	/**
+	 * Current white-list setting in server.properties
+	 *
+	 * @generated from field: bool whitelist_enabled = 3;
+	 */
+	whitelistEnabled: boolean;
 
-  /**
-   * Current online-mode setting in server.properties
-   *
-   * @generated from field: bool online_mode = 4;
-   */
-  onlineMode: boolean;
+	/**
+	 * Current online-mode setting in server.properties
+	 *
+	 * @generated from field: bool online_mode = 4;
+	 */
+	onlineMode: boolean;
 
-  /**
-   * Current max-players setting in server.properties
-   *
-   * @generated from field: int32 max_players = 5;
-   */
-  maxPlayers: number;
+	/**
+	 * Current max-players setting in server.properties
+	 *
+	 * @generated from field: int32 max_players = 5;
+	 */
+	maxPlayers: number;
 };
 
 /**
  * Describes the message discopanel.v1.GetServerMotdResponse.
  * Use `create(GetServerMotdResponseSchema)` to create a new message.
  */
-export const GetServerMotdResponseSchema: GenMessage<GetServerMotdResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 17);
+export const GetServerMotdResponseSchema: GenMessage<GetServerMotdResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 17);
 
 /**
  * Update MOTD request
  *
  * @generated from message discopanel.v1.UpdateServerMotdRequest
  */
-export type UpdateServerMotdRequest = Message<"discopanel.v1.UpdateServerMotdRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type UpdateServerMotdRequest = Message<'discopanel.v1.UpdateServerMotdRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * Omit to leave unchanged
-   *
-   * @generated from field: optional string motd = 2;
-   */
-  motd?: string | undefined;
+	/**
+	 * Omit to leave unchanged
+	 *
+	 * @generated from field: optional string motd = 2;
+	 */
+	motd?: string | undefined;
 
-  /**
-   * Base64 PNG; empty string removes icon.png
-   *
-   * @generated from field: optional string icon = 3;
-   */
-  icon?: string | undefined;
+	/**
+	 * Base64 PNG; empty string removes icon.png
+	 *
+	 * @generated from field: optional string icon = 3;
+	 */
+	icon?: string | undefined;
 
-  /**
-   * Writes white-list=true/false and issues the RCON reload
-   *
-   * @generated from field: optional bool whitelist_enabled = 4;
-   */
-  whitelistEnabled?: boolean | undefined;
+	/**
+	 * Writes white-list=true/false and issues the RCON reload
+	 *
+	 * @generated from field: optional bool whitelist_enabled = 4;
+	 */
+	whitelistEnabled?: boolean | undefined;
 
-  /**
-   * Writes online-mode (requires restart)
-   *
-   * @generated from field: optional bool online_mode = 5;
-   */
-  onlineMode?: boolean | undefined;
+	/**
+	 * Writes online-mode (requires restart)
+	 *
+	 * @generated from field: optional bool online_mode = 5;
+	 */
+	onlineMode?: boolean | undefined;
 
-  /**
-   * Writes max-players (requires restart)
-   *
-   * @generated from field: optional int32 max_players = 6;
-   */
-  maxPlayers?: number | undefined;
+	/**
+	 * Writes max-players (requires restart)
+	 *
+	 * @generated from field: optional int32 max_players = 6;
+	 */
+	maxPlayers?: number | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateServerMotdRequest.
  * Use `create(UpdateServerMotdRequestSchema)` to create a new message.
  */
-export const UpdateServerMotdRequestSchema: GenMessage<UpdateServerMotdRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 18);
+export const UpdateServerMotdRequestSchema: GenMessage<UpdateServerMotdRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 18);
 
 /**
  * Update MOTD response
  *
  * @generated from message discopanel.v1.UpdateServerMotdResponse
  */
-export type UpdateServerMotdResponse = Message<"discopanel.v1.UpdateServerMotdResponse"> & {
-  /**
-   * "updated"
-   *
-   * @generated from field: string status = 1;
-   */
-  status: string;
+export type UpdateServerMotdResponse = Message<'discopanel.v1.UpdateServerMotdResponse'> & {
+	/**
+	 * "updated"
+	 *
+	 * @generated from field: string status = 1;
+	 */
+	status: string;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateServerMotdResponse.
  * Use `create(UpdateServerMotdResponseSchema)` to create a new message.
  */
-export const UpdateServerMotdResponseSchema: GenMessage<UpdateServerMotdResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_admin, 19);
+export const UpdateServerMotdResponseSchema: GenMessage<UpdateServerMotdResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_admin, 19);
 
 /**
  * Server administration: whitelist management and MOTD editing.
@@ -546,96 +570,94 @@ export const UpdateServerMotdResponseSchema: GenMessage<UpdateServerMotdResponse
  * @generated from service discopanel.v1.AdminService
  */
 export const AdminService: GenService<{
-  /**
-   * List whitelist entries stored in the panel
-   *
-   * @generated from rpc discopanel.v1.AdminService.ListWhitelistEntries
-   */
-  listWhitelistEntries: {
-    methodKind: "unary";
-    input: typeof ListWhitelistEntriesRequestSchema;
-    output: typeof ListWhitelistEntriesResponseSchema;
-  },
-  /**
-   * Add a player to the panel-side whitelist
-   *
-   * @generated from rpc discopanel.v1.AdminService.AddWhitelistEntry
-   */
-  addWhitelistEntry: {
-    methodKind: "unary";
-    input: typeof AddWhitelistEntryRequestSchema;
-    output: typeof AddWhitelistEntryResponseSchema;
-  },
-  /**
-   * Remove a player from the panel-side whitelist
-   *
-   * @generated from rpc discopanel.v1.AdminService.RemoveWhitelistEntry
-   */
-  removeWhitelistEntry: {
-    methodKind: "unary";
-    input: typeof RemoveWhitelistEntryRequestSchema;
-    output: typeof RemoveWhitelistEntryResponseSchema;
-  },
-  /**
-   * Converge selected servers to the panel-side whitelist via RCON
-   *
-   * @generated from rpc discopanel.v1.AdminService.ApplyWhitelist
-   */
-  applyWhitelist: {
-    methodKind: "unary";
-    input: typeof ApplyWhitelistRequestSchema;
-    output: typeof ApplyWhitelistResponseSchema;
-  },
-  /**
-   * Read the current whitelist from a server via RCON and import it into the panel
-   *
-   * @generated from rpc discopanel.v1.AdminService.PullWhitelist
-   */
-  pullWhitelist: {
-    methodKind: "unary";
-    input: typeof PullWhitelistRequestSchema;
-    output: typeof PullWhitelistResponseSchema;
-  },
-  /**
-   * Ban a player on the selected servers via RCON
-   *
-   * @generated from rpc discopanel.v1.AdminService.BanPlayer
-   */
-  banPlayer: {
-    methodKind: "unary";
-    input: typeof BanPlayerRequestSchema;
-    output: typeof BanPlayerResponseSchema;
-  },
-  /**
-   * Unban a player on the selected servers via RCON
-   *
-   * @generated from rpc discopanel.v1.AdminService.UnbanPlayer
-   */
-  unbanPlayer: {
-    methodKind: "unary";
-    input: typeof UnbanPlayerRequestSchema;
-    output: typeof UnbanPlayerResponseSchema;
-  },
-  /**
-   * Read the MOTD and icon from a server's server.properties / icon.png
-   *
-   * @generated from rpc discopanel.v1.AdminService.GetServerMotd
-   */
-  getServerMotd: {
-    methodKind: "unary";
-    input: typeof GetServerMotdRequestSchema;
-    output: typeof GetServerMotdResponseSchema;
-  },
-  /**
-   * Write the MOTD and/or icon to a server (server must be stopped to take effect on restart)
-   *
-   * @generated from rpc discopanel.v1.AdminService.UpdateServerMotd
-   */
-  updateServerMotd: {
-    methodKind: "unary";
-    input: typeof UpdateServerMotdRequestSchema;
-    output: typeof UpdateServerMotdResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_discopanel_v1_admin, 0);
-
+	/**
+	 * List whitelist entries stored in the panel
+	 *
+	 * @generated from rpc discopanel.v1.AdminService.ListWhitelistEntries
+	 */
+	listWhitelistEntries: {
+		methodKind: 'unary';
+		input: typeof ListWhitelistEntriesRequestSchema;
+		output: typeof ListWhitelistEntriesResponseSchema;
+	};
+	/**
+	 * Add a player to the panel-side whitelist
+	 *
+	 * @generated from rpc discopanel.v1.AdminService.AddWhitelistEntry
+	 */
+	addWhitelistEntry: {
+		methodKind: 'unary';
+		input: typeof AddWhitelistEntryRequestSchema;
+		output: typeof AddWhitelistEntryResponseSchema;
+	};
+	/**
+	 * Remove a player from the panel-side whitelist
+	 *
+	 * @generated from rpc discopanel.v1.AdminService.RemoveWhitelistEntry
+	 */
+	removeWhitelistEntry: {
+		methodKind: 'unary';
+		input: typeof RemoveWhitelistEntryRequestSchema;
+		output: typeof RemoveWhitelistEntryResponseSchema;
+	};
+	/**
+	 * Converge selected servers to the panel-side whitelist via RCON
+	 *
+	 * @generated from rpc discopanel.v1.AdminService.ApplyWhitelist
+	 */
+	applyWhitelist: {
+		methodKind: 'unary';
+		input: typeof ApplyWhitelistRequestSchema;
+		output: typeof ApplyWhitelistResponseSchema;
+	};
+	/**
+	 * Read the current whitelist from a server via RCON and import it into the panel
+	 *
+	 * @generated from rpc discopanel.v1.AdminService.PullWhitelist
+	 */
+	pullWhitelist: {
+		methodKind: 'unary';
+		input: typeof PullWhitelistRequestSchema;
+		output: typeof PullWhitelistResponseSchema;
+	};
+	/**
+	 * Ban a player on the selected servers via RCON
+	 *
+	 * @generated from rpc discopanel.v1.AdminService.BanPlayer
+	 */
+	banPlayer: {
+		methodKind: 'unary';
+		input: typeof BanPlayerRequestSchema;
+		output: typeof BanPlayerResponseSchema;
+	};
+	/**
+	 * Unban a player on the selected servers via RCON
+	 *
+	 * @generated from rpc discopanel.v1.AdminService.UnbanPlayer
+	 */
+	unbanPlayer: {
+		methodKind: 'unary';
+		input: typeof UnbanPlayerRequestSchema;
+		output: typeof UnbanPlayerResponseSchema;
+	};
+	/**
+	 * Read the MOTD and icon from a server's server.properties / icon.png
+	 *
+	 * @generated from rpc discopanel.v1.AdminService.GetServerMotd
+	 */
+	getServerMotd: {
+		methodKind: 'unary';
+		input: typeof GetServerMotdRequestSchema;
+		output: typeof GetServerMotdResponseSchema;
+	};
+	/**
+	 * Write the MOTD and/or icon to a server (server must be stopped to take effect on restart)
+	 *
+	 * @generated from rpc discopanel.v1.AdminService.UpdateServerMotd
+	 */
+	updateServerMotd: {
+		methodKind: 'unary';
+		input: typeof UpdateServerMotdRequestSchema;
+		output: typeof UpdateServerMotdResponseSchema;
+	};
+}> = /*@__PURE__*/ serviceDesc(file_discopanel_v1_admin, 0);

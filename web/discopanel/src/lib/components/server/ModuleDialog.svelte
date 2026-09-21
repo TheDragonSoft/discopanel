@@ -584,19 +584,29 @@
 
 <Dialog bind:open>
 	<DialogContent
-		class="flex h-[100dvh]! sm:h-[85vh]! w-full! sm:w-[95vw]! max-w-6xl! flex-col gap-0! overflow-hidden p-0! rounded-none sm:rounded-lg border-0 sm:border"
+		class="flex h-[100dvh]! w-full! max-w-6xl! flex-col gap-0! overflow-hidden rounded-none border-0 p-0! sm:h-[85vh]! sm:w-[95vw]! sm:rounded-lg sm:border"
 		showCloseButton={false}
 	>
 		{#if mode === 'create' && step === 'select'}
 			<!-- Template Selection -->
 			<div class="flex h-full flex-col">
 				<!-- Header -->
-				<div class="flex items-center justify-between border-b bg-muted/30 px-4 py-3 sm:px-8 sm:py-6">
+				<div
+					class="flex items-center justify-between border-b bg-muted/30 px-4 py-3 sm:px-8 sm:py-6"
+				>
 					<div>
-						<h2 class="text-lg sm:text-2xl font-semibold tracking-tight">Add Module</h2>
-						<p class="mt-0.5 sm:mt-1 text-xs sm:text-sm text-muted-foreground">Select a module template to get started</p>
+						<h2 class="text-lg font-semibold tracking-tight sm:text-2xl">Add Module</h2>
+						<p class="mt-0.5 text-xs text-muted-foreground sm:mt-1 sm:text-sm">
+							Select a module template to get started
+						</p>
 					</div>
-					<Button variant="ghost" size="icon" onclick={() => (open = false)} class="h-8 w-8 sm:h-10 sm:w-10" aria-label="Close">
+					<Button
+						variant="ghost"
+						size="icon"
+						onclick={() => (open = false)}
+						class="h-8 w-8 sm:h-10 sm:w-10"
+						aria-label="Close"
+					>
 						<X class="h-4 w-4 sm:h-5 sm:w-5" />
 					</Button>
 				</div>
@@ -612,11 +622,11 @@
 			</div>
 		{:else}
 			<!-- Configuration View -->
-			<div class="flex flex-col md:flex-row h-full">
+			<div class="flex h-full flex-col md:flex-row">
 				<!-- Navigation: Horizontal Tabs on mobile (< md), Left Sidebar on Desktop (>= md) -->
-				<div class="flex flex-col md:w-64 shrink-0 border-b md:border-b-0 md:border-r bg-muted/30">
+				<div class="flex shrink-0 flex-col border-b bg-muted/30 md:w-64 md:border-r md:border-b-0">
 					<!-- Sidebar Header (desktop only) -->
-					<div class="border-b p-4 sm:p-6 hidden md:block">
+					<div class="hidden border-b p-4 sm:p-6 md:block">
 						{#if mode === 'create'}
 							<button
 								onclick={() => {
@@ -630,11 +640,13 @@
 							</button>
 						{/if}
 						<div class="flex items-center gap-3">
-							<div class="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-xl bg-primary/10">
-								<Package class="h-5 w-5 sm:h-6 sm:w-6 text-primary" />
+							<div
+								class="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 sm:h-12 sm:w-12"
+							>
+								<Package class="h-5 w-5 text-primary sm:h-6 sm:w-6" />
 							</div>
 							<div class="min-w-0 flex-1">
-								<h3 class="truncate font-semibold text-sm sm:text-base">
+								<h3 class="truncate text-sm font-semibold sm:text-base">
 									{mode === 'create' ? selectedTemplate?.name : module?.templateName}
 								</h3>
 								{#if module}
@@ -651,14 +663,16 @@
 					</div>
 
 					<!-- Navigation -->
-					<nav class="flex md:flex-col overflow-x-auto md:overflow-y-auto scrollbar-none gap-1 p-2 md:p-4">
+					<nav
+						class="flex scrollbar-none gap-1 overflow-x-auto p-2 md:flex-col md:overflow-y-auto md:p-4"
+					>
 						{#if mode === 'create'}
 							<button
 								onclick={() => {
 									step = 'select';
 									selectedTemplate = null;
 								}}
-								class="md:hidden flex shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-muted border border-border/40"
+								class="flex shrink-0 items-center gap-1.5 rounded-lg border border-border/40 px-2.5 py-1.5 text-xs text-muted-foreground hover:bg-muted md:hidden"
 							>
 								<ArrowLeft class="h-3.5 w-3.5" />
 								Templates
@@ -668,12 +682,12 @@
 							{@const Icon = item.icon}
 							<button
 								onclick={() => (activeSection = item.id)}
-								class="flex shrink-0 items-center gap-2 md:gap-3 rounded-lg px-3 py-2 md:px-4 md:py-3 text-left transition-colors whitespace-nowrap text-xs md:text-sm {activeSection ===
+								class="flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-left text-xs whitespace-nowrap transition-colors md:gap-3 md:px-4 md:py-3 md:text-sm {activeSection ===
 								item.id
-									? 'bg-primary text-primary-foreground font-medium shadow-xs'
-									: 'text-muted-foreground hover:bg-muted hover:text-foreground bg-background/50 md:bg-transparent border md:border-0 border-border/40'}"
+									? 'bg-primary font-medium text-primary-foreground shadow-xs'
+									: 'border border-border/40 bg-background/50 text-muted-foreground hover:bg-muted hover:text-foreground md:border-0 md:bg-transparent'}"
 							>
-								<Icon class="h-4 w-4 md:h-5 md:w-5 shrink-0" />
+								<Icon class="h-4 w-4 shrink-0 md:h-5 md:w-5" />
 								<span>{item.label}</span>
 							</button>
 						{/each}
@@ -734,7 +748,13 @@
 								{/if}
 							</p>
 						</div>
-						<Button variant="ghost" size="icon" onclick={() => (open = false)} class="h-10 w-10" aria-label="Close">
+						<Button
+							variant="ghost"
+							size="icon"
+							onclick={() => (open = false)}
+							class="h-10 w-10"
+							aria-label="Close"
+						>
 							<X class="h-5 w-5" />
 						</Button>
 					</div>

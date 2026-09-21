@@ -2,358 +2,372 @@
 // @generated from file discopanel/v1/template.proto (package discopanel.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { AdditionalPort, DockerOverrides, ModLoader, Server } from "./common_pb";
-import { file_discopanel_v1_common } from "./common_pb";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenFile, GenMessage, GenService } from '@bufbuild/protobuf/codegenv2';
+import { fileDesc, messageDesc, serviceDesc } from '@bufbuild/protobuf/codegenv2';
+import type { AdditionalPort, DockerOverrides, ModLoader, Server } from './common_pb';
+import { file_discopanel_v1_common } from './common_pb';
+import type { Timestamp } from '@bufbuild/protobuf/wkt';
+import { file_google_protobuf_timestamp } from '@bufbuild/protobuf/wkt';
+import type { Message } from '@bufbuild/protobuf';
 
 /**
  * Describes the file discopanel/v1/template.proto.
  */
-export const file_discopanel_v1_template: GenFile = /*@__PURE__*/
-  fileDesc("ChxkaXNjb3BhbmVsL3YxL3RlbXBsYXRlLnByb3RvEg1kaXNjb3BhbmVsLnYxIoEECg5TZXJ2ZXJUZW1wbGF0ZRIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEiwKCm1vZF9sb2FkZXIYBCABKA4yGC5kaXNjb3BhbmVsLnYxLk1vZExvYWRlchISCgptY192ZXJzaW9uGAUgASgJEg4KBm1lbW9yeRgGIAEoBRITCgttYXhfcGxheWVycxgHIAEoBRIUCgxqYXZhX3ZlcnNpb24YCCABKAkSFAoMZG9ja2VyX2ltYWdlGAkgASgJEjcKEGFkZGl0aW9uYWxfcG9ydHMYCiADKAsyHS5kaXNjb3BhbmVsLnYxLkFkZGl0aW9uYWxQb3J0EjgKEGRvY2tlcl9vdmVycmlkZXMYCyABKAsyHi5kaXNjb3BhbmVsLnYxLkRvY2tlck92ZXJyaWRlcxITCgtjb25maWdfanNvbhgMIAEoCRIQCghoYXNfbW9kcxgNIAEoCBIXCg9tb2RzX3NpemVfYnl0ZXMYDiABKAMSGgoSc291cmNlX3NlcnZlcl9uYW1lGA8gASgJEi4KCmNyZWF0ZWRfYXQYECABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYESABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIhwKGkxpc3RTZXJ2ZXJUZW1wbGF0ZXNSZXF1ZXN0Ik8KG0xpc3RTZXJ2ZXJUZW1wbGF0ZXNSZXNwb25zZRIwCgl0ZW1wbGF0ZXMYASADKAsyHS5kaXNjb3BhbmVsLnYxLlNlcnZlclRlbXBsYXRlImkKG0NyZWF0ZVNlcnZlclRlbXBsYXRlUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkSDAoEbmFtZRgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIUCgxpbmNsdWRlX21vZHMYBCABKAgiTwocQ3JlYXRlU2VydmVyVGVtcGxhdGVSZXNwb25zZRIvCgh0ZW1wbGF0ZRgBIAEoCzIdLmRpc2NvcGFuZWwudjEuU2VydmVyVGVtcGxhdGUibwobVXBkYXRlU2VydmVyVGVtcGxhdGVSZXF1ZXN0EgoKAmlkGAEgASgJEhEKBG5hbWUYAiABKAlIAIgBARIYCgtkZXNjcmlwdGlvbhgDIAEoCUgBiAEBQgcKBV9uYW1lQg4KDF9kZXNjcmlwdGlvbiJPChxVcGRhdGVTZXJ2ZXJUZW1wbGF0ZVJlc3BvbnNlEi8KCHRlbXBsYXRlGAEgASgLMh0uZGlzY29wYW5lbC52MS5TZXJ2ZXJUZW1wbGF0ZSIpChtEZWxldGVTZXJ2ZXJUZW1wbGF0ZVJlcXVlc3QSCgoCaWQYASABKAkiHgocRGVsZXRlU2VydmVyVGVtcGxhdGVSZXNwb25zZSJjChtEZXBsb3lTZXJ2ZXJUZW1wbGF0ZVJlcXVlc3QSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIWCg5wcm94eV9ob3N0bmFtZRgDIAEoCRISCgphdXRvX3N0YXJ0GAQgASgIIkUKHERlcGxveVNlcnZlclRlbXBsYXRlUmVzcG9uc2USJQoGc2VydmVyGAEgASgLMhUuZGlzY29wYW5lbC52MS5TZXJ2ZXIywwQKD1RlbXBsYXRlU2VydmljZRJsChNMaXN0U2VydmVyVGVtcGxhdGVzEikuZGlzY29wYW5lbC52MS5MaXN0U2VydmVyVGVtcGxhdGVzUmVxdWVzdBoqLmRpc2NvcGFuZWwudjEuTGlzdFNlcnZlclRlbXBsYXRlc1Jlc3BvbnNlEm8KFENyZWF0ZVNlcnZlclRlbXBsYXRlEiouZGlzY29wYW5lbC52MS5DcmVhdGVTZXJ2ZXJUZW1wbGF0ZVJlcXVlc3QaKy5kaXNjb3BhbmVsLnYxLkNyZWF0ZVNlcnZlclRlbXBsYXRlUmVzcG9uc2USbwoUVXBkYXRlU2VydmVyVGVtcGxhdGUSKi5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlclRlbXBsYXRlUmVxdWVzdBorLmRpc2NvcGFuZWwudjEuVXBkYXRlU2VydmVyVGVtcGxhdGVSZXNwb25zZRJvChREZWxldGVTZXJ2ZXJUZW1wbGF0ZRIqLmRpc2NvcGFuZWwudjEuRGVsZXRlU2VydmVyVGVtcGxhdGVSZXF1ZXN0GisuZGlzY29wYW5lbC52MS5EZWxldGVTZXJ2ZXJUZW1wbGF0ZVJlc3BvbnNlEm8KFERlcGxveVNlcnZlclRlbXBsYXRlEiouZGlzY29wYW5lbC52MS5EZXBsb3lTZXJ2ZXJUZW1wbGF0ZVJlcXVlc3QaKy5kaXNjb3BhbmVsLnYxLkRlcGxveVNlcnZlclRlbXBsYXRlUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw", [file_discopanel_v1_common, file_google_protobuf_timestamp]);
+export const file_discopanel_v1_template: GenFile =
+	/*@__PURE__*/
+	fileDesc(
+		'ChxkaXNjb3BhbmVsL3YxL3RlbXBsYXRlLnByb3RvEg1kaXNjb3BhbmVsLnYxIoEECg5TZXJ2ZXJUZW1wbGF0ZRIKCgJpZBgBIAEoCRIMCgRuYW1lGAIgASgJEhMKC2Rlc2NyaXB0aW9uGAMgASgJEiwKCm1vZF9sb2FkZXIYBCABKA4yGC5kaXNjb3BhbmVsLnYxLk1vZExvYWRlchISCgptY192ZXJzaW9uGAUgASgJEg4KBm1lbW9yeRgGIAEoBRITCgttYXhfcGxheWVycxgHIAEoBRIUCgxqYXZhX3ZlcnNpb24YCCABKAkSFAoMZG9ja2VyX2ltYWdlGAkgASgJEjcKEGFkZGl0aW9uYWxfcG9ydHMYCiADKAsyHS5kaXNjb3BhbmVsLnYxLkFkZGl0aW9uYWxQb3J0EjgKEGRvY2tlcl9vdmVycmlkZXMYCyABKAsyHi5kaXNjb3BhbmVsLnYxLkRvY2tlck92ZXJyaWRlcxITCgtjb25maWdfanNvbhgMIAEoCRIQCghoYXNfbW9kcxgNIAEoCBIXCg9tb2RzX3NpemVfYnl0ZXMYDiABKAMSGgoSc291cmNlX3NlcnZlcl9uYW1lGA8gASgJEi4KCmNyZWF0ZWRfYXQYECABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEi4KCnVwZGF0ZWRfYXQYESABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wIhwKGkxpc3RTZXJ2ZXJUZW1wbGF0ZXNSZXF1ZXN0Ik8KG0xpc3RTZXJ2ZXJUZW1wbGF0ZXNSZXNwb25zZRIwCgl0ZW1wbGF0ZXMYASADKAsyHS5kaXNjb3BhbmVsLnYxLlNlcnZlclRlbXBsYXRlImkKG0NyZWF0ZVNlcnZlclRlbXBsYXRlUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkSDAoEbmFtZRgCIAEoCRITCgtkZXNjcmlwdGlvbhgDIAEoCRIUCgxpbmNsdWRlX21vZHMYBCABKAgiTwocQ3JlYXRlU2VydmVyVGVtcGxhdGVSZXNwb25zZRIvCgh0ZW1wbGF0ZRgBIAEoCzIdLmRpc2NvcGFuZWwudjEuU2VydmVyVGVtcGxhdGUibwobVXBkYXRlU2VydmVyVGVtcGxhdGVSZXF1ZXN0EgoKAmlkGAEgASgJEhEKBG5hbWUYAiABKAlIAIgBARIYCgtkZXNjcmlwdGlvbhgDIAEoCUgBiAEBQgcKBV9uYW1lQg4KDF9kZXNjcmlwdGlvbiJPChxVcGRhdGVTZXJ2ZXJUZW1wbGF0ZVJlc3BvbnNlEi8KCHRlbXBsYXRlGAEgASgLMh0uZGlzY29wYW5lbC52MS5TZXJ2ZXJUZW1wbGF0ZSIpChtEZWxldGVTZXJ2ZXJUZW1wbGF0ZVJlcXVlc3QSCgoCaWQYASABKAkiHgocRGVsZXRlU2VydmVyVGVtcGxhdGVSZXNwb25zZSJjChtEZXBsb3lTZXJ2ZXJUZW1wbGF0ZVJlcXVlc3QSCgoCaWQYASABKAkSDAoEbmFtZRgCIAEoCRIWCg5wcm94eV9ob3N0bmFtZRgDIAEoCRISCgphdXRvX3N0YXJ0GAQgASgIIkUKHERlcGxveVNlcnZlclRlbXBsYXRlUmVzcG9uc2USJQoGc2VydmVyGAEgASgLMhUuZGlzY29wYW5lbC52MS5TZXJ2ZXIywwQKD1RlbXBsYXRlU2VydmljZRJsChNMaXN0U2VydmVyVGVtcGxhdGVzEikuZGlzY29wYW5lbC52MS5MaXN0U2VydmVyVGVtcGxhdGVzUmVxdWVzdBoqLmRpc2NvcGFuZWwudjEuTGlzdFNlcnZlclRlbXBsYXRlc1Jlc3BvbnNlEm8KFENyZWF0ZVNlcnZlclRlbXBsYXRlEiouZGlzY29wYW5lbC52MS5DcmVhdGVTZXJ2ZXJUZW1wbGF0ZVJlcXVlc3QaKy5kaXNjb3BhbmVsLnYxLkNyZWF0ZVNlcnZlclRlbXBsYXRlUmVzcG9uc2USbwoUVXBkYXRlU2VydmVyVGVtcGxhdGUSKi5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlclRlbXBsYXRlUmVxdWVzdBorLmRpc2NvcGFuZWwudjEuVXBkYXRlU2VydmVyVGVtcGxhdGVSZXNwb25zZRJvChREZWxldGVTZXJ2ZXJUZW1wbGF0ZRIqLmRpc2NvcGFuZWwudjEuRGVsZXRlU2VydmVyVGVtcGxhdGVSZXF1ZXN0GisuZGlzY29wYW5lbC52MS5EZWxldGVTZXJ2ZXJUZW1wbGF0ZVJlc3BvbnNlEm8KFERlcGxveVNlcnZlclRlbXBsYXRlEiouZGlzY29wYW5lbC52MS5EZXBsb3lTZXJ2ZXJUZW1wbGF0ZVJlcXVlc3QaKy5kaXNjb3BhbmVsLnYxLkRlcGxveVNlcnZlclRlbXBsYXRlUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw',
+		[file_discopanel_v1_common, file_google_protobuf_timestamp]
+	);
 
 /**
  * A saved server template
  *
  * @generated from message discopanel.v1.ServerTemplate
  */
-export type ServerTemplate = Message<"discopanel.v1.ServerTemplate"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type ServerTemplate = Message<'discopanel.v1.ServerTemplate'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+	/**
+	 * @generated from field: string name = 2;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string description = 3;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 3;
+	 */
+	description: string;
 
-  /**
-   * @generated from field: discopanel.v1.ModLoader mod_loader = 4;
-   */
-  modLoader: ModLoader;
+	/**
+	 * @generated from field: discopanel.v1.ModLoader mod_loader = 4;
+	 */
+	modLoader: ModLoader;
 
-  /**
-   * @generated from field: string mc_version = 5;
-   */
-  mcVersion: string;
+	/**
+	 * @generated from field: string mc_version = 5;
+	 */
+	mcVersion: string;
 
-  /**
-   * MB
-   *
-   * @generated from field: int32 memory = 6;
-   */
-  memory: number;
+	/**
+	 * MB
+	 *
+	 * @generated from field: int32 memory = 6;
+	 */
+	memory: number;
 
-  /**
-   * @generated from field: int32 max_players = 7;
-   */
-  maxPlayers: number;
+	/**
+	 * @generated from field: int32 max_players = 7;
+	 */
+	maxPlayers: number;
 
-  /**
-   * @generated from field: string java_version = 8;
-   */
-  javaVersion: string;
+	/**
+	 * @generated from field: string java_version = 8;
+	 */
+	javaVersion: string;
 
-  /**
-   * @generated from field: string docker_image = 9;
-   */
-  dockerImage: string;
+	/**
+	 * @generated from field: string docker_image = 9;
+	 */
+	dockerImage: string;
 
-  /**
-   * @generated from field: repeated discopanel.v1.AdditionalPort additional_ports = 10;
-   */
-  additionalPorts: AdditionalPort[];
+	/**
+	 * @generated from field: repeated discopanel.v1.AdditionalPort additional_ports = 10;
+	 */
+	additionalPorts: AdditionalPort[];
 
-  /**
-   * @generated from field: discopanel.v1.DockerOverrides docker_overrides = 11;
-   */
-  dockerOverrides?: DockerOverrides | undefined;
+	/**
+	 * @generated from field: discopanel.v1.DockerOverrides docker_overrides = 11;
+	 */
+	dockerOverrides?: DockerOverrides | undefined;
 
-  /**
-   * Serialized ServerConfig (JVM flags, env vars, etc.)
-   *
-   * @generated from field: string config_json = 12;
-   */
-  configJson: string;
+	/**
+	 * Serialized ServerConfig (JVM flags, env vars, etc.)
+	 *
+	 * @generated from field: string config_json = 12;
+	 */
+	configJson: string;
 
-  /**
-   * Mods directory captured and available for deploy
-   *
-   * @generated from field: bool has_mods = 13;
-   */
-  hasMods: boolean;
+	/**
+	 * Mods directory captured and available for deploy
+	 *
+	 * @generated from field: bool has_mods = 13;
+	 */
+	hasMods: boolean;
 
-  /**
-   * @generated from field: int64 mods_size_bytes = 14;
-   */
-  modsSizeBytes: bigint;
+	/**
+	 * @generated from field: int64 mods_size_bytes = 14;
+	 */
+	modsSizeBytes: bigint;
 
-  /**
-   * Server the template was captured from (informational)
-   *
-   * @generated from field: string source_server_name = 15;
-   */
-  sourceServerName: string;
+	/**
+	 * Server the template was captured from (informational)
+	 *
+	 * @generated from field: string source_server_name = 15;
+	 */
+	sourceServerName: string;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp created_at = 16;
-   */
-  createdAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp created_at = 16;
+	 */
+	createdAt?: Timestamp | undefined;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 17;
-   */
-  updatedAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp updated_at = 17;
+	 */
+	updatedAt?: Timestamp | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.ServerTemplate.
  * Use `create(ServerTemplateSchema)` to create a new message.
  */
-export const ServerTemplateSchema: GenMessage<ServerTemplate> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_template, 0);
+export const ServerTemplateSchema: GenMessage<ServerTemplate> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_template, 0);
 
 /**
  * List templates request
  *
  * @generated from message discopanel.v1.ListServerTemplatesRequest
  */
-export type ListServerTemplatesRequest = Message<"discopanel.v1.ListServerTemplatesRequest"> & {
-};
+export type ListServerTemplatesRequest = Message<'discopanel.v1.ListServerTemplatesRequest'> & {};
 
 /**
  * Describes the message discopanel.v1.ListServerTemplatesRequest.
  * Use `create(ListServerTemplatesRequestSchema)` to create a new message.
  */
-export const ListServerTemplatesRequestSchema: GenMessage<ListServerTemplatesRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_template, 1);
+export const ListServerTemplatesRequestSchema: GenMessage<ListServerTemplatesRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_template, 1);
 
 /**
  * List templates response
  *
  * @generated from message discopanel.v1.ListServerTemplatesResponse
  */
-export type ListServerTemplatesResponse = Message<"discopanel.v1.ListServerTemplatesResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ServerTemplate templates = 1;
-   */
-  templates: ServerTemplate[];
+export type ListServerTemplatesResponse = Message<'discopanel.v1.ListServerTemplatesResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ServerTemplate templates = 1;
+	 */
+	templates: ServerTemplate[];
 };
 
 /**
  * Describes the message discopanel.v1.ListServerTemplatesResponse.
  * Use `create(ListServerTemplatesResponseSchema)` to create a new message.
  */
-export const ListServerTemplatesResponseSchema: GenMessage<ListServerTemplatesResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_template, 2);
+export const ListServerTemplatesResponseSchema: GenMessage<ListServerTemplatesResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_template, 2);
 
 /**
  * Capture a template from an existing server
  *
  * @generated from message discopanel.v1.CreateServerTemplateRequest
  */
-export type CreateServerTemplateRequest = Message<"discopanel.v1.CreateServerTemplateRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type CreateServerTemplateRequest = Message<'discopanel.v1.CreateServerTemplateRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string name = 2;
-   */
-  name: string;
+	/**
+	 * @generated from field: string name = 2;
+	 */
+	name: string;
 
-  /**
-   * @generated from field: string description = 3;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 3;
+	 */
+	description: string;
 
-  /**
-   * Copy the server's mods directory into the template
-   *
-   * @generated from field: bool include_mods = 4;
-   */
-  includeMods: boolean;
+	/**
+	 * Copy the server's mods directory into the template
+	 *
+	 * @generated from field: bool include_mods = 4;
+	 */
+	includeMods: boolean;
 };
 
 /**
  * Describes the message discopanel.v1.CreateServerTemplateRequest.
  * Use `create(CreateServerTemplateRequestSchema)` to create a new message.
  */
-export const CreateServerTemplateRequestSchema: GenMessage<CreateServerTemplateRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_template, 3);
+export const CreateServerTemplateRequestSchema: GenMessage<CreateServerTemplateRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_template, 3);
 
 /**
  * Capture response
  *
  * @generated from message discopanel.v1.CreateServerTemplateResponse
  */
-export type CreateServerTemplateResponse = Message<"discopanel.v1.CreateServerTemplateResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.ServerTemplate template = 1;
-   */
-  template?: ServerTemplate | undefined;
+export type CreateServerTemplateResponse = Message<'discopanel.v1.CreateServerTemplateResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.ServerTemplate template = 1;
+	 */
+	template?: ServerTemplate | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.CreateServerTemplateResponse.
  * Use `create(CreateServerTemplateResponseSchema)` to create a new message.
  */
-export const CreateServerTemplateResponseSchema: GenMessage<CreateServerTemplateResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_template, 4);
+export const CreateServerTemplateResponseSchema: GenMessage<CreateServerTemplateResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_template, 4);
 
 /**
  * Update template metadata request
  *
  * @generated from message discopanel.v1.UpdateServerTemplateRequest
  */
-export type UpdateServerTemplateRequest = Message<"discopanel.v1.UpdateServerTemplateRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type UpdateServerTemplateRequest = Message<'discopanel.v1.UpdateServerTemplateRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: optional string name = 2;
-   */
-  name?: string | undefined;
+	/**
+	 * @generated from field: optional string name = 2;
+	 */
+	name?: string | undefined;
 
-  /**
-   * @generated from field: optional string description = 3;
-   */
-  description?: string | undefined;
+	/**
+	 * @generated from field: optional string description = 3;
+	 */
+	description?: string | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateServerTemplateRequest.
  * Use `create(UpdateServerTemplateRequestSchema)` to create a new message.
  */
-export const UpdateServerTemplateRequestSchema: GenMessage<UpdateServerTemplateRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_template, 5);
+export const UpdateServerTemplateRequestSchema: GenMessage<UpdateServerTemplateRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_template, 5);
 
 /**
  * Update template response
  *
  * @generated from message discopanel.v1.UpdateServerTemplateResponse
  */
-export type UpdateServerTemplateResponse = Message<"discopanel.v1.UpdateServerTemplateResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.ServerTemplate template = 1;
-   */
-  template?: ServerTemplate | undefined;
+export type UpdateServerTemplateResponse = Message<'discopanel.v1.UpdateServerTemplateResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.ServerTemplate template = 1;
+	 */
+	template?: ServerTemplate | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateServerTemplateResponse.
  * Use `create(UpdateServerTemplateResponseSchema)` to create a new message.
  */
-export const UpdateServerTemplateResponseSchema: GenMessage<UpdateServerTemplateResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_template, 6);
+export const UpdateServerTemplateResponseSchema: GenMessage<UpdateServerTemplateResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_template, 6);
 
 /**
  * Delete template request
  *
  * @generated from message discopanel.v1.DeleteServerTemplateRequest
  */
-export type DeleteServerTemplateRequest = Message<"discopanel.v1.DeleteServerTemplateRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type DeleteServerTemplateRequest = Message<'discopanel.v1.DeleteServerTemplateRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 };
 
 /**
  * Describes the message discopanel.v1.DeleteServerTemplateRequest.
  * Use `create(DeleteServerTemplateRequestSchema)` to create a new message.
  */
-export const DeleteServerTemplateRequestSchema: GenMessage<DeleteServerTemplateRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_template, 7);
+export const DeleteServerTemplateRequestSchema: GenMessage<DeleteServerTemplateRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_template, 7);
 
 /**
  * Delete template response
  *
  * @generated from message discopanel.v1.DeleteServerTemplateResponse
  */
-export type DeleteServerTemplateResponse = Message<"discopanel.v1.DeleteServerTemplateResponse"> & {
-};
+export type DeleteServerTemplateResponse =
+	Message<'discopanel.v1.DeleteServerTemplateResponse'> & {};
 
 /**
  * Describes the message discopanel.v1.DeleteServerTemplateResponse.
  * Use `create(DeleteServerTemplateResponseSchema)` to create a new message.
  */
-export const DeleteServerTemplateResponseSchema: GenMessage<DeleteServerTemplateResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_template, 8);
+export const DeleteServerTemplateResponseSchema: GenMessage<DeleteServerTemplateResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_template, 8);
 
 /**
  * Deploy a new server from a template
  *
  * @generated from message discopanel.v1.DeployServerTemplateRequest
  */
-export type DeployServerTemplateRequest = Message<"discopanel.v1.DeployServerTemplateRequest"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type DeployServerTemplateRequest = Message<'discopanel.v1.DeployServerTemplateRequest'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * Name for the new server
-   *
-   * @generated from field: string name = 2;
-   */
-  name: string;
+	/**
+	 * Name for the new server
+	 *
+	 * @generated from field: string name = 2;
+	 */
+	name: string;
 
-  /**
-   * Optional hostname routing for the new server
-   *
-   * @generated from field: string proxy_hostname = 3;
-   */
-  proxyHostname: string;
+	/**
+	 * Optional hostname routing for the new server
+	 *
+	 * @generated from field: string proxy_hostname = 3;
+	 */
+	proxyHostname: string;
 
-  /**
-   * Start the server after creation
-   *
-   * @generated from field: bool auto_start = 4;
-   */
-  autoStart: boolean;
+	/**
+	 * Start the server after creation
+	 *
+	 * @generated from field: bool auto_start = 4;
+	 */
+	autoStart: boolean;
 };
 
 /**
  * Describes the message discopanel.v1.DeployServerTemplateRequest.
  * Use `create(DeployServerTemplateRequestSchema)` to create a new message.
  */
-export const DeployServerTemplateRequestSchema: GenMessage<DeployServerTemplateRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_template, 9);
+export const DeployServerTemplateRequestSchema: GenMessage<DeployServerTemplateRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_template, 9);
 
 /**
  * Deploy response
  *
  * @generated from message discopanel.v1.DeployServerTemplateResponse
  */
-export type DeployServerTemplateResponse = Message<"discopanel.v1.DeployServerTemplateResponse"> & {
-  /**
-   * The newly created server
-   *
-   * @generated from field: discopanel.v1.Server server = 1;
-   */
-  server?: Server | undefined;
+export type DeployServerTemplateResponse = Message<'discopanel.v1.DeployServerTemplateResponse'> & {
+	/**
+	 * The newly created server
+	 *
+	 * @generated from field: discopanel.v1.Server server = 1;
+	 */
+	server?: Server | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.DeployServerTemplateResponse.
  * Use `create(DeployServerTemplateResponseSchema)` to create a new message.
  */
-export const DeployServerTemplateResponseSchema: GenMessage<DeployServerTemplateResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_template, 10);
+export const DeployServerTemplateResponseSchema: GenMessage<DeployServerTemplateResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_template, 10);
 
 /**
  * Reusable server templates: capture a server's configuration and mods,
@@ -362,56 +376,54 @@ export const DeployServerTemplateResponseSchema: GenMessage<DeployServerTemplate
  * @generated from service discopanel.v1.TemplateService
  */
 export const TemplateService: GenService<{
-  /**
-   * List all server templates
-   *
-   * @generated from rpc discopanel.v1.TemplateService.ListServerTemplates
-   */
-  listServerTemplates: {
-    methodKind: "unary";
-    input: typeof ListServerTemplatesRequestSchema;
-    output: typeof ListServerTemplatesResponseSchema;
-  },
-  /**
-   * Capture a template from an existing server (config + optional mods)
-   *
-   * @generated from rpc discopanel.v1.TemplateService.CreateServerTemplate
-   */
-  createServerTemplate: {
-    methodKind: "unary";
-    input: typeof CreateServerTemplateRequestSchema;
-    output: typeof CreateServerTemplateResponseSchema;
-  },
-  /**
-   * Update a template's metadata
-   *
-   * @generated from rpc discopanel.v1.TemplateService.UpdateServerTemplate
-   */
-  updateServerTemplate: {
-    methodKind: "unary";
-    input: typeof UpdateServerTemplateRequestSchema;
-    output: typeof UpdateServerTemplateResponseSchema;
-  },
-  /**
-   * Delete a template (and its captured mods)
-   *
-   * @generated from rpc discopanel.v1.TemplateService.DeleteServerTemplate
-   */
-  deleteServerTemplate: {
-    methodKind: "unary";
-    input: typeof DeleteServerTemplateRequestSchema;
-    output: typeof DeleteServerTemplateResponseSchema;
-  },
-  /**
-   * Create a new server from a template
-   *
-   * @generated from rpc discopanel.v1.TemplateService.DeployServerTemplate
-   */
-  deployServerTemplate: {
-    methodKind: "unary";
-    input: typeof DeployServerTemplateRequestSchema;
-    output: typeof DeployServerTemplateResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_discopanel_v1_template, 0);
-
+	/**
+	 * List all server templates
+	 *
+	 * @generated from rpc discopanel.v1.TemplateService.ListServerTemplates
+	 */
+	listServerTemplates: {
+		methodKind: 'unary';
+		input: typeof ListServerTemplatesRequestSchema;
+		output: typeof ListServerTemplatesResponseSchema;
+	};
+	/**
+	 * Capture a template from an existing server (config + optional mods)
+	 *
+	 * @generated from rpc discopanel.v1.TemplateService.CreateServerTemplate
+	 */
+	createServerTemplate: {
+		methodKind: 'unary';
+		input: typeof CreateServerTemplateRequestSchema;
+		output: typeof CreateServerTemplateResponseSchema;
+	};
+	/**
+	 * Update a template's metadata
+	 *
+	 * @generated from rpc discopanel.v1.TemplateService.UpdateServerTemplate
+	 */
+	updateServerTemplate: {
+		methodKind: 'unary';
+		input: typeof UpdateServerTemplateRequestSchema;
+		output: typeof UpdateServerTemplateResponseSchema;
+	};
+	/**
+	 * Delete a template (and its captured mods)
+	 *
+	 * @generated from rpc discopanel.v1.TemplateService.DeleteServerTemplate
+	 */
+	deleteServerTemplate: {
+		methodKind: 'unary';
+		input: typeof DeleteServerTemplateRequestSchema;
+		output: typeof DeleteServerTemplateResponseSchema;
+	};
+	/**
+	 * Create a new server from a template
+	 *
+	 * @generated from rpc discopanel.v1.TemplateService.DeployServerTemplate
+	 */
+	deployServerTemplate: {
+		methodKind: 'unary';
+		input: typeof DeployServerTemplateRequestSchema;
+		output: typeof DeployServerTemplateResponseSchema;
+	};
+}> = /*@__PURE__*/ serviceDesc(file_discopanel_v1_template, 0);

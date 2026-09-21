@@ -33,7 +33,11 @@
 					</Badge>
 				</div>
 				{#if result.message}
-					<p class="text-xs text-muted-foreground {result.success ? '' : 'text-red-600 dark:text-red-400'}">
+					<p
+						class="text-xs text-muted-foreground {result.success
+							? ''
+							: 'text-red-600 dark:text-red-400'}"
+					>
 						{result.message}
 					</p>
 				{/if}

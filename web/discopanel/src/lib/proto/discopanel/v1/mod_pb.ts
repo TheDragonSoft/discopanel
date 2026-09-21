@@ -2,343 +2,356 @@
 // @generated from file discopanel/v1/mod.proto (package discopanel.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenFile, GenMessage, GenService } from '@bufbuild/protobuf/codegenv2';
+import { fileDesc, messageDesc, serviceDesc } from '@bufbuild/protobuf/codegenv2';
+import type { Timestamp } from '@bufbuild/protobuf/wkt';
+import { file_google_protobuf_timestamp } from '@bufbuild/protobuf/wkt';
+import type { Message } from '@bufbuild/protobuf';
 
 /**
  * Describes the file discopanel/v1/mod.proto.
  */
-export const file_discopanel_v1_mod: GenFile = /*@__PURE__*/
-  fileDesc("ChdkaXNjb3BhbmVsL3YxL21vZC5wcm90bxINZGlzY29wYW5lbC52MSK7AgoDTW9kEgoKAmlkGAEgASgJEhEKCXNlcnZlcl9pZBgCIAEoCRIRCglmaWxlX25hbWUYAyABKAkSFAoMZGlzcGxheV9uYW1lGAQgASgJEhMKC2Rlc2NyaXB0aW9uGAUgASgJEg8KB3ZlcnNpb24YBiABKAkSDgoGbW9kX2lkGAcgASgJEg4KBmF1dGhvchgIIAEoCRIPCgd3ZWJzaXRlGAkgASgJEhEKCWZpbGVfc2l6ZRgKIAEoAxIvCgt1cGxvYWRlZF9hdBgLIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKdXBkYXRlZF9hdBgMIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDwoHZW5hYmxlZBgNIAEoCBIQCghpY29uX3VybBgOIAEoCSIkCg9MaXN0TW9kc1JlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJIjQKEExpc3RNb2RzUmVzcG9uc2USIAoEbW9kcxgBIAMoCzISLmRpc2NvcGFuZWwudjEuTW9kIjIKDUdldE1vZFJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEg4KBm1vZF9pZBgCIAEoCSIxCg5HZXRNb2RSZXNwb25zZRIfCgNtb2QYASABKAsyEi5kaXNjb3BhbmVsLnYxLk1vZCJzChhJbXBvcnRVcGxvYWRlZE1vZFJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEhkKEXVwbG9hZF9zZXNzaW9uX2lkGAIgASgJEhQKDGRpc3BsYXlfbmFtZRgDIAEoCRITCgtkZXNjcmlwdGlvbhgEIAEoCSJNChlJbXBvcnRVcGxvYWRlZE1vZFJlc3BvbnNlEh8KA21vZBgBIAEoCzISLmRpc2NvcGFuZWwudjEuTW9kEg8KB21lc3NhZ2UYAiABKAkirQEKEFVwZGF0ZU1vZFJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEg4KBm1vZF9pZBgCIAEoCRIZCgxkaXNwbGF5X25hbWUYAyABKAlIAIgBARIYCgtkZXNjcmlwdGlvbhgEIAEoCUgBiAEBEhQKB2VuYWJsZWQYBSABKAhIAogBAUIPCg1fZGlzcGxheV9uYW1lQg4KDF9kZXNjcmlwdGlvbkIKCghfZW5hYmxlZCI0ChFVcGRhdGVNb2RSZXNwb25zZRIfCgNtb2QYASABKAsyEi5kaXNjb3BhbmVsLnYxLk1vZCI1ChBEZWxldGVNb2RSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIOCgZtb2RfaWQYAiABKAkiJAoRRGVsZXRlTW9kUmVzcG9uc2USDwoHbWVzc2FnZRgBIAEoCTKoAwoKTW9kU2VydmljZRJLCghMaXN0TW9kcxIeLmRpc2NvcGFuZWwudjEuTGlzdE1vZHNSZXF1ZXN0Gh8uZGlzY29wYW5lbC52MS5MaXN0TW9kc1Jlc3BvbnNlEkUKBkdldE1vZBIcLmRpc2NvcGFuZWwudjEuR2V0TW9kUmVxdWVzdBodLmRpc2NvcGFuZWwudjEuR2V0TW9kUmVzcG9uc2USZgoRSW1wb3J0VXBsb2FkZWRNb2QSJy5kaXNjb3BhbmVsLnYxLkltcG9ydFVwbG9hZGVkTW9kUmVxdWVzdBooLmRpc2NvcGFuZWwudjEuSW1wb3J0VXBsb2FkZWRNb2RSZXNwb25zZRJOCglVcGRhdGVNb2QSHy5kaXNjb3BhbmVsLnYxLlVwZGF0ZU1vZFJlcXVlc3QaIC5kaXNjb3BhbmVsLnYxLlVwZGF0ZU1vZFJlc3BvbnNlEk4KCURlbGV0ZU1vZBIfLmRpc2NvcGFuZWwudjEuRGVsZXRlTW9kUmVxdWVzdBogLmRpc2NvcGFuZWwudjEuRGVsZXRlTW9kUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw", [file_google_protobuf_timestamp]);
+export const file_discopanel_v1_mod: GenFile =
+	/*@__PURE__*/
+	fileDesc(
+		'ChdkaXNjb3BhbmVsL3YxL21vZC5wcm90bxINZGlzY29wYW5lbC52MSK7AgoDTW9kEgoKAmlkGAEgASgJEhEKCXNlcnZlcl9pZBgCIAEoCRIRCglmaWxlX25hbWUYAyABKAkSFAoMZGlzcGxheV9uYW1lGAQgASgJEhMKC2Rlc2NyaXB0aW9uGAUgASgJEg8KB3ZlcnNpb24YBiABKAkSDgoGbW9kX2lkGAcgASgJEg4KBmF1dGhvchgIIAEoCRIPCgd3ZWJzaXRlGAkgASgJEhEKCWZpbGVfc2l6ZRgKIAEoAxIvCgt1cGxvYWRlZF9hdBgLIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASLgoKdXBkYXRlZF9hdBgMIAEoCzIaLmdvb2dsZS5wcm90b2J1Zi5UaW1lc3RhbXASDwoHZW5hYmxlZBgNIAEoCBIQCghpY29uX3VybBgOIAEoCSIkCg9MaXN0TW9kc1JlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJIjQKEExpc3RNb2RzUmVzcG9uc2USIAoEbW9kcxgBIAMoCzISLmRpc2NvcGFuZWwudjEuTW9kIjIKDUdldE1vZFJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEg4KBm1vZF9pZBgCIAEoCSIxCg5HZXRNb2RSZXNwb25zZRIfCgNtb2QYASABKAsyEi5kaXNjb3BhbmVsLnYxLk1vZCJzChhJbXBvcnRVcGxvYWRlZE1vZFJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEhkKEXVwbG9hZF9zZXNzaW9uX2lkGAIgASgJEhQKDGRpc3BsYXlfbmFtZRgDIAEoCRITCgtkZXNjcmlwdGlvbhgEIAEoCSJNChlJbXBvcnRVcGxvYWRlZE1vZFJlc3BvbnNlEh8KA21vZBgBIAEoCzISLmRpc2NvcGFuZWwudjEuTW9kEg8KB21lc3NhZ2UYAiABKAkirQEKEFVwZGF0ZU1vZFJlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJEg4KBm1vZF9pZBgCIAEoCRIZCgxkaXNwbGF5X25hbWUYAyABKAlIAIgBARIYCgtkZXNjcmlwdGlvbhgEIAEoCUgBiAEBEhQKB2VuYWJsZWQYBSABKAhIAogBAUIPCg1fZGlzcGxheV9uYW1lQg4KDF9kZXNjcmlwdGlvbkIKCghfZW5hYmxlZCI0ChFVcGRhdGVNb2RSZXNwb25zZRIfCgNtb2QYASABKAsyEi5kaXNjb3BhbmVsLnYxLk1vZCI1ChBEZWxldGVNb2RSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIOCgZtb2RfaWQYAiABKAkiJAoRRGVsZXRlTW9kUmVzcG9uc2USDwoHbWVzc2FnZRgBIAEoCTKoAwoKTW9kU2VydmljZRJLCghMaXN0TW9kcxIeLmRpc2NvcGFuZWwudjEuTGlzdE1vZHNSZXF1ZXN0Gh8uZGlzY29wYW5lbC52MS5MaXN0TW9kc1Jlc3BvbnNlEkUKBkdldE1vZBIcLmRpc2NvcGFuZWwudjEuR2V0TW9kUmVxdWVzdBodLmRpc2NvcGFuZWwudjEuR2V0TW9kUmVzcG9uc2USZgoRSW1wb3J0VXBsb2FkZWRNb2QSJy5kaXNjb3BhbmVsLnYxLkltcG9ydFVwbG9hZGVkTW9kUmVxdWVzdBooLmRpc2NvcGFuZWwudjEuSW1wb3J0VXBsb2FkZWRNb2RSZXNwb25zZRJOCglVcGRhdGVNb2QSHy5kaXNjb3BhbmVsLnYxLlVwZGF0ZU1vZFJlcXVlc3QaIC5kaXNjb3BhbmVsLnYxLlVwZGF0ZU1vZFJlc3BvbnNlEk4KCURlbGV0ZU1vZBIfLmRpc2NvcGFuZWwudjEuRGVsZXRlTW9kUmVxdWVzdBogLmRpc2NvcGFuZWwudjEuRGVsZXRlTW9kUmVzcG9uc2VCRlpEZ2l0aHViLmNvbS9uaWNraGV5ZXIvZGlzY29wYW5lbC9wa2cvcHJvdG8vZGlzY29wYW5lbC92MTtkaXNjb3BhbmVsdjFiBnByb3RvMw',
+		[file_google_protobuf_timestamp]
+	);
 
 /**
  * Server mod metadata
  *
  * @generated from message discopanel.v1.Mod
  */
-export type Mod = Message<"discopanel.v1.Mod"> & {
-  /**
-   * @generated from field: string id = 1;
-   */
-  id: string;
+export type Mod = Message<'discopanel.v1.Mod'> & {
+	/**
+	 * @generated from field: string id = 1;
+	 */
+	id: string;
 
-  /**
-   * @generated from field: string server_id = 2;
-   */
-  serverId: string;
+	/**
+	 * @generated from field: string server_id = 2;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string file_name = 3;
-   */
-  fileName: string;
+	/**
+	 * @generated from field: string file_name = 3;
+	 */
+	fileName: string;
 
-  /**
-   * @generated from field: string display_name = 4;
-   */
-  displayName: string;
+	/**
+	 * @generated from field: string display_name = 4;
+	 */
+	displayName: string;
 
-  /**
-   * @generated from field: string description = 5;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 5;
+	 */
+	description: string;
 
-  /**
-   * @generated from field: string version = 6;
-   */
-  version: string;
+	/**
+	 * @generated from field: string version = 6;
+	 */
+	version: string;
 
-  /**
-   * External mod ID (e.g., CurseForge ID)
-   *
-   * @generated from field: string mod_id = 7;
-   */
-  modId: string;
+	/**
+	 * External mod ID (e.g., CurseForge ID)
+	 *
+	 * @generated from field: string mod_id = 7;
+	 */
+	modId: string;
 
-  /**
-   * @generated from field: string author = 8;
-   */
-  author: string;
+	/**
+	 * @generated from field: string author = 8;
+	 */
+	author: string;
 
-  /**
-   * @generated from field: string website = 9;
-   */
-  website: string;
+	/**
+	 * @generated from field: string website = 9;
+	 */
+	website: string;
 
-  /**
-   * @generated from field: int64 file_size = 10;
-   */
-  fileSize: bigint;
+	/**
+	 * @generated from field: int64 file_size = 10;
+	 */
+	fileSize: bigint;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp uploaded_at = 11;
-   */
-  uploadedAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp uploaded_at = 11;
+	 */
+	uploadedAt?: Timestamp | undefined;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp updated_at = 12;
-   */
-  updatedAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp updated_at = 12;
+	 */
+	updatedAt?: Timestamp | undefined;
 
-  /**
-   * @generated from field: bool enabled = 13;
-   */
-  enabled: boolean;
+	/**
+	 * @generated from field: bool enabled = 13;
+	 */
+	enabled: boolean;
 
-  /**
-   * @generated from field: string icon_url = 14;
-   */
-  iconUrl: string;
+	/**
+	 * @generated from field: string icon_url = 14;
+	 */
+	iconUrl: string;
 };
 
 /**
  * Describes the message discopanel.v1.Mod.
  * Use `create(ModSchema)` to create a new message.
  */
-export const ModSchema: GenMessage<Mod> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_mod, 0);
+export const ModSchema: GenMessage<Mod> = /*@__PURE__*/ messageDesc(file_discopanel_v1_mod, 0);
 
 /**
  * Server mods request
  *
  * @generated from message discopanel.v1.ListModsRequest
  */
-export type ListModsRequest = Message<"discopanel.v1.ListModsRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type ListModsRequest = Message<'discopanel.v1.ListModsRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 };
 
 /**
  * Describes the message discopanel.v1.ListModsRequest.
  * Use `create(ListModsRequestSchema)` to create a new message.
  */
-export const ListModsRequestSchema: GenMessage<ListModsRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_mod, 1);
+export const ListModsRequestSchema: GenMessage<ListModsRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_mod, 1);
 
 /**
  * All server mods
  *
  * @generated from message discopanel.v1.ListModsResponse
  */
-export type ListModsResponse = Message<"discopanel.v1.ListModsResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.Mod mods = 1;
-   */
-  mods: Mod[];
+export type ListModsResponse = Message<'discopanel.v1.ListModsResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.Mod mods = 1;
+	 */
+	mods: Mod[];
 };
 
 /**
  * Describes the message discopanel.v1.ListModsResponse.
  * Use `create(ListModsResponseSchema)` to create a new message.
  */
-export const ListModsResponseSchema: GenMessage<ListModsResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_mod, 2);
+export const ListModsResponseSchema: GenMessage<ListModsResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_mod, 2);
 
 /**
  * Mod lookup
  *
  * @generated from message discopanel.v1.GetModRequest
  */
-export type GetModRequest = Message<"discopanel.v1.GetModRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type GetModRequest = Message<'discopanel.v1.GetModRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string mod_id = 2;
-   */
-  modId: string;
+	/**
+	 * @generated from field: string mod_id = 2;
+	 */
+	modId: string;
 };
 
 /**
  * Describes the message discopanel.v1.GetModRequest.
  * Use `create(GetModRequestSchema)` to create a new message.
  */
-export const GetModRequestSchema: GenMessage<GetModRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_mod, 3);
+export const GetModRequestSchema: GenMessage<GetModRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_mod, 3);
 
 /**
  * Mod details
  *
  * @generated from message discopanel.v1.GetModResponse
  */
-export type GetModResponse = Message<"discopanel.v1.GetModResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.Mod mod = 1;
-   */
-  mod?: Mod | undefined;
+export type GetModResponse = Message<'discopanel.v1.GetModResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.Mod mod = 1;
+	 */
+	mod?: Mod | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.GetModResponse.
  * Use `create(GetModResponseSchema)` to create a new message.
  */
-export const GetModResponseSchema: GenMessage<GetModResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_mod, 4);
+export const GetModResponseSchema: GenMessage<GetModResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_mod, 4);
 
 /**
  * Import mod from chunked upload session
  *
  * @generated from message discopanel.v1.ImportUploadedModRequest
  */
-export type ImportUploadedModRequest = Message<"discopanel.v1.ImportUploadedModRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type ImportUploadedModRequest = Message<'discopanel.v1.ImportUploadedModRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string upload_session_id = 2;
-   */
-  uploadSessionId: string;
+	/**
+	 * @generated from field: string upload_session_id = 2;
+	 */
+	uploadSessionId: string;
 
-  /**
-   * @generated from field: string display_name = 3;
-   */
-  displayName: string;
+	/**
+	 * @generated from field: string display_name = 3;
+	 */
+	displayName: string;
 
-  /**
-   * @generated from field: string description = 4;
-   */
-  description: string;
+	/**
+	 * @generated from field: string description = 4;
+	 */
+	description: string;
 };
 
 /**
  * Describes the message discopanel.v1.ImportUploadedModRequest.
  * Use `create(ImportUploadedModRequestSchema)` to create a new message.
  */
-export const ImportUploadedModRequestSchema: GenMessage<ImportUploadedModRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_mod, 5);
+export const ImportUploadedModRequestSchema: GenMessage<ImportUploadedModRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_mod, 5);
 
 /**
  * Import result
  *
  * @generated from message discopanel.v1.ImportUploadedModResponse
  */
-export type ImportUploadedModResponse = Message<"discopanel.v1.ImportUploadedModResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.Mod mod = 1;
-   */
-  mod?: Mod | undefined;
+export type ImportUploadedModResponse = Message<'discopanel.v1.ImportUploadedModResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.Mod mod = 1;
+	 */
+	mod?: Mod | undefined;
 
-  /**
-   * @generated from field: string message = 2;
-   */
-  message: string;
+	/**
+	 * @generated from field: string message = 2;
+	 */
+	message: string;
 };
 
 /**
  * Describes the message discopanel.v1.ImportUploadedModResponse.
  * Use `create(ImportUploadedModResponseSchema)` to create a new message.
  */
-export const ImportUploadedModResponseSchema: GenMessage<ImportUploadedModResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_mod, 6);
+export const ImportUploadedModResponseSchema: GenMessage<ImportUploadedModResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_mod, 6);
 
 /**
  * Mod fields to update
  *
  * @generated from message discopanel.v1.UpdateModRequest
  */
-export type UpdateModRequest = Message<"discopanel.v1.UpdateModRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type UpdateModRequest = Message<'discopanel.v1.UpdateModRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string mod_id = 2;
-   */
-  modId: string;
+	/**
+	 * @generated from field: string mod_id = 2;
+	 */
+	modId: string;
 
-  /**
-   * @generated from field: optional string display_name = 3;
-   */
-  displayName?: string | undefined;
+	/**
+	 * @generated from field: optional string display_name = 3;
+	 */
+	displayName?: string | undefined;
 
-  /**
-   * @generated from field: optional string description = 4;
-   */
-  description?: string | undefined;
+	/**
+	 * @generated from field: optional string description = 4;
+	 */
+	description?: string | undefined;
 
-  /**
-   * @generated from field: optional bool enabled = 5;
-   */
-  enabled?: boolean | undefined;
+	/**
+	 * @generated from field: optional bool enabled = 5;
+	 */
+	enabled?: boolean | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateModRequest.
  * Use `create(UpdateModRequestSchema)` to create a new message.
  */
-export const UpdateModRequestSchema: GenMessage<UpdateModRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_mod, 7);
+export const UpdateModRequestSchema: GenMessage<UpdateModRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_mod, 7);
 
 /**
  * Updated mod
  *
  * @generated from message discopanel.v1.UpdateModResponse
  */
-export type UpdateModResponse = Message<"discopanel.v1.UpdateModResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.Mod mod = 1;
-   */
-  mod?: Mod | undefined;
+export type UpdateModResponse = Message<'discopanel.v1.UpdateModResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.Mod mod = 1;
+	 */
+	mod?: Mod | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateModResponse.
  * Use `create(UpdateModResponseSchema)` to create a new message.
  */
-export const UpdateModResponseSchema: GenMessage<UpdateModResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_mod, 8);
+export const UpdateModResponseSchema: GenMessage<UpdateModResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_mod, 8);
 
 /**
  * Mod to delete
  *
  * @generated from message discopanel.v1.DeleteModRequest
  */
-export type DeleteModRequest = Message<"discopanel.v1.DeleteModRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type DeleteModRequest = Message<'discopanel.v1.DeleteModRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string mod_id = 2;
-   */
-  modId: string;
+	/**
+	 * @generated from field: string mod_id = 2;
+	 */
+	modId: string;
 };
 
 /**
  * Describes the message discopanel.v1.DeleteModRequest.
  * Use `create(DeleteModRequestSchema)` to create a new message.
  */
-export const DeleteModRequestSchema: GenMessage<DeleteModRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_mod, 9);
+export const DeleteModRequestSchema: GenMessage<DeleteModRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_mod, 9);
 
 /**
  * Deletion confirmation
  *
  * @generated from message discopanel.v1.DeleteModResponse
  */
-export type DeleteModResponse = Message<"discopanel.v1.DeleteModResponse"> & {
-  /**
-   * @generated from field: string message = 1;
-   */
-  message: string;
+export type DeleteModResponse = Message<'discopanel.v1.DeleteModResponse'> & {
+	/**
+	 * @generated from field: string message = 1;
+	 */
+	message: string;
 };
 
 /**
  * Describes the message discopanel.v1.DeleteModResponse.
  * Use `create(DeleteModResponseSchema)` to create a new message.
  */
-export const DeleteModResponseSchema: GenMessage<DeleteModResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_mod, 10);
+export const DeleteModResponseSchema: GenMessage<DeleteModResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_mod, 10);
 
 /**
  * Server mod management
@@ -346,56 +359,54 @@ export const DeleteModResponseSchema: GenMessage<DeleteModResponse> = /*@__PURE_
  * @generated from service discopanel.v1.ModService
  */
 export const ModService: GenService<{
-  /**
-   * List server mods
-   *
-   * @generated from rpc discopanel.v1.ModService.ListMods
-   */
-  listMods: {
-    methodKind: "unary";
-    input: typeof ListModsRequestSchema;
-    output: typeof ListModsResponseSchema;
-  },
-  /**
-   * Get mod details
-   *
-   * @generated from rpc discopanel.v1.ModService.GetMod
-   */
-  getMod: {
-    methodKind: "unary";
-    input: typeof GetModRequestSchema;
-    output: typeof GetModResponseSchema;
-  },
-  /**
-   * Import mod from chunked upload session
-   *
-   * @generated from rpc discopanel.v1.ModService.ImportUploadedMod
-   */
-  importUploadedMod: {
-    methodKind: "unary";
-    input: typeof ImportUploadedModRequestSchema;
-    output: typeof ImportUploadedModResponseSchema;
-  },
-  /**
-   * Update mod metadata
-   *
-   * @generated from rpc discopanel.v1.ModService.UpdateMod
-   */
-  updateMod: {
-    methodKind: "unary";
-    input: typeof UpdateModRequestSchema;
-    output: typeof UpdateModResponseSchema;
-  },
-  /**
-   * Delete mod file
-   *
-   * @generated from rpc discopanel.v1.ModService.DeleteMod
-   */
-  deleteMod: {
-    methodKind: "unary";
-    input: typeof DeleteModRequestSchema;
-    output: typeof DeleteModResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_discopanel_v1_mod, 0);
-
+	/**
+	 * List server mods
+	 *
+	 * @generated from rpc discopanel.v1.ModService.ListMods
+	 */
+	listMods: {
+		methodKind: 'unary';
+		input: typeof ListModsRequestSchema;
+		output: typeof ListModsResponseSchema;
+	};
+	/**
+	 * Get mod details
+	 *
+	 * @generated from rpc discopanel.v1.ModService.GetMod
+	 */
+	getMod: {
+		methodKind: 'unary';
+		input: typeof GetModRequestSchema;
+		output: typeof GetModResponseSchema;
+	};
+	/**
+	 * Import mod from chunked upload session
+	 *
+	 * @generated from rpc discopanel.v1.ModService.ImportUploadedMod
+	 */
+	importUploadedMod: {
+		methodKind: 'unary';
+		input: typeof ImportUploadedModRequestSchema;
+		output: typeof ImportUploadedModResponseSchema;
+	};
+	/**
+	 * Update mod metadata
+	 *
+	 * @generated from rpc discopanel.v1.ModService.UpdateMod
+	 */
+	updateMod: {
+		methodKind: 'unary';
+		input: typeof UpdateModRequestSchema;
+		output: typeof UpdateModResponseSchema;
+	};
+	/**
+	 * Delete mod file
+	 *
+	 * @generated from rpc discopanel.v1.ModService.DeleteMod
+	 */
+	deleteMod: {
+		methodKind: 'unary';
+		input: typeof DeleteModRequestSchema;
+		output: typeof DeleteModResponseSchema;
+	};
+}> = /*@__PURE__*/ serviceDesc(file_discopanel_v1_mod, 0);

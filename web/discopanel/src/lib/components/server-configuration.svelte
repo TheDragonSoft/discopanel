@@ -344,13 +344,13 @@
 </script>
 
 <Card class="flex h-full flex-col gap-0 pb-0">
-	<CardHeader class="pb-3 shrink-0 border-b">
-		<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+	<CardHeader class="shrink-0 border-b pb-3">
+		<div class="flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
 			<div>
 				<CardTitle class="text-lg sm:text-xl">
 					{!server ? 'Default Server Configuration' : 'Server Configuration'}
 				</CardTitle>
-				<p class="mt-0.5 text-xs sm:text-sm text-muted-foreground">
+				<p class="mt-0.5 text-xs text-muted-foreground sm:text-sm">
 					{!server
 						? 'Configure default values for new servers'
 						: 'Configure Minecraft server environment variables'}
@@ -358,7 +358,7 @@
 			</div>
 			<div class="flex flex-wrap items-center gap-2 sm:gap-3">
 				{#if hasChanges}
-					<span class="text-xs sm:text-sm whitespace-nowrap text-muted-foreground">
+					<span class="text-xs whitespace-nowrap text-muted-foreground sm:text-sm">
 						{modifiedFields.size} unsaved {modifiedFields.size === 1 ? 'change' : 'changes'}
 					</span>
 				{/if}
@@ -400,25 +400,27 @@
 				<p class="text-sm">Unable to load server configuration</p>
 			</div>
 		{:else}
-			<div class="flex flex-col md:flex-row h-full">
+			<div class="flex h-full flex-col md:flex-row">
 				<!-- Category Navigation: Horizontal Pills on mobile (< md), Left Sidebar on Desktop (>= md) -->
-				<div class="w-full md:w-48 shrink-0 overflow-x-auto md:overflow-y-auto border-b md:border-b-0 md:border-r bg-muted/20 scrollbar-none">
-					<nav class="flex md:flex-col gap-1 p-2">
+				<div
+					class="w-full shrink-0 scrollbar-none overflow-x-auto border-b bg-muted/20 md:w-48 md:overflow-y-auto md:border-r md:border-b-0"
+				>
+					<nav class="flex gap-1 p-2 md:flex-col">
 						{#each filteredCategories as category (category.name)}
 							{@const categoryId = getCategoryId(category.name)}
 							{@const isActive = activeCategory === categoryId}
 							{@const modCount = modifiedCountByCategory.get(categoryId) ?? 0}
 							<button
-								class="flex shrink-0 items-center justify-between gap-2 rounded-md px-3 py-1.5 md:py-2 text-left text-xs md:text-sm font-medium whitespace-nowrap transition-colors
+								class="flex shrink-0 items-center justify-between gap-2 rounded-md px-3 py-1.5 text-left text-xs font-medium whitespace-nowrap transition-colors md:py-2 md:text-sm
 									{isActive
 									? 'bg-primary text-primary-foreground shadow-xs'
-									: 'text-muted-foreground hover:bg-muted hover:text-foreground bg-background/50 md:bg-transparent border md:border-0 border-border/40'}"
+									: 'border border-border/40 bg-background/50 text-muted-foreground hover:bg-muted hover:text-foreground md:border-0 md:bg-transparent'}"
 								onclick={() => selectCategory(categoryId)}
 							>
 								<span class="truncate">{category.name}</span>
 								{#if modCount > 0}
 									<span
-										class="inline-flex h-4 min-w-4 md:h-5 md:min-w-5 items-center justify-center rounded-full px-1 text-[10px] md:text-xs font-semibold
+										class="inline-flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-semibold md:h-5 md:min-w-5 md:text-xs
 										{isActive ? 'bg-primary-foreground/20 text-primary-foreground' : 'bg-orange-500 text-white'}"
 									>
 										{modCount}

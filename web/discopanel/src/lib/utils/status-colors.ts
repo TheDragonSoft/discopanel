@@ -73,5 +73,4 @@ export const ONLINE_BADGE_CLASS =
 	'border-green-500/20 bg-green-500/10 text-green-500 dark:text-green-400';
 
 /** Tinted-outline badge classes for "error" states. */
-export const ERROR_BADGE_CLASS =
-	'border-red-500/20 bg-red-500/10 text-red-500 dark:text-red-400';
+export const ERROR_BADGE_CLASS = 'border-red-500/20 bg-red-500/10 text-red-500 dark:text-red-400';

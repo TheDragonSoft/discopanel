@@ -2,432 +2,456 @@
 // @generated from file discopanel/v1/modpack_update.proto (package discopanel.v1, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage, GenService } from "@bufbuild/protobuf/codegenv2";
-import { enumDesc, fileDesc, messageDesc, serviceDesc } from "@bufbuild/protobuf/codegenv2";
-import type { Timestamp } from "@bufbuild/protobuf/wkt";
-import { file_google_protobuf_timestamp } from "@bufbuild/protobuf/wkt";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenEnum, GenFile, GenMessage, GenService } from '@bufbuild/protobuf/codegenv2';
+import { enumDesc, fileDesc, messageDesc, serviceDesc } from '@bufbuild/protobuf/codegenv2';
+import type { Timestamp } from '@bufbuild/protobuf/wkt';
+import { file_google_protobuf_timestamp } from '@bufbuild/protobuf/wkt';
+import type { Message } from '@bufbuild/protobuf';
 
 /**
  * Describes the file discopanel/v1/modpack_update.proto.
  */
-export const file_discopanel_v1_modpack_update: GenFile = /*@__PURE__*/
-  fileDesc("CiJkaXNjb3BhbmVsL3YxL21vZHBhY2tfdXBkYXRlLnByb3RvEg1kaXNjb3BhbmVsLnYxIrIBChJNb2RwYWNrVXBkYXRlQ2hlY2sSEQoJc2VydmVyX2lkGAEgASgJEhQKDG1vZHBhY2tfbmFtZRgCIAEoCRIXCg9jdXJyZW50X3ZlcnNpb24YAyABKAkSFgoObGF0ZXN0X3ZlcnNpb24YBCABKAkSGQoRbGF0ZXN0X3ZlcnNpb25faWQYBSABKAkSGAoQdXBkYXRlX2F2YWlsYWJsZRgGIAEoCBINCgVlcnJvchgHIAEoCSIuChlDaGVja01vZHBhY2tVcGRhdGVSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCSJOChpDaGVja01vZHBhY2tVcGRhdGVSZXNwb25zZRIwCgVjaGVjaxgBIAEoCzIhLmRpc2NvcGFuZWwudjEuTW9kcGFja1VwZGF0ZUNoZWNrImEKGlVwZGF0ZVNlcnZlck1vZHBhY2tSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIZChF0YXJnZXRfdmVyc2lvbl9pZBgCIAEoCRIVCg1jcmVhdGVfYmFja3VwGAMgASgIIlcKG1VwZGF0ZVNlcnZlck1vZHBhY2tSZXNwb25zZRIOCgZzdGF0dXMYASABKAkSDwoHbWVzc2FnZRgCIAEoCRIXCg9iYWNrdXBfZmlsZW5hbWUYAyABKAkiLwoaTGlzdE1vZHBhY2tWZXJzaW9uc1JlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJIoMBChJNb2RwYWNrVmVyc2lvbkluZm8SEgoKdmVyc2lvbl9pZBgBIAEoCRIUCgx2ZXJzaW9uX25hbWUYAiABKAkSLwoLcmVsZWFzZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhIKCmlzX2N1cnJlbnQYBCABKAgiUgobTGlzdE1vZHBhY2tWZXJzaW9uc1Jlc3BvbnNlEjMKCHZlcnNpb25zGAEgAygLMiEuZGlzY29wYW5lbC52MS5Nb2RwYWNrVmVyc2lvbkluZm8iMQocUm9sbGJhY2tNb2RwYWNrVXBkYXRlUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkiQAodUm9sbGJhY2tNb2RwYWNrVXBkYXRlUmVzcG9uc2USDgoGc3RhdHVzGAEgASgJEg8KB21lc3NhZ2UYAiABKAkiNAofR2V0TW9kcGFja1VwZGF0ZVNldHRpbmdzUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkiyAEKFU1vZHBhY2tVcGRhdGVTZXR0aW5ncxIRCglzZXJ2ZXJfaWQYASABKAkSDwoHZW5hYmxlZBgCIAEoCBIWCg5pbnRlcnZhbF9ob3VycxgDIAEoBRIuCgRtb2RlGAQgASgOMiAuZGlzY29wYW5lbC52MS5Nb2RwYWNrVXBkYXRlTW9kZRIuCgpsYXN0X2NoZWNrGAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBITCgtsYXN0X3Jlc3VsdBgGIAEoCSJaCiBHZXRNb2RwYWNrVXBkYXRlU2V0dGluZ3NSZXNwb25zZRI2CghzZXR0aW5ncxgBIAEoCzIkLmRpc2NvcGFuZWwudjEuTW9kcGFja1VwZGF0ZVNldHRpbmdzIo0BCh9TZXRNb2RwYWNrVXBkYXRlU2V0dGluZ3NSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIPCgdlbmFibGVkGAIgASgIEhYKDmludGVydmFsX2hvdXJzGAMgASgFEi4KBG1vZGUYBCABKA4yIC5kaXNjb3BhbmVsLnYxLk1vZHBhY2tVcGRhdGVNb2RlIloKIFNldE1vZHBhY2tVcGRhdGVTZXR0aW5nc1Jlc3BvbnNlEjYKCHNldHRpbmdzGAEgASgLMiQuZGlzY29wYW5lbC52MS5Nb2RwYWNrVXBkYXRlU2V0dGluZ3MqdwoRTW9kcGFja1VwZGF0ZU1vZGUSIwofTU9EUEFDS19VUERBVEVfTU9ERV9VTlNQRUNJRklFRBAAEh4KGk1PRFBBQ0tfVVBEQVRFX01PREVfTk9USUZZEAESHQoZTU9EUEFDS19VUERBVEVfTU9ERV9BUFBMWRACMssFChRNb2RwYWNrVXBkYXRlU2VydmljZRJpChJDaGVja01vZHBhY2tVcGRhdGUSKC5kaXNjb3BhbmVsLnYxLkNoZWNrTW9kcGFja1VwZGF0ZVJlcXVlc3QaKS5kaXNjb3BhbmVsLnYxLkNoZWNrTW9kcGFja1VwZGF0ZVJlc3BvbnNlEmwKE1VwZGF0ZVNlcnZlck1vZHBhY2sSKS5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlck1vZHBhY2tSZXF1ZXN0GiouZGlzY29wYW5lbC52MS5VcGRhdGVTZXJ2ZXJNb2RwYWNrUmVzcG9uc2USbAoTTGlzdE1vZHBhY2tWZXJzaW9ucxIpLmRpc2NvcGFuZWwudjEuTGlzdE1vZHBhY2tWZXJzaW9uc1JlcXVlc3QaKi5kaXNjb3BhbmVsLnYxLkxpc3RNb2RwYWNrVmVyc2lvbnNSZXNwb25zZRJyChVSb2xsYmFja01vZHBhY2tVcGRhdGUSKy5kaXNjb3BhbmVsLnYxLlJvbGxiYWNrTW9kcGFja1VwZGF0ZVJlcXVlc3QaLC5kaXNjb3BhbmVsLnYxLlJvbGxiYWNrTW9kcGFja1VwZGF0ZVJlc3BvbnNlEnsKGEdldE1vZHBhY2tVcGRhdGVTZXR0aW5ncxIuLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja1VwZGF0ZVNldHRpbmdzUmVxdWVzdBovLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja1VwZGF0ZVNldHRpbmdzUmVzcG9uc2USewoYU2V0TW9kcGFja1VwZGF0ZVNldHRpbmdzEi4uZGlzY29wYW5lbC52MS5TZXRNb2RwYWNrVXBkYXRlU2V0dGluZ3NSZXF1ZXN0Gi8uZGlzY29wYW5lbC52MS5TZXRNb2RwYWNrVXBkYXRlU2V0dGluZ3NSZXNwb25zZUJGWkRnaXRodWIuY29tL25pY2toZXllci9kaXNjb3BhbmVsL3BrZy9wcm90by9kaXNjb3BhbmVsL3YxO2Rpc2NvcGFuZWx2MWIGcHJvdG8z", [file_google_protobuf_timestamp]);
+export const file_discopanel_v1_modpack_update: GenFile =
+	/*@__PURE__*/
+	fileDesc(
+		'CiJkaXNjb3BhbmVsL3YxL21vZHBhY2tfdXBkYXRlLnByb3RvEg1kaXNjb3BhbmVsLnYxIrIBChJNb2RwYWNrVXBkYXRlQ2hlY2sSEQoJc2VydmVyX2lkGAEgASgJEhQKDG1vZHBhY2tfbmFtZRgCIAEoCRIXCg9jdXJyZW50X3ZlcnNpb24YAyABKAkSFgoObGF0ZXN0X3ZlcnNpb24YBCABKAkSGQoRbGF0ZXN0X3ZlcnNpb25faWQYBSABKAkSGAoQdXBkYXRlX2F2YWlsYWJsZRgGIAEoCBINCgVlcnJvchgHIAEoCSIuChlDaGVja01vZHBhY2tVcGRhdGVSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCSJOChpDaGVja01vZHBhY2tVcGRhdGVSZXNwb25zZRIwCgVjaGVjaxgBIAEoCzIhLmRpc2NvcGFuZWwudjEuTW9kcGFja1VwZGF0ZUNoZWNrImEKGlVwZGF0ZVNlcnZlck1vZHBhY2tSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIZChF0YXJnZXRfdmVyc2lvbl9pZBgCIAEoCRIVCg1jcmVhdGVfYmFja3VwGAMgASgIIlcKG1VwZGF0ZVNlcnZlck1vZHBhY2tSZXNwb25zZRIOCgZzdGF0dXMYASABKAkSDwoHbWVzc2FnZRgCIAEoCRIXCg9iYWNrdXBfZmlsZW5hbWUYAyABKAkiLwoaTGlzdE1vZHBhY2tWZXJzaW9uc1JlcXVlc3QSEQoJc2VydmVyX2lkGAEgASgJIoMBChJNb2RwYWNrVmVyc2lvbkluZm8SEgoKdmVyc2lvbl9pZBgBIAEoCRIUCgx2ZXJzaW9uX25hbWUYAiABKAkSLwoLcmVsZWFzZWRfYXQYAyABKAsyGi5nb29nbGUucHJvdG9idWYuVGltZXN0YW1wEhIKCmlzX2N1cnJlbnQYBCABKAgiUgobTGlzdE1vZHBhY2tWZXJzaW9uc1Jlc3BvbnNlEjMKCHZlcnNpb25zGAEgAygLMiEuZGlzY29wYW5lbC52MS5Nb2RwYWNrVmVyc2lvbkluZm8iMQocUm9sbGJhY2tNb2RwYWNrVXBkYXRlUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkiQAodUm9sbGJhY2tNb2RwYWNrVXBkYXRlUmVzcG9uc2USDgoGc3RhdHVzGAEgASgJEg8KB21lc3NhZ2UYAiABKAkiNAofR2V0TW9kcGFja1VwZGF0ZVNldHRpbmdzUmVxdWVzdBIRCglzZXJ2ZXJfaWQYASABKAkiyAEKFU1vZHBhY2tVcGRhdGVTZXR0aW5ncxIRCglzZXJ2ZXJfaWQYASABKAkSDwoHZW5hYmxlZBgCIAEoCBIWCg5pbnRlcnZhbF9ob3VycxgDIAEoBRIuCgRtb2RlGAQgASgOMiAuZGlzY29wYW5lbC52MS5Nb2RwYWNrVXBkYXRlTW9kZRIuCgpsYXN0X2NoZWNrGAUgASgLMhouZ29vZ2xlLnByb3RvYnVmLlRpbWVzdGFtcBITCgtsYXN0X3Jlc3VsdBgGIAEoCSJaCiBHZXRNb2RwYWNrVXBkYXRlU2V0dGluZ3NSZXNwb25zZRI2CghzZXR0aW5ncxgBIAEoCzIkLmRpc2NvcGFuZWwudjEuTW9kcGFja1VwZGF0ZVNldHRpbmdzIo0BCh9TZXRNb2RwYWNrVXBkYXRlU2V0dGluZ3NSZXF1ZXN0EhEKCXNlcnZlcl9pZBgBIAEoCRIPCgdlbmFibGVkGAIgASgIEhYKDmludGVydmFsX2hvdXJzGAMgASgFEi4KBG1vZGUYBCABKA4yIC5kaXNjb3BhbmVsLnYxLk1vZHBhY2tVcGRhdGVNb2RlIloKIFNldE1vZHBhY2tVcGRhdGVTZXR0aW5nc1Jlc3BvbnNlEjYKCHNldHRpbmdzGAEgASgLMiQuZGlzY29wYW5lbC52MS5Nb2RwYWNrVXBkYXRlU2V0dGluZ3MqdwoRTW9kcGFja1VwZGF0ZU1vZGUSIwofTU9EUEFDS19VUERBVEVfTU9ERV9VTlNQRUNJRklFRBAAEh4KGk1PRFBBQ0tfVVBEQVRFX01PREVfTk9USUZZEAESHQoZTU9EUEFDS19VUERBVEVfTU9ERV9BUFBMWRACMssFChRNb2RwYWNrVXBkYXRlU2VydmljZRJpChJDaGVja01vZHBhY2tVcGRhdGUSKC5kaXNjb3BhbmVsLnYxLkNoZWNrTW9kcGFja1VwZGF0ZVJlcXVlc3QaKS5kaXNjb3BhbmVsLnYxLkNoZWNrTW9kcGFja1VwZGF0ZVJlc3BvbnNlEmwKE1VwZGF0ZVNlcnZlck1vZHBhY2sSKS5kaXNjb3BhbmVsLnYxLlVwZGF0ZVNlcnZlck1vZHBhY2tSZXF1ZXN0GiouZGlzY29wYW5lbC52MS5VcGRhdGVTZXJ2ZXJNb2RwYWNrUmVzcG9uc2USbAoTTGlzdE1vZHBhY2tWZXJzaW9ucxIpLmRpc2NvcGFuZWwudjEuTGlzdE1vZHBhY2tWZXJzaW9uc1JlcXVlc3QaKi5kaXNjb3BhbmVsLnYxLkxpc3RNb2RwYWNrVmVyc2lvbnNSZXNwb25zZRJyChVSb2xsYmFja01vZHBhY2tVcGRhdGUSKy5kaXNjb3BhbmVsLnYxLlJvbGxiYWNrTW9kcGFja1VwZGF0ZVJlcXVlc3QaLC5kaXNjb3BhbmVsLnYxLlJvbGxiYWNrTW9kcGFja1VwZGF0ZVJlc3BvbnNlEnsKGEdldE1vZHBhY2tVcGRhdGVTZXR0aW5ncxIuLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja1VwZGF0ZVNldHRpbmdzUmVxdWVzdBovLmRpc2NvcGFuZWwudjEuR2V0TW9kcGFja1VwZGF0ZVNldHRpbmdzUmVzcG9uc2USewoYU2V0TW9kcGFja1VwZGF0ZVNldHRpbmdzEi4uZGlzY29wYW5lbC52MS5TZXRNb2RwYWNrVXBkYXRlU2V0dGluZ3NSZXF1ZXN0Gi8uZGlzY29wYW5lbC52MS5TZXRNb2RwYWNrVXBkYXRlU2V0dGluZ3NSZXNwb25zZUJGWkRnaXRodWIuY29tL25pY2toZXllci9kaXNjb3BhbmVsL3BrZy9wcm90by9kaXNjb3BhbmVsL3YxO2Rpc2NvcGFuZWx2MWIGcHJvdG8z',
+		[file_google_protobuf_timestamp]
+	);
 
 /**
  * Update availability snapshot
  *
  * @generated from message discopanel.v1.ModpackUpdateCheck
  */
-export type ModpackUpdateCheck = Message<"discopanel.v1.ModpackUpdateCheck"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type ModpackUpdateCheck = Message<'discopanel.v1.ModpackUpdateCheck'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: string modpack_name = 2;
-   */
-  modpackName: string;
+	/**
+	 * @generated from field: string modpack_name = 2;
+	 */
+	modpackName: string;
 
-  /**
-   * @generated from field: string current_version = 3;
-   */
-  currentVersion: string;
+	/**
+	 * @generated from field: string current_version = 3;
+	 */
+	currentVersion: string;
 
-  /**
-   * @generated from field: string latest_version = 4;
-   */
-  latestVersion: string;
+	/**
+	 * @generated from field: string latest_version = 4;
+	 */
+	latestVersion: string;
 
-  /**
-   * @generated from field: string latest_version_id = 5;
-   */
-  latestVersionId: string;
+	/**
+	 * @generated from field: string latest_version_id = 5;
+	 */
+	latestVersionId: string;
 
-  /**
-   * @generated from field: bool update_available = 6;
-   */
-  updateAvailable: boolean;
+	/**
+	 * @generated from field: bool update_available = 6;
+	 */
+	updateAvailable: boolean;
 
-  /**
-   * Lookup failure detail when the check could not complete
-   *
-   * @generated from field: string error = 7;
-   */
-  error: string;
+	/**
+	 * Lookup failure detail when the check could not complete
+	 *
+	 * @generated from field: string error = 7;
+	 */
+	error: string;
 };
 
 /**
  * Describes the message discopanel.v1.ModpackUpdateCheck.
  * Use `create(ModpackUpdateCheckSchema)` to create a new message.
  */
-export const ModpackUpdateCheckSchema: GenMessage<ModpackUpdateCheck> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 0);
+export const ModpackUpdateCheckSchema: GenMessage<ModpackUpdateCheck> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 0);
 
 /**
  * Check update request
  *
  * @generated from message discopanel.v1.CheckModpackUpdateRequest
  */
-export type CheckModpackUpdateRequest = Message<"discopanel.v1.CheckModpackUpdateRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type CheckModpackUpdateRequest = Message<'discopanel.v1.CheckModpackUpdateRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 };
 
 /**
  * Describes the message discopanel.v1.CheckModpackUpdateRequest.
  * Use `create(CheckModpackUpdateRequestSchema)` to create a new message.
  */
-export const CheckModpackUpdateRequestSchema: GenMessage<CheckModpackUpdateRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 1);
+export const CheckModpackUpdateRequestSchema: GenMessage<CheckModpackUpdateRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 1);
 
 /**
  * Check update response
  *
  * @generated from message discopanel.v1.CheckModpackUpdateResponse
  */
-export type CheckModpackUpdateResponse = Message<"discopanel.v1.CheckModpackUpdateResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.ModpackUpdateCheck check = 1;
-   */
-  check?: ModpackUpdateCheck | undefined;
+export type CheckModpackUpdateResponse = Message<'discopanel.v1.CheckModpackUpdateResponse'> & {
+	/**
+	 * @generated from field: discopanel.v1.ModpackUpdateCheck check = 1;
+	 */
+	check?: ModpackUpdateCheck | undefined;
 };
 
 /**
  * Describes the message discopanel.v1.CheckModpackUpdateResponse.
  * Use `create(CheckModpackUpdateResponseSchema)` to create a new message.
  */
-export const CheckModpackUpdateResponseSchema: GenMessage<CheckModpackUpdateResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 2);
+export const CheckModpackUpdateResponseSchema: GenMessage<CheckModpackUpdateResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 2);
 
 /**
  * Update request
  *
  * @generated from message discopanel.v1.UpdateServerModpackRequest
  */
-export type UpdateServerModpackRequest = Message<"discopanel.v1.UpdateServerModpackRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type UpdateServerModpackRequest = Message<'discopanel.v1.UpdateServerModpackRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * Version to install (empty = latest)
-   *
-   * @generated from field: string target_version_id = 2;
-   */
-  targetVersionId: string;
+	/**
+	 * Version to install (empty = latest)
+	 *
+	 * @generated from field: string target_version_id = 2;
+	 */
+	targetVersionId: string;
 
-  /**
-   * Create a pre-update backup (recommended, default true)
-   *
-   * @generated from field: bool create_backup = 3;
-   */
-  createBackup: boolean;
+	/**
+	 * Create a pre-update backup (recommended, default true)
+	 *
+	 * @generated from field: bool create_backup = 3;
+	 */
+	createBackup: boolean;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateServerModpackRequest.
  * Use `create(UpdateServerModpackRequestSchema)` to create a new message.
  */
-export const UpdateServerModpackRequestSchema: GenMessage<UpdateServerModpackRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 3);
+export const UpdateServerModpackRequestSchema: GenMessage<UpdateServerModpackRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 3);
 
 /**
  * Update response — status reflects the synchronous update attempt
  *
  * @generated from message discopanel.v1.UpdateServerModpackResponse
  */
-export type UpdateServerModpackResponse = Message<"discopanel.v1.UpdateServerModpackResponse"> & {
-  /**
-   * "updated" | "failed"
-   *
-   * @generated from field: string status = 1;
-   */
-  status: string;
+export type UpdateServerModpackResponse = Message<'discopanel.v1.UpdateServerModpackResponse'> & {
+	/**
+	 * "updated" | "failed"
+	 *
+	 * @generated from field: string status = 1;
+	 */
+	status: string;
 
-  /**
-   * Detail, e.g. backup filename or failure reason
-   *
-   * @generated from field: string message = 2;
-   */
-  message: string;
+	/**
+	 * Detail, e.g. backup filename or failure reason
+	 *
+	 * @generated from field: string message = 2;
+	 */
+	message: string;
 
-  /**
-   * Pre-update backup name (for rollback reference)
-   *
-   * @generated from field: string backup_filename = 3;
-   */
-  backupFilename: string;
+	/**
+	 * Pre-update backup name (for rollback reference)
+	 *
+	 * @generated from field: string backup_filename = 3;
+	 */
+	backupFilename: string;
 };
 
 /**
  * Describes the message discopanel.v1.UpdateServerModpackResponse.
  * Use `create(UpdateServerModpackResponseSchema)` to create a new message.
  */
-export const UpdateServerModpackResponseSchema: GenMessage<UpdateServerModpackResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 4);
+export const UpdateServerModpackResponseSchema: GenMessage<UpdateServerModpackResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 4);
 
 /**
  * List versions request
  *
  * @generated from message discopanel.v1.ListModpackVersionsRequest
  */
-export type ListModpackVersionsRequest = Message<"discopanel.v1.ListModpackVersionsRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type ListModpackVersionsRequest = Message<'discopanel.v1.ListModpackVersionsRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 };
 
 /**
  * Describes the message discopanel.v1.ListModpackVersionsRequest.
  * Use `create(ListModpackVersionsRequestSchema)` to create a new message.
  */
-export const ListModpackVersionsRequestSchema: GenMessage<ListModpackVersionsRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 5);
+export const ListModpackVersionsRequestSchema: GenMessage<ListModpackVersionsRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 5);
 
 /**
  * A selectable modpack version
  *
  * @generated from message discopanel.v1.ModpackVersionInfo
  */
-export type ModpackVersionInfo = Message<"discopanel.v1.ModpackVersionInfo"> & {
-  /**
-   * @generated from field: string version_id = 1;
-   */
-  versionId: string;
+export type ModpackVersionInfo = Message<'discopanel.v1.ModpackVersionInfo'> & {
+	/**
+	 * @generated from field: string version_id = 1;
+	 */
+	versionId: string;
 
-  /**
-   * @generated from field: string version_name = 2;
-   */
-  versionName: string;
+	/**
+	 * @generated from field: string version_name = 2;
+	 */
+	versionName: string;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp released_at = 3;
-   */
-  releasedAt?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp released_at = 3;
+	 */
+	releasedAt?: Timestamp | undefined;
 
-  /**
-   * @generated from field: bool is_current = 4;
-   */
-  isCurrent: boolean;
+	/**
+	 * @generated from field: bool is_current = 4;
+	 */
+	isCurrent: boolean;
 };
 
 /**
  * Describes the message discopanel.v1.ModpackVersionInfo.
  * Use `create(ModpackVersionInfoSchema)` to create a new message.
  */
-export const ModpackVersionInfoSchema: GenMessage<ModpackVersionInfo> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 6);
+export const ModpackVersionInfoSchema: GenMessage<ModpackVersionInfo> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 6);
 
 /**
  * List versions response
  *
  * @generated from message discopanel.v1.ListModpackVersionsResponse
  */
-export type ListModpackVersionsResponse = Message<"discopanel.v1.ListModpackVersionsResponse"> & {
-  /**
-   * @generated from field: repeated discopanel.v1.ModpackVersionInfo versions = 1;
-   */
-  versions: ModpackVersionInfo[];
+export type ListModpackVersionsResponse = Message<'discopanel.v1.ListModpackVersionsResponse'> & {
+	/**
+	 * @generated from field: repeated discopanel.v1.ModpackVersionInfo versions = 1;
+	 */
+	versions: ModpackVersionInfo[];
 };
 
 /**
  * Describes the message discopanel.v1.ListModpackVersionsResponse.
  * Use `create(ListModpackVersionsResponseSchema)` to create a new message.
  */
-export const ListModpackVersionsResponseSchema: GenMessage<ListModpackVersionsResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 7);
+export const ListModpackVersionsResponseSchema: GenMessage<ListModpackVersionsResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 7);
 
 /**
  * Rollback request
  *
  * @generated from message discopanel.v1.RollbackModpackUpdateRequest
  */
-export type RollbackModpackUpdateRequest = Message<"discopanel.v1.RollbackModpackUpdateRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type RollbackModpackUpdateRequest = Message<'discopanel.v1.RollbackModpackUpdateRequest'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 };
 
 /**
  * Describes the message discopanel.v1.RollbackModpackUpdateRequest.
  * Use `create(RollbackModpackUpdateRequestSchema)` to create a new message.
  */
-export const RollbackModpackUpdateRequestSchema: GenMessage<RollbackModpackUpdateRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 8);
+export const RollbackModpackUpdateRequestSchema: GenMessage<RollbackModpackUpdateRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 8);
 
 /**
  * Rollback response
  *
  * @generated from message discopanel.v1.RollbackModpackUpdateResponse
  */
-export type RollbackModpackUpdateResponse = Message<"discopanel.v1.RollbackModpackUpdateResponse"> & {
-  /**
-   * "restored" | "failed"
-   *
-   * @generated from field: string status = 1;
-   */
-  status: string;
+export type RollbackModpackUpdateResponse =
+	Message<'discopanel.v1.RollbackModpackUpdateResponse'> & {
+		/**
+		 * "restored" | "failed"
+		 *
+		 * @generated from field: string status = 1;
+		 */
+		status: string;
 
-  /**
-   * @generated from field: string message = 2;
-   */
-  message: string;
-};
+		/**
+		 * @generated from field: string message = 2;
+		 */
+		message: string;
+	};
 
 /**
  * Describes the message discopanel.v1.RollbackModpackUpdateResponse.
  * Use `create(RollbackModpackUpdateResponseSchema)` to create a new message.
  */
-export const RollbackModpackUpdateResponseSchema: GenMessage<RollbackModpackUpdateResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 9);
+export const RollbackModpackUpdateResponseSchema: GenMessage<RollbackModpackUpdateResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 9);
 
 /**
  * Get update settings request
  *
  * @generated from message discopanel.v1.GetModpackUpdateSettingsRequest
  */
-export type GetModpackUpdateSettingsRequest = Message<"discopanel.v1.GetModpackUpdateSettingsRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
-};
+export type GetModpackUpdateSettingsRequest =
+	Message<'discopanel.v1.GetModpackUpdateSettingsRequest'> & {
+		/**
+		 * @generated from field: string server_id = 1;
+		 */
+		serverId: string;
+	};
 
 /**
  * Describes the message discopanel.v1.GetModpackUpdateSettingsRequest.
  * Use `create(GetModpackUpdateSettingsRequestSchema)` to create a new message.
  */
-export const GetModpackUpdateSettingsRequestSchema: GenMessage<GetModpackUpdateSettingsRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 10);
+export const GetModpackUpdateSettingsRequestSchema: GenMessage<GetModpackUpdateSettingsRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 10);
 
 /**
  * Update settings
  *
  * @generated from message discopanel.v1.ModpackUpdateSettings
  */
-export type ModpackUpdateSettings = Message<"discopanel.v1.ModpackUpdateSettings"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type ModpackUpdateSettings = Message<'discopanel.v1.ModpackUpdateSettings'> & {
+	/**
+	 * @generated from field: string server_id = 1;
+	 */
+	serverId: string;
 
-  /**
-   * @generated from field: bool enabled = 2;
-   */
-  enabled: boolean;
+	/**
+	 * @generated from field: bool enabled = 2;
+	 */
+	enabled: boolean;
 
-  /**
-   * Check interval
-   *
-   * @generated from field: int32 interval_hours = 3;
-   */
-  intervalHours: number;
+	/**
+	 * Check interval
+	 *
+	 * @generated from field: int32 interval_hours = 3;
+	 */
+	intervalHours: number;
 
-  /**
-   * Notify only vs auto-apply
-   *
-   * @generated from field: discopanel.v1.ModpackUpdateMode mode = 4;
-   */
-  mode: ModpackUpdateMode;
+	/**
+	 * Notify only vs auto-apply
+	 *
+	 * @generated from field: discopanel.v1.ModpackUpdateMode mode = 4;
+	 */
+	mode: ModpackUpdateMode;
 
-  /**
-   * @generated from field: google.protobuf.Timestamp last_check = 5;
-   */
-  lastCheck?: Timestamp | undefined;
+	/**
+	 * @generated from field: google.protobuf.Timestamp last_check = 5;
+	 */
+	lastCheck?: Timestamp | undefined;
 
-  /**
-   * Human-readable outcome of the last check ("up to date", "updated to 1.2.3", error)
-   *
-   * @generated from field: string last_result = 6;
-   */
-  lastResult: string;
+	/**
+	 * Human-readable outcome of the last check ("up to date", "updated to 1.2.3", error)
+	 *
+	 * @generated from field: string last_result = 6;
+	 */
+	lastResult: string;
 };
 
 /**
  * Describes the message discopanel.v1.ModpackUpdateSettings.
  * Use `create(ModpackUpdateSettingsSchema)` to create a new message.
  */
-export const ModpackUpdateSettingsSchema: GenMessage<ModpackUpdateSettings> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 11);
+export const ModpackUpdateSettingsSchema: GenMessage<ModpackUpdateSettings> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 11);
 
 /**
  * Get settings response
  *
  * @generated from message discopanel.v1.GetModpackUpdateSettingsResponse
  */
-export type GetModpackUpdateSettingsResponse = Message<"discopanel.v1.GetModpackUpdateSettingsResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.ModpackUpdateSettings settings = 1;
-   */
-  settings?: ModpackUpdateSettings | undefined;
-};
+export type GetModpackUpdateSettingsResponse =
+	Message<'discopanel.v1.GetModpackUpdateSettingsResponse'> & {
+		/**
+		 * @generated from field: discopanel.v1.ModpackUpdateSettings settings = 1;
+		 */
+		settings?: ModpackUpdateSettings | undefined;
+	};
 
 /**
  * Describes the message discopanel.v1.GetModpackUpdateSettingsResponse.
  * Use `create(GetModpackUpdateSettingsResponseSchema)` to create a new message.
  */
-export const GetModpackUpdateSettingsResponseSchema: GenMessage<GetModpackUpdateSettingsResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 12);
+export const GetModpackUpdateSettingsResponseSchema: GenMessage<GetModpackUpdateSettingsResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 12);
 
 /**
  * Set settings request
  *
  * @generated from message discopanel.v1.SetModpackUpdateSettingsRequest
  */
-export type SetModpackUpdateSettingsRequest = Message<"discopanel.v1.SetModpackUpdateSettingsRequest"> & {
-  /**
-   * @generated from field: string server_id = 1;
-   */
-  serverId: string;
+export type SetModpackUpdateSettingsRequest =
+	Message<'discopanel.v1.SetModpackUpdateSettingsRequest'> & {
+		/**
+		 * @generated from field: string server_id = 1;
+		 */
+		serverId: string;
 
-  /**
-   * @generated from field: bool enabled = 2;
-   */
-  enabled: boolean;
+		/**
+		 * @generated from field: bool enabled = 2;
+		 */
+		enabled: boolean;
 
-  /**
-   * @generated from field: int32 interval_hours = 3;
-   */
-  intervalHours: number;
+		/**
+		 * @generated from field: int32 interval_hours = 3;
+		 */
+		intervalHours: number;
 
-  /**
-   * @generated from field: discopanel.v1.ModpackUpdateMode mode = 4;
-   */
-  mode: ModpackUpdateMode;
-};
+		/**
+		 * @generated from field: discopanel.v1.ModpackUpdateMode mode = 4;
+		 */
+		mode: ModpackUpdateMode;
+	};
 
 /**
  * Describes the message discopanel.v1.SetModpackUpdateSettingsRequest.
  * Use `create(SetModpackUpdateSettingsRequestSchema)` to create a new message.
  */
-export const SetModpackUpdateSettingsRequestSchema: GenMessage<SetModpackUpdateSettingsRequest> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 13);
+export const SetModpackUpdateSettingsRequestSchema: GenMessage<SetModpackUpdateSettingsRequest> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 13);
 
 /**
  * Set settings response
  *
  * @generated from message discopanel.v1.SetModpackUpdateSettingsResponse
  */
-export type SetModpackUpdateSettingsResponse = Message<"discopanel.v1.SetModpackUpdateSettingsResponse"> & {
-  /**
-   * @generated from field: discopanel.v1.ModpackUpdateSettings settings = 1;
-   */
-  settings?: ModpackUpdateSettings | undefined;
-};
+export type SetModpackUpdateSettingsResponse =
+	Message<'discopanel.v1.SetModpackUpdateSettingsResponse'> & {
+		/**
+		 * @generated from field: discopanel.v1.ModpackUpdateSettings settings = 1;
+		 */
+		settings?: ModpackUpdateSettings | undefined;
+	};
 
 /**
  * Describes the message discopanel.v1.SetModpackUpdateSettingsResponse.
  * Use `create(SetModpackUpdateSettingsResponseSchema)` to create a new message.
  */
-export const SetModpackUpdateSettingsResponseSchema: GenMessage<SetModpackUpdateSettingsResponse> = /*@__PURE__*/
-  messageDesc(file_discopanel_v1_modpack_update, 14);
+export const SetModpackUpdateSettingsResponseSchema: GenMessage<SetModpackUpdateSettingsResponse> =
+	/*@__PURE__*/
+	messageDesc(file_discopanel_v1_modpack_update, 14);
 
 /**
  * Modest update mode for scheduled checks
@@ -435,31 +459,32 @@ export const SetModpackUpdateSettingsResponseSchema: GenMessage<SetModpackUpdate
  * @generated from enum discopanel.v1.ModpackUpdateMode
  */
 export enum ModpackUpdateMode {
-  /**
-   * @generated from enum value: MODPACK_UPDATE_MODE_UNSPECIFIED = 0;
-   */
-  UNSPECIFIED = 0,
+	/**
+	 * @generated from enum value: MODPACK_UPDATE_MODE_UNSPECIFIED = 0;
+	 */
+	UNSPECIFIED = 0,
 
-  /**
-   * Emit MODPACK_UPDATE_AVAILABLE event only
-   *
-   * @generated from enum value: MODPACK_UPDATE_MODE_NOTIFY = 1;
-   */
-  NOTIFY = 1,
+	/**
+	 * Emit MODPACK_UPDATE_AVAILABLE event only
+	 *
+	 * @generated from enum value: MODPACK_UPDATE_MODE_NOTIFY = 1;
+	 */
+	NOTIFY = 1,
 
-  /**
-   * Back up, stop, update, restart automatically
-   *
-   * @generated from enum value: MODPACK_UPDATE_MODE_APPLY = 2;
-   */
-  APPLY = 2,
+	/**
+	 * Back up, stop, update, restart automatically
+	 *
+	 * @generated from enum value: MODPACK_UPDATE_MODE_APPLY = 2;
+	 */
+	APPLY = 2
 }
 
 /**
  * Describes the enum discopanel.v1.ModpackUpdateMode.
  */
-export const ModpackUpdateModeSchema: GenEnum<ModpackUpdateMode> = /*@__PURE__*/
-  enumDesc(file_discopanel_v1_modpack_update, 0);
+export const ModpackUpdateModeSchema: GenEnum<ModpackUpdateMode> =
+	/*@__PURE__*/
+	enumDesc(file_discopanel_v1_modpack_update, 0);
 
 /**
  * In-place modpack updates that preserve the world, with backup + rollback
@@ -468,66 +493,64 @@ export const ModpackUpdateModeSchema: GenEnum<ModpackUpdateMode> = /*@__PURE__*/
  * @generated from service discopanel.v1.ModpackUpdateService
  */
 export const ModpackUpdateService: GenService<{
-  /**
-   * Check whether a newer version of a server's modpack is available
-   *
-   * @generated from rpc discopanel.v1.ModpackUpdateService.CheckModpackUpdate
-   */
-  checkModpackUpdate: {
-    methodKind: "unary";
-    input: typeof CheckModpackUpdateRequestSchema;
-    output: typeof CheckModpackUpdateResponseSchema;
-  },
-  /**
-   * Update a server's modpack to a target version (world preserved, optional pre-update backup)
-   *
-   * @generated from rpc discopanel.v1.ModpackUpdateService.UpdateServerModpack
-   */
-  updateServerModpack: {
-    methodKind: "unary";
-    input: typeof UpdateServerModpackRequestSchema;
-    output: typeof UpdateServerModpackResponseSchema;
-  },
-  /**
-   * List versions available for a server's modpack
-   *
-   * @generated from rpc discopanel.v1.ModpackUpdateService.ListModpackVersions
-   */
-  listModpackVersions: {
-    methodKind: "unary";
-    input: typeof ListModpackVersionsRequestSchema;
-    output: typeof ListModpackVersionsResponseSchema;
-  },
-  /**
-   * Restore the pre-update backup created by the last update (server must be stopped)
-   *
-   * @generated from rpc discopanel.v1.ModpackUpdateService.RollbackModpackUpdate
-   */
-  rollbackModpackUpdate: {
-    methodKind: "unary";
-    input: typeof RollbackModpackUpdateRequestSchema;
-    output: typeof RollbackModpackUpdateResponseSchema;
-  },
-  /**
-   * Get the scheduled-update settings for a server
-   *
-   * @generated from rpc discopanel.v1.ModpackUpdateService.GetModpackUpdateSettings
-   */
-  getModpackUpdateSettings: {
-    methodKind: "unary";
-    input: typeof GetModpackUpdateSettingsRequestSchema;
-    output: typeof GetModpackUpdateSettingsResponseSchema;
-  },
-  /**
-   * Set the scheduled-update settings for a server
-   *
-   * @generated from rpc discopanel.v1.ModpackUpdateService.SetModpackUpdateSettings
-   */
-  setModpackUpdateSettings: {
-    methodKind: "unary";
-    input: typeof SetModpackUpdateSettingsRequestSchema;
-    output: typeof SetModpackUpdateSettingsResponseSchema;
-  },
-}> = /*@__PURE__*/
-  serviceDesc(file_discopanel_v1_modpack_update, 0);
-
+	/**
+	 * Check whether a newer version of a server's modpack is available
+	 *
+	 * @generated from rpc discopanel.v1.ModpackUpdateService.CheckModpackUpdate
+	 */
+	checkModpackUpdate: {
+		methodKind: 'unary';
+		input: typeof CheckModpackUpdateRequestSchema;
+		output: typeof CheckModpackUpdateResponseSchema;
+	};
+	/**
+	 * Update a server's modpack to a target version (world preserved, optional pre-update backup)
+	 *
+	 * @generated from rpc discopanel.v1.ModpackUpdateService.UpdateServerModpack
+	 */
+	updateServerModpack: {
+		methodKind: 'unary';
+		input: typeof UpdateServerModpackRequestSchema;
+		output: typeof UpdateServerModpackResponseSchema;
+	};
+	/**
+	 * List versions available for a server's modpack
+	 *
+	 * @generated from rpc discopanel.v1.ModpackUpdateService.ListModpackVersions
+	 */
+	listModpackVersions: {
+		methodKind: 'unary';
+		input: typeof ListModpackVersionsRequestSchema;
+		output: typeof ListModpackVersionsResponseSchema;
+	};
+	/**
+	 * Restore the pre-update backup created by the last update (server must be stopped)
+	 *
+	 * @generated from rpc discopanel.v1.ModpackUpdateService.RollbackModpackUpdate
+	 */
+	rollbackModpackUpdate: {
+		methodKind: 'unary';
+		input: typeof RollbackModpackUpdateRequestSchema;
+		output: typeof RollbackModpackUpdateResponseSchema;
+	};
+	/**
+	 * Get the scheduled-update settings for a server
+	 *
+	 * @generated from rpc discopanel.v1.ModpackUpdateService.GetModpackUpdateSettings
+	 */
+	getModpackUpdateSettings: {
+		methodKind: 'unary';
+		input: typeof GetModpackUpdateSettingsRequestSchema;
+		output: typeof GetModpackUpdateSettingsResponseSchema;
+	};
+	/**
+	 * Set the scheduled-update settings for a server
+	 *
+	 * @generated from rpc discopanel.v1.ModpackUpdateService.SetModpackUpdateSettings
+	 */
+	setModpackUpdateSettings: {
+		methodKind: 'unary';
+		input: typeof SetModpackUpdateSettingsRequestSchema;
+		output: typeof SetModpackUpdateSettingsResponseSchema;
+	};
+}> = /*@__PURE__*/ serviceDesc(file_discopanel_v1_modpack_update, 0);
