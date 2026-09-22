@@ -136,6 +136,16 @@ func GetVersions() []string {
 	return versions
 }
 
+// Returns detailed information about all versions
+func GetAllVersionInfos() ([]Version, error) {
+	manifest, err := fetchVersionManifest()
+	if err != nil {
+		return nil, err
+	}
+
+	return manifest.Versions, nil
+}
+
 // Returns all versions including snapshots
 func GetAllVersions() []string {
 	manifest, err := fetchVersionManifest()

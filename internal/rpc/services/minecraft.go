@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 
 	"connectrpc.com/connect"
 	storage "github.com/nickheyer/discopanel/internal/db"
@@ -34,16 +35,15 @@ func NewMinecraftService(store *storage.Store, docker *docker.Client, log *logge
 // GetMinecraftVersions gets available Minecraft versions
 func (s *MinecraftService) GetMinecraftVersions(ctx context.Context, req *connect.Request[v1.GetMinecraftVersionsRequest]) (*connect.Response[v1.GetMinecraftVersionsResponse], error) {
 	// Get all versions (includes all types)
-	allVersionIDs := minecraft.GetAllVersions()
+	versionInfos, err := minecraft.GetAllVersionInfos()
+	if err != nil {
+		s.log.Error("Failed to fetch version infos: %v", err)
+		return nil, connect.NewError(connect.CodeInternal, fmt.Errorf("failed to fetch version infos: %w", err))
+	}
 
-	// Convert to proto format by fetching info for each version
-	versions := make([]*v1.MinecraftVersion, 0, len(allVersionIDs))
-	for _, versionID := range allVersionIDs {
-		versionInfo, err := minecraft.GetVersionInfo(versionID)
-		if err != nil {
-			continue // Skip versions we can't get info for
-		}
-
+	// ⚡ Bolt optimization: Convert to proto format using pre-fetched O(1) loop instead of O(N^2) individual fetch
+	versions := make([]*v1.MinecraftVersion, 0, len(versionInfos))
+	for _, versionInfo := range versionInfos {
 		versions = append(versions, &v1.MinecraftVersion{
 			Id:          versionInfo.ID,
 			Type:        versionInfo.Type,
