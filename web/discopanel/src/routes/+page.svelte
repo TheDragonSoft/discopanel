@@ -67,10 +67,7 @@
 	let actionBusyId = $state<string | null>(null);
 
 	// Quick actions (start/stop/restart) — same RPC flow as the servers page
-	async function handleServerAction(
-		action: 'start' | 'stop' | 'restart',
-		server: ServerType
-	) {
+	async function handleServerAction(action: 'start' | 'stop' | 'restart', server: ServerType) {
 		actionBusyId = server.id;
 		try {
 			switch (action) {
@@ -141,34 +138,68 @@
 		isRefreshing = false;
 	}
 
-	let stats = $derived({
-		total: dashboardServers.length,
-		running: dashboardServers.filter((s) => s.status === ServerStatus.RUNNING).length,
-		stopped: dashboardServers.filter((s) => s.status === ServerStatus.STOPPED).length,
-		error: dashboardServers.filter(
-			(s) => s.status === ServerStatus.ERROR || s.status === ServerStatus.UNHEALTHY
-		).length,
-		totalMemory: dashboardServers.reduce((acc, s) => acc + (s.memory || 0), 0),
-		usedMemory: dashboardServers
-			.filter((s) => s.status === ServerStatus.RUNNING)
-			.reduce((acc, s) => acc + Number(s.memoryUsage || s.memory || 0), 0),
-		totalPlayers: dashboardServers
-			.filter((s) => s.status === ServerStatus.RUNNING)
-			.reduce((acc, s) => acc + (s.playersOnline || 0), 0),
-		totalMaxPlayers: dashboardServers.reduce((acc, s) => acc + (s.maxPlayers || 0), 0),
-		avgTps: dashboardServers
-			.filter((s) => s.tps && s.tps > 0)
-			.reduce((acc, s, _, arr) => acc + (s.tps || 0) / arr.length, 0),
-		totalDiskUsage: dashboardServers.reduce((acc, s) => acc + Number(s.diskUsage || 0), 0),
-		totalDiskSize:
-			dashboardServers.length > 0
-				? ` / ${dashboardServers?.[0]?.diskTotal && formatBytes(Number(dashboardServers[0].diskTotal))}`
-				: '',
-		diskFree:
-			dashboardServers.length > 0 ? Number(dashboardServers[0].diskFree || 0) : 0,
-		avgCpu: dashboardServers
-			.filter((s) => s.cpuPercent && s.cpuPercent > 0)
-			.reduce((acc, s, _, arr) => acc + (s.cpuPercent || 0) / arr.length, 0)
+	// ⚡ Bolt: Performance optimization
+	// Replaced multiple filter/reduce passes (O(N*11)) with a single pass (O(N))
+	// to improve dashboard render performance, especially for instances with many servers.
+	let stats = $derived.by(() => {
+		let running = 0;
+		let stopped = 0;
+		let error = 0;
+		let totalMemory = 0;
+		let usedMemory = 0;
+		let totalPlayers = 0;
+		let totalMaxPlayers = 0;
+		let totalDiskUsage = 0;
+
+		let tpsSum = 0;
+		let tpsCount = 0;
+		let cpuSum = 0;
+		let cpuCount = 0;
+
+		for (const s of dashboardServers) {
+			totalMemory += s.memory || 0;
+			totalMaxPlayers += s.maxPlayers || 0;
+			totalDiskUsage += Number(s.diskUsage || 0);
+
+			if (s.status === ServerStatus.RUNNING) {
+				running++;
+				usedMemory += Number(s.memoryUsage || s.memory || 0);
+				totalPlayers += s.playersOnline || 0;
+			} else if (s.status === ServerStatus.STOPPED) {
+				stopped++;
+			} else if (s.status === ServerStatus.ERROR || s.status === ServerStatus.UNHEALTHY) {
+				error++;
+			}
+
+			if (s.tps && s.tps > 0) {
+				tpsSum += s.tps;
+				tpsCount++;
+			}
+
+			if (s.cpuPercent && s.cpuPercent > 0) {
+				cpuSum += s.cpuPercent;
+				cpuCount++;
+			}
+		}
+
+		return {
+			total: dashboardServers.length,
+			running,
+			stopped,
+			error,
+			totalMemory,
+			usedMemory,
+			totalPlayers,
+			totalMaxPlayers,
+			totalDiskUsage,
+			totalDiskSize:
+				dashboardServers.length > 0
+					? ` / ${dashboardServers?.[0]?.diskTotal && formatBytes(Number(dashboardServers[0].diskTotal))}`
+					: '',
+			diskFree: dashboardServers.length > 0 ? Number(dashboardServers[0].diskFree || 0) : 0,
+			avgTps: tpsCount > 0 ? tpsSum / tpsCount : 0,
+			avgCpu: cpuCount > 0 ? cpuSum / cpuCount : 0
+		};
 	});
 
 	let recentActivity = $derived(
@@ -188,19 +219,28 @@
 			}))
 	);
 
-	let serversByStatus = $derived({
-		healthy: dashboardServers.filter(
-			(s) => s.status === ServerStatus.RUNNING && (!s.tps || s.tps >= 18)
-		),
-		warning: dashboardServers.filter(
-			(s) => s.status === ServerStatus.RUNNING && s.tps && s.tps < 18 && s.tps >= 15
-		),
-		critical: dashboardServers.filter(
-			(s) =>
-				s.status === ServerStatus.ERROR ||
-				s.status === ServerStatus.UNHEALTHY ||
-				(s.status === ServerStatus.RUNNING && s.tps && s.tps < 15)
-		)
+	// ⚡ Bolt: Performance optimization
+	// Combined 3 separate O(N) array passes into a single pass (O(N))
+	let serversByStatus = $derived.by(() => {
+		const healthy: typeof dashboardServers = [];
+		const warning: typeof dashboardServers = [];
+		const critical: typeof dashboardServers = [];
+
+		for (const s of dashboardServers) {
+			if (s.status === ServerStatus.RUNNING) {
+				if (!s.tps || s.tps >= 18) {
+					healthy.push(s);
+				} else if (s.tps && s.tps < 18 && s.tps >= 15) {
+					warning.push(s);
+				} else if (s.tps && s.tps < 15) {
+					critical.push(s);
+				}
+			} else if (s.status === ServerStatus.ERROR || s.status === ServerStatus.UNHEALTHY) {
+				critical.push(s);
+			}
+		}
+
+		return { healthy, warning, critical };
 	});
 
 	onMount(() => {
@@ -263,9 +303,7 @@
 		</div>
 	</div>
 {:else}
-	<div
-		class="h-full flex-1 space-y-8 bg-linear-to-br from-background to-muted/10 p-8 pt-6"
-	>
+	<div class="h-full flex-1 space-y-8 bg-linear-to-br from-background to-muted/10 p-8 pt-6">
 		<div class="flex flex-wrap items-center justify-between gap-4 border-b-2 border-border/50 pb-6">
 			<div class="flex items-center gap-4">
 				<div
@@ -274,7 +312,9 @@
 					<LayoutDashboard class="h-8 w-8 text-primary" />
 				</div>
 				<div class="animate-in space-y-1 duration-500 slide-in-from-left-5">
-					<h2 class="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-4xl font-bold tracking-tight text-transparent">
+					<h2
+						class="bg-linear-to-r from-foreground to-foreground/70 bg-clip-text text-4xl font-bold tracking-tight text-transparent"
+					>
 						Dashboard
 					</h2>
 					<p class="text-base text-muted-foreground">
@@ -304,9 +344,7 @@
 		</div>
 
 		<!-- Aggregate health strip -->
-		<Card
-			class="animate-in border-border/50 duration-500 fade-in-50 slide-in-from-bottom-2"
-		>
+		<Card class="animate-in border-border/50 duration-500 fade-in-50 slide-in-from-bottom-2">
 			<CardContent class="grid grid-cols-2 gap-4 p-5 sm:grid-cols-3 lg:grid-cols-5">
 				<div class="flex items-center gap-3">
 					<div
@@ -315,9 +353,9 @@
 						<Server class="h-5 w-5 text-blue-500" />
 					</div>
 					<div class="min-w-0">
-						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
-							>Servers</p
-						>
+						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+							Servers
+						</p>
 						<p class="text-2xl leading-tight font-bold">{stats.total}</p>
 					</div>
 				</div>
@@ -328,9 +366,9 @@
 						<CheckCircle class="h-5 w-5 text-green-500" />
 					</div>
 					<div class="min-w-0">
-						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
-							>Running</p
-						>
+						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+							Running
+						</p>
 						<p class="text-2xl leading-tight font-bold text-green-500 dark:text-green-400">
 							{stats.running}
 						</p>
@@ -343,9 +381,9 @@
 						<XCircle class="h-5 w-5 text-gray-400" />
 					</div>
 					<div class="min-w-0">
-						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
-							>Stopped</p
-						>
+						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+							Stopped
+						</p>
 						<p class="text-2xl leading-tight font-bold">{stats.stopped}</p>
 					</div>
 				</div>
@@ -356,12 +394,14 @@
 						<AlertTriangle class="h-5 w-5 text-red-500" />
 					</div>
 					<div class="min-w-0">
-						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
-							>Issues</p
-						>
-						<p class="text-2xl leading-tight font-bold {stats.error > 0
+						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+							Issues
+						</p>
+						<p
+							class="text-2xl leading-tight font-bold {stats.error > 0
 								? 'text-red-500 dark:text-red-400'
-								: ''}">
+								: ''}"
+						>
 							{stats.error}
 						</p>
 					</div>
@@ -373,9 +413,9 @@
 						<Users class="h-5 w-5 text-green-500" />
 					</div>
 					<div class="min-w-0">
-						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
-							>Players Online</p
-						>
+						<p class="text-[10px] font-medium tracking-wider text-muted-foreground uppercase">
+							Players Online
+						</p>
 						<p class="text-2xl leading-tight font-bold">{stats.totalPlayers}</p>
 					</div>
 				</div>
@@ -458,8 +498,7 @@
 												{serverStatusLabel(server.status)}
 											</Badge>
 											<Badge variant="outline" class="text-xs">{server.mcVersion}</Badge>
-											{#if server.modLoader !== ModLoader.VANILLA &&
-												server.modLoader !== ModLoader.UNSPECIFIED}
+											{#if server.modLoader !== ModLoader.VANILLA && server.modLoader !== ModLoader.UNSPECIFIED}
 												<Badge variant="outline" class="text-xs capitalize">
 													{getModLoaderDisplay(server.modLoader)}
 												</Badge>
@@ -480,9 +519,7 @@
 												<Play class="h-4 w-4 text-green-500" />
 											</Button>
 										{/if}
-										{#if server.status === ServerStatus.RUNNING ||
-											server.status === ServerStatus.UNHEALTHY ||
-											server.status === ServerStatus.STARTING}
+										{#if server.status === ServerStatus.RUNNING || server.status === ServerStatus.UNHEALTHY || server.status === ServerStatus.STARTING}
 											<Button
 												variant="ghost"
 												size="icon"
@@ -495,8 +532,7 @@
 												<Square class="h-4 w-4 text-red-500" />
 											</Button>
 										{/if}
-										{#if server.status === ServerStatus.RUNNING ||
-											server.status === ServerStatus.UNHEALTHY}
+										{#if server.status === ServerStatus.RUNNING || server.status === ServerStatus.UNHEALTHY}
 											<Button
 												variant="ghost"
 												size="icon"
@@ -521,9 +557,7 @@
 										</Button>
 									</div>
 								</div>
-								<div
-									class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-border/40 pt-3"
-								>
+								<div class="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 border-t border-border/40 pt-3">
 									<div>
 										<p
 											class="flex items-center gap-1 text-[10px] font-medium tracking-wider text-muted-foreground uppercase"
@@ -676,7 +710,7 @@
 							<p class="text-sm">No players online</p>
 						</div>
 					{:else}
-						<div class="scrollbar-thin max-h-56 space-y-2 overflow-y-auto pr-1">
+						<div class="max-h-56 scrollbar-thin space-y-2 overflow-y-auto pr-1">
 							{#each onlinePlayers as op (op.playerId + op.serverId)}
 								<div
 									class="flex items-center justify-between gap-2 rounded-lg border bg-muted/30 px-3 py-2"
@@ -805,7 +839,9 @@
 										>{formatBytes(stats.totalDiskUsage)}{stats.totalDiskSize}</span
 									>
 									{#if stats.diskFree > 0}
-										<span class="text-xs text-muted-foreground">· {formatBytes(stats.diskFree)} free</span>
+										<span class="text-xs text-muted-foreground"
+											>· {formatBytes(stats.diskFree)} free</span
+										>
 									{/if}
 								{:else}
 									<Database class="h-4 w-4 text-gray-400" />
