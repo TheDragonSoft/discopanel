@@ -107,10 +107,12 @@ func CalculateDirSize(dirPath string) (int64, error) {
 	return totalSize, nil
 }
 
+// ⚡ Bolt: pre-compile regex to avoid O(N) allocation bottleneck
+var sanitizePathRe = regexp.MustCompile(`[^a-zA-Z0-9_-]+`)
+
 func SanitizePathName(name string) string {
 	// alphanum + _ + -
-	re := regexp.MustCompile(`[^a-zA-Z0-9_-]+`)
-	safe := re.ReplaceAllString(strings.ToLower(strings.TrimSpace(name)), "_")
+	safe := sanitizePathRe.ReplaceAllString(strings.ToLower(strings.TrimSpace(name)), "_")
 
 	// Empty
 	if safe == "" {
