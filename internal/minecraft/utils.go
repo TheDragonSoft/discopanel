@@ -8,20 +8,25 @@ import (
 	models "github.com/nickheyer/discopanel/internal/db"
 )
 
-// ParseTPSFromOutput parses TPS value from various server command outputs
-func ParseTPSFromOutput(output string) float64 {
-	// Remove color codes and clean the output
-	output = stripMinecraftColors(output)
+var (
+	tpsOverallRe    = regexp.MustCompile(`Overall:\s*([\d.]+)\s*TPS`)
+	tpsLastRe       = regexp.MustCompile(`TPS from last .*?:\s*([\d.]+)`)
+	tpsMeanRe       = regexp.MustCompile(`Mean TPS:\s*([\d.]+)`)
+	tpsOverworldRe  = regexp.MustCompile(`Overworld:\s*([\d.]+)\s*TPS`)
+	tpsGenericRe    = regexp.MustCompile(`(?i)tps[\s:]+(\d+\.?\d*)`)
+	tpsLastResortRe = regexp.MustCompile(`\b(\d{1,2}\.?\d*)\b`)
+	playerCountRe   = regexp.MustCompile(`(\d+)\s*(?:of|/)`)
+	mcColorRe       = regexp.MustCompile(`§.`)
+	ansiColorRe     = regexp.MustCompile(`\x1b\[[0-9;]*m`)
 
-	// Try different parsing patterns
-	patterns := []struct {
+	tpsPatterns = []struct {
 		regex   *regexp.Regexp
 		extract func([]string) float64
 	}{
 		// NeoForge/Forge with Overall format: "Overall: 20.000 TPS"
 		// This should be checked first as it's the most reliable when present
 		{
-			regex: regexp.MustCompile(`Overall:\s*([\d.]+)\s*TPS`),
+			regex: tpsOverallRe,
 			extract: func(matches []string) float64 {
 				if len(matches) > 1 {
 					val, _ := strconv.ParseFloat(matches[1], 64)
@@ -32,7 +37,7 @@ func ParseTPSFromOutput(output string) float64 {
 		},
 		// Vanilla/Paper/Spigot format: "TPS from last 1m, 5m, 15m: 20.0, 20.0, 20.0"
 		{
-			regex: regexp.MustCompile(`TPS from last .*?:\s*([\d.]+)`),
+			regex: tpsLastRe,
 			extract: func(matches []string) float64 {
 				if len(matches) > 1 {
 					val, _ := strconv.ParseFloat(matches[1], 64)
@@ -43,7 +48,7 @@ func ParseTPSFromOutput(output string) float64 {
 		},
 		// Forge format: "Dim 0 (overworld): Mean tick time: 2.333 ms. Mean TPS: 20.0"
 		{
-			regex: regexp.MustCompile(`Mean TPS:\s*([\d.]+)`),
+			regex: tpsMeanRe,
 			extract: func(matches []string) float64 {
 				if len(matches) > 1 {
 					val, _ := strconv.ParseFloat(matches[1], 64)
@@ -54,7 +59,7 @@ func ParseTPSFromOutput(output string) float64 {
 		},
 		// Overworld-specific format (fallback if no Overall): "Overworld: 20.000 TPS"
 		{
-			regex: regexp.MustCompile(`Overworld:\s*([\d.]+)\s*TPS`),
+			regex: tpsOverworldRe,
 			extract: func(matches []string) float64 {
 				if len(matches) > 1 {
 					val, _ := strconv.ParseFloat(matches[1], 64)
@@ -65,7 +70,7 @@ func ParseTPSFromOutput(output string) float64 {
 		},
 		// Generic TPS format: "TPS: 20.0" or "tps: 20.0"
 		{
-			regex: regexp.MustCompile(`(?i)tps[\s:]+(\d+\.?\d*)`),
+			regex: tpsGenericRe,
 			extract: func(matches []string) float64 {
 				if len(matches) > 1 {
 					val, _ := strconv.ParseFloat(matches[1], 64)
@@ -76,7 +81,7 @@ func ParseTPSFromOutput(output string) float64 {
 		},
 		// Just find any float number between 0 and 20 (last resort)
 		{
-			regex: regexp.MustCompile(`\b(\d{1,2}\.?\d*)\b`),
+			regex: tpsLastResortRe,
 			extract: func(matches []string) float64 {
 				if len(matches) > 1 {
 					val, _ := strconv.ParseFloat(matches[1], 64)
@@ -89,8 +94,15 @@ func ParseTPSFromOutput(output string) float64 {
 			},
 		},
 	}
+)
 
-	for _, pattern := range patterns {
+// ParseTPSFromOutput parses TPS value from various server command outputs
+func ParseTPSFromOutput(output string) float64 {
+	// Remove color codes and clean the output
+	output = stripMinecraftColors(output)
+
+	// Try different parsing patterns
+	for _, pattern := range tpsPatterns {
 		matches := pattern.regex.FindStringSubmatch(output)
 		if tps := pattern.extract(matches); tps > 0 {
 			return tps
@@ -113,8 +125,7 @@ func ParsePlayerListFromOutput(output string) (int, []string) {
 	var players []string
 
 	// Extract player count
-	re := regexp.MustCompile(`(\d+)\s*(?:of|/)`)
-	matches := re.FindStringSubmatch(output)
+	matches := playerCountRe.FindStringSubmatch(output)
 	if len(matches) > 1 {
 		count, _ = strconv.Atoi(matches[1])
 	}
@@ -147,12 +158,10 @@ func ParsePlayerListFromOutput(output string) (int, []string) {
 
 func stripMinecraftColors(text string) string {
 	// Remove Minecraft color codes (§ followed by a character)
-	re := regexp.MustCompile(`§.`)
-	text = re.ReplaceAllString(text, "")
+	text = mcColorRe.ReplaceAllString(text, "")
 
 	// Also remove ANSI color codes
-	ansiRe := regexp.MustCompile(`\x1b\[[0-9;]*m`)
-	text = ansiRe.ReplaceAllString(text, "")
+	text = ansiColorRe.ReplaceAllString(text, "")
 
 	return text
 }
