@@ -33,17 +33,12 @@ func NewMinecraftService(store *storage.Store, docker *docker.Client, log *logge
 
 // GetMinecraftVersions gets available Minecraft versions
 func (s *MinecraftService) GetMinecraftVersions(ctx context.Context, req *connect.Request[v1.GetMinecraftVersionsRequest]) (*connect.Response[v1.GetMinecraftVersionsResponse], error) {
-	// Get all versions (includes all types)
-	allVersionIDs := minecraft.GetAllVersions()
+	// ⚡ Bolt: Use GetAllVersionInfos to avoid O(N²) iteration where GetVersionInfo is called in a loop.
+	allVersionInfos := minecraft.GetAllVersionInfos()
 
-	// Convert to proto format by fetching info for each version
-	versions := make([]*v1.MinecraftVersion, 0, len(allVersionIDs))
-	for _, versionID := range allVersionIDs {
-		versionInfo, err := minecraft.GetVersionInfo(versionID)
-		if err != nil {
-			continue // Skip versions we can't get info for
-		}
-
+	// Convert to proto format
+	versions := make([]*v1.MinecraftVersion, 0, len(allVersionInfos))
+	for _, versionInfo := range allVersionInfos {
 		versions = append(versions, &v1.MinecraftVersion{
 			Id:          versionInfo.ID,
 			Type:        versionInfo.Type,

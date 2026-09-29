@@ -136,6 +136,20 @@ func GetVersions() []string {
 	return versions
 }
 
+// Returns all version infos including snapshots
+func GetAllVersionInfos() []Version {
+	manifest, err := fetchVersionManifest()
+	if err != nil {
+		return []Version{}
+	}
+
+	// Return a copy to prevent mutation
+	versions := make([]Version, len(manifest.Versions))
+	copy(versions, manifest.Versions)
+
+	return versions
+}
+
 // Returns all versions including snapshots
 func GetAllVersions() []string {
 	manifest, err := fetchVersionManifest()
