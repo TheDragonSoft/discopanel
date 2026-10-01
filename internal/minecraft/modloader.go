@@ -4,6 +4,7 @@ import (
 	"path/filepath"
 	"slices"
 	"strings"
+	"sync"
 
 	models "github.com/nickheyer/discopanel/internal/db"
 	"github.com/nickheyer/discopanel/pkg/strmatch"
@@ -365,63 +366,71 @@ func IsValidModFile(filename string, loader models.ModLoader) bool {
 	return slices.Contains(info.FileExtensions, ext)
 }
 
+var (
+	cachedModLoaders []ModLoaderInfo
+	modLoadersOnce   sync.Once
+)
+
 // GetAllModLoaders returns information about all available mod loaders
 func GetAllModLoaders() []ModLoaderInfo {
-	loaders := []models.ModLoader{
-		// Vanilla
-		models.ModLoaderVanilla,
+	modLoadersOnce.Do(func() {
+		loaders := []models.ModLoader{
+			// Vanilla
+			models.ModLoaderVanilla,
 
-		// Forge-based
-		models.ModLoaderForge,
-		models.ModLoaderNeoForge,
+			// Forge-based
+			models.ModLoaderForge,
+			models.ModLoaderNeoForge,
 
-		// Fabric-based
-		models.ModLoaderFabric,
-		models.ModLoaderQuilt,
+			// Fabric-based
+			models.ModLoaderFabric,
+			models.ModLoaderQuilt,
 
-		// Bukkit-based
-		models.ModLoaderBukkit,
-		models.ModLoaderSpigot,
+			// Bukkit-based
+			models.ModLoaderBukkit,
+			models.ModLoaderSpigot,
 
-		// Paper-based
-		models.ModLoaderPaper,
-		models.ModLoaderPurpur,
-		models.ModLoaderPufferfish,
-		models.ModLoaderFolia,
+			// Paper-based
+			models.ModLoaderPaper,
+			models.ModLoaderPurpur,
+			models.ModLoaderPufferfish,
+			models.ModLoaderFolia,
 
-		// Hybrids (Forge + Bukkit)
-		models.ModLoaderMagma,
-		models.ModLoaderMagmaMaintained,
-		models.ModLoaderKetting,
-		models.ModLoaderMohist,
-		models.ModLoaderYouer,
-		models.ModLoaderBanner,
-		models.ModLoaderCatserver,
-		models.ModLoaderArclight,
+			// Hybrids (Forge + Bukkit)
+			models.ModLoaderMagma,
+			models.ModLoaderMagmaMaintained,
+			models.ModLoaderKetting,
+			models.ModLoaderMohist,
+			models.ModLoaderYouer,
+			models.ModLoaderBanner,
+			models.ModLoaderCatserver,
+			models.ModLoaderArclight,
 
-		// Sponge
-		models.ModLoaderSpongeVanilla,
+			// Sponge
+			models.ModLoaderSpongeVanilla,
 
-		// Others
-		models.ModLoaderLimbo,
-		models.ModLoaderNanoLimbo,
-		models.ModLoaderCrucible,
-		models.ModLoaderGlowstone,
-		models.ModLoaderCustom,
+			// Others
+			models.ModLoaderLimbo,
+			models.ModLoaderNanoLimbo,
+			models.ModLoaderCrucible,
+			models.ModLoaderGlowstone,
+			models.ModLoaderCustom,
 
-		// Modpack Platforms
-		models.ModLoaderAutoCurseForge,
-		models.ModLoaderCurseForge,
-		models.ModLoaderFTBA,
-		models.ModLoaderModrinth,
-	}
+			// Modpack Platforms
+			models.ModLoaderAutoCurseForge,
+			models.ModLoaderCurseForge,
+			models.ModLoaderFTBA,
+			models.ModLoaderModrinth,
+		}
 
-	infos := make([]ModLoaderInfo, len(loaders))
-	for i, loader := range loaders {
-		infos[i] = GetModLoaderInfo(loader)
-	}
+		infos := make([]ModLoaderInfo, len(loaders))
+		for i, loader := range loaders {
+			infos[i] = GetModLoaderInfo(loader)
+		}
+		cachedModLoaders = infos
+	})
 
-	return infos
+	return cachedModLoaders
 }
 
 // Fuzzy weights for mod loader matches
