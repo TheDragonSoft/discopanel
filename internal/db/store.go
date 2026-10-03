@@ -1321,7 +1321,10 @@ func (s *Store) DeleteModule(ctx context.Context, id string) error {
 // GetModuleByHostPort finds a module that uses the specified host port
 func (s *Store) GetModuleByHostPort(ctx context.Context, port int) (*Module, error) {
 	var modules []*Module
-	if err := s.db.WithContext(ctx).Find(&modules).Error; err != nil {
+
+	// Optimize performance: Push the port filtering down to the SQLite level rather than
+	// loading all modules in memory. json1 extension allows extracting properties from JSON strings.
+	if err := s.db.WithContext(ctx).Where("EXISTS (SELECT 1 FROM json_each(ports) WHERE json_extract(value, '$.hostPort') = ?)", port).Find(&modules).Error; err != nil {
 		return nil, err
 	}
 
@@ -1353,15 +1356,19 @@ type PortConflict struct {
 // excludeModuleID allows excluding the current module when updating.
 func (s *Store) CheckPortAvailability(ctx context.Context, hostPort int, protocol string, proxyEnabled bool, hostname string, excludeModuleID string) (*PortConflict, error) {
 	var modules []*Module
-	if err := s.db.WithContext(ctx).Find(&modules).Error; err != nil {
+
+	// Optimize performance: Push the port filtering down to the SQLite level rather than
+	// loading all modules in memory. json1 extension allows extracting properties from JSON strings.
+	query := s.db.WithContext(ctx).Where("EXISTS (SELECT 1 FROM json_each(ports) WHERE json_extract(value, '$.hostPort') = ?)", hostPort)
+	if excludeModuleID != "" {
+		query = query.Where("id != ?", excludeModuleID)
+	}
+
+	if err := query.Find(&modules).Error; err != nil {
 		return nil, err
 	}
 
 	for _, module := range modules {
-		if module.ID == excludeModuleID {
-			continue
-		}
-
 		for _, p := range module.Ports {
 			if p == nil || int(p.HostPort) != hostPort {
 				continue
@@ -1429,26 +1436,18 @@ func (s *Store) ListModulesFollowingServerLifecycle(ctx context.Context, serverI
 }
 
 // ListEventTriggeredTasks returns all enabled tasks subscribed to the given event for a server.
-// EventTriggers is stored as a JSON array, so we filter in Go.
 func (s *Store) ListEventTriggeredTasks(ctx context.Context, serverID string, eventType v1.TriggeredEventType) ([]*ScheduledTask, error) {
 	var tasks []*ScheduledTask
+	// Optimize performance: Push the event type filtering down to the SQLite level using json_each
 	err := s.db.WithContext(ctx).
 		Where("server_id = ? AND status = ? AND schedule = ?",
 			serverID, TaskStatusEnabled, ScheduleTypeEvent).
+		Where("EXISTS (SELECT 1 FROM json_each(event_triggers) WHERE value = ?)", int(eventType)).
 		Find(&tasks).Error
 	if err != nil {
 		return nil, err
 	}
-	matching := make([]*ScheduledTask, 0, len(tasks))
-	for _, t := range tasks {
-		for _, e := range t.EventTriggers {
-			if e == eventType {
-				matching = append(matching, t)
-				break
-			}
-		}
-	}
-	return matching, nil
+	return tasks, nil
 }
 
 
