@@ -1429,26 +1429,25 @@ func (s *Store) ListModulesFollowingServerLifecycle(ctx context.Context, serverI
 }
 
 // ListEventTriggeredTasks returns all enabled tasks subscribed to the given event for a server.
-// EventTriggers is stored as a JSON array, so we filter in Go.
+// EventTriggers is stored as a JSON array. We use LIKE to filter at the database level across
+// different SQL dialects, checking for all possible JSON array formatting of the value.
 func (s *Store) ListEventTriggeredTasks(ctx context.Context, serverID string, eventType v1.TriggeredEventType) ([]*ScheduledTask, error) {
 	var tasks []*ScheduledTask
+
+	val := int(eventType)
 	err := s.db.WithContext(ctx).
-		Where("server_id = ? AND status = ? AND schedule = ?",
-			serverID, TaskStatusEnabled, ScheduleTypeEvent).
+		Where("server_id = ? AND status = ? AND schedule = ?", serverID, TaskStatusEnabled, ScheduleTypeEvent).
+		Where(
+			s.db.Where("event_triggers LIKE ?", fmt.Sprintf("%%[%d]%%", val)).
+			Or("event_triggers LIKE ?", fmt.Sprintf("%%[%d,%%", val)).
+			Or("event_triggers LIKE ?", fmt.Sprintf("%%,%d,%%", val)).
+			Or("event_triggers LIKE ?", fmt.Sprintf("%%,%d]%%", val)),
+		).
 		Find(&tasks).Error
 	if err != nil {
 		return nil, err
 	}
-	matching := make([]*ScheduledTask, 0, len(tasks))
-	for _, t := range tasks {
-		for _, e := range t.EventTriggers {
-			if e == eventType {
-				matching = append(matching, t)
-				break
-			}
-		}
-	}
-	return matching, nil
+	return tasks, nil
 }
 
 
