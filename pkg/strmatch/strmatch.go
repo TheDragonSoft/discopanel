@@ -231,32 +231,65 @@ func isWordByte(b byte) bool {
 }
 
 // Computes the edit distance between a and b - rune aware
+// Optimized: stack allocation for strings up to 64 runes to avoid O(N) heap allocations during strmatch
 func levenshtein(a, b string) int {
-	ra, rb := []rune(a), []rune(b)
-	if len(ra) == 0 {
-		return len(rb)
-	}
-	if len(rb) == 0 {
-		return len(ra)
+	lenA := 0
+	for range a { lenA++ }
+	lenB := 0
+	for range b { lenB++ }
+
+	if lenA == 0 { return lenB }
+	if lenB == 0 { return lenA }
+
+	if lenA < lenB {
+		a, b = b, a
+		lenA, lenB = lenB, lenA
 	}
 
-	prev := make([]int, len(rb)+1)
-	curr := make([]int, len(rb)+1)
-	for j := range prev {
-		prev[j] = j
+	var rowBuf [64]int
+	var row []int
+	if lenB+1 <= 64 {
+		row = rowBuf[:lenB+1]
+	} else {
+		row = make([]int, lenB+1)
 	}
-	for i := 1; i <= len(ra); i++ {
-		curr[0] = i
-		for j := 1; j <= len(rb); j++ {
+
+	for j := 0; j <= lenB; j++ {
+		row[j] = j
+	}
+
+	var bRuneBuf [64]rune
+	var rb []rune
+	if lenB <= 64 {
+		rb = bRuneBuf[:lenB]
+	} else {
+		rb = make([]rune, lenB)
+	}
+
+	j := 0
+	for _, r := range b {
+		rb[j] = r
+		j++
+	}
+
+	i := 1
+	for _, ra := range a {
+		prevDiag := row[0]
+		row[0] = i
+
+		for j := 1; j <= lenB; j++ {
+			prevRowJ := row[j]
 			cost := 1
-			if ra[i-1] == rb[j-1] {
+			if ra == rb[j-1] {
 				cost = 0
 			}
-			curr[j] = min3(prev[j]+1, curr[j-1]+1, prev[j-1]+cost)
+			row[j] = min3(row[j]+1, row[j-1]+1, prevDiag+cost)
+			prevDiag = prevRowJ
 		}
-		prev, curr = curr, prev
+		i++
 	}
-	return prev[len(rb)]
+
+	return row[lenB]
 }
 
 func min3(a, b, c int) int {
