@@ -338,6 +338,18 @@ func (s *ServerService) ListServers(ctx context.Context, req *connect.Request[v1
 		}
 	}
 
+	// Fetch all container statuses in a single bulk API call to avoid N+1 queries
+	var containerIDs []string
+	for _, server := range servers {
+		if server.ContainerID != "" {
+			containerIDs = append(containerIDs, server.ContainerID)
+		}
+	}
+	containerStatuses, err := s.docker.GetContainerStatuses(ctx, containerIDs)
+	if err != nil {
+		s.log.Warn("Failed to bulk fetch container statuses: %v", err)
+	}
+
 	// Update status from Docker and apply cached metrics
 	for _, server := range servers {
 		// If server uses proxy, ensure ProxyPort is populated from the listener
@@ -348,8 +360,7 @@ func (s *ServerService) ListServers(ctx context.Context, req *connect.Request[v1
 		}
 
 		if server.ContainerID != "" {
-			status, err := s.docker.GetContainerStatus(ctx, server.ContainerID)
-			if err == nil {
+			if status, ok := containerStatuses[server.ContainerID]; ok && status != storage.StatusError {
 				server.Status = status
 			}
 

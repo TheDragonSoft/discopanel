@@ -1,0 +1,5 @@
+1. We found an N+1 query issue when listing servers in `ListServers` in `internal/rpc/services/server.go`.
+2. Currently it calls `s.docker.GetContainerStatus` in a for loop for every single server.
+3. `s.docker.GetContainerStatus` calls `ContainerInspect` to the docker API for each container.
+4. We can optimize this by using `ContainerList` from docker API to fetch all container statuses at once, and caching them in a map, and then look up the status from the map.
+5. Create a `GetContainerStatuses` function in `internal/docker/client.go` to fetch statuses in bulk.

@@ -732,6 +732,61 @@ func (c *Client) RecreateContainer(ctx context.Context, oldContainerID string, s
 	return result, nil
 }
 
+// GetContainerStatuses fetches the statuses for all requested containers in a single API call.
+func (c *Client) GetContainerStatuses(ctx context.Context, containerIDs []string) (map[string]models.ServerStatus, error) {
+	// List all containers to avoid N+1 queries
+	containers, err := c.docker.ContainerList(ctx, container.ListOptions{All: true})
+	if err != nil {
+		return nil, err
+	}
+
+	// Create lookup map for requested containers
+	requestedMap := make(map[string]bool)
+	for _, id := range containerIDs {
+		requestedMap[id] = true
+	}
+
+	statuses := make(map[string]models.ServerStatus)
+	for _, cont := range containers {
+		// Only process requested containers
+		if !requestedMap[cont.ID] {
+			continue
+		}
+
+		var status models.ServerStatus
+		switch cont.State {
+		case "running":
+			if strings.Contains(cont.Status, "(healthy)") {
+				status = models.StatusRunning
+			} else if strings.Contains(cont.Status, "(starting)") {
+				status = models.StatusStarting
+			} else if strings.Contains(cont.Status, "(unhealthy)") {
+				status = models.StatusUnhealthy
+			} else {
+				status = models.StatusRunning
+			}
+		case "restarting":
+			status = models.StatusStarting
+		case "exited", "dead":
+			status = models.StatusStopped
+		case "created", "paused", "removing":
+			status = models.StatusStopped
+		default:
+			status = models.StatusError
+		}
+		statuses[cont.ID] = status
+	}
+
+	// Ensure all requested IDs have an entry (defaulting to error if missing)
+	for _, id := range containerIDs {
+		if _, ok := statuses[id]; !ok {
+			statuses[id] = models.StatusError
+		}
+	}
+
+	return statuses, nil
+}
+
 func (c *Client) GetContainerStatus(ctx context.Context, containerID string) (models.ServerStatus, error) {
 	inspect, err := c.docker.ContainerInspect(ctx, containerID)
 	if err != nil {
