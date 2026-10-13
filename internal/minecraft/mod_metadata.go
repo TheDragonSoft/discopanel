@@ -16,6 +16,10 @@ import (
 	yaml "gopkg.in/yaml.v3"
 )
 
+var (
+	iconFallbackRe = regexp.MustCompile(`(?i)^assets/[^/]+/(icon|logo|pack)\.(png|jpg|jpeg|webp)$`)
+)
+
 // ModMetadata holds extracted metadata and icons from a mod/plugin jar
 type ModMetadata struct {
 	ModID       string
@@ -393,9 +397,8 @@ func extractIconFromZip(r *zip.Reader, iconPath string, modID string) string {
 
 	// 3. Fallback regex lookup for any asset icon/logo png
 	if targetFile == nil {
-		iconRegex := regexp.MustCompile(`(?i)^assets/[^/]+/(icon|logo|pack)\.(png|jpg|jpeg|webp)$`)
 		for _, f := range r.File {
-			if iconRegex.MatchString(f.Name) {
+			if iconFallbackRe.MatchString(f.Name) {
 				targetFile = f
 				break
 			}

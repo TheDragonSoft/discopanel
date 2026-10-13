@@ -32,6 +32,11 @@ var whitelistNameRE = regexp.MustCompile(`^[A-Za-z0-9_]{1,32}$`)
 // iconDataURIPrefix is stripped when a client sends the icon as a data URI.
 var iconDataURIPrefix = regexp.MustCompile(`(?i)^data:image/[a-z]+;base64,`)
 
+var (
+	mcColorRE   = regexp.MustCompile("§.")
+	ansiColorRE = regexp.MustCompile(`\x1b\[[0-9;]*m`)
+)
+
 // AdminService implements the Admin service (whitelist, bans, MOTD/icon).
 type AdminService struct {
 	store   *storage.Store
@@ -508,8 +513,8 @@ func (s *AdminService) toggleWhitelist(ctx context.Context, server *storage.Serv
 // stripChatFormatting removes Minecraft section-sign color codes and ANSI
 // escape sequences from server console output.
 func stripChatFormatting(text string) string {
-	text = regexp.MustCompile("§.").ReplaceAllString(text, "")
-	text = regexp.MustCompile(`\x1b\[[0-9;]*m`).ReplaceAllString(text, "")
+	text = mcColorRE.ReplaceAllString(text, "")
+	text = ansiColorRE.ReplaceAllString(text, "")
 	return text
 }
 
