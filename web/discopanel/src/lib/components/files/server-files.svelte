@@ -86,10 +86,15 @@
 	// --- Derived ---
 	let flatFiles = $derived.by(() => {
 		const result: FileInfo[] = [];
+		// ⚡ Bolt: Caching `filterText.toLowerCase()` before walking the file tree
+		// reduces redundant string allocation and operations by ~O(N)
+		// on keystrokes, significantly improving UI responsiveness on large folders.
+		const lowerFilterText = filterText ? filterText.toLowerCase() : '';
+
 		function walk(items: FileInfo[]) {
 			for (const item of items) {
-				if (filterText) {
-					const match = item.name.toLowerCase().includes(filterText.toLowerCase());
+				if (lowerFilterText) {
+					const match = item.name.toLowerCase().includes(lowerFilterText);
 					if (match) result.push(item);
 					if (item.isDir && item.children) walk(item.children);
 				} else {

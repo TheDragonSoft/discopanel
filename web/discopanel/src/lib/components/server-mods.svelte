@@ -49,18 +49,21 @@
 	let previousServerId = $state(server.id);
 
 	// Filtered mods based on search query
-	let filteredMods = $derived(
-		mods.filter((mod) => {
-			if (!searchQuery.trim()) return true;
-			const q = searchQuery.toLowerCase();
+	let filteredMods = $derived.by(() => {
+		// ⚡ Bolt: Early return for empty queries skips the filter loop entirely.
+		// Moving `searchQuery.toLowerCase()` out of the `.filter()` callback avoids
+		// O(N) repetitive calculations on every render, improving search performance.
+		if (!searchQuery.trim()) return mods;
+		const q = searchQuery.toLowerCase();
+		return mods.filter((mod) => {
 			return (
 				mod.displayName.toLowerCase().includes(q) ||
 				mod.fileName.toLowerCase().includes(q) ||
 				mod.description.toLowerCase().includes(q) ||
 				mod.author.toLowerCase().includes(q)
 			);
-		})
-	);
+		});
+	});
 
 	let enabledCount = $derived(mods.filter((m) => m.enabled).length);
 
