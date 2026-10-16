@@ -41,13 +41,19 @@ func Score(query, candidate string) float64 {
 	return scoreWithPrecomputed(q, c, queryTokens)
 }
 
+// Optimized: Added early returns. If the containment score is already higher than
+// the maximum possible score for tokens or edit distance, we can skip computing them.
 func scoreWithPrecomputed(q, c string, queryTokens map[string]bool) float64 {
 	best := containmentScore(q, c)
-	if s := tokenScoreWithPrecomputed(queryTokens, c); s > best {
-		best = s
+	if best < tokenBase+tokenSpan {
+		if s := tokenScoreWithPrecomputed(queryTokens, c); s > best {
+			best = s
+		}
 	}
-	if s := editScore(q, c); s > best {
-		best = s
+	if best < editWeight {
+		if s := editScore(q, c); s > best {
+			best = s
+		}
 	}
 	return best
 }
@@ -211,12 +217,7 @@ func normalize(s string) string {
 	return strings.ToLower(strings.TrimSpace(s))
 }
 
-// Splits s into runs of letters and digits, discarding separators
-func tokens(s string) []string {
-	return strings.FieldsFunc(s, func(r rune) bool {
-		return !unicode.IsLetter(r) && !unicode.IsNumber(r)
-	})
-}
+
 
 func tokenSet(s string) map[string]bool {
 	set := make(map[string]bool)
@@ -226,11 +227,20 @@ func tokenSet(s string) map[string]bool {
 	return set
 }
 
+// Splits s into runs of letters and digits, discarding separators
+func tokens(s string) []string {
+	return strings.FieldsFunc(s, func(r rune) bool {
+		return !unicode.IsLetter(r) && !unicode.IsNumber(r)
+	})
+}
+
 func isWordByte(b byte) bool {
 	return (b >= 'a' && b <= 'z') || (b >= 'A' && b <= 'Z') || (b >= '0' && b <= '9')
 }
 
 // Computes the edit distance between a and b - rune aware
+// Optimized: Uses a single row slice instead of two for the dynamic programming grid,
+// reducing allocations by 50%
 func levenshtein(a, b string) int {
 	ra, rb := []rune(a), []rune(b)
 	if len(ra) == 0 {
@@ -240,23 +250,24 @@ func levenshtein(a, b string) int {
 		return len(ra)
 	}
 
-	prev := make([]int, len(rb)+1)
-	curr := make([]int, len(rb)+1)
-	for j := range prev {
-		prev[j] = j
+	row := make([]int, len(rb)+1)
+	for j := range row {
+		row[j] = j
 	}
 	for i := 1; i <= len(ra); i++ {
-		curr[0] = i
+		prevDiagonal := row[0]
+		row[0] = i
 		for j := 1; j <= len(rb); j++ {
 			cost := 1
 			if ra[i-1] == rb[j-1] {
 				cost = 0
 			}
-			curr[j] = min3(prev[j]+1, curr[j-1]+1, prev[j-1]+cost)
+			oldVal := row[j]
+			row[j] = min3(row[j]+1, row[j-1]+1, prevDiagonal+cost)
+			prevDiagonal = oldVal
 		}
-		prev, curr = curr, prev
 	}
-	return prev[len(rb)]
+	return row[len(rb)]
 }
 
 func min3(a, b, c int) int {
