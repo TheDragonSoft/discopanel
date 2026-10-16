@@ -75,7 +75,10 @@ func (p *MinecraftProxy) AddRoute(serverID, hostname, backendHost string, backen
 	p.routesMutex.Lock()
 	defer p.routesMutex.Unlock()
 
-	hostname = strings.ToLower(strings.Split(hostname, ":")[0])
+	if idx := strings.IndexByte(hostname, ':'); idx != -1 {
+		hostname = hostname[:idx]
+	}
+	hostname = strings.ToLower(hostname)
 
 	p.routes[hostname] = &Route{
 		ServerID:    serverID,
@@ -93,7 +96,10 @@ func (p *MinecraftProxy) RemoveRoute(hostname string) {
 	p.routesMutex.Lock()
 	defer p.routesMutex.Unlock()
 
-	hostname = strings.ToLower(strings.Split(hostname, ":")[0])
+	if idx := strings.IndexByte(hostname, ':'); idx != -1 {
+		hostname = hostname[:idx]
+	}
+	hostname = strings.ToLower(hostname)
 	delete(p.routes, hostname)
 
 	p.logger.Info("Removed route: hostname=%s", hostname)
@@ -104,7 +110,10 @@ func (p *MinecraftProxy) UpdateRoute(hostname, backendHost string, backendPort i
 	p.routesMutex.Lock()
 	defer p.routesMutex.Unlock()
 
-	hostname = strings.ToLower(strings.Split(hostname, ":")[0])
+	if idx := strings.IndexByte(hostname, ':'); idx != -1 {
+		hostname = hostname[:idx]
+	}
+	hostname = strings.ToLower(hostname)
 	if route, exists := p.routes[hostname]; exists {
 		route.BackendHost = backendHost
 		route.BackendPort = backendPort
@@ -117,7 +126,10 @@ func (p *MinecraftProxy) SetRouteActive(hostname string, active bool) {
 	p.routesMutex.Lock()
 	defer p.routesMutex.Unlock()
 
-	hostname = strings.ToLower(strings.Split(hostname, ":")[0])
+	if idx := strings.IndexByte(hostname, ':'); idx != -1 {
+		hostname = hostname[:idx]
+	}
+	hostname = strings.ToLower(hostname)
 	if route, exists := p.routes[hostname]; exists {
 		route.Active = active
 		p.logger.Info("Set route active: hostname=%s active=%v", hostname, active)
@@ -213,7 +225,12 @@ func (p *MinecraftProxy) handleConnection(clientConn net.Conn) {
 
 	// Extract hostname from the handshake
 	p.logger.Debug("Extracting hostname from: %s", handshake.ServerAddress)
-	hostname := strings.ToLower(strings.Split(handshake.ServerAddress, ":")[0])
+	// ⚡ Bolt: avoid allocating a slice with strings.Split for performance
+	host := handshake.ServerAddress
+	if idx := strings.IndexByte(host, ':'); idx != -1 {
+		host = host[:idx]
+	}
+	hostname := strings.ToLower(host)
 	if idx := strings.IndexByte(hostname, 0); idx != -1 {
 		hostname = hostname[:idx]
 		p.logger.Debug("Null byte(s) detected, trimmed suffix null termination: %s", hostname)
