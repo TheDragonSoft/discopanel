@@ -674,19 +674,33 @@ func (s *Store) FindAvailableListenerPort(ctx context.Context) (int, error) {
 		}
 	}
 
+	// Fetch module ports upfront to avoid O(N) DB queries in the loop.
+	// Only fetching the ports column avoids memory bloat from loading full module configurations.
+	var modulePorts []struct {
+		Ports []*v1.ModulePort `gorm:"column:ports;serializer:json"`
+	}
+	if err := s.db.WithContext(ctx).Model(&Module{}).Find(&modulePorts).Error; err != nil {
+		return 0, fmt.Errorf("failed to fetch module ports: %w", err)
+	}
+
+	for _, mp := range modulePorts {
+		for _, p := range mp.Ports {
+			// Only consider non-proxied TCP ports as conflicts for direct host binding
+			if p != nil && p.HostPort > 0 && !p.ProxyEnabled {
+				protocol := p.Protocol
+				if protocol == "" {
+					protocol = "tcp"
+				}
+				if protocol == "tcp" {
+					usedPorts[int(p.HostPort)] = true
+				}
+			}
+		}
+	}
+
 	// Find first available port
 	for port := startPort; port <= maxPort; port++ {
 		if usedPorts[port] {
-			continue
-		}
-
-		// Check if any non-proxied module is using this port
-		// proxyEnabled=false means we're checking for direct host binding
-		conflict, err := s.CheckPortAvailability(ctx, port, "tcp", false, "", "")
-		if err != nil {
-			return 0, fmt.Errorf("failed to check port availability: %w", err)
-		}
-		if conflict != nil {
 			continue
 		}
 
