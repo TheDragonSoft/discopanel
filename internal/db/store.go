@@ -1321,16 +1321,28 @@ func (s *Store) DeleteModule(ctx context.Context, id string) error {
 // GetModuleByHostPort finds a module that uses the specified host port
 func (s *Store) GetModuleByHostPort(ctx context.Context, port int) (*Module, error) {
 	var modules []*Module
-	if err := s.db.WithContext(ctx).Find(&modules).Error; err != nil {
+	// PERFORMANCE OPTIMIZATION: Only fetch the columns we need to check port matching.
+	// This avoids loading massive JSON blobs for every module when searching.
+	if err := s.db.WithContext(ctx).Select("id", "ports").Find(&modules).Error; err != nil {
 		return nil, err
 	}
 
+	var matchID string
 	for _, module := range modules {
 		for _, p := range module.Ports {
 			if p != nil && int(p.HostPort) == port {
-				return module, nil
+				matchID = module.ID
+				break
 			}
 		}
+		if matchID != "" {
+			break
+		}
+	}
+
+	if matchID != "" {
+		// Refetch the full module now that we found it
+		return s.GetModule(ctx, matchID)
 	}
 
 	return nil, nil
@@ -1353,7 +1365,9 @@ type PortConflict struct {
 // excludeModuleID allows excluding the current module when updating.
 func (s *Store) CheckPortAvailability(ctx context.Context, hostPort int, protocol string, proxyEnabled bool, hostname string, excludeModuleID string) (*PortConflict, error) {
 	var modules []*Module
-	if err := s.db.WithContext(ctx).Find(&modules).Error; err != nil {
+	// PERFORMANCE OPTIMIZATION: Only fetch the columns we need to check port availability.
+	// This avoids loading massive JSON blobs (Config, EnvOverrides, etc.) for every module.
+	if err := s.db.WithContext(ctx).Select("id", "name", "ports").Find(&modules).Error; err != nil {
 		return nil, err
 	}
 
