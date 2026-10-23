@@ -231,43 +231,57 @@ func isWordByte(b byte) bool {
 }
 
 // Computes the edit distance between a and b - rune aware
+// ⚡ Bolt: optimized to use a single 1D array slice for DP state instead of 2 allocations.
+// Inlined min3 and utilizes a 64-element stack array for typical lengths to completely
+// eliminate heap allocations on small strings, improving speed and reducing GC pressure.
 func levenshtein(a, b string) int {
 	ra, rb := []rune(a), []rune(b)
-	if len(ra) == 0 {
-		return len(rb)
+	n := len(ra)
+	m := len(rb)
+	if n == 0 {
+		return m
 	}
-	if len(rb) == 0 {
-		return len(ra)
+	if m == 0 {
+		return n
 	}
 
-	prev := make([]int, len(rb)+1)
-	curr := make([]int, len(rb)+1)
-	for j := range prev {
-		prev[j] = j
+	if n < m {
+		ra, rb = rb, ra
+		n, m = m, n
 	}
-	for i := 1; i <= len(ra); i++ {
-		curr[0] = i
-		for j := 1; j <= len(rb); j++ {
+
+	var v0 [64]int
+	var row []int
+	if m+1 <= 64 {
+		row = v0[:m+1]
+	} else {
+		row = make([]int, m+1)
+	}
+
+	for i := 0; i <= m; i++ {
+		row[i] = i
+	}
+
+	for i := 0; i < n; i++ {
+		prevDiagonal := row[0]
+		row[0] = i + 1
+		for j := 0; j < m; j++ {
 			cost := 1
-			if ra[i-1] == rb[j-1] {
+			if ra[i] == rb[j] {
 				cost = 0
 			}
-			curr[j] = min3(prev[j]+1, curr[j-1]+1, prev[j-1]+cost)
+			val := row[j+1] + 1 // deletion
+			if row[j]+1 < val { // insertion
+				val = row[j] + 1
+			}
+			if prevDiagonal+cost < val { // substitution
+				val = prevDiagonal + cost
+			}
+			prevDiagonal = row[j+1]
+			row[j+1] = val
 		}
-		prev, curr = curr, prev
 	}
-	return prev[len(rb)]
-}
-
-func min3(a, b, c int) int {
-	m := a
-	if b < m {
-		m = b
-	}
-	if c < m {
-		m = c
-	}
-	return m
+	return row[m]
 }
 
 func clamp(v, lo, hi float64) float64 {
