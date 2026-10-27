@@ -885,7 +885,8 @@ func (s *Store) CreateSession(ctx context.Context, session *Session) error {
 
 func (s *Store) GetSession(ctx context.Context, token string) (*Session, error) {
 	var session Session
-	err := s.db.WithContext(ctx).Preload("User").Where("token = ? AND expires_at > ?", token, time.Now()).First(&session).Error
+	// Note: User is not preloaded here to save a DB query, as it is fetched later in auth/manager.go
+	err := s.db.WithContext(ctx).Where("token = ? AND expires_at > ?", token, time.Now()).First(&session).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return nil, fmt.Errorf("session not found or expired")
