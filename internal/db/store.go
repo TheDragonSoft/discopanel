@@ -1321,14 +1321,16 @@ func (s *Store) DeleteModule(ctx context.Context, id string) error {
 // GetModuleByHostPort finds a module that uses the specified host port
 func (s *Store) GetModuleByHostPort(ctx context.Context, port int) (*Module, error) {
 	var modules []*Module
-	if err := s.db.WithContext(ctx).Find(&modules).Error; err != nil {
+	// Optimize memory allocation by only fetching the ID and Ports JSON column.
+	if err := s.db.WithContext(ctx).Select("id", "ports").Find(&modules).Error; err != nil {
 		return nil, err
 	}
 
 	for _, module := range modules {
 		for _, p := range module.Ports {
 			if p != nil && int(p.HostPort) == port {
-				return module, nil
+				// Fetch the full module since we have a match
+				return s.GetModule(ctx, module.ID)
 			}
 		}
 	}
@@ -1353,7 +1355,8 @@ type PortConflict struct {
 // excludeModuleID allows excluding the current module when updating.
 func (s *Store) CheckPortAvailability(ctx context.Context, hostPort int, protocol string, proxyEnabled bool, hostname string, excludeModuleID string) (*PortConflict, error) {
 	var modules []*Module
-	if err := s.db.WithContext(ctx).Find(&modules).Error; err != nil {
+	// Optimize memory allocation by only fetching the ID and Ports JSON column.
+	if err := s.db.WithContext(ctx).Select("id", "ports").Find(&modules).Error; err != nil {
 		return nil, err
 	}
 
@@ -1379,8 +1382,12 @@ func (s *Store) CheckPortAvailability(ctx context.Context, hostPort int, protoco
 
 			// Non-proxied ports bind directly to host
 			if !proxyEnabled || !p.ProxyEnabled {
+				fullModule, err := s.GetModule(ctx, module.ID)
+				if err != nil {
+					return nil, err
+				}
 				return &PortConflict{
-					Module:   module,
+					Module:   fullModule,
 					Port:     hostPort,
 					Protocol: protocol,
 					Reason:   "port is bound directly to host by another module",
@@ -1389,8 +1396,12 @@ func (s *Store) CheckPortAvailability(ctx context.Context, hostPort int, protoco
 
 			// Proxied UDP: exclusive (no hostname routing)
 			if protocol == "udp" {
+				fullModule, err := s.GetModule(ctx, module.ID)
+				if err != nil {
+					return nil, err
+				}
 				return &PortConflict{
-					Module:   module,
+					Module:   fullModule,
 					Port:     hostPort,
 					Protocol: protocol,
 					Reason:   "UDP proxy port already in use",
