@@ -674,23 +674,32 @@ func (s *Store) FindAvailableListenerPort(ctx context.Context) (int, error) {
 		}
 	}
 
+	// Pre-fetch all module ports to avoid N+1 queries in the loop
+	var modules []*Module
+	if err := s.db.WithContext(ctx).Select("id", "ports").Find(&modules).Error; err != nil {
+		return 0, fmt.Errorf("failed to get modules: %w", err)
+	}
+	for _, module := range modules {
+		for _, p := range module.Ports {
+			if p == nil {
+				continue
+			}
+			protocol := p.Protocol
+			if protocol == "" {
+				protocol = "tcp"
+			}
+			// Only consider tcp ports that are bound to host
+			if protocol == "tcp" && !p.ProxyEnabled {
+				usedPorts[int(p.HostPort)] = true
+			}
+		}
+	}
+
 	// Find first available port
 	for port := startPort; port <= maxPort; port++ {
-		if usedPorts[port] {
-			continue
+		if !usedPorts[port] {
+			return port, nil
 		}
-
-		// Check if any non-proxied module is using this port
-		// proxyEnabled=false means we're checking for direct host binding
-		conflict, err := s.CheckPortAvailability(ctx, port, "tcp", false, "", "")
-		if err != nil {
-			return 0, fmt.Errorf("failed to check port availability: %w", err)
-		}
-		if conflict != nil {
-			continue
-		}
-
-		return port, nil
 	}
 
 	return 0, fmt.Errorf("no available ports found starting from %d", startPort)
@@ -1321,14 +1330,14 @@ func (s *Store) DeleteModule(ctx context.Context, id string) error {
 // GetModuleByHostPort finds a module that uses the specified host port
 func (s *Store) GetModuleByHostPort(ctx context.Context, port int) (*Module, error) {
 	var modules []*Module
-	if err := s.db.WithContext(ctx).Find(&modules).Error; err != nil {
+	if err := s.db.WithContext(ctx).Select("id", "ports").Find(&modules).Error; err != nil {
 		return nil, err
 	}
 
 	for _, module := range modules {
 		for _, p := range module.Ports {
 			if p != nil && int(p.HostPort) == port {
-				return module, nil
+				return s.GetModule(ctx, module.ID)
 			}
 		}
 	}
@@ -1353,7 +1362,7 @@ type PortConflict struct {
 // excludeModuleID allows excluding the current module when updating.
 func (s *Store) CheckPortAvailability(ctx context.Context, hostPort int, protocol string, proxyEnabled bool, hostname string, excludeModuleID string) (*PortConflict, error) {
 	var modules []*Module
-	if err := s.db.WithContext(ctx).Find(&modules).Error; err != nil {
+	if err := s.db.WithContext(ctx).Select("id", "name", "ports").Find(&modules).Error; err != nil {
 		return nil, err
 	}
 
